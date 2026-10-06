@@ -54,6 +54,7 @@ ahí y ve solo la carga de su cierre.
 | `/admin/proveedores` | Listado y ficha | 2. Proveedores |
 | `/admin/reportes` | Ventas, gastos y caja, con filtros por fecha y comparación entre meses | 14. Reportes |
 | `/admin/usuarios` | Roles, desactivar, resetear contraseña | 1. Usuarios |
+| `/admin/cuenta` | Datos propios y cambio de contraseña | 1. Usuarios |
 | `/admin/auditoria` | Quién creó, modificó o anuló cada dato, con valor anterior y nuevo | 17. Auditoría |
 | `/admin/guia-de-estilos` | Guía de estilos, interna | — |
 
