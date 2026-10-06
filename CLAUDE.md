@@ -18,8 +18,15 @@ auditoría. El mapa de rutas, los recortes de cada módulo y el orden están en
 - Cada módulo se construye completo (base, servidor y pantalla) antes de pasar al siguiente.
 - Qué es el producto, para quién y qué deja afuera está en `docs/producto.md`. Toda
   definición de módulo parte de ahí.
+- Qué hace cada módulo está en `docs/modulos/`, un archivo por módulo: pantallas, reglas,
+  casos de borde y decisiones tomadas con Santiago. El diseño de un módulo parte de su
+  archivo y no vuelve a preguntar lo que ahí está decidido. La parte técnica se le agrega al
+  construirlo. Donde ese archivo y `PROPUESTA.md` digan cosas distintas, vale el archivo.
 - Menú y Ventas usan un catálogo mínimo de productos: nombre, variantes y precio, sin
   composición ni costo.
+- Las ventas de Fudo entran solas por su API; no se construye la subida de Excel. Donde una
+  skill habla de "importar el Excel" o de "subir dos veces el mismo período", vale para la
+  sincronización: traer dos veces la misma venta no la duplica.
 - La compra de mercadería se carga como un gasto, con su proveedor. La regla de
   `PROPUESTA.md` de que las compras no son gastos vale desde que exista el módulo Compras.
 - Lo de la segunda fase (materia prima, composición y costos, compras, producción, stock,
@@ -184,7 +191,8 @@ El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
 
 - El login es Supabase Auth; no se suma otro proveedor de autenticación.
 - Las versiones se fijan en `package.json` al armar el proyecto.
-- El lector de Excel se elige con un archivo real de Fudo.
+- Las ventas de Fudo se leen de su API (`https://api.fu.do/v1alpha1/openapi.yml`), con un
+  proceso automático. Las credenciales salen de variables de entorno del servidor.
 - `.env.local` apunta a la base de pruebas. Los valores de la real se cargan solo en Vercel.
 
 ### Comandos

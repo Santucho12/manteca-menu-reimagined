@@ -47,13 +47,14 @@ ahí y ve solo la carga de su cierre.
 | `/` | Menú público, leído de la base, sin sesión | 9. Menú digital |
 | `/admin/ingresar`, `/admin/registro` | Login y alta de cuenta | 1. Usuarios |
 | `/admin` | Inicio: KPIs del mes, comparativo mes a mes, más vendidos y los tres avisos. El invitado sin rol ve la pantalla de espera | 13. Dashboard |
-| `/admin/ventas` | Importaciones de Fudo (subir, duplicados, anular), vinculación de productos, ventas manuales | 10. Ventas |
+| `/admin/ventas` | Ventas que entran por la API de Fudo, vinculación de productos, ventas manuales | 10. Ventas |
 | `/admin/caja` | Cargar cierre; control de cierres (esperado contra declarado, revisado con comentario) | 11. Cierres de caja |
 | `/admin/gastos` | Gastos, recurrentes y categorías | 12. Gastos |
 | `/admin/menu` | Categorías, productos, variantes, visibilidad, precios y actualización masiva | 9. Menú digital y catálogo mínimo |
 | `/admin/proveedores` | Listado y ficha | 2. Proveedores |
 | `/admin/reportes` | Ventas, gastos y caja, con filtros por fecha y comparación entre meses | 14. Reportes |
 | `/admin/usuarios` | Roles, desactivar, resetear contraseña | 1. Usuarios |
+| `/admin/cuenta` | Datos propios y cambio de contraseña | 1. Usuarios |
 | `/admin/auditoria` | Quién creó, modificó o anuló cada dato, con valor anterior y nuevo | 17. Auditoría |
 | `/admin/guia-de-estilos` | Guía de estilos, interna | — |
 
@@ -89,7 +90,7 @@ Por dependencia y por riesgo.
    independiente, se ve y no depende de Fudo.
 4. Proveedores. Es un ABM simple, y Gastos lo necesita.
 5. Gastos.
-6. Ventas: entrada de las ventas de Fudo, vinculación y ventas manuales.
+6. Ventas: sincronización con la API de Fudo, vinculación y ventas manuales.
 7. Cierres de caja. Necesita Ventas y Gastos.
 8. Reportes.
 9. Inicio (dashboard).
@@ -130,7 +131,8 @@ Cada una frena un módulo y se resuelve antes de diseñarlo.
 
 | Decisión | Frena |
 |---|---|
-| Si las ventas entran por la API de Fudo o por el Excel, y qué detalle traen | 6. Ventas, 7. Cierres de caja y el modelo de variantes del paso 3 |
+| Las credenciales de la API de Fudo, cuando el cliente pase al plan Pro | 6. Ventas |
+| Cuántos turnos hay por día | 7. Cierres de caja |
 
 ## Restricciones globales
 
