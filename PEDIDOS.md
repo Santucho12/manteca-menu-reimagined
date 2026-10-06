@@ -81,12 +81,23 @@ no corrieron contra una base real.
 ### 18. Enumerar las skills y el `CLAUDE.md`
 Listar todas las skills y lo que contiene `CLAUDE.md`.
 
+### 19. Armado del sistema
+Diseñar y armar la base del sistema para poder empezar a desarrollar los módulos. Arranca
+con el diseño (brainstorming, spec y plan) mientras Santiago crea los dos proyectos de
+Supabase.
+
+### 20. Acceso por MCP a Supabase, Vercel, GitHub y Playwright
+Dejar conectados por MCP los dos proyectos de Supabase, Vercel, GitHub y Playwright antes
+de seguir con el armado.
+
 ## Pendientes
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 19 | Armado del sistema | En diseño (brainstorming), en la rama `feat/base-tecnica`. Primera decisión pendiente: si se parte en dos (base técnica y guía de estilos por un lado; cuentas y acceso con Supabase por otro) |
+| 20 | Acceso por MCP a Supabase, Vercel, GitHub y Playwright | `.mcp.json` ya tiene `playwright`, `supabase-pruebas` y `supabase-real`. Falta que Santiago reinicie Claude Code, apruebe los tres servidores e inicie sesión en los dos de Supabase eligiendo la organización `manteca`. GitHub ya funciona por `gh`. Vercel no hace falta hasta publicar |
 | 14 | Descargar y configurar Playwright, en vivo | Descargado y probado en vivo (abrió el menú de Manteca y tocó un producto). Creado `.mcp.json` con el servidor de Playwright. La configuración quedó definida en `CLAUDE.md` (navegador a la vista, 300 ms entre acciones, un navegador a la vez). Falta instalar `@playwright/test` dentro del proyecto, al armarlo |
-| 2 | Base de datos | Santiago crea las dos bases (pruebas y real) desde el panel de Supabase y pasa los dos identificadores de proyecto. Con eso se fija cada una en su servidor de `.mcp.json` (`supabase-pruebas` y `supabase-real`) y se arma `.env.local` con la de pruebas |
+| 2 | Base de datos | Los dos proyectos ya existen en la organización `manteca` de Supabase (plan gratuito) y están fijados en `.mcp.json`. Falta `.env.local` con los datos de pruebas, que se arma junto con el proyecto, cuando exista el `.gitignore`. Las tablas llegan con cada módulo |
 | 6 | Tests reales contra la base de pruebas | La regla está escrita en `CLAUDE.md` y en `pre-finish`. Falta que exista la base de pruebas y la primera suite corriendo contra ella |
 | 7 | Guía de estilos dentro de la aplicación | La regla está escrita en `CLAUDE.md` y en `pre-finish`. Falta construir la página, que se hace junto con el inicio de la aplicación |
 
