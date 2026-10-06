@@ -1,1 +1,135 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+/* No hay modo oscuro: las clases dark: de shadcn solo aplicarian dentro de .dark. */
+@custom-variant dark (&:is(.dark *));
+
+@font-face {
+  font-family: 'Neufile Grotesk';
+  src: url('/fonts/NeufileGrotesk-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neufile Grotesk';
+  src: url('/fonts/NeufileGrotesk-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neufile Grotesk';
+  src: url('/fonts/NeufileGrotesk-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neufile Grotesk';
+  src: url('/fonts/NeufileGrotesk-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neufile Grotesk';
+  src: url('/fonts/NeufileGrotesk-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manic';
+  src: url('/fonts/MANIC.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme inline {
+  --radius-sm: var(--radio-chico);
+  --radius-md: var(--radio-medio);
+  --radius-lg: var(--radio-grande);
+  --radius-xl: var(--radio-extra);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-title: var(--font-family-title);
+  --font-sans: var(--font-family-sans);
+
+  --shadow-suave: var(--sombra-suave);
+  --shadow-media: var(--sombra-media);
+  --shadow-alta: var(--sombra-alta);
+}
+
+:root {
+  --radius: 0.75rem;
+  --font-family-title: 'Manic', sans-serif;
+  --font-family-sans: 'Neufile Grotesk', sans-serif;
+
+  --background: oklch(0.955 0.015 85);
+  --foreground: oklch(0.22 0.035 45);
+  --card: oklch(0.985 0.008 85);
+  --card-foreground: oklch(0.22 0.035 45);
+  --popover: oklch(0.98 0.01 85);
+  --popover-foreground: oklch(0.22 0.035 45);
+  --primary: oklch(0.32 0.065 45);
+  --primary-foreground: oklch(0.97 0.008 75);
+  --secondary: oklch(0.935 0.018 85);
+  --secondary-foreground: oklch(0.32 0.065 45);
+  --muted: oklch(0.92 0.015 85);
+  --muted-foreground: oklch(0.5 0.03 55);
+  --accent: #bfa042;
+  --accent-foreground: white;
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(0.88 0.02 85);
+  --input: oklch(0.88 0.02 85);
+  --ring: #bfa042;
+
+  /* Radios y sombras se definen aca y no solo en @theme: Tailwind emite
+     unicamente las variables de tema que alguna clase usa, y la guia las
+     muestra todas. */
+  --radio-chico: calc(var(--radius) - 4px);
+  --radio-medio: calc(var(--radius) - 2px);
+  --radio-grande: var(--radius);
+  --radio-extra: calc(var(--radius) + 4px);
+
+  --sombra-suave: 0 1px 2px oklch(0.4 0.05 60 / 8%);
+  --sombra-media: 0 8px 30px -12px oklch(0.4 0.05 60 / 15%);
+  --sombra-alta: 0 16px 40px -16px oklch(0.4 0.05 60 / 25%);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-family-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
