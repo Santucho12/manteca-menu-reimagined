@@ -86,9 +86,23 @@ menos gastos. No se usa la palabra "margen" en esta fase.
   función del menú que más se va a usar.
 - El menú se entrega primero: es independiente, se ve y no depende de Fudo.
 
+### Las ventas entran solas, por la API de Fudo
+
+El cliente tenía el plan Avanzado de Fudo, que no trae API. El 2026-10-06 confirmó que pasa
+al plan Pro para tenerla. Las ventas entran solas, sin que nadie suba un archivo.
+
+Según la especificación de Fudo (`https://api.fu.do/v1alpha1/openapi.yml`, vista el
+2026-10-06), cada venta trae fecha y hora de creación y de cierre, total, estado (cerrada,
+cancelada o en curso), sus ítems con producto, cantidad y precio, y sus pagos con medio de
+pago y monto. Se puede filtrar por fecha, se pagina de a 500 como máximo y tiene límite de
+pedidos. Falta probarla contra la cuenta real.
+
+El Excel "Reporte de ventas" de Fudo no sirve como fuente: trae totales por día, sin
+productos ni tickets. No se construye la subida de Excel.
+
 ## Sin decidir
 
 | Qué | De qué depende | Qué cambia |
 |---|---|---|
-| Si las ventas entran por la API de Fudo o subiendo el Excel | Del plan de Fudo que tenga el cliente. Santiago lo pregunta | Con la API las ventas entran solas. Con el Excel hay un paso manual todos los días, y hay que definir quién lo hace |
-| Qué detalle traen las ventas (por ticket, por turno, por medio de pago) | De un archivo real o de la respuesta de la API | Si lo esperado de un cierre se puede calcular por medio de pago |
+| Cuántos turnos hay por día | Del cliente. Se asume uno | Si hay un cierre por día o uno por turno |
+| Qué son las ventas sin medio de pago | En el Excel de un mes, la suma por medio de pago da menos que el total vendido. Se ve con la API | Cómo se calcula lo esperado de la caja |
