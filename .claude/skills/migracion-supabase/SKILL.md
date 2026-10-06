@@ -103,8 +103,9 @@ policies**, no en el código de la aplicación.
 
 1. **RLS activada siempre**, y con la sección de permisos de arriba.
 2. Las policies piensan en invitado, caja, encargado, admin y, para el menú, anónimo.
-3. **Hasta que Santiago defina Caja y Encargado**, las policies dan acceso solo a Admin, y
-   al público solo el menú visible (`CLAUDE.md`).
+3. Las policies dan acceso solo a Admin, y al público solo el menú visible. La única
+   excepción es Caja en los cierres: inserta el de su turno y lee los suyos. Encargado no
+   accede a nada en la primera fase (`CLAUDE.md`).
 4. Un invitado y un usuario desactivado no leen ni escriben nada. Cada fila es accesible
    solo para usuarios de su local. Las notas personales, solo para admins.
 

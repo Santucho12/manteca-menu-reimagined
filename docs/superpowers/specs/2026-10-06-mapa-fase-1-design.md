@@ -21,15 +21,16 @@ gestión de costos, producción, stock, centro de avisos, notas e IA.
 
 ### Recortes que impone ese alcance
 
-Varios módulos de la primera fase se apoyan en módulos de la segunda. Cada recorte se
-confirma con Santiago al diseñar el módulo que afecta.
+Varios módulos de la primera fase se apoyan en módulos de la segunda. Los recortes salen de
+`docs/producto.md`, que delimita el producto.
 
 | Módulo | Qué depende de la segunda fase | Cómo queda en la primera |
 |---|---|---|
 | Menú digital y Ventas | Se vinculan a "productos del sistema" | Catálogo mínimo de productos: nombre, variantes y precio, sin composición ni costo |
-| Proveedores | Materias primas con precio, orden por WhatsApp, cuenta corriente | Contacto y observaciones |
+| Proveedores | Materias primas con precio, orden por WhatsApp, cuenta corriente | Contacto, observaciones y los gastos que se le pagaron |
+| Gastos | Las compras de materia prima van al módulo Compras | La compra de mercadería se carga como gasto, en su categoría y con su proveedor |
 | Dashboard | Margen, más rentables, mermas, valor del stock, stock bajo, margen bajo | Ventas, gastos, resultado (ventas menos gastos), ticket promedio, más vendidos y cajas con diferencia |
-| Cierres de caja | Compras pagadas con la caja, aviso de diferencia | La compra entra como un egreso más; la diferencia se ve en Inicio y en el control de cierres |
+| Cierres de caja | Compras pagadas con la caja, aviso de diferencia | La compra pagada con la caja es un gasto más; la diferencia se ve en Inicio y en el control de cierres |
 | Ventas | Descuento de stock | La venta suma a reportes y a la caja esperada |
 
 El centro de avisos es de la segunda fase. Los tres avisos que la primera necesita se
@@ -38,8 +39,8 @@ muestran en Inicio: cajas con diferencia, invitados sin rol y productos de Fudo 
 ## Mapa de rutas
 
 Todo vive en un solo dominio, `mantecabakeryar.com`. El menú público está en la raíz y el
-sistema bajo `/admin`. "Admin" es el nombre de la ruta, no del rol: cuando se defina el
-alcance de Caja y Encargado, también entran por ahí.
+sistema bajo `/admin`. "Admin" es el nombre de la ruta, no del rol: Caja también entra por
+ahí y ve solo la carga de su cierre.
 
 | Ruta | Contenido | Módulo de la propuesta |
 |---|---|---|
@@ -84,19 +85,20 @@ Por dependencia y por riesgo.
 
 1. Base técnica y guía de estilos.
 2. Usuarios y permisos, con el mecanismo de auditoría y la navegación de `/admin`.
-3. Proveedores. Es un ABM simple y fija el patrón: RLS, anulación, auditoría y formulario.
-4. Catálogo mínimo de productos y menú digital, con la página pública.
-5. Ventas: importación de Fudo, vinculación y ventas manuales.
-6. Gastos.
+3. Catálogo mínimo de productos y menú digital, con la página pública. Va primero porque es
+   independiente, se ve y no depende de Fudo.
+4. Proveedores. Es un ABM simple, y Gastos lo necesita.
+5. Gastos.
+6. Ventas: entrada de las ventas de Fudo, vinculación y ventas manuales.
 7. Cierres de caja. Necesita Ventas y Gastos.
 8. Reportes.
-9. Dashboard.
+9. Inicio (dashboard).
 10. Pantalla de auditoría. El mecanismo existe desde el paso 2.
 
 ## Menú público
 
 La página actual está en otro repo (`manteca-menu-reimagined`, TanStack Start) y tiene el
-menú escrito en el código. Se porta a este proyecto en el paso 4; no se copia tal cual.
+menú escrito en el código. Se porta a este proyecto en el paso 3; no se copia tal cual.
 
 - Los colores, tipografías y radios de su `styles.css` son la base de la guía de estilos, en
   el paso 1.
@@ -106,7 +108,7 @@ menú escrito en el código. Se porta a este proyecto en el paso 4; no se copia 
 - Los 35 productos y las 6 categorías de hoy se cargan como dato inicial.
 - No hay etapa intermedia con la página estática: va directo a leer de la base.
 
-El menú de hoy no es uniforme, y el modelo de datos del paso 4 tiene que cubrir estos casos:
+El menú de hoy no es uniforme, y el modelo de datos del paso 3 tiene que cubrir estos casos:
 
 - Facturas: el precio es de la categoría (docena, media docena, unidad) y los productos no
   tienen precio propio.
@@ -128,9 +130,7 @@ Cada una frena un módulo y se resuelve antes de diseñarlo.
 
 | Decisión | Frena |
 |---|---|
-| Alcance del rol Caja para cargar cierres | 7. Cierres de caja |
-| Archivo real de Fudo, y si se usa el Excel o la API | 5. Ventas, y el modelo de variantes del paso 4 |
-| Confirmar los recortes de Proveedores y de Dashboard | 3 y 9 |
+| Si las ventas entran por la API de Fudo o por el Excel, y qué detalle traen | 6. Ventas, 7. Cierres de caja y el modelo de variantes del paso 3 |
 
 ## Restricciones globales
 
@@ -149,8 +149,9 @@ Reglas de `CLAUDE.md` que valen para todo spec y plan que salga de este mapa.
   voseo.
 - **Plata en centavos enteros:** `bigint` en la base, `number` entero en TypeScript, nombres
   terminados en `_centavos` o `Centavos`.
-- **Permisos:** todo lo que no sea el menú público queda solo para Admin hasta que Santiago
-  defina Caja y Encargado, y los tests comprueban el rechazo a invitado, caja y encargado.
+- **Permisos:** Caja carga el cierre de su turno y ve los suyos; Encargado no accede a nada
+  en esta fase. Todo lo demás que no sea el menú público es solo para Admin, y los tests
+  comprueban el rechazo a invitado, caja y encargado fuera de lo que les corresponde.
 - **Datos:** sesión del usuario y RLS; nada se borra, se anula con motivo; toda escritura
   deja auditoría; fechas en UTC y "el día" es el de Argentina; toda tabla operativa lleva su
   local.
