@@ -7,6 +7,22 @@ está en `PROPUESTA.md`.
 `PROPUESTA.md` es un documento **para el cliente**. El sistema se construye preparado para
 varios locales, pero eso no se menciona en ningún texto que le llegue al cliente.
 
+## Alcance actual: primera fase
+
+Se construye solo la primera fase de `PROPUESTA.md`: usuarios y permisos, proveedores, menú
+digital, ventas importadas de Fudo, cierres de caja, gastos, dashboard, reportes y
+auditoría. El mapa de rutas, los recortes de cada módulo y el orden están en
+`docs/superpowers/specs/2026-10-06-mapa-fase-1-design.md`.
+
+- Todo vive en un dominio: el menú público en `/` y el sistema bajo `/admin`.
+- Cada módulo se construye completo (base, servidor y pantalla) antes de pasar al siguiente.
+- Menú y Ventas usan un catálogo mínimo de productos: nombre, variantes y precio, sin
+  composición ni costo.
+- Lo de la segunda fase (materia prima, composición y costos, compras, producción, stock,
+  centro de avisos, notas, IA) no se construye por adelantado. Las reglas de este archivo y
+  de las skills que hablan de esos módulos aplican cuando el módulo exista: hasta entonces,
+  una venta o una anulación no tocan stock.
+
 ## Quién decide
 
 Las autorizaciones las da **solo Santiago**: dónde se crean las bases (cuenta, organización,
@@ -26,7 +42,8 @@ decide Santiago.
 **Siempre con superpowers.** Toda tarea arranca con `superpowers:using-superpowers`; sus
 skills marcan el proceso y estas reglas se aplican dentro de él.
 
-1. **Anotar el pedido** en `PEDIDOS.md`, con título y resumen breve, antes de empezar.
+1. **Anotar el pedido** en `PEDIDOS.md`, con título y resumen breve, antes de empezar, si
+   cambia la aplicación (ver "Registro de pedidos").
 2. **Diseñar** con `superpowers:brainstorming`: un cambio acotado se diseña en el chat; uno
    grande lleva spec y plan (`superpowers:writing-plans`). Nada se implementa sin el OK.
 3. **Implementar con TDD** (`superpowers:test-driven-development`): primero el test, verlo
@@ -195,8 +212,12 @@ también abre la ventana a la vista.
 
 ## Registro de pedidos (`PEDIDOS.md`)
 
-- Cada pedido nuevo se anota en el momento, con título y resumen breve, en la lista general
-  y en "Pendientes".
+- Se anota solo lo que cambia la aplicación: una funcionalidad, un endpoint, una corrección,
+  un cambio estético, un cambio en la base o en la configuración del proyecto.
+- No se anotan los análisis, las definiciones, las consultas ni las conversaciones sobre cómo
+  trabajar, aunque terminen en un documento.
+- Cada pedido que corresponde se anota en el momento, con título y resumen breve, en la lista
+  general y en "Pendientes".
 - Pasa a "Completados" solo cuando se cumplió "Cuándo algo está hecho", con la fecha y cómo
   se verificó.
 

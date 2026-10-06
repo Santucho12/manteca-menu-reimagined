@@ -1,6 +1,6 @@
 # Pedidos
 
-Registro de todo lo que se pidió para el Sistema Manteca. Las reglas de cómo se mantiene
+Registro de los pedidos que cambian la aplicación del Sistema Manteca. Las reglas de cómo se mantiene
 este archivo están en `CLAUDE.md`.
 
 Un pedido pasa a **Completados** solo cuando se hizo, corrieron todos los tests y se probó
@@ -94,8 +94,7 @@ de seguir con el armado.
 
 | # | Pedido | Qué falta |
 |---|---|---|
-| 19 | Armado del sistema | En diseño (brainstorming), en la rama `feat/base-tecnica`. Primera decisión pendiente: si se parte en dos (base técnica y guía de estilos por un lado; cuentas y acceso con Supabase por otro) |
-| 20 | Acceso por MCP a Supabase, Vercel, GitHub y Playwright | `.mcp.json` ya tiene `playwright`, `supabase-pruebas` y `supabase-real`. Falta que Santiago reinicie Claude Code, apruebe los tres servidores e inicie sesión en los dos de Supabase eligiendo la organización `manteca`. GitHub ya funciona por `gh`. Vercel no hace falta hasta publicar |
+| 19 | Armado del sistema | En diseño (brainstorming), en la rama `feat/base-tecnica`. Se partió en dos: este pedido es la base técnica y la guía de estilos; cuentas y acceso van en el módulo de usuarios |
 | 14 | Descargar y configurar Playwright, en vivo | Descargado y probado en vivo (abrió el menú de Manteca y tocó un producto). Creado `.mcp.json` con el servidor de Playwright. La configuración quedó definida en `CLAUDE.md` (navegador a la vista, 300 ms entre acciones, un navegador a la vez). Falta instalar `@playwright/test` dentro del proyecto, al armarlo |
 | 2 | Base de datos | Los dos proyectos ya existen en la organización `manteca` de Supabase (plan gratuito) y están fijados en `.mcp.json`. Falta `.env.local` con los datos de pruebas, que se arma junto con el proyecto, cuando exista el `.gitignore`. Las tablas llegan con cada módulo |
 | 6 | Tests reales contra la base de pruebas | La regla está escrita en `CLAUDE.md` y en `pre-finish`. Falta que exista la base de pruebas y la primera suite corriendo contra ella |
@@ -122,3 +121,4 @@ correr: se anota cómo se verificó cada uno.
 | 16 | Commitear y pushear lo de hoy | 2026-10-06 | Un commit en `main` con `CLAUDE.md`, `PEDIDOS.md`, las seis skills y `.mcp.json`, subido al repo privado. Verificado con `git status` y con el commit visible en GitHub |
 | 17 | Dos reglas nuevas en `CLAUDE.md` y nota en `tests-rls` | 2026-10-06 | Las dos reglas quedaron en `CLAUDE.md` ("Flujo de trabajo" y "Git") y la nota en `tests-rls`. Skills validadas y referencias cruzadas sin errores. Entra a `main` por PR |
 | 18 | Enumerar las skills y el `CLAUDE.md` | 2026-10-06 | Enumeración entregada en la conversación |
+| 20 | Acceso por MCP a Supabase, Vercel, GitHub y Playwright | 2026-10-06 | `supabase-pruebas` y `supabase-real` respondieron `list_tables` y `list_migrations` (las dos bases vacías y sin migraciones). El servidor de Playwright está aprobado en `.claude/settings.local.json`. GitHub funciona por `gh`. Vercel queda para cuando se publique |
