@@ -29,7 +29,8 @@ Definidos en `PROPUESTA.md` §1.
 |---|---|
 | **Anónimo** | Leer el menú publicado (productos y categorías visibles) |
 | **Invitado** | Nada. Es el estado de quien se acaba de registrar |
-| **Caja** y **Encargado** | Nada, hasta que Santiago defina su alcance (`CLAUDE.md`) |
+| **Caja** | Cargar el cierre de su turno y ver sus propios cierres. Nada más (`CLAUDE.md`) |
+| **Encargado** | Nada. Queda fuera de la primera fase y no se puede asignar |
 | **Admin** | Todo, incluidos usuarios, roles, precios y revisión de cierres |
 
 Un usuario **desactivado** no opera aunque conserve su rol.
@@ -37,7 +38,8 @@ Un usuario **desactivado** no opera aunque conserve su rol.
 ## Checklist
 
 1. **Sesión válida.** Sin sesión, ninguna ruta protegida responde datos.
-2. **Rol mínimo necesario.** Hoy, Admin para todo lo que no sea el menú público.
+2. **Rol mínimo necesario.** Admin para todo lo que no sea el menú público, salvo la carga
+   y la lectura del cierre propio, que también son de Caja.
 3. **Validar todo lo que llega** con Zod: tipo, formato, rango y obligatoriedad. Montos en
    centavos enteros, nunca negativos salvo que el caso lo pida.
 4. **No confiar en el navegador.** El usuario y el local salen de la sesión. Precios y costos
@@ -72,7 +74,8 @@ que recibe el servicio es el real, con la sesión de cada usuario de prueba.
 
 - Sin sesión → error de autenticación.
 - Invitado → error de permisos.
-- Caja y encargado → error de permisos, mientras no esté definido su alcance.
+- Caja y encargado → error de permisos. La única excepción es caja en los cierres: carga el
+  de su turno y ve los suyos, y recibe rechazo sobre los de otro.
 - Usuario desactivado → no opera.
 - Datos inválidos → rechazo con mensaje claro.
 - Usuario, local y totales enviados por el navegador → ignorados.

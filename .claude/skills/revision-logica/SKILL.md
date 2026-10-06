@@ -28,12 +28,16 @@ sistema, no de quien lo escribió.
 ### 0. Partir de lo ya definido
 Antes de razonar desde cero, leer lo que ya está decidido en `PROPUESTA.md`. Muchas
 reglas ya tienen su razón escrita, y varias son fáciles de violar sin darse cuenta:
-nada se borra, se anula; las compras de materia prima no son gastos; el precio del menú
-es el mismo con el que se calcula la ganancia; el invitado no ve nada; el sistema no
-reemplaza a Fudo. Si la implementación contradice el documento, eso ya es un hallazgo.
+nada se borra, se anula; el precio del menú es el mismo con el que se calcula la ganancia;
+el invitado no ve nada; el sistema no reemplaza a Fudo. Si la implementación contradice el
+documento, eso ya es un hallazgo.
 
-Y al revés: hay cosas **explícitamente sin definir** (el alcance de Caja y Encargado, el
-nivel de detalle que exporta Fudo). Eso no se resuelve suponiendo.
+Leer también `docs/producto.md`: delimita la primera fase y dice dónde se aparta de la
+propuesta (la compra de mercadería se carga como gasto; Caja solo carga su cierre;
+Encargado queda afuera).
+
+Y al revés: hay cosas **explícitamente sin definir** (el nivel de detalle que exporta Fudo,
+y si las ventas entran por Excel o por la API). Eso no se resuelve suponiendo.
 
 ### 1. Entender el flujo REAL, no el ideal
 Leé el código que gobierna el comportamiento (servicios, rutas, base de datos,

@@ -37,7 +37,9 @@ Las dos direcciones: quien debe SÍ puede, y quien no debe NO puede.
 |---|---|
 | **Admin** lee y escribe lo de su local | ✅ funciona (control positivo) |
 | **Invitado** lee o escribe cualquier tabla | 🔒 vacío / 0 filas |
-| **Caja** y **Encargado**, mientras no esté definido su alcance | 🔒 vacío / 0 filas en todo |
+| **Caja** carga el cierre de su turno y lee los suyos | ✅ funciona |
+| **Caja** lee o cambia el cierre de otro, o cualquier otra tabla | 🔒 vacío / 0 filas |
+| **Encargado** lee o escribe cualquier tabla | 🔒 vacío / 0 filas |
 | **Anon** lee el menú publicado (productos y categorías visibles) | ✅ funciona |
 | **Anon** lee productos ocultos, costos, ventas o cualquier otra tabla | 🔒 vacío |
 | Usuario del **local B** lee o escribe datos del **local A** | 🔒 vacío / 0 filas |
@@ -48,8 +50,8 @@ Las dos direcciones: quien debe SÍ puede, y quien no debe NO puede.
 | Cualquier rol intenta **modificar o borrar la auditoría** | 🔒 rechazado |
 | Un no admin lee las **notas personales** | 🔒 vacío |
 
-Cuando Santiago defina Caja y Encargado, sus filas se reemplazan por lo definido, cada una
-con su control positivo. El caso del local B se prueba aunque hoy haya un solo local: el
+Si Santiago amplía el alcance de Caja o define el de Encargado, sus filas se reemplazan por
+lo definido, cada una con su control positivo. El caso del local B se prueba aunque hoy haya un solo local: el
 aislamiento es mucho más barato de garantizar desde la primera tabla.
 
 ## 🔴 Gotcha 1: negar es silencioso, y de dos formas
@@ -157,7 +159,8 @@ describe('RLS de gastos', () => {
 ## Checklist al crear o revisar la RLS de una tabla
 
 1. ¿Hay control positivo: quien debe, puede?
-2. ¿Invitado, caja y encargado reciben vacío o 0 filas, en lectura y en escritura?
+2. ¿Invitado, caja y encargado reciben vacío o 0 filas, en lectura y en escritura, fuera
+   del cierre propio de caja?
 3. ¿Anon solo llega al menú publicado?
 4. ¿Un usuario de otro local recibe vacío o 0 filas?
 5. ¿Las columnas protegidas (rol, activo, quién cargó, montos de un cierre) resisten el

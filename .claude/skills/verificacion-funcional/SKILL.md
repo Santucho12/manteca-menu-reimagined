@@ -78,6 +78,7 @@ exista el código**, para no re-derivarlo en cada corrida.
 | Usuarios y permisos | §1 | — | — |
 | Proveedores | §2 | — | — |
 | Gestión del menú digital (y el menú web público) | §9 | — | — |
+| Catálogo mínimo de productos (nombre, variantes y precio) | §4, recortado | — | — |
 | Ventas — importación de Fudo | §10 | — | — |
 | Ventas — vinculación de productos | §10 | — | — |
 | Ventas — carga a mano (fuera de Fudo) | §10 | — | — |
