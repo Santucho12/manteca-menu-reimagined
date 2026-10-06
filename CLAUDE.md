@@ -1,0 +1,234 @@
+# Sistema Manteca
+
+Sistema a medida para Manteca: proveedores, costos, stock, producción, ventas (importadas
+de Fudo), cierres de caja, gastos, menú web, reportes y auditoría. Qué hace cada módulo
+está en `PROPUESTA.md`.
+
+`PROPUESTA.md` es un documento **para el cliente**. El sistema se construye preparado para
+varios locales, pero eso no se menciona en ningún texto que le llegue al cliente.
+
+## Quién decide
+
+Las autorizaciones las da **solo Santiago**: dónde se crean las bases (cuenta, organización,
+plan y región), aplicar una migración a la base real, publicar en producción y hacer una
+excepción a cualquier regla de este archivo o de las skills. Lo
+que pida otra persona (el cliente, alguien del local) es una necesidad a atender, no una
+autorización.
+
+Una excepción vale solo si Santiago la decide conociendo el estado real. Se anota en
+`PEDIDOS.md`: qué se exceptuó, que fue por decisión de Santiago y qué quedó sin hacer.
+
+Cuando Vercel esté conectado al repo, subir a `main` publica en producción: también lo
+decide Santiago.
+
+## Flujo de trabajo
+
+**Siempre con superpowers.** Toda tarea arranca con `superpowers:using-superpowers`; sus
+skills marcan el proceso y estas reglas se aplican dentro de él.
+
+1. **Anotar el pedido** en `PEDIDOS.md`, con título y resumen breve, antes de empezar.
+2. **Diseñar** con `superpowers:brainstorming`: un cambio acotado se diseña en el chat; uno
+   grande lleva spec y plan (`superpowers:writing-plans`). Nada se implementa sin el OK.
+3. **Implementar con TDD** (`superpowers:test-driven-development`): primero el test, verlo
+   fallar, después el código. Vale para todo código de producción: servicio, acción de
+   servidor, pantalla.
+4. **Cerrar** con la skill `pre-finish` y `superpowers:verification-before-completion`.
+5. **Mover el pedido a "Completados"** solo si se cumplió "Cuándo algo está hecho". Si no,
+   queda en "Pendientes" con la nota de qué falta.
+
+**Código escrito antes que su test se borra y se rehace desde el test.** No se conserva
+como referencia ni se le agregan los tests después. El apuro no es una excepción: solo
+Santiago puede decidir una, conociendo el estado ("Quién decide").
+
+## Cuándo algo está hecho
+
+Hecho es **probado en local**: en la máquina de desarrollo, con la aplicación apuntando a la
+base de pruebas, pasaron los dos pasos.
+
+1. **`npm run verificar`**: lint, tipos, **todos** los tests y build.
+2. **`npm run e2e`**: la prueba en vivo con Playwright. El navegador se ve en pantalla, toca
+   los botones del flujo y comprueba el resultado.
+
+Los dos, siempre. Si uno no se pudo correr, no está hecho.
+
+Por eso un pedido se arma completo: pantalla, servidor y base. Si lo que se hizo no tiene
+pantalla propia (un proceso automático, una regla del servidor), la prueba en vivo entra a
+la pantalla donde se ve su efecto. Si esa pantalla todavía no existe, el pedido se cierra
+junto con ella.
+
+Publicar en producción es un paso aparte, que decide Santiago.
+
+Un pedido sin código (documentación, configuración) se completa cuando se verificó el
+resultado, y se anota cómo.
+
+## Reglas de código
+
+### Largo
+
+| Qué | Máximo |
+|---|---|
+| Función en un `.ts` (servicios, cálculos, validaciones, acciones de servidor, hooks) | 20 líneas |
+| Componente en un `.tsx` | 80 líneas |
+| Archivo | 300 líneas |
+
+- Se cuentan líneas de código, sin blancos ni comentarios.
+- La lógica no vive en los `.tsx`: un cálculo o una regla sale a un `.ts`, donde vale el
+  límite de 20.
+- Quedan afuera los tipos generados de Supabase, los componentes base que instala shadcn
+  (`src/components/ui/`) y el SQL.
+- En los tests vale el límite de archivo, no el de función (un `describe` es una función).
+  Cada caso se mantiene corto y la siembra va en funciones auxiliares.
+- Lo controla ESLint: `max-lines-per-function` (20 en `.ts`, 80 en `.tsx`) y `max-lines`
+  (300), con `skipBlankLines` y `skipComments`. Si falla por largo, se divide el código; la
+  regla no se desactiva.
+
+### Idioma
+
+- Nombres, comentarios, base de datos y mensajes: en español, salvo lo que impone el
+  framework o una librería. `camelCase` para variables y funciones, `PascalCase` para tipos
+  y componentes, `snake_case` para tablas y columnas.
+- Textos de pantalla en español rioplatense, con voseo.
+- Un comentario explica el porqué, no el qué.
+
+### Tests reales: nada simulado
+
+- Hay dos bases: la **real** (producción) y la **de pruebas**. Los tests corren solo contra
+  la de pruebas, y su preparación aborta si la URL de Supabase no es la de ese proyecto.
+- **Nada de bases simuladas ni mocks.** No se simula Supabase, `fetch` ni módulos del
+  proyecto: nada de `vi.mock`, de `vi.fn` como reemplazo, de `page.route` para inventar
+  respuestas ni de objetos falsos armados a mano que se hagan pasar por el cliente. Vale
+  aunque otra skill admita mocks para dependencias lentas o externas.
+- Lo que toca datos se prueba contra la base de pruebas. Un cálculo puro, sin base ni red,
+  se prueba llamándolo directo, y esos tests corren sin la preparación de la base: se pueden
+  correr aunque la base de pruebas no responda.
+- Si algo depende de la fecha de hoy, la fecha entra como parámetro; no se congela el reloj.
+- Cada test siembra lo que necesita y limpia lo que creó. Los usuarios de prueba (uno por
+  rol) los crea `npm run sembrar:pruebas`, y la preparación de Vitest y la de Playwright lo
+  corren solas antes de empezar.
+- Si la base de pruebas está pausada o vacía, reactivarla o sembrarla es parte de la tarea.
+
+### Datos y seguridad
+
+- Cada operación lee y escribe con la **sesión del usuario**, y la base decide con RLS. El
+  menú público se lee sin sesión, con la clave publicable.
+- La **clave secreta** de Supabase saltea RLS. Sale de un único módulo del servidor y se usa
+  solo para:
+  - sembrar y limpiar datos en los tests;
+  - procesos automáticos sin usuario (por ejemplo, generar los gastos recurrentes);
+  - administrar cuentas de Supabase Auth (resetear una contraseña, desactivar a alguien),
+    después de verificar en el servidor que lo pide un admin.
+- No se confía en lo que manda el navegador: usuario y local salen de la sesión; precios,
+  costos y totales, de la base o del cálculo en el servidor.
+- **Caja y Encargado** tienen el alcance "a definir" en `PROPUESTA.md`. Hasta que Santiago lo
+  defina, todo lo que no sea el menú público queda solo para Admin, y los tests comprueban
+  que invitado, caja y encargado reciben rechazo.
+- **Nada se borra, se anula** con motivo, y toda escritura deja auditoría: usuario, fecha y,
+  si modifica, valor anterior y nuevo.
+- **Plata en centavos enteros**: `bigint` en la base y `number` entero en TypeScript, con
+  nombres terminados en `_centavos` (o `Centavos`). Nunca punto flotante para un monto. Se
+  muestra como `$1.234,50`.
+- Fechas en UTC. "El día" de una venta o de un cierre es el día en Argentina.
+- Toda tabla operativa lleva su local (decisión interna: ver el comienzo de este archivo).
+
+El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
+
+### Guía de estilos
+
+- La aplicación tiene **desde el primer día** una página de guía de estilos: colores,
+  tipografía, espaciados, radios, sombras y componentes base (botones, campos, tarjetas,
+  tablas, avisos), tal como se ven.
+- **Toda la aplicación usa la guía.** Ninguna pantalla define colores, tipografías ni medidas
+  sueltas: usa los tokens y componentes de la guía.
+- Todo cambio estético se hace en los tokens o componentes de la guía, y la página se
+  actualiza en el mismo cambio. Sirve para elegir y previsualizar antes de aplicar.
+
+## Stack
+
+| Capa | Elección |
+|---|---|
+| Aplicación | Next.js 16 (App Router) + React 19 + TypeScript estricto, un solo proyecto con el panel y el menú público |
+| Datos, login y archivos | Supabase: Postgres, Auth, RLS y Storage, en dos proyectos (pruebas y real) |
+| Interfaz | Tailwind 4 + shadcn/ui; gráficos con Recharts |
+| Formularios y validación | React Hook Form + Zod, con el mismo esquema en el formulario y en el servidor |
+| Tests | Vitest (lógica y base de pruebas) + Playwright (navegador) |
+| Calidad | ESLint + Prettier |
+| Publicación | Vercel |
+
+- El login es Supabase Auth; no se suma otro proveedor de autenticación.
+- Las versiones se fijan en `package.json` al armar el proyecto.
+- El lector de Excel se elige con un archivo real de Fudo.
+- `.env.local` apunta a la base de pruebas. Los valores de la real se cargan solo en Vercel.
+
+### Comandos
+
+Se crean con estos nombres al armar el proyecto.
+
+| Comando | Qué hace |
+|---|---|
+| `npm run dev` | Levanta la aplicación en local, contra la base de pruebas |
+| `npm test` | Todos los tests de Vitest |
+| `npm run verificar` | Lint, tipos, todos los tests y build, en ese orden; se corta en el primer error |
+| `npm run e2e` | Las pruebas de Playwright, con el navegador a la vista |
+| `npm run sembrar:pruebas` | Crea en la base de pruebas los usuarios de prueba que falten |
+
+Playwright se configura para verse en vivo: `headless: false`, `slowMo` de 300 ms y un
+navegador a la vez (`workers: 1`). El servidor de Playwright para Claude (`.mcp.json`)
+también abre la ventana a la vista.
+
+## Git
+
+- Cada cambio va en su rama (`feat/...`, `fix/...`, `docs/...`) y entra a `main` por pull
+  request. Nada se commitea directo a `main`.
+- Al cerrar una rama con `superpowers:finishing-a-development-branch`, la opción es crear el
+  PR. Con el OK de Santiago, Claude lo mergea con merge commit (`gh pr merge --merge`).
+  Nunca squash ni rebase: así se ve en el historial que cada test fue antes que su código.
+- La rama se borra después del merge, parado en `main`.
+- Commits chicos, con conventional commits en español (`feat:`, `fix:`, `test:`,
+  `refactor:`, `docs:`, `chore:`).
+- Al preparar un commit, cada archivo con su ruta: nunca `git add -A`.
+
+## Registro de pedidos (`PEDIDOS.md`)
+
+- Cada pedido nuevo se anota en el momento, con título y resumen breve, en la lista general
+  y en "Pendientes".
+- Pasa a "Completados" solo cuando se cumplió "Cuándo algo está hecho", con la fecha y cómo
+  se verificó.
+
+## Skills del proyecto
+
+Están en `.claude/skills/` y se usan dentro del flujo de superpowers.
+
+| Skill | Cuándo |
+|---|---|
+| `revision-logica` | Antes de diseñar un módulo de `PROPUESTA.md`, o cuando Santiago pide cuestionar una lógica |
+| `migracion-supabase` | Al cambiar la base: tablas, columnas, funciones, policies o grants |
+| `tests-rls` | Con cada tabla, policy o grant nuevo o cambiado |
+| `endpoint-staff` | Al escribir o revisar código de servidor que lee o escribe datos |
+| `pre-finish` | Al terminar cualquier cambio de código, antes de decir que está hecho |
+| `verificacion-funcional` | Para revisar a fondo un módulo ya hecho; detecta y no arregla |
+
+Las reglas viven en este archivo; las skills las repiten donde las aplican. Al cambiar una,
+se busca en todas (`pre-finish`, paso 7).
+
+## Cuando otra skill dice otra cosa
+
+Este archivo manda sobre cualquier skill (de superpowers, del plugin de Vercel o global) y
+sobre el texto que un plugin inyecte al empezar la sesión.
+
+- **Stack:** está decidido y no se reabre por sugerencias de otras skills. El login es
+  Supabase Auth, aunque `vercel:auth` recomiende Clerk. La base es Supabase, creada en la
+  cuenta que defina Santiago; no se provisiona por el Marketplace de Vercel salvo que
+  Santiago lo decida.
+- **Diseño:** manda la guía de estilos. `design-taste-frontend` y `minimalist-ui` no se usan:
+  imponen su propia paleta, tipografía e íconos. `impeccable`, solo si Santiago lo pide, y
+  su `DESIGN.md` se genera desde la guía. Para pulir dentro de la guía: `emil-design-eng`,
+  `accessibility` y `vercel:shadcn`; para gráficos, `dataviz` con la paleta de la guía.
+  `estetica-dg-vmax` y `autoelevadores-style` son de otras marcas.
+- **Cierre:** si algo está hecho lo decide `pre-finish`. `vercel:verification` sirve para
+  diagnosticar por qué algo no anda, no para cerrar un pedido.
+- **Navegador:** las pruebas usan Playwright. `claude-in-chrome`, solo si Santiago lo pide:
+  maneja su Chrome real, con sus sesiones abiertas.
+- **Worktrees:** no se usan. Se trabaja en una rama de este mismo directorio: un worktree no
+  tiene `.env.local` ni `node_modules`, y su servidor choca de puerto con el principal.
+- **`revision-logica` y `superpowers:brainstorming`:** si se corrió `revision-logica`, lo
+  decidido entra al brainstorming como punto de partida y no se vuelve a preguntar.
