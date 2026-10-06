@@ -76,8 +76,10 @@ Variables, con `.env.example` en el repo:
 
 - Las variables se validan con Zod al leerlas. Si falta una, el error dice cuál.
 - Las públicas y las del servidor se leen en módulos separados.
-- Tres clientes de Supabase: el del navegador, el del servidor con la sesión del usuario, y
-  el de la clave secreta.
+- En este paso se construye un solo cliente de Supabase: el de la clave secreta, que usa la
+  siembra. Los tests usan además un cliente firmado como cada cuenta de prueba.
+- El cliente del navegador y el del servidor con la sesión del usuario llegan en el paso 2,
+  con el login: acá no habría nada que los use ni un test que los pida.
 - La clave secreta se usa en un único módulo. Nada más la lee.
 - `.env.local` apunta a la base de pruebas. Claude carga la URL, la clave publicable, el
   identificador y una contraseña generada. La clave secreta la carga Santiago.
@@ -139,7 +141,7 @@ src/components/guia/        secciones de la página de la guía
 src/lib/plata.ts
 src/lib/fechas.ts
 src/lib/entorno/            lectura y validación de variables
-src/lib/supabase/           los tres clientes
+src/lib/supabase/           el cliente de la clave secreta
 scripts/sembrar-pruebas.ts
 tests/                      preparación del grupo base y auxiliares
 e2e/                        pruebas de Playwright y su preparación
