@@ -13,6 +13,10 @@ el rol a admin.
 > ⚠️ **La trampa que da falsa tranquilidad:** la clave secreta (rol `service_role`) saltea
 > RLS entera. Un test de acceso que la usa pasa siempre, aunque las policies estén rotas.
 
+> ⚠️ **Los ejemplos de esta skill todavía no corrieron contra una base real.** Con la
+> primera tabla, validar `clienteComo` y el ejemplo de `gastos` contra la base de pruebas y
+> corregir acá lo que haga falta. Cuando estén validados, se borra esta nota.
+
 ## La regla de hierro
 
 **Se siembra con privilegio y se verifica sin él.** La clave secreta sirve para preparar y

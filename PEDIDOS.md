@@ -73,6 +73,14 @@ Subir al repo privado, en un commit en `main`, todo lo trabajado hoy: `CLAUDE.md
 `PEDIDOS.md`, las seis skills y `.mcp.json`. De acá en adelante, los cambios entran por PR
 con merge commit.
 
+### 17. Dos reglas nuevas en `CLAUDE.md` y nota en `tests-rls`
+Agregar a `CLAUDE.md` que todo spec y todo plan lleven las reglas que les apliquen, y que
+la rama se cree antes del spec. Reponer en `tests-rls` la nota de que sus ejemplos todavía
+no corrieron contra una base real.
+
+### 18. Enumerar las skills y el `CLAUDE.md`
+Listar todas las skills y lo que contiene `CLAUDE.md`.
+
 ## Pendientes
 
 | # | Pedido | Qué falta |
@@ -101,3 +109,5 @@ correr: se anota cómo se verificó cada uno.
 | 13 | Sugerir el stack | 2026-10-06 | Sugerido y aprobado; quedó escrito en `CLAUDE.md`, sección "Stack", con los comandos del proyecto |
 | 15 | Análisis en profundidad de todas las skills | 2026-10-06 | Análisis entregado en la conversación y correcciones aplicadas en `CLAUDE.md` y en las skills. La regla nueva sobre qué manda cuando otra skill o un plugin dice otra cosa se verificó con una prueba de presión: el subagente no creó las bases por el Marketplace de Vercel ni en una organización ajena |
 | 16 | Commitear y pushear lo de hoy | 2026-10-06 | Un commit en `main` con `CLAUDE.md`, `PEDIDOS.md`, las seis skills y `.mcp.json`, subido al repo privado. Verificado con `git status` y con el commit visible en GitHub |
+| 17 | Dos reglas nuevas en `CLAUDE.md` y nota en `tests-rls` | 2026-10-06 | Las dos reglas quedaron en `CLAUDE.md` ("Flujo de trabajo" y "Git") y la nota en `tests-rls`. Skills validadas y referencias cruzadas sin errores. Entra a `main` por PR |
+| 18 | Enumerar las skills y el `CLAUDE.md` | 2026-10-06 | Enumeración entregada en la conversación |

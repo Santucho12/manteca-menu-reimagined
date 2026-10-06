@@ -40,6 +40,11 @@ skills marcan el proceso y estas reglas se aplican dentro de él.
 como referencia ni se le agregan los tests después. El apuro no es una excepción: solo
 Santiago puede decidir una, conociendo el estado ("Quién decide").
 
+**Todo spec y todo plan llevan las reglas de este archivo que les apliquen**, en sus
+restricciones globales ("Global Constraints"): tests sin mocks, límites de líneas, español,
+plata en centavos y quién decide. Quien ejecuta una tarea de un plan puede ver solo esa
+tarea y el plan.
+
 ## Cuándo algo está hecho
 
 Hecho es **probado en local**: en la máquina de desarrollo, con la aplicación apuntando a la
@@ -179,6 +184,7 @@ también abre la ventana a la vista.
 
 - Cada cambio va en su rama (`feat/...`, `fix/...`, `docs/...`) y entra a `main` por pull
   request. Nada se commitea directo a `main`.
+- La rama se crea al empezar el pedido, antes del spec y del plan: superpowers los commitea.
 - Al cerrar una rama con `superpowers:finishing-a-development-branch`, la opción es crear el
   PR. Con el OK de Santiago, Claude lo mergea con merge commit (`gh pr merge --merge`).
   Nunca squash ni rebase: así se ve en el historial que cada test fue antes que su código.
