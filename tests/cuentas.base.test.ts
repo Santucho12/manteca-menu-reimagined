@@ -1,8 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { describe, expect, it } from 'vitest';
 import { leerEntornoPublico } from '../src/lib/entorno/publico';
-import { crearClienteSecreto } from '../src/lib/supabase/secreto';
-import { clienteComo } from './clientes';
+import { clienteComo, clienteSecretoDePruebas } from './clientes';
 import { ROLES_DE_PRUEBA, emailDePrueba, sembrarCuentas } from './cuentas';
 import { leerEntornoPruebas } from './entorno-pruebas';
 
@@ -28,7 +27,7 @@ describe('cuentas de prueba', () => {
 
   it('sembrar de nuevo no crea cuentas ni falla', async () => {
     const { CONTRASENA_USUARIOS_PRUEBA } = leerEntornoPruebas();
-    const creadas = await sembrarCuentas(crearClienteSecreto(), CONTRASENA_USUARIOS_PRUEBA);
+    const creadas = await sembrarCuentas(clienteSecretoDePruebas(), CONTRASENA_USUARIOS_PRUEBA);
     expect(creadas).toEqual([]);
   });
 
