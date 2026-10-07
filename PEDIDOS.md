@@ -96,10 +96,16 @@ nombre, variantes que faltan en la guía, utilidades y configuración por endure
 siembra que no repara cuentas, las tipografías en un formato liviano, y las tres decisiones
 de diseño (acentos de Manic, tamaño táctil y contraste del foco).
 
+### 22. Módulo de usuarios y acceso
+Construir el módulo de usuarios definido en `docs/modulos/01-usuarios.md`: registro, ingreso,
+espera del invitado, cambio obligado de contraseña, mi cuenta, administración de usuarios y
+el mecanismo de auditoría que van a usar todos los módulos.
+
 ## Pendientes
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 22 | Módulo de usuarios y acceso | En diseño, en la rama `feat/usuarios` |
 | 21 | Arreglos de la revisión de la base técnica | Hecho y verificado (rama `fix/revision-base-tecnica`): montos sin precisión y URL sin cifrar se rechazan; protecciones de configuración (todo test corre en algún grupo, versión de Node, tipos de Supabase fuera de Prettier, clave secreta prohibida en componentes); la siembra repara cuentas y lee todas las páginas; un solo aviso con todas las variables que faltan; comprobación de tokens corregida; colores con contraste suficiente y anillo de foco entero. Queda, por decisión de Santiago, para cuando lo necesite una pantalla real: controles de 44 px y campo con error (con el login), títulos del panel en Neufile Grotesk (con la primera pantalla del panel), las variantes que faltan en la guía y las tipografías en woff2 (con el menú público). Las pruebas de la guía para eso quedaron en `git stash` |
 
 ## Completados
