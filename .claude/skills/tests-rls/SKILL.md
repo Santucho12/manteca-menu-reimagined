@@ -87,7 +87,8 @@ fila en el test.
 - La contraseña sale de `CONTRASENA_USUARIOS_PRUEBA` en `.env.local`. Nunca se escribe en el
   repo.
 - Antes de sembrar nada, la preparación comprueba que la URL de Supabase sea la del proyecto
-  de pruebas (`SUPABASE_REF_PRUEBAS`) y aborta si no lo es.
+  de pruebas (`SUPABASE_REF_PRUEBAS`) y aborta si no lo es. Los tests heredan esas mismas
+  variables, y cada cliente que arman vuelve a comprobarlo.
 - Las filas de cada corrida llevan una marca propia y se borran al terminar.
 - Un test que usa la base se llama `*.base.test.ts`: así corre en el grupo `base` de Vitest,
   que es el que tiene la preparación y las variables de `.env.local`.
@@ -97,12 +98,8 @@ cliente firmado es `clienteComo`, de `tests/clientes.ts`:
 
 ```ts
 // tests/clientes.ts — cliente firmado como una cuenta de prueba.
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { leerEntornoPublico } from '../src/lib/entorno/publico';
-import { emailDePrueba, type RolDePrueba } from './cuentas';
-import { leerEntornoPruebas } from './entorno-pruebas';
-
 export async function clienteComo(rol: RolDePrueba): Promise<SupabaseClient> {
+  comprobarBaseDePruebas(); // aborta si la URL no es la del proyecto de pruebas
   const entorno = leerEntornoPublico();
   const cliente = createClient(
     entorno.NEXT_PUBLIC_SUPABASE_URL,
@@ -118,8 +115,10 @@ export async function clienteComo(rol: RolDePrueba): Promise<SupabaseClient> {
 }
 ```
 
-Para sembrar y limpiar se usa `crearClienteSecreto()`, de `src/lib/supabase/secreto.ts`: es
-el único módulo que lee la clave secreta.
+Para sembrar y limpiar se usa `clienteSecretoDePruebas()`, del mismo archivo: comprueba la
+base y recién ahí arma el cliente con la clave secreta, que solo lee
+`src/lib/supabase/secreto.ts`. En los tests no se llama a `crearClienteSecreto()` directo: se
+saltearía esa comprobación.
 
 ## Ejemplo: aislamiento de `gastos`
 
@@ -129,7 +128,7 @@ Tablas y columnas ilustrativas: usar las del esquema real.
 // tests/rls/gastos.base.test.ts
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { clienteComo } from '../clientes';
-import { limpiarCorrida, sembrarGasto } from './siembra'; // usan la clave secreta
+import { limpiarCorrida, sembrarGasto } from './siembra'; // usan clienteSecretoDePruebas
 
 const corrida = `rls-gastos-${Date.now()}`;
 let idGasto: string;

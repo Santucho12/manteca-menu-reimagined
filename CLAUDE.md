@@ -149,7 +149,8 @@ resultado, y se anota cómo.
   menú público se lee sin sesión, con la clave publicable.
 - La **clave secreta** de Supabase saltea RLS. Sale de un único módulo del servidor y se usa
   solo para:
-  - sembrar y limpiar datos en los tests;
+  - sembrar y limpiar datos en los tests, con `clienteSecretoDePruebas()` de
+    `tests/clientes.ts`, que antes comprueba que la base sea la de pruebas;
   - procesos automáticos sin usuario (por ejemplo, generar los gastos recurrentes);
   - administrar cuentas de Supabase Auth (resetear una contraseña, desactivar a alguien),
     después de verificar en el servidor que lo pide un admin.

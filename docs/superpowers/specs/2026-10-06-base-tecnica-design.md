@@ -197,8 +197,13 @@ Lo que se resolvió distinto de lo escrito arriba, y por qué.
 | Indicador de Next.js | Oculto (`devIndicators: false`) | Tapaba contenido en la captura de celular |
 | `AGENTS.md` | Se commitea | Lo genera `next dev` y apunta a la documentación de la versión instalada |
 | Dependencias | `shadcn` y `tw-animate-css` van en `devDependencies` | Solo aportan estilos al compilar |
+| Espera de Playwright | Por el puerto y no por una URL | Una ruta que todavía no existe responde 404, y Playwright no la da por lista |
+| Tipos de Node | `@types/node` 24, no 26 | El proyecto corre en Node 24 |
+| Estilo de shadcn | Base radix con el preset nova, que trae el paquete `cn` en lugar de `clsx` y `tailwind-merge` | Su instalador cambió las opciones |
+| Entorno de los tests | El grupo `base` no carga variables por su cuenta: hereda las que cargó y comprobó la preparación. Además, cada cliente de los tests (`clienteComo`, `clienteSecretoDePruebas`) vuelve a comprobar la base | La revisión encontró que un `.env.test.local` podía cambiar la base después de la comprobación |
+| `.gitignore` | Ignora todos los `.env*`, salvo `.env.example` | Un `.env` con la clave secreta podía terminar en el repo |
 
-Dos hallazgos que quedan para decidir:
+Tres hallazgos que quedan para decidir:
 
 - **Manic no dibuja acentos ni la eñe.** El archivo de la fuente manda cada vocal acentuada
   y la eñe al glifo sin tilde, y no tiene `¿` ni `¡`. Todo título en Manic los pierde:
@@ -206,6 +211,11 @@ Dos hallazgos que quedan para decidir:
 - **Tamaño táctil.** El botón y el campo miden 32 px de alto, y el botón grande 36 px. Para
   las pantallas pensadas para el celular conviene un tamaño mayor; se define al diseñar
   Cierres de caja.
+- **Contraste del foco.** El anillo que marca lo seleccionado con el teclado es el dorado
+  (`--ring`): contra el fondo crema da 2,2 a 1, y como los componentes lo usan al 50 %, en
+  la práctica 1,5 a 1. La referencia para un indicador es 3 a 1. El texto blanco sobre el
+  dorado (`--accent-foreground` sobre `--accent`) da 2,5 a 1. Los valores vienen de la página
+  actual.
 
 ## Restricciones globales
 
