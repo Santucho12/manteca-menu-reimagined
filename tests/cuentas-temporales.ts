@@ -45,3 +45,14 @@ export async function borrarCuentaTemporal(id: string): Promise<void> {
   const { error } = await secreto.auth.admin.deleteUser(id);
   if (error) throw new Error(`No pude borrar la cuenta temporal: ${error.message}`);
 }
+
+/** Borra la cuenta con ese email, si existe: la crea la pantalla de registro y el test pudo fallar antes. */
+export async function borrarCuentaPorEmail(email: string): Promise<void> {
+  const { data, error } = await clienteSecretoDePruebas()
+    .from('perfiles')
+    .select('id')
+    .eq('email', email.toLowerCase())
+    .maybeSingle();
+  if (error) throw new Error(`No pude buscar la cuenta ${email}: ${error.message}`);
+  if (data) await borrarCuentaTemporal(data.id);
+}
