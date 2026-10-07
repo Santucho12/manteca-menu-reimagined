@@ -1,4 +1,4 @@
-import type { Locator, Page } from '@playwright/test';
+import type { Browser, Locator, Page } from '@playwright/test';
 
 /** Sesiones que guarda e2e/sesiones.setup.ts, una por rol. Git no las sigue: tienen tokens. */
 export const SESIONES = {
@@ -15,6 +15,15 @@ export function colorDeFondo(elemento: Locator): Promise<string> {
 /** El aviso de la pantalla. Dentro de main: Next.js suma afuera un anunciador con el mismo rol. */
 export function aviso(page: Page): Locator {
   return page.getByRole('main').getByRole('alert');
+}
+
+/**
+ * Otra persona, en otra ventana y sin sesion. La sesion vacia va a mano: un contexto nuevo
+ * hereda la de `test.use`, y la persona entraria ya como el rol de la prueba.
+ */
+export async function abrirSinSesion(browser: Browser): Promise<Page> {
+  const contexto = await browser.newContext({ storageState: { cookies: [], origins: [] } });
+  return contexto.newPage();
 }
 
 export async function ingresarComo(page: Page, email: string, contrasena: string): Promise<void> {

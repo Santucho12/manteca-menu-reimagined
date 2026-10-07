@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { emailDePrueba } from '../tests/cuentas';
 import { borrarCuentaTemporal, crearCuentaTemporal } from '../tests/cuentas-temporales';
-import { SESIONES, aviso, ingresarComo } from './ayudas';
+import { SESIONES, abrirSinSesion, aviso, ingresarComo } from './ayudas';
 
 const DESACTIVADA = 'Tu cuenta está desactivada. Hablá con el administrador.';
 const ESPERA = 'Tu cuenta ya está creada. Un administrador tiene que darte acceso.';
@@ -25,7 +25,7 @@ async function abrirLaCuenta(page: Page, email: string): Promise<Locator> {
 
 test('quien espera recibe el rol de Caja y entra al recargar', async ({ page, browser }) => {
   const cuenta = await crearCuentaTemporal();
-  const persona = await (await browser.newContext()).newPage();
+  const persona = await abrirSinSesion(browser);
   try {
     await ingresarComo(persona, cuenta.email, cuenta.contrasena);
     await expect(persona.getByRole('main').getByText(ESPERA)).toBeVisible();
@@ -85,7 +85,7 @@ test('desactivar pide confirmacion y la persona pierde el acceso en el momento',
   browser,
 }) => {
   const cuenta = await crearCuentaTemporal({ rol: 'caja' });
-  const persona = await (await browser.newContext()).newPage();
+  const persona = await abrirSinSesion(browser);
   try {
     await ingresarComo(persona, cuenta.email, cuenta.contrasena);
     await expect(persona).toHaveURL(/\/admin$/);
@@ -113,7 +113,7 @@ test('resetear muestra la contraseña temporal una sola vez y obliga a cambiarla
   browser,
 }) => {
   const cuenta = await crearCuentaTemporal({ rol: 'caja' });
-  const persona = await (await browser.newContext()).newPage();
+  const persona = await abrirSinSesion(browser);
   try {
     const fila = await abrirLaCuenta(page, cuenta.email);
     await fila.getByRole('button', { name: 'Resetear contraseña' }).click();
