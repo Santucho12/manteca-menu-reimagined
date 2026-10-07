@@ -110,9 +110,7 @@ y los componentes base que usan las pantallas quedan.
 
 | # | Pedido | Qué falta |
 |---|---|---|
-| 23 | Sacar la guía de estilos | En curso, en la rama `feat/usuarios` |
-| 22 | Módulo de usuarios y acceso | Construido en la rama `feat/usuarios`; falta la verificación completa del cierre |
-| 21 | Arreglos de la revisión de la base técnica | Hecho y verificado (rama `fix/revision-base-tecnica`): montos sin precisión y URL sin cifrar se rechazan; protecciones de configuración (todo test corre en algún grupo, versión de Node, tipos de Supabase fuera de Prettier, clave secreta prohibida en componentes); la siembra repara cuentas y lee todas las páginas; un solo aviso con todas las variables que faltan; comprobación de tokens corregida; colores con contraste suficiente y anillo de foco entero. Queda, por decisión de Santiago, para cuando lo necesite una pantalla real: controles de 44 px y campo con error (con el login), títulos del panel en Neufile Grotesk (con la primera pantalla del panel), las variantes que faltan en la guía y las tipografías en woff2 (con el menú público). Las pruebas de la guía para eso quedaron en `git stash` |
+| 21 | Arreglos de la revisión de la base técnica | Hecho y verificado (rama `fix/revision-base-tecnica`): montos sin precisión y URL sin cifrar se rechazan; protecciones de configuración (todo test corre en algún grupo, versión de Node, tipos de Supabase fuera de Prettier, clave secreta prohibida en componentes); la siembra repara cuentas y lee todas las páginas; un solo aviso con todas las variables que faltan; comprobación de tokens corregida; colores con contraste suficiente y anillo de foco entero. Los controles de 44 px, el campo con error y los títulos en Neufile Grotesk entraron con el pedido 22. Queda para el menú público: las tipografías en woff2. Las variantes de la guía ya no van: la guía se sacó en el pedido 23 |
 
 ## Completados
 
@@ -121,6 +119,8 @@ cómo se verificó cada uno.
 
 | # | Pedido | Fecha | Cómo se verificó |
 |---|---|---|---|
+| 22 | Módulo de usuarios y acceso | 2026-10-07 | `npm run verificar` en verde (lint, tipos, 335 tests de Vitest y build) y `npm run e2e` en verde (39 pruebas en computadora y 39 en celular, con las sesiones). Migraciones aplicadas y verificadas solo en la base de pruebas; aplicarlas a la real lo decide Santiago. Capturas revisadas en los dos tamaños. La revisión independiente de la rama queda pendiente: se cortó por el límite de uso |
+| 23 | Sacar la guía de estilos | 2026-10-07 | Página, componentes, pruebas y regla borrados. La prueba de acceso comprueba que `/admin/guia-de-estilos` da 404 y que el menú del admin queda en Inicio, Usuarios y Mi cuenta; entra en las corridas del pedido 22 |
 | 1 | Repositorio privado en GitHub | 2026-10-06 | `gh repo view` confirma `Santucho12/sistema-manteca` como privado, con `main` sincronizada |
 | 3 | Comparar skills con otros proyectos | 2026-10-06 | Se listaron las skills de los dos proyectos y se entregó la comparación |
 | 4 | Traer seis skills | 2026-10-06 | Las seis están en `.claude/skills/` y Claude Code las carga |
