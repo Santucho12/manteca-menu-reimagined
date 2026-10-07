@@ -189,9 +189,11 @@ La infraestructura de pruebas cambia en cinco puntos:
 
 ## Pasos de Santiago
 
-- Poner la longitud mínima de contraseña en 8 en los dos proyectos de Supabase
-  (Authentication > Sign In / Providers > Email).
 - Aplicar la migración a la base real, cuando decida publicar.
+
+La contraseña pide 6 caracteres como mínimo, el mismo mínimo que trae Supabase Auth: así la
+regla de la aplicación y la de Supabase coinciden sin tocar su configuración (decisión de
+Santiago, 2026-10-07).
 
 ## Cuándo está hecho
 

@@ -36,7 +36,7 @@ tenga el rol que tenga, y conserva todo su historial.
 ### Registro (`/admin/registro`)
 
 - Pide nombre, email y contraseña. Los tres son obligatorios.
-- La contraseña tiene 8 caracteres como mínimo.
+- La contraseña tiene 6 caracteres como mínimo.
 - El email no se confirma: funciona como nombre de usuario.
 - Al registrarse, la persona queda con la sesión iniciada.
 - **La primera cuenta que se crea en el sistema queda como admin.** Todas las siguientes
@@ -60,7 +60,7 @@ tenga el rol que tenga, y conserva todo su historial.
 ### Cambio obligado de contraseña
 
 - Aparece al entrar con una contraseña temporal.
-- Pide la contraseña nueva, de 8 caracteres como mínimo.
+- Pide la contraseña nueva, de 6 caracteres como mínimo.
 - Hasta que la cambia, la persona no puede ir a ninguna otra pantalla.
 
 ### Mi cuenta (`/admin/cuenta`)
@@ -158,6 +158,7 @@ Acciones sobre una cuenta:
 | Emails | No se usan en esta fase |
 | Sesión | Abierta hasta "Salir", con el nombre siempre a la vista |
 | Datos propios | Cada uno cambia su contraseña; nombre y email, solo el admin |
+| Largo de la contraseña | 6 caracteres como mínimo, el mismo que pide Supabase Auth (2026-10-07) |
 
 ## Para la publicación
 
