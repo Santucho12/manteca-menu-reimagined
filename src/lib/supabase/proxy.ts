@@ -1,4 +1,4 @@
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient, type SetAllCookies } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { requiereSesion } from '../acceso/estados';
 import { leerEntornoPublico } from '../entorno/publico';
@@ -8,26 +8,25 @@ type Salida = { respuesta: NextResponse };
 
 // Las cookies renovadas van al pedido (para lo que se arme despues) y a la respuesta (para el
 // navegador). Las cabeceras evitan que una cache guarde la sesion de otra persona.
+function renovarEn(pedido: NextRequest, salida: Salida): SetAllCookies {
+  return (galletas, cabeceras) => {
+    galletas.forEach(({ name, value }) => pedido.cookies.set(name, value));
+    salida.respuesta = NextResponse.next({ request: pedido });
+    galletas.forEach(({ name, value, options }) =>
+      salida.respuesta.cookies.set(name, value, options),
+    );
+    Object.entries(cabeceras).forEach(([clave, valor]) =>
+      salida.respuesta.headers.set(clave, valor),
+    );
+  };
+}
+
 function clienteDelPedido(pedido: NextRequest, salida: Salida) {
   const entorno = leerEntornoPublico();
   return createServerClient<Database>(
     entorno.NEXT_PUBLIC_SUPABASE_URL,
     entorno.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-    {
-      cookies: {
-        getAll: () => pedido.cookies.getAll(),
-        setAll: (galletas, cabeceras) => {
-          galletas.forEach(({ name, value }) => pedido.cookies.set(name, value));
-          salida.respuesta = NextResponse.next({ request: pedido });
-          galletas.forEach(({ name, value, options }) =>
-            salida.respuesta.cookies.set(name, value, options),
-          );
-          Object.entries(cabeceras).forEach(([clave, valor]) =>
-            salida.respuesta.headers.set(clave, valor),
-          );
-        },
-      },
-    },
+    { cookies: { getAll: () => pedido.cookies.getAll(), setAll: renovarEn(pedido, salida) } },
   );
 }
 

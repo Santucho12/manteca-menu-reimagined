@@ -108,26 +108,27 @@ async function ajustarPerfil(
   if (error) throw new Error(`No pude ajustar el perfil de prueba ${id}: ${error.message}`);
 }
 
+// Supabase guarda el email en minusculas: se compara asi para no recrear adminOtroLocal.
+async function cuentasPorEmail(cliente: Cliente): Promise<Map<string, User>> {
+  const cuentas = await listarCuentas(cliente);
+  return new Map(cuentas.map((cuenta) => [(cuenta.email ?? '').toLowerCase(), cuenta]));
+}
+
+async function localesDePrueba(cliente: Cliente): Promise<Locales> {
+  return { principal: await idDelLocalPrincipal(cliente), otro: await asegurarLocalB(cliente) };
+}
+
 /** Crea las cuentas de prueba que falten, repara su contraseña y les deja rol, local y estado. */
 export async function sembrarCuentas(cliente: Cliente, contrasena: string): Promise<string[]> {
-  // Supabase guarda el email en minusculas: se compara asi para no recrear adminOtroLocal.
-  const cuentas = await listarCuentas(cliente);
-  const porEmail = new Map(cuentas.map((cuenta) => [(cuenta.email ?? '').toLowerCase(), cuenta]));
-  const locales = {
-    principal: await idDelLocalPrincipal(cliente),
-    otro: await asegurarLocalB(cliente),
-  };
+  const porEmail = await cuentasPorEmail(cliente);
+  const locales = await localesDePrueba(cliente);
   const creadas: string[] = [];
   // admin primero: el local principal tiene un admin activo antes de tocar al resto.
   const orden = ['admin', ...ROLES_DE_PRUEBA.filter((rol) => rol !== 'admin')] as RolDePrueba[];
   for (const rol of orden) {
     const email = emailDePrueba(rol);
-    const { id, creada } = await asegurarCuenta(
-      cliente,
-      email,
-      contrasena,
-      porEmail.get(email.toLowerCase()),
-    );
+    const existente = porEmail.get(email.toLowerCase());
+    const { id, creada } = await asegurarCuenta(cliente, email, contrasena, existente);
     await ajustarPerfil(cliente, id, PERFILES_DE_PRUEBA[rol], locales);
     if (creada) creadas.push(email);
   }
