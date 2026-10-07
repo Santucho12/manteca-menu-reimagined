@@ -4,6 +4,17 @@ import nextTs from 'eslint-config-next/typescript';
 
 const sinBlancosNiComentarios = { skipBlankLines: true, skipComments: true };
 
+// La clave secreta se usa en servicios y acciones de servidor (.ts), nunca desde un componente.
+const sinClaveSecreta = {
+  patterns: [
+    {
+      group: ['**/lib/supabase/secreto'],
+      message:
+        'Un componente no usa la clave secreta: pasala a un servicio o una acción de servidor (.ts).',
+    },
+  ],
+};
+
 export default defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -19,6 +30,7 @@ export default defineConfig([
     rules: {
       'max-lines-per-function': ['error', { max: 80, ...sinBlancosNiComentarios }],
       'max-lines': ['error', { max: 300, ...sinBlancosNiComentarios }],
+      'no-restricted-imports': ['error', sinClaveSecreta],
     },
   },
   {

@@ -4,9 +4,19 @@ import { COLORES, ESPACIADOS, RADIOS, SOMBRAS, TIPOGRAFIAS } from './tokens';
 
 const css = readFileSync('src/app/globals.css', 'utf8');
 
-function estaDefinida(variable: string): boolean {
-  return new RegExp(`${variable}\s*:`).test(css);
+function estaDefinida(variable: string, hoja = css): boolean {
+  return new RegExp(`${variable}\\s*:`).test(hoja);
 }
+
+describe('la comprobacion de que un token esta definido', () => {
+  it('no confunde una variable con otra que empieza igual', () => {
+    expect(estaDefinida('--accent', '--accents: 1;')).toBe(false);
+  });
+
+  it('acepta espacios antes de los dos puntos', () => {
+    expect(estaDefinida('--accent', '--accent : 1;')).toBe(true);
+  });
+});
 
 describe('tokens de la guia de estilos', () => {
   it.each([...COLORES, ...RADIOS, ...SOMBRAS, ...TIPOGRAFIAS])(
@@ -33,6 +43,8 @@ describe('tokens de la guia de estilos', () => {
       '--accent',
       '--destructive',
       '--border',
+      '--input',
+      '--ring',
     ]);
   });
 

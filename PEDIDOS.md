@@ -90,9 +90,17 @@ Supabase.
 Dejar conectados por MCP los dos proyectos de Supabase, Vercel, GitHub y Playwright antes
 de seguir con el armado.
 
+### 21. Arreglos de la revisión de la base técnica
+Arreglar todo lo que dejó anotado la revisión de la base técnica: tests más flojos que su
+nombre, variantes que faltan en la guía, utilidades y configuración por endurecer, la
+siembra que no repara cuentas, las tipografías en un formato liviano, y las tres decisiones
+de diseño (acentos de Manic, tamaño táctil y contraste del foco).
+
 ## Pendientes
 
-No hay pedidos pendientes.
+| # | Pedido | Qué falta |
+|---|---|---|
+| 21 | Arreglos de la revisión de la base técnica | Hecho y verificado (rama `fix/revision-base-tecnica`): montos sin precisión y URL sin cifrar se rechazan; protecciones de configuración (todo test corre en algún grupo, versión de Node, tipos de Supabase fuera de Prettier, clave secreta prohibida en componentes); la siembra repara cuentas y lee todas las páginas; un solo aviso con todas las variables que faltan; comprobación de tokens corregida; colores con contraste suficiente y anillo de foco entero. Queda, por decisión de Santiago, para cuando lo necesite una pantalla real: controles de 44 px y campo con error (con el login), títulos del panel en Neufile Grotesk (con la primera pantalla del panel), las variantes que faltan en la guía y las tipografías en woff2 (con el menú público). Las pruebas de la guía para eso quedaron en `git stash` |
 
 ## Completados
 

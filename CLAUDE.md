@@ -210,7 +210,7 @@ El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
 | `npm test` | Todos los tests de Vitest |
 | `npm run verificar` | Lint, tipos, todos los tests y build, en ese orden; se corta en el primer error |
 | `npm run e2e` | Las pruebas de Playwright, con el navegador a la vista |
-| `npm run sembrar:pruebas` | Crea en la base de pruebas los usuarios de prueba que falten |
+| `npm run sembrar:pruebas` | Crea en la base de pruebas los usuarios de prueba que falten y repara la contraseña de los que ya estaban |
 
 El lint es ESLint más el control de formato de Prettier. Si falla por formato, lo corrige
 `npx prettier --write .`.

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { validarEntorno } from './validar';
+import { FaltanVariables, validarEntorno } from './validar';
 
 const esquema = z.object({
   UNA_URL: z.url(),
@@ -31,6 +31,17 @@ describe('validarEntorno', () => {
 
   it('explica en español donde se cargan', () => {
     expect(() => validarEntorno(esquema, {})).toThrow('.env.local');
+  });
+
+  it('el error lleva los nombres, para juntarlos con los de otras lecturas', () => {
+    let error: unknown;
+    try {
+      validarEntorno(esquema, {});
+    } catch (capturado) {
+      error = capturado;
+    }
+    expect(error).toBeInstanceOf(FaltanVariables);
+    expect((error as FaltanVariables).nombres).toEqual(['UNA_URL', 'UNA_CLAVE']);
   });
 });
 

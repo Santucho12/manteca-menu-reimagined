@@ -33,4 +33,8 @@ describe('formatearPesos', () => {
   it('rechaza un monto que no es un numero', () => {
     expect(() => formatearPesos(Number.NaN)).toThrow('entero de centavos');
   });
+
+  it('rechaza un monto tan grande que ya perdio precision', () => {
+    expect(() => formatearPesos(2 ** 53)).toThrow('entero de centavos');
+  });
 });

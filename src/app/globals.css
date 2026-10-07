@@ -103,12 +103,15 @@
   --muted: oklch(0.92 0.015 85);
   --muted-foreground: oklch(0.5 0.03 55);
   --accent: #bfa042;
-  --accent-foreground: white;
-  --destructive: oklch(0.577 0.245 27.325);
+  /* Marron oscuro y no blanco: el blanco sobre el dorado da 2,5 a 1 y no se lee. */
+  --accent-foreground: oklch(0.22 0.035 45);
+  /* Un poco mas oscuro que el rojo de shadcn: tiene que leerse sobre su propio fondo tenue. */
+  --destructive: oklch(0.5 0.2 27);
   --destructive-foreground: oklch(0.984 0.003 247.858);
   --border: oklch(0.88 0.02 85);
-  --input: oklch(0.88 0.02 85);
-  --ring: #bfa042;
+  /* El borde de un campo y el anillo de foco tienen que distinguirse del fondo (3 a 1). */
+  --input: oklch(0.62 0.03 70);
+  --ring: oklch(0.6 0.115 88);
 
   /* Radios y sombras se definen aca y no solo en @theme: Tailwind emite
      unicamente las variables de tema que alguna clase usa, y la guia las

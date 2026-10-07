@@ -202,20 +202,17 @@ Lo que se resolvió distinto de lo escrito arriba, y por qué.
 | Estilo de shadcn | Base radix con el preset nova, que trae el paquete `cn` en lugar de `clsx` y `tailwind-merge` | Su instalador cambió las opciones |
 | Entorno de los tests | El grupo `base` no carga variables por su cuenta: hereda las que cargó y comprobó la preparación. Además, cada cliente de los tests (`clienteComo`, `clienteSecretoDePruebas`) vuelve a comprobar la base | La revisión encontró que un `.env.test.local` podía cambiar la base después de la comprobación |
 | `.gitignore` | Ignora todos los `.env*`, salvo `.env.example` | Un `.env` con la clave secreta podía terminar en el repo |
+| Colores con contraste | El texto sobre el dorado pasa a marrón oscuro; el rojo de error, el anillo de foco y el borde de los campos, un poco más oscuros. Los componentes pintan el anillo entero, no al 50 %. `tests/contraste.test.ts` lo controla | Contraste de accesibilidad: 4,5 a 1 para texto y 3 a 1 para controles (pedido 21) |
 
-Tres hallazgos que quedan para decidir:
+Dos hallazgos que quedan para decidir con las primeras pantallas del panel:
 
 - **Manic no dibuja acentos ni la eñe.** El archivo de la fuente manda cada vocal acentuada
   y la eñe al glifo sin tilde, y no tiene `¿` ni `¡`. Todo título en Manic los pierde:
-  «Cafetería» se ve «Cafeteria». La guía lo muestra. Falta decidir dónde se usa.
+  «Cafetería» se ve «Cafeteria». La guía lo muestra. La propuesta es usar Neufile Grotesk
+  para los títulos del panel y dejar Manic para la marca.
 - **Tamaño táctil.** El botón y el campo miden 32 px de alto, y el botón grande 36 px. Para
-  las pantallas pensadas para el celular conviene un tamaño mayor; se define al diseñar
-  Cierres de caja.
-- **Contraste del foco.** El anillo que marca lo seleccionado con el teclado es el dorado
-  (`--ring`): contra el fondo crema da 2,2 a 1, y como los componentes lo usan al 50 %, en
-  la práctica 1,5 a 1. La referencia para un indicador es 3 a 1. El texto blanco sobre el
-  dorado (`--accent-foreground` sobre `--accent`) da 2,5 a 1. Los valores vienen de la página
-  actual.
+  las pantallas que se usan desde el celular conviene llevarlos a 44 px en pantallas
+  táctiles. El login es la primera.
 
 ## Restricciones globales
 

@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 
 // Corre el comando de verdad, en otro proceso: arranca npm y tsx, por eso tarda.
 const ESPERA_MS = 60_000;
+const CLAVE_SECRETA = ['SUPABASE', 'SECRET', 'KEY'].join('_');
+const AVISO = 'Faltan o están mal estas variables de entorno';
 
 function correr(variables: Record<string, string> = {}): string {
   return execSync('npm run sembrar:pruebas', {
@@ -10,6 +12,16 @@ function correr(variables: Record<string, string> = {}): string {
     stdio: 'pipe',
     env: { ...process.env, ...variables },
   });
+}
+
+function avisoDeVariables(variables: Record<string, string>): string {
+  try {
+    correr(variables);
+  } catch (error) {
+    const mensaje = error instanceof Error ? error.message : String(error);
+    return mensaje.split('\n').find((linea) => linea.includes(AVISO)) ?? '';
+  }
+  return '';
 }
 
 describe('comando sembrar:pruebas', () => {
@@ -34,8 +46,17 @@ describe('comando sembrar:pruebas', () => {
   it(
     'si falta la clave secreta, dice que variable falta',
     () => {
-      const sinClave = { [['SUPABASE', 'SECRET', 'KEY'].join('_')]: '' };
-      expect(() => correr(sinClave)).toThrow(/Faltan o están mal estas variables de entorno/);
+      expect(avisoDeVariables({ [CLAVE_SECRETA]: '' })).toContain(`${AVISO}: ${CLAVE_SECRETA}.`);
+    },
+    ESPERA_MS,
+  );
+
+  it(
+    'si faltan varias variables, las nombra todas en un solo aviso',
+    () => {
+      const faltantes = ['NEXT_PUBLIC_SUPABASE_URL', 'CONTRASENA_USUARIOS_PRUEBA', CLAVE_SECRETA];
+      const aviso = avisoDeVariables(Object.fromEntries(faltantes.map((nombre) => [nombre, ''])));
+      for (const nombre of faltantes) expect(aviso).toContain(nombre);
     },
     ESPERA_MS,
   );
