@@ -82,7 +82,8 @@ fila en el test.
 ## Usuarios de prueba y preparación
 
 - Uno por rol, fijos, en la base de pruebas: `prueba.<rol>@manteca.test`. Los crea
-  `npm run sembrar:pruebas`, que crea solo los que faltan. La preparación de Vitest y la de
+  `npm run sembrar:pruebas`, que crea los que faltan y repara la contraseña de los que ya
+  estaban. La preparación de Vitest y la de
   Playwright lo corren solas antes de empezar, así que un usuario borrado se vuelve a crear.
 - La contraseña sale de `CONTRASENA_USUARIOS_PRUEBA` en `.env.local`. Nunca se escribe en el
   repo.

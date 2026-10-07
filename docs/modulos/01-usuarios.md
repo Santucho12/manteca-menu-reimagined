@@ -177,14 +177,14 @@ Pendientes que dejó la revisión de la base técnica, para resolver al construi
 - **Inicios de sesión de los tests.** `clienteComo` inicia sesión en cada llamada, y
   Supabase limita los inicios de sesión por IP (150 cada 5 minutos). Antes de la primera
   matriz de RLS, reutilizar una sesión por rol.
-- **La siembra crea pero no repara.** Si cambia la contraseña de `.env.local`, las cuentas
-  que ya existían quedan con la anterior y los tests fallan sin decir por qué. Cuando la
-  siembra sume los roles, que también actualice la contraseña de las cuentas existentes.
 - **El entorno de la aplicación.** Playwright comprueba `.env.local`, pero `next dev` lee
   antes `.env.development.local`. Con el login, comprobar también desde la aplicación que
   apunta a la base de pruebas.
-- **La clave secreta y los componentes de cliente.** Nada impide importar
-  `src/lib/supabase/secreto.ts` desde un componente de cliente: no filtraría la clave, pero
-  fallaría recién en el navegador. Con los primeros componentes de cliente, sumar una regla
-  de ESLint que lo prohíba en los `.tsx`.
 - **El campo con error** todavía no está en la guía: entra con el primer formulario.
+- **Controles de 44 px en pantallas táctiles.** Hoy botones y campos miden 32 px; el login es
+  lo primero que se usa desde el celular.
+- **Títulos del panel.** Manic no dibuja acentos ni la eñe: la propuesta es Neufile Grotesk
+  para los títulos del panel y Manic solo para la marca.
+
+Las pruebas de Playwright para los tres últimos ya están escritas, sin correr: quedaron
+guardadas en `git stash` como "pruebas de la guia sin implementar".
