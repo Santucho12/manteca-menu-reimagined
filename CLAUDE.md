@@ -134,6 +134,9 @@ resultado, y se anota cómo.
 - Lo que toca datos se prueba contra la base de pruebas. Un cálculo puro, sin base ni red,
   se prueba llamándolo directo, y esos tests corren sin la preparación de la base: se pueden
   correr aunque la base de pruebas no responda.
+- El nombre del archivo dice el tipo. `*.base.test.ts` usa la base y corre en el grupo
+  `base` de Vitest, con su preparación. Cualquier otro `*.test.ts` es puro y corre en el
+  grupo `puros`, sin base: `npx vitest run --project puros`.
 - Si algo depende de la fecha de hoy, la fecha entra como parámetro; no se congela el reloj.
 - Cada test siembra lo que necesita y limpia lo que creó. Los usuarios de prueba (uno por
   rol) los crea `npm run sembrar:pruebas`, y la preparación de Vitest y la de Playwright lo
@@ -190,26 +193,33 @@ El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
 | Publicación | Vercel |
 
 - El login es Supabase Auth; no se suma otro proveedor de autenticación.
-- Las versiones se fijan en `package.json` al armar el proyecto.
+- Las versiones están fijadas exactas en `package.json`, sin `^`.
+- Next.js trae la documentación de la versión instalada en `node_modules/next/dist/docs/`.
+  Se consulta antes de usar una API de Next.js, porque cambian entre versiones. `AGENTS.md`
+  lo escribe `next dev` y apunta a esa misma carpeta.
 - Las ventas de Fudo se leen de su API (`https://api.fu.do/v1alpha1/openapi.yml`), con un
   proceso automático. Las credenciales salen de variables de entorno del servidor.
 - `.env.local` apunta a la base de pruebas. Los valores de la real se cargan solo en Vercel.
 
 ### Comandos
 
-Se crean con estos nombres al armar el proyecto.
-
 | Comando | Qué hace |
 |---|---|
-| `npm run dev` | Levanta la aplicación en local, contra la base de pruebas |
+| `npm run dev` | Levanta la aplicación en local, contra la base de pruebas, en `http://localhost:3210` |
 | `npm test` | Todos los tests de Vitest |
 | `npm run verificar` | Lint, tipos, todos los tests y build, en ese orden; se corta en el primer error |
 | `npm run e2e` | Las pruebas de Playwright, con el navegador a la vista |
 | `npm run sembrar:pruebas` | Crea en la base de pruebas los usuarios de prueba que falten |
 
+El lint es ESLint más el control de formato de Prettier. Si falla por formato, lo corrige
+`npx prettier --write .`.
+
+La aplicación usa el puerto 3210 y no el 3000, que suele estar ocupado por otro proyecto.
+
 Playwright se configura para verse en vivo: `headless: false`, `slowMo` de 300 ms y un
-navegador a la vez (`workers: 1`). El servidor de Playwright para Claude (`.mcp.json`)
-también abre la ventana a la vista.
+navegador a la vez (`workers: 1`). Prueba contra el servidor de `npm run dev` si ya está
+levantado; si no, lo levanta. El servidor de Playwright para Claude (`.mcp.json`) también
+abre la ventana a la vista.
 
 ## Git
 

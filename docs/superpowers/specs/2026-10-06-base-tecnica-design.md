@@ -183,6 +183,30 @@ Al cerrar se actualiza `PEDIDOS.md`: el 19, y los que dependían de este paso (2
 - Conectar Vercel y publicar.
 - Integración continua en GitHub.
 
+## Cambios durante la implementación
+
+Lo que se resolvió distinto de lo escrito arriba, y por qué.
+
+| Tema | Cómo quedó | Por qué |
+|---|---|---|
+| Puerto | La aplicación usa el 3210, en `npm run dev` y en Playwright | El 3000 lo ocupaba otro proyecto, y Playwright prueba contra lo que encuentre escuchando |
+| Versiones | ESLint 9.39.5 y TypeScript 6.0.3 | Son las más altas que acepta `eslint-config-next` 16.4.0 |
+| Lint | `npm run lint` corre ESLint y el control de formato de Prettier | Sin control, el formato se desordena |
+| Clave secreta | Se lee y se usa en `src/lib/supabase/secreto.ts`; no hay un módulo general de variables del servidor | Un test exige que un solo módulo la nombre |
+| Guía | Suma una muestra con acentos y eñe, los botones en tres tamaños y un aviso informativo | El spec pide cada componente en sus variantes |
+| Indicador de Next.js | Oculto (`devIndicators: false`) | Tapaba contenido en la captura de celular |
+| `AGENTS.md` | Se commitea | Lo genera `next dev` y apunta a la documentación de la versión instalada |
+| Dependencias | `shadcn` y `tw-animate-css` van en `devDependencies` | Solo aportan estilos al compilar |
+
+Dos hallazgos que quedan para decidir:
+
+- **Manic no dibuja acentos ni la eñe.** El archivo de la fuente manda cada vocal acentuada
+  y la eñe al glifo sin tilde, y no tiene `¿` ni `¡`. Todo título en Manic los pierde:
+  «Cafetería» se ve «Cafeteria». La guía lo muestra. Falta decidir dónde se usa.
+- **Tamaño táctil.** El botón y el campo miden 32 px de alto, y el botón grande 36 px. Para
+  las pantallas pensadas para el celular conviene un tamaño mayor; se define al diseñar
+  Cierres de caja.
+
 ## Restricciones globales
 
 Reglas de `CLAUDE.md` que valen para este spec y su plan.
