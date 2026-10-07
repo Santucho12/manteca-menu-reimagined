@@ -84,6 +84,11 @@ base de pruebas, pasaron los dos pasos.
 
 Los dos, siempre. Si uno no se pudo correr, no está hecho.
 
+**Mientras se construye**, cada tarea corre solo sus tests nuevos: verlos fallar y después
+pasar (en una pantalla, su archivo de Playwright en un solo tamaño), y `npm run tipos` al
+cerrarla. Los dos pasos completos (lint, todos los tests, `npm run e2e` en los dos tamaños y
+las capturas) se corren una vez, al cerrar el pedido. Todo plan arma así sus tareas.
+
 Por eso un pedido se arma completo: pantalla, servidor y base. Si lo que se hizo no tiene
 pantalla propia (un proceso automático, una regla del servidor), la prueba en vivo entra a
 la pantalla donde se ve su efecto. Si esa pantalla todavía no existe, el pedido se cierra
