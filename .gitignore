@@ -4,8 +4,9 @@ out/
 next-env.d.ts
 *.tsbuildinfo
 
-.env.local
-.env*.local
+# Cualquier archivo de entorno puede tener la clave secreta. Solo se sube el ejemplo, vacio.
+.env*
+!.env.example
 
 test-results/
 playwright-report/
