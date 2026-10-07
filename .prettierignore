@@ -10,9 +10,10 @@ e2e/capturas/
 .superpowers/
 .vercel/
 
-# Lo escriben otras herramientas (shadcn, Next.js, Claude Code)
+# Lo escriben otras herramientas (shadcn, Next.js, Supabase, Claude Code)
 src/components/ui/
 src/lib/utils.ts
+src/lib/supabase/tipos.ts
 components.json
 tsconfig.json
 .claude/

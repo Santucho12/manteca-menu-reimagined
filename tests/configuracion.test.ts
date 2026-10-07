@@ -62,8 +62,15 @@ describe('clave secreta en los componentes', () => {
       "import { crearClienteSecreto } from '../../lib/supabase/secreto';",
       'src/components/guia/prueba.tsx',
     ],
-  ])('el lint rechaza %s en un componente', async (importacion, archivo) => {
-    const reglas = await reglasQueSaltan(`${importacion}\nexport { crearClienteSecreto };\n`, archivo);
-    expect(reglas).toContain('no-restricted-imports');
-  }, 30_000);
+  ])(
+    'el lint rechaza %s en un componente',
+    async (importacion, archivo) => {
+      const reglas = await reglasQueSaltan(
+        `${importacion}\nexport { crearClienteSecreto };\n`,
+        archivo,
+      );
+      expect(reglas).toContain('no-restricted-imports');
+    },
+    30_000,
+  );
 });

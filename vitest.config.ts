@@ -17,7 +17,11 @@ export default defineConfig({
         extends: true,
         test: {
           name: 'base',
-          include: ['src/**/*.base.test.ts', 'tests/**/*.base.test.ts'],
+          include: [
+            'src/**/*.base.test.ts',
+            'tests/**/*.base.test.ts',
+            'scripts/**/*.base.test.ts',
+          ],
           exclude: ['node_modules/**'],
           // Carga .env.local y comprueba la base. Los tests heredan esas mismas
           // variables: ningun otro archivo de entorno se carga despues.
