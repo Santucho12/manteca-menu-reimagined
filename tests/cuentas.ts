@@ -1,4 +1,6 @@
-import type { SupabaseClient, User } from '@supabase/supabase-js';
+import { createHash } from 'node:crypto';
+import type { User } from '@supabase/supabase-js';
+import type { Cliente } from '../src/lib/supabase/cliente';
 
 export const ROLES_DE_PRUEBA = [
   'invitado',
@@ -15,8 +17,13 @@ export function emailDePrueba(rol: RolDePrueba): string {
   return `prueba.${rol}@manteca.test`;
 }
 
+/** Huella de la contraseña de .env.local: si cambia, la siembra actualiza las cuentas. */
+export function huellaDe(contrasena: string): string {
+  return createHash('sha256').update(contrasena).digest('hex');
+}
+
 /** Todas las cuentas de Supabase Auth: listUsers devuelve una pagina por pedido. */
-export async function listarCuentas(cliente: SupabaseClient, porPagina = 1000): Promise<User[]> {
+export async function listarCuentas(cliente: Cliente, porPagina = 1000): Promise<User[]> {
   const cuentas: User[] = [];
   for (let pagina = 1; ; pagina += 1) {
     const { data, error } = await cliente.auth.admin.listUsers({
@@ -29,27 +36,42 @@ export async function listarCuentas(cliente: SupabaseClient, porPagina = 1000): 
   }
 }
 
-async function crearCuenta(cliente: SupabaseClient, email: string, password: string) {
+async function crearCuenta(cliente: Cliente, email: string, password: string) {
   // email_confirm evita depender de que la confirmacion por mail este apagada.
-  const { error } = await cliente.auth.admin.createUser({ email, password, email_confirm: true });
+  const { error } = await cliente.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    app_metadata: { huella_siembra: huellaDe(password) },
+  });
   if (error) throw new Error(`No pude crear la cuenta ${email}: ${error.message}`);
 }
 
-// Si la contrasena de .env.local cambio, la cuenta vieja quedaria afuera sin aviso.
-async function repararCuenta(cliente: SupabaseClient, id: string, password: string) {
-  const { error } = await cliente.auth.admin.updateUserById(id, { password, email_confirm: true });
-  if (error) throw new Error(`No pude reparar la cuenta de prueba ${id}: ${error.message}`);
+// Supabase Auth cierra todas las sesiones de una cuenta cada vez que le ponen una contraseña,
+// aunque sea la misma: solo se cambia si cambio la de .env.local.
+export async function asegurarContrasenaDeSiembra(
+  cliente: Cliente,
+  cuenta: User,
+  password: string,
+) {
+  if (cuenta.app_metadata?.huella_siembra === huellaDe(password)) return;
+  const { error } = await cliente.auth.admin.updateUserById(cuenta.id, {
+    password,
+    email_confirm: true,
+    app_metadata: { huella_siembra: huellaDe(password) },
+  });
+  if (error) throw new Error(`No pude reparar la cuenta de prueba ${cuenta.id}: ${error.message}`);
 }
 
 /** Repara la cuenta si ya existe o la crea si falta. Devuelve si la creo. */
 async function asegurarCuenta(
-  cliente: SupabaseClient,
+  cliente: Cliente,
   email: string,
   contrasena: string,
-  id: string | undefined,
+  cuenta: User | undefined,
 ): Promise<boolean> {
-  if (id) {
-    await repararCuenta(cliente, id, contrasena);
+  if (cuenta) {
+    await asegurarContrasenaDeSiembra(cliente, cuenta, contrasena);
     return false;
   }
   await crearCuenta(cliente, email, contrasena);
@@ -57,17 +79,14 @@ async function asegurarCuenta(
 }
 
 /** Crea las cuentas de prueba que falten, repara las que ya estaban y devuelve las creadas. */
-export async function sembrarCuentas(
-  cliente: SupabaseClient,
-  contrasena: string,
-): Promise<string[]> {
+export async function sembrarCuentas(cliente: Cliente, contrasena: string): Promise<string[]> {
   // Supabase guarda el email en minusculas: se compara asi para no recrear adminOtroLocal.
   const cuentas = await listarCuentas(cliente);
-  const ids = new Map(cuentas.map((cuenta) => [(cuenta.email ?? '').toLowerCase(), cuenta.id]));
+  const porEmail = new Map(cuentas.map((cuenta) => [(cuenta.email ?? '').toLowerCase(), cuenta]));
   const creadas: string[] = [];
   for (const email of ROLES_DE_PRUEBA.map(emailDePrueba)) {
-    const id = ids.get(email.toLowerCase());
-    if (await asegurarCuenta(cliente, email, contrasena, id)) creadas.push(email);
+    const existente = porEmail.get(email.toLowerCase());
+    if (await asegurarCuenta(cliente, email, contrasena, existente)) creadas.push(email);
   }
   return creadas;
 }
