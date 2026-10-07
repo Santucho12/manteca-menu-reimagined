@@ -11,6 +11,8 @@ export const COLORES: readonly Token[] = [
   { nombre: 'Acento', variable: '--accent' },
   { nombre: 'Destructivo', variable: '--destructive' },
   { nombre: 'Borde', variable: '--border' },
+  { nombre: 'Borde de campo', variable: '--input' },
+  { nombre: 'Anillo de foco', variable: '--ring' },
 ];
 
 export const TIPOGRAFIAS: readonly Token[] = [
