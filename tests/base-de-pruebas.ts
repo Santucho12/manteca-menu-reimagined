@@ -2,7 +2,9 @@
 export function esBaseDePruebas(url: string, ref: string): boolean {
   if (ref === '') return false;
   try {
-    return new URL(url).hostname === `${ref}.supabase.co`;
+    const direccion = new URL(url);
+    // Sin https, la clave secreta viajaria sin cifrar.
+    return direccion.protocol === 'https:' && direccion.hostname === `${ref}.supabase.co`;
   } catch {
     return false;
   }

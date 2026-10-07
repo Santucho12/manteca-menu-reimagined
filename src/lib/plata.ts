@@ -1,6 +1,7 @@
 /** Muestra un monto en centavos enteros como $1.234,50. */
 export function formatearPesos(centavos: number): string {
-  if (!Number.isInteger(centavos)) {
+  // isSafeInteger y no isInteger: pasado 2^53 los enteros ya perdieron precision.
+  if (!Number.isSafeInteger(centavos)) {
     throw new Error(`Un monto tiene que ser un entero de centavos y llegó: ${centavos}`);
   }
   const signo = centavos < 0 ? '-' : '';
