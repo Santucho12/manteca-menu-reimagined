@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Cualquier archivo de entorno puede tener la clave secreta. Solo se sube el ejemplo, vacio.
+.env*
+!.env.example
+
+test-results/
+playwright-report/
+e2e/capturas/
+
+.vercel/
+.superpowers/

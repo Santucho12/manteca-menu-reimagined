@@ -163,9 +163,28 @@ Acciones sobre una cuenta:
 
 - El dueño se registra apenas se publica, antes de compartir la dirección con nadie: es lo
   que cierra el riesgo de la regla de la primera cuenta.
-- Hay que apagar la confirmación de email en los dos proyectos de Supabase. En la real, con
-  el OK de Santiago.
+- La confirmación de email ya está apagada en los dos proyectos de Supabase, por decisión de
+  Santiago (verificado el 2026-10-06 leyendo la configuración de cada uno).
+- El registro de cuentas del proyecto real quedó abierto. Cerrarlo hasta la publicación
+  achica el riesgo de la regla de la primera cuenta; lo decide Santiago.
 
 ## Parte técnica
 
 Se escribe al construir el módulo: tablas, permisos, acciones de servidor y pruebas.
+
+Pendientes que dejó la revisión de la base técnica, para resolver al construirlo:
+
+- **Inicios de sesión de los tests.** `clienteComo` inicia sesión en cada llamada, y
+  Supabase limita los inicios de sesión por IP (150 cada 5 minutos). Antes de la primera
+  matriz de RLS, reutilizar una sesión por rol.
+- **La siembra crea pero no repara.** Si cambia la contraseña de `.env.local`, las cuentas
+  que ya existían quedan con la anterior y los tests fallan sin decir por qué. Cuando la
+  siembra sume los roles, que también actualice la contraseña de las cuentas existentes.
+- **El entorno de la aplicación.** Playwright comprueba `.env.local`, pero `next dev` lee
+  antes `.env.development.local`. Con el login, comprobar también desde la aplicación que
+  apunta a la base de pruebas.
+- **La clave secreta y los componentes de cliente.** Nada impide importar
+  `src/lib/supabase/secreto.ts` desde un componente de cliente: no filtraría la clave, pero
+  fallaría recién en el navegador. Con los primeros componentes de cliente, sumar una regla
+  de ESLint que lo prohíba en los `.tsx`.
+- **El campo con error** todavía no está en la guía: entra con el primer formulario.

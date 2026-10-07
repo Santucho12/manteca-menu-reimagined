@@ -92,18 +92,12 @@ de seguir con el armado.
 
 ## Pendientes
 
-| # | Pedido | Qué falta |
-|---|---|---|
-| 19 | Armado del sistema | En diseño (brainstorming), en la rama `feat/base-tecnica`. Se partió en dos: este pedido es la base técnica y la guía de estilos; cuentas y acceso van en el módulo de usuarios |
-| 14 | Descargar y configurar Playwright, en vivo | Descargado y probado en vivo (abrió el menú de Manteca y tocó un producto). Creado `.mcp.json` con el servidor de Playwright. La configuración quedó definida en `CLAUDE.md` (navegador a la vista, 300 ms entre acciones, un navegador a la vez). Falta instalar `@playwright/test` dentro del proyecto, al armarlo |
-| 2 | Base de datos | Los dos proyectos ya existen en la organización `manteca` de Supabase (plan gratuito) y están fijados en `.mcp.json`. Falta `.env.local` con los datos de pruebas, que se arma junto con el proyecto, cuando exista el `.gitignore`. Las tablas llegan con cada módulo |
-| 6 | Tests reales contra la base de pruebas | La regla está escrita en `CLAUDE.md` y en `pre-finish`. Falta que exista la base de pruebas y la primera suite corriendo contra ella |
-| 7 | Guía de estilos dentro de la aplicación | La regla está escrita en `CLAUDE.md` y en `pre-finish`. Falta construir la página, que se hace junto con el inicio de la aplicación |
+No hay pedidos pendientes.
 
 ## Completados
 
-Ninguno de estos tiene código de aplicación, así que no hubo tests ni Playwright que
-correr: se anota cómo se verificó cada uno.
+Los pedidos sin código de aplicación no tuvieron tests ni Playwright que correr: se anota
+cómo se verificó cada uno.
 
 | # | Pedido | Fecha | Cómo se verificó |
 |---|---|---|---|
@@ -122,3 +116,8 @@ correr: se anota cómo se verificó cada uno.
 | 17 | Dos reglas nuevas en `CLAUDE.md` y nota en `tests-rls` | 2026-10-06 | Las dos reglas quedaron en `CLAUDE.md` ("Flujo de trabajo" y "Git") y la nota en `tests-rls`. Skills validadas y referencias cruzadas sin errores. Entra a `main` por PR |
 | 18 | Enumerar las skills y el `CLAUDE.md` | 2026-10-06 | Enumeración entregada en la conversación |
 | 20 | Acceso por MCP a Supabase, Vercel, GitHub y Playwright | 2026-10-06 | `supabase-pruebas` y `supabase-real` respondieron `list_tables` y `list_migrations` (las dos bases vacías y sin migraciones). El servidor de Playwright está aprobado en `.claude/settings.local.json`. GitHub funciona por `gh`. Vercel queda para cuando se publique |
+| 19 | Armado del sistema | 2026-10-06 | `npm run verificar` (lint con formato, tipos, 77 tests de Vitest y build) y `npm run e2e` (36 pruebas de Playwright, en computadora y en celular) en verde; capturas de la guía revisadas en los dos tamaños. Pasó además por una revisión independiente; sus hallazgos importantes se corrigieron, cada uno con un test que primero falló. Quedó el proyecto Next.js con el lint controlando los límites de líneas, los tres tipos de test, las seis cuentas de prueba, los tokens de Manteca y la página `/admin/guia-de-estilos` |
+| 14 | Descargar y configurar Playwright, en vivo | 2026-10-06 | `@playwright/test` instalado en el proyecto y configurado a la vista (`headless: false`, 300 ms, un navegador a la vez). `npm run e2e` corrió 36 pruebas en verde |
+| 2 | Base de datos | 2026-10-06 | `.env.local` apunta al proyecto de pruebas y git no lo sigue. Los 20 tests contra la base pasan, y su preparación aborta si la URL no es la de pruebas (hay tests que lo comprueban, también con un `.env.test.local` que apunta a otra base). La base real no se tocó. Las tablas llegan con cada módulo |
+| 6 | Tests reales contra la base de pruebas | 2026-10-06 | El grupo `base` de Vitest corre contra el proyecto de pruebas, sin mocks: 20 tests en verde dentro de `npm run verificar` |
+| 7 | Guía de estilos dentro de la aplicación | 2026-10-06 | La página `/admin/guia-de-estilos` muestra colores, tipografías, radios, sombras, espaciados y componentes. 32 pruebas de Playwright en verde y capturas revisadas |

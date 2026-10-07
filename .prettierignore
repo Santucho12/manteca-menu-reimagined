@@ -1,0 +1,23 @@
+# Generado
+.next/
+out/
+node_modules/
+package-lock.json
+next-env.d.ts
+test-results/
+playwright-report/
+e2e/capturas/
+.superpowers/
+.vercel/
+
+# Lo escriben otras herramientas (shadcn, Next.js, Claude Code)
+src/components/ui/
+src/lib/utils.ts
+components.json
+tsconfig.json
+.claude/
+.mcp.json
+
+# Documentacion
+docs/
+*.md
