@@ -43,6 +43,8 @@ describe('tokens de la guia de estilos', () => {
       '--accent',
       '--destructive',
       '--border',
+      '--input',
+      '--ring',
     ]);
   });
 
