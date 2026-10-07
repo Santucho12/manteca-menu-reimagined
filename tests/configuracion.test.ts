@@ -80,9 +80,13 @@ describe('servidor de desarrollo', () => {
     const paquete = JSON.parse(readFileSync('package.json', 'utf8')) as {
       scripts: Record<string, string>;
     };
-    // next dev lee antes .env.development.local, pero no pisa lo que ya trae el proceso.
-    expect(paquete.scripts.dev).toBe(
-      'node --env-file=.env.local node_modules/next/dist/bin/next dev --port 3210',
-    );
+    expect(paquete.scripts.dev).toBe('node scripts/dev.mjs');
+    // next dev lee antes .env.development.local, pero no pisa lo que ya trae el proceso: el
+    // lanzador carga .env.local y recien despues arranca Next.js.
+    const lanzador = readFileSync('scripts/dev.mjs', 'utf8');
+    const carga = lanzador.indexOf("loadEnvFile('.env.local')");
+    expect(carga).toBeGreaterThan(-1);
+    expect(carga).toBeLessThan(lanzador.indexOf('spawn('));
+    expect(lanzador).toContain("'--port', '3210'");
   });
 });
