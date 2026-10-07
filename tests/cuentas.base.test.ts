@@ -1,22 +1,34 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { randomUUID } from 'node:crypto';
+import type { User } from '@supabase/supabase-js';
 import { describe, expect, it } from 'vitest';
-import { leerEntornoPublico } from '../src/lib/entorno/publico';
-import { clienteComo, clienteSecretoDePruebas } from './clientes';
+import type { Cliente } from '../src/lib/supabase/cliente';
+import { crearClienteSinSesion } from '../src/lib/supabase/sin-sesion';
+import { clienteSecretoDePruebas } from './clientes';
 import {
   ROLES_DE_PRUEBA,
+  asegurarContrasenaDeSiembra,
   emailDePrueba,
   listarCuentas,
   sembrarCuentas,
-  type RolDePrueba,
 } from './cuentas';
 import { leerEntornoPruebas } from './entorno-pruebas';
+import { iniciarSesion } from './iniciar-sesion';
+import { clienteComo } from './sesiones';
 
-async function idDeLaCuenta(secreto: SupabaseClient, rol: RolDePrueba): Promise<string> {
-  const { data, error } = await secreto.auth.admin.listUsers({ page: 1, perPage: 1000 });
-  if (error) throw new Error(`No pude listar las cuentas: ${error.message}`);
-  const cuenta = data.users.find((usuario) => usuario.email === emailDePrueba(rol).toLowerCase());
-  if (!cuenta) throw new Error(`No existe la cuenta de ${rol}`);
-  return cuenta.id;
+async function usuario(secreto: Cliente, id: string): Promise<User> {
+  const { data, error } = await secreto.auth.admin.getUserById(id);
+  if (error || !data.user) throw new Error(`No encontré la cuenta ${id}: ${error?.message}`);
+  return data.user;
+}
+
+async function crearDescartable(secreto: Cliente, email: string): Promise<string> {
+  const { data, error } = await secreto.auth.admin.createUser({
+    email,
+    password: 'una-vieja-larga',
+    email_confirm: true,
+  });
+  if (error || !data.user) throw new Error(`No pude crear la cuenta ${email}: ${error?.message}`);
+  return data.user.id;
 }
 
 describe('cuentas de prueba', () => {
@@ -31,9 +43,8 @@ describe('cuentas de prueba', () => {
     ]);
   });
 
-  it.each(ROLES_DE_PRUEBA)('la cuenta de %s inicia sesion con la clave publicable', async (rol) => {
-    const cliente = await clienteComo(rol);
-    const { data, error } = await cliente.auth.getUser();
+  it.each(ROLES_DE_PRUEBA)('la sesion de %s es la de su cuenta', async (rol) => {
+    const { data, error } = await (await clienteComo(rol)).auth.getUser();
     expect(error).toBeNull();
     // Supabase guarda el email en minusculas.
     expect(data.user?.email).toBe(emailDePrueba(rol).toLowerCase());
@@ -41,21 +52,27 @@ describe('cuentas de prueba', () => {
 
   it('sembrar de nuevo no crea cuentas ni falla', async () => {
     const { CONTRASENA_USUARIOS_PRUEBA } = leerEntornoPruebas();
-    const creadas = await sembrarCuentas(clienteSecretoDePruebas(), CONTRASENA_USUARIOS_PRUEBA);
-    expect(creadas).toEqual([]);
+    expect(await sembrarCuentas(clienteSecretoDePruebas(), CONTRASENA_USUARIOS_PRUEBA)).toEqual([]);
   });
 
-  it('sembrar repara una cuenta que quedo con otra contraseña', async () => {
-    const secreto = clienteSecretoDePruebas();
+  it('sembrar de nuevo no cierra las sesiones abiertas de las cuentas de prueba', async () => {
     const { CONTRASENA_USUARIOS_PRUEBA } = leerEntornoPruebas();
-    const id = await idDeLaCuenta(secreto, 'caja');
-    await secreto.auth.admin.updateUserById(id, { password: 'una-contraseña-vieja' });
+    const caja = await iniciarSesion(emailDePrueba('caja'), CONTRASENA_USUARIOS_PRUEBA);
+    await sembrarCuentas(clienteSecretoDePruebas(), CONTRASENA_USUARIOS_PRUEBA);
+    expect((await caja.auth.getUser()).error).toBeNull();
+  });
+
+  it('la siembra cambia la contraseña solo cuando cambio la de .env.local', async () => {
+    const secreto = clienteSecretoDePruebas();
+    const email = `siembra.${randomUUID()}@manteca.test`;
+    const id = await crearDescartable(secreto, email);
     try {
-      await sembrarCuentas(secreto, CONTRASENA_USUARIOS_PRUEBA);
-      await expect(clienteComo('caja')).resolves.toBeTruthy();
+      await asegurarContrasenaDeSiembra(secreto, await usuario(secreto, id), 'una-nueva-larga');
+      const abierta = await iniciarSesion(email, 'una-nueva-larga');
+      await asegurarContrasenaDeSiembra(secreto, await usuario(secreto, id), 'una-nueva-larga');
+      expect((await abierta.auth.getUser()).error).toBeNull();
     } finally {
-      // Pase lo que pase, la cuenta vuelve a la contraseña de .env.local.
-      await secreto.auth.admin.updateUserById(id, { password: CONTRASENA_USUARIOS_PRUEBA });
+      await secreto.auth.admin.deleteUser(id);
     }
   });
 
@@ -70,13 +87,7 @@ describe('cuentas de prueba', () => {
   });
 
   it('una contraseña equivocada no entra', async () => {
-    const entorno = leerEntornoPublico();
-    const cliente = createClient(
-      entorno.NEXT_PUBLIC_SUPABASE_URL,
-      entorno.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-      { auth: { persistSession: false, autoRefreshToken: false } },
-    );
-    const { data, error } = await cliente.auth.signInWithPassword({
+    const { data, error } = await crearClienteSinSesion().auth.signInWithPassword({
       email: emailDePrueba('admin'),
       password: 'no-es-la-contraseña',
     });
