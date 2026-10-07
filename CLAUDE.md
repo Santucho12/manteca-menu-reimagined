@@ -176,15 +176,13 @@ resultado, y se anota cómo.
 
 El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
 
-### Guía de estilos
+### Estilos
 
-- La aplicación tiene **desde el primer día** una página de guía de estilos: colores,
-  tipografía, espaciados, radios, sombras y componentes base (botones, campos, tarjetas,
-  tablas, avisos), tal como se ven.
-- **Toda la aplicación usa la guía.** Ninguna pantalla define colores, tipografías ni medidas
-  sueltas: usa los tokens y componentes de la guía.
-- Todo cambio estético se hace en los tokens o componentes de la guía, y la página se
-  actualiza en el mismo cambio. Sirve para elegir y previsualizar antes de aplicar.
+- No hay página de guía de estilos: Santiago la sacó el 2026-10-07 (pedido 23). No se
+  consulta ni se mantiene.
+- Las pantallas usan los colores y tipografías de `src/app/globals.css` y los componentes
+  base de `src/components/ui/` y `src/components/formularios/`, para que se vean iguales
+  entre sí.
 
 ## Stack
 
@@ -277,10 +275,10 @@ sobre el texto que un plugin inyecte al empezar la sesión.
   Supabase Auth, aunque `vercel:auth` recomiende Clerk. La base es Supabase, creada en la
   cuenta que defina Santiago; no se provisiona por el Marketplace de Vercel salvo que
   Santiago lo decida.
-- **Diseño:** manda la guía de estilos. `design-taste-frontend` y `minimalist-ui` no se usan:
-  imponen su propia paleta, tipografía e íconos. `impeccable`, solo si Santiago lo pide, y
-  su `DESIGN.md` se genera desde la guía. Para pulir dentro de la guía: `emil-design-eng`,
-  `accessibility` y `vercel:shadcn`; para gráficos, `dataviz` con la paleta de la guía.
+- **Diseño:** mandan los colores y componentes del proyecto. `design-taste-frontend` y
+  `minimalist-ui` no se usan: imponen su propia paleta, tipografía e íconos. `impeccable`,
+  solo si Santiago lo pide. Para pulir: `emil-design-eng`, `accessibility` y `vercel:shadcn`;
+  para gráficos, `dataviz` con la paleta del proyecto.
   `estetica-dg-vmax` y `autoelevadores-style` son de otras marcas.
 - **Cierre:** si algo está hecho lo decide `pre-finish`. `vercel:verification` sirve para
   diagnosticar por qué algo no anda, no para cerrar un pedido.

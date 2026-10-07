@@ -13,7 +13,6 @@ describe('enlacesDelMarco', () => {
       null,
       null,
       null,
-      null,
     ]);
   });
 

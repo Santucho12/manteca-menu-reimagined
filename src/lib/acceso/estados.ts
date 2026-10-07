@@ -15,7 +15,7 @@ export type EstadoDeAcceso = 'sin-sesion' | 'desactivado' | 'cambiar-contrasena'
 export type Pagina = 'publica' | 'panel' | 'cuenta' | 'admin' | 'cambiar-contrasena';
 
 export type EnlaceDelPanel = {
-  clave: 'inicio' | 'usuarios' | 'guia' | 'cuenta';
+  clave: 'inicio' | 'usuarios' | 'cuenta';
   href: string;
   texto: string;
 };
@@ -37,7 +37,6 @@ const ENLACES: Record<'caja' | 'admin', EnlaceDelPanel[]> = {
   admin: [
     { clave: 'inicio', href: '/admin', texto: 'Inicio' },
     { clave: 'usuarios', href: '/admin/usuarios', texto: 'Usuarios' },
-    { clave: 'guia', href: '/admin/guia-de-estilos', texto: 'Guía de estilos' },
     { clave: 'cuenta', href: '/admin/cuenta', texto: 'Mi cuenta' },
   ],
 };
