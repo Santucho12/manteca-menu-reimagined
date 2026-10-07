@@ -24,7 +24,12 @@ describe('estadoDeAcceso', () => {
   });
 
   it('desactivado pesa mas que el rol y que el cambio obligado', () => {
-    const desactivado = { ...perfil, rol: 'admin', activo: false, debe_cambiar_contrasena: true } as const;
+    const desactivado = {
+      ...perfil,
+      rol: 'admin',
+      activo: false,
+      debe_cambiar_contrasena: true,
+    } as const;
     expect(estadoDeAcceso(desactivado)).toBe('desactivado');
   });
 
@@ -34,9 +39,12 @@ describe('estadoDeAcceso', () => {
     );
   });
 
-  it.each(['invitado', 'caja', 'encargado', 'admin'] as const)('activo, el estado es el rol %s', (rol) => {
-    expect(estadoDeAcceso({ ...perfil, rol })).toBe(rol);
-  });
+  it.each(['invitado', 'caja', 'encargado', 'admin'] as const)(
+    'activo, el estado es el rol %s',
+    (rol) => {
+      expect(estadoDeAcceso({ ...perfil, rol })).toBe(rol);
+    },
+  );
 });
 
 describe('destinoDe', () => {
