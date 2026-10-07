@@ -1,7 +1,9 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import { leerEntornoPublico } from '../entorno/publico';
 import { validarEntorno } from '../entorno/validar';
+import type { Cliente } from './cliente';
+import type { Database } from './tipos';
 
 const esquema = z.object({
   SUPABASE_SECRET_KEY: z.string().min(1),
@@ -23,9 +25,9 @@ export function exigirClaveSecreta(): void {
   leerClaveSecreta();
 }
 
-export function crearClienteSecreto(): SupabaseClient {
+export function crearClienteSecreto(): Cliente {
   const { NEXT_PUBLIC_SUPABASE_URL } = leerEntornoPublico();
-  return createClient(NEXT_PUBLIC_SUPABASE_URL, leerClaveSecreta(), {
+  return createClient<Database>(NEXT_PUBLIC_SUPABASE_URL, leerClaveSecreta(), {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
