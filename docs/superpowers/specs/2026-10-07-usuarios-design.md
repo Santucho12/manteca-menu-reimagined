@@ -40,6 +40,7 @@ y `supabase/schema.sql` al día (`migracion-supabase`).
 |---|---|---|
 | `locales` | `id`, `nombre`, `activo`, `fecha_creacion`, `fecha_actualizacion` | La migración crea Manteca. Las cuentas nuevas van al local más antiguo |
 | `perfiles` | `id` (el de `auth.users`), `local_id`, `nombre`, `email`, `rol`, `activo`, `debe_cambiar_contrasena`, `fecha_creacion`, `fecha_actualizacion` | `rol` es el tipo `rol_usuario`: `invitado`, `caja`, `encargado`, `admin`. El email es único |
+| `acciones_de_cuenta` | `id`, `cuenta_id`, `tipo`, `por`, `fecha_uso`, `fecha_creacion`, `fecha_actualizacion` | Lo que el servidor anota antes de resetear una contraseña o corregir un email: el tipo (`reseteo`, `correccion` o `siembra`) y el admin que lo pidió. La base la usa una sola vez y solo si tiene menos de 10 minutos |
 | `auditoria` | `id`, `local_id`, `usuario_id`, `tabla`, `registro_id`, `accion`, `antes`, `despues`, `motivo`, `fecha` | `usuario_id` vacío quiere decir "el sistema". `antes` y `despues` guardan solo lo que cambió |
 
 `perfiles.id` referencia a `auth.users` con borrado en cascada: en el sistema nada se borra,
@@ -55,8 +56,8 @@ base de pruebas son las seis cuentas de prueba; en la real no hay ninguna.
 | La primera cuenta queda como admin; las demás, como invitado | Trigger al crearse una cuenta en `auth.users`. Un bloqueo serializa los registros simultáneos. La decisión vive en una función pura, `rol_de_cuenta_nueva(cuentas)`, que se prueba sola |
 | Nadie se cambia el rol ni se desactiva a sí mismo | Trigger antes de actualizar `perfiles` |
 | Nunca quedan cero admins activos en un local | El mismo trigger, con un bloqueo por local para que dos admins no se bajen a la vez |
-| El email del perfil sigue al de la cuenta | Trigger al actualizarse `auth.users` |
-| Cambiar la contraseña apaga el cambio obligado; un reseteo lo prende | El mismo trigger. Para distinguirlos, el servidor marca cada reseteo y cada corrección con un identificador nuevo en `app_metadata`, junto con el admin que lo pidió. Solo la clave secreta puede escribir ahí, así que la marca no se puede falsificar desde el navegador |
+| El email del perfil sigue al de la cuenta, y solo lo cambia un admin | Trigger al actualizarse `auth.users`. Un cambio de email sin una corrección anotada se rechaza |
+| Cambiar la contraseña apaga el cambio obligado; un reseteo lo prende | El mismo trigger. Para distinguirlos, el servidor anota cada reseteo y cada corrección en `acciones_de_cuenta` antes de llamar a Supabase Auth, con el admin que lo pidió. A esa tabla solo llega la clave secreta, así que nadie la falsifica desde el navegador. No sirve una marca en `app_metadata`: Supabase Auth guarda la contraseña y el email antes que los metadatos, y la marca llegaría tarde |
 
 Los errores de estas reglas salen con un código propio y el mensaje en español de la
 definición.
@@ -84,6 +85,7 @@ Toda tabla revoca todo y otorga lo justo, por columna cuando hace falta.
 | `locales` | Un usuario activo, su propio local | Nadie desde la aplicación |
 | `perfiles` | Cada uno su perfil, aunque esté desactivado o sea invitado; el admin activo, los de su local | El admin activo, en su local: `nombre`, `rol` y `activo`. Nadie inserta ni borra |
 | `auditoria` | El admin activo, la de su local | Nadie: solo los triggers |
+| `acciones_de_cuenta` | Nadie desde la aplicación | Nadie desde la aplicación: la anota el servidor con la clave secreta |
 
 El visitante sin sesión no lee nada. Las funciones que usan las políticas
 (`es_admin_activo()`, `local_del_usuario()`) se definen con `search_path` fijo.
@@ -128,8 +130,8 @@ llama a un servicio de `src/lib/usuarios/` que recibe el cliente por parámetro
 | Asignar rol | Admin | Caja o Admin; no Encargado |
 | Rechazar a un invitado | Admin | Lo desactiva |
 | Desactivar y reactivar | Admin | Cambia `activo` con su sesión y además bloquea o desbloquea la cuenta en Supabase Auth con la clave secreta |
-| Resetear la contraseña | Admin | Genera una temporal de 12 caracteres sin letras que se confundan, la pone con la clave secreta y la devuelve para mostrarla una sola vez. No sirve para la propia cuenta |
-| Corregir nombre o email | Admin | El nombre, con su sesión; el email, con la clave secreta |
+| Resetear la contraseña | Admin | Anota el reseteo, genera una temporal de 12 caracteres sin letras que se confundan, la pone con la clave secreta y la devuelve para mostrarla una sola vez. No sirve para la propia cuenta |
+| Corregir nombre o email | Admin | El nombre, con su sesión; el email, anotando la corrección y con la clave secreta |
 
 La clave secreta se usa solo después de comprobar en el servidor que lo pide un admin
 activo, como permite `CLAUDE.md`.
@@ -169,11 +171,17 @@ Formularios con React Hook Form y Zod. Se suman `react-hook-form` y `@hookform/r
 | Cada acción: sin sesión, invitado, caja, encargado y desactivado rechazados; datos inválidos; auditoría | Contra la base |
 | Registro, espera, el admin da rol y la persona entra; ingreso con error; desactivar; resetear y cambio obligado; las pantallas táctiles | En vivo |
 
-La infraestructura de pruebas cambia en tres puntos:
+La infraestructura de pruebas cambia en cinco puntos:
 
 - `clienteComo` reutiliza una sesión por rol dentro de cada archivo, y Playwright guarda la
   sesión de cada rol una vez. Así no se pasa el límite de ráfagas de inicios de sesión de
   Supabase (30).
+- La siembra cambia la contraseña de una cuenta de prueba solo si cambió la de `.env.local`:
+  cada vez que se la pone, Supabase Auth cierra todas las sesiones de la cuenta, también las
+  compartidas.
+- `npm run dev` carga `.env.local` antes que cualquier otro archivo de entorno, y Playwright
+  no reutiliza un servidor que ya estaba abierto: la aplicación de las pruebas en vivo usa la
+  base comprobada.
 - La siembra deja a cada cuenta de prueba con su rol, su local y su estado. `adminOtroLocal`
   va a un segundo local que crea la siembra. `desactivado` es un admin inactivo, sin
   bloquear en Supabase Auth, para probar que RLS lo frena aunque tenga sesión.
