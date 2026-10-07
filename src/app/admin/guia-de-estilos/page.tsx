@@ -13,7 +13,7 @@ export default function PaginaGuiaDeEstilos() {
   return (
     <main className="mx-auto max-w-5xl space-y-12 px-4 py-8">
       <header className="space-y-2">
-        <h1 className="font-title text-4xl">Guía de estilos</h1>
+        <h1 className="font-heading text-4xl font-semibold">Guía de estilos</h1>
         <p className="text-muted-foreground">
           Colores, tipografías, medidas y componentes que usa toda la aplicación.
         </p>

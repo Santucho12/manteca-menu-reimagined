@@ -17,12 +17,12 @@ export const COLORES: readonly Token[] = [
 
 export const TIPOGRAFIAS: readonly Token[] = [
   {
-    nombre: 'Manic, para títulos',
+    nombre: 'Manic, para la marca',
     variable: '--font-family-title',
     // El archivo de la fuente manda cada vocal acentuada y la ñ al glifo sin tilde.
-    nota: 'Manic no dibuja acentos ni la ñ: «Cafetería» se ve «Cafeteria».',
+    nota: 'Manic no dibuja acentos ni la ñ: «Cafetería» se ve «Cafeteria». El panel usa Neufile Grotesk para los títulos.',
   },
-  { nombre: 'Neufile Grotesk, para texto', variable: '--font-family-sans' },
+  { nombre: 'Neufile Grotesk, para títulos y texto del panel', variable: '--font-family-sans' },
 ];
 
 export const RADIOS: readonly Token[] = [

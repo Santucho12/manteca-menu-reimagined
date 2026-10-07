@@ -2,8 +2,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Campo } from '@/components/formularios/Campo';
+import { CampoContrasena } from '@/components/formularios/CampoContrasena';
 import {
   Table,
   TableBody,
@@ -68,15 +68,28 @@ function TablaDeEjemplo() {
   );
 }
 
+function Campos() {
+  return (
+    <div className="max-w-sm space-y-4">
+      <Campo id="guia-nombre" etiqueta="Nombre" placeholder="Escribí un nombre" />
+      <Campo
+        id="guia-monto"
+        etiqueta="Monto"
+        inputMode="numeric"
+        defaultValue="0"
+        error="Ingresá un monto mayor a cero."
+      />
+      <CampoContrasena id="guia-contrasena" etiqueta="Contraseña" autoComplete="off" />
+    </div>
+  );
+}
+
 export function SeccionComponentes() {
   return (
     <SeccionGuia titulo="Componentes">
       <div className="space-y-8">
         <Botones />
-        <div className="max-w-sm space-y-2">
-          <Label htmlFor="guia-nombre">Nombre</Label>
-          <Input id="guia-nombre" placeholder="Escribí un nombre" />
-        </div>
+        <Campos />
         <Card className="max-w-sm">
           <CardHeader>
             <CardTitle>Tarjeta</CardTitle>

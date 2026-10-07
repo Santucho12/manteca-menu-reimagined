@@ -7,7 +7,7 @@ export function SeccionGuia({ titulo, children }: Props) {
   const idTitulo = useId();
   return (
     <section aria-labelledby={idTitulo} className="space-y-4">
-      <h2 id={idTitulo} className="font-title text-2xl">
+      <h2 id={idTitulo} className="font-heading text-2xl font-semibold">
         {titulo}
       </h2>
       {children}
