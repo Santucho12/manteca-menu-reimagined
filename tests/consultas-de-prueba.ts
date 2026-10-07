@@ -62,6 +62,17 @@ export async function anotarAccion(
   if (error) throw new Error(`No pude anotar la accion: ${error.message}`);
 }
 
+/** Las acciones anotadas para la cuenta que todavia nadie uso. */
+export async function accionesSinUsar(cuentaId: string): Promise<number> {
+  const { count, error } = await clienteSecretoDePruebas()
+    .from('acciones_de_cuenta')
+    .select('id', { count: 'exact', head: true })
+    .eq('cuenta_id', cuentaId)
+    .is('fecha_uso', null);
+  if (error) throw new Error(`No pude contar las acciones: ${error.message}`);
+  return count ?? 0;
+}
+
 /** Lo mismo que hace un admin al resetear, sin pasar por la pantalla: prepara las pruebas. */
 export async function resetearComoAdmin(cuentaId: string, temporal: string): Promise<void> {
   await anotarAccion(cuentaId, 'reseteo', await idDeCuentaDePrueba('admin'));
