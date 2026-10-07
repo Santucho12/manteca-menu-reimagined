@@ -1,7 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// Puerto propio del proyecto: el 3000 suele estar ocupado por otra aplicacion,
-// y Playwright reutiliza lo que encuentre escuchando en la URL.
+// Puerto propio del proyecto: el 3000 suele estar ocupado por otra aplicacion.
 const PUERTO = 3210;
 const URL_LOCAL = `http://localhost:${PUERTO}`;
 
@@ -20,8 +19,10 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
-    { name: 'computadora', use: { ...devices['Desktop Chrome'] } },
-    { name: 'celular', use: { ...devices['Pixel 7'] } },
+    // Abre y guarda una sesion por rol antes de las pruebas.
+    { name: 'sesiones', testMatch: /sesiones\.setup\.ts/ },
+    { name: 'computadora', use: { ...devices['Desktop Chrome'] }, dependencies: ['sesiones'] },
+    { name: 'celular', use: { ...devices['Pixel 7'] }, dependencies: ['sesiones'] },
   ],
   webServer: {
     command: 'npm run dev',
@@ -29,7 +30,8 @@ export default defineConfig({
     // servidor que responde 2xx, 3xx o 400 a 403, y una ruta que todavia no
     // existe responde 404.
     port: PUERTO,
-    reuseExistingServer: true,
+    // Nunca uno que ya estaba abierto: pudo arrancar con otras variables y otra base.
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 });

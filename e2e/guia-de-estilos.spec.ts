@@ -1,4 +1,8 @@
 import { expect, test, type Locator } from '@playwright/test';
+import { SESIONES, colorDeFondo } from './ayudas';
+
+// La guia es solo para el admin.
+test.use({ storageState: SESIONES.admin });
 
 const SECCIONES = ['Colores', 'Tipografías', 'Radios', 'Sombras', 'Espaciados', 'Componentes'];
 
@@ -14,10 +18,6 @@ const COLORES = [
   'Destructivo',
   'Borde',
 ];
-
-function colorDeFondo(elemento: Locator): Promise<string> {
-  return elemento.evaluate((nodo) => getComputedStyle(nodo).backgroundColor);
-}
 
 async function alturaYAncho(control: Locator): Promise<[number, number]> {
   const caja = await control.boundingBox();

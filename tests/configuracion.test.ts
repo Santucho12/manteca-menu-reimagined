@@ -74,3 +74,15 @@ describe('clave secreta en los componentes', () => {
     30_000,
   );
 });
+
+describe('servidor de desarrollo', () => {
+  it('npm run dev arranca con .env.local, que manda sobre los otros archivos de entorno', () => {
+    const paquete = JSON.parse(readFileSync('package.json', 'utf8')) as {
+      scripts: Record<string, string>;
+    };
+    // next dev lee antes .env.development.local, pero no pisa lo que ya trae el proceso.
+    expect(paquete.scripts.dev).toBe(
+      'node --env-file=.env.local node_modules/next/dist/bin/next dev --port 3210',
+    );
+  });
+});
