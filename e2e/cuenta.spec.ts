@@ -57,8 +57,10 @@ test.describe('cambiar la contraseña', () => {
     await expect(aviso(page)).toHaveText('Tu contraseña actual no coincide.');
     await page.getByLabel('Contraseña actual', { exact: true }).fill(cuenta.contrasena);
     await page.getByRole('button', { name: 'Cambiar contraseña' }).click();
+    // Comprueba la actual y pone la nueva: son varios pedidos a Supabase por internet.
     await expect(page.getByRole('main').getByRole('status')).toHaveText(
       'Listo, cambiaste tu contraseña.',
+      { timeout: 15_000 },
     );
     await page.getByRole('button', { name: 'Salir' }).click();
     await ingresarComo(page, cuenta.email, 'la-nueva-larga');
