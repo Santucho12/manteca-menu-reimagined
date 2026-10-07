@@ -158,7 +158,8 @@ test('en la computadora, botones y campos conservan su tamaño compacto', async 
     (await alturaYAncho(componentes.getByLabel('Nombre')))[0],
     (await alturaYAncho(componentes.getByRole('button', { name: 'Mostrar contraseña' })))[0],
   ];
-  expect(altos).toEqual([32, 32, 32]);
+  // El navegador puede medir fracciones de pixel segun donde quede el control.
+  expect(altos.map(Math.round)).toEqual([32, 32, 32]);
 });
 
 test('muestra un campo con error, que el lector de pantalla anuncia', async ({ page }) => {

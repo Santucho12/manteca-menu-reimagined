@@ -3,15 +3,14 @@ import { SeccionColores } from '@/components/guia/SeccionColores';
 import { SeccionComponentes } from '@/components/guia/SeccionComponentes';
 import { SeccionEspaciados, SeccionRadios, SeccionSombras } from '@/components/guia/SeccionMedidas';
 import { SeccionTipografias } from '@/components/guia/SeccionTipografias';
+import { exigirPagina } from '@/lib/acceso/servidor';
 
-export const metadata: Metadata = {
-  title: 'Guía de estilos',
-  robots: { index: false, follow: false },
-};
+export const metadata: Metadata = { title: 'Guía de estilos' };
 
-export default function PaginaGuiaDeEstilos() {
+export default async function PaginaGuiaDeEstilos() {
+  await exigirPagina('admin');
   return (
-    <main className="mx-auto max-w-5xl space-y-12 px-4 py-8">
+    <div className="space-y-12">
       <header className="space-y-2">
         <h1 className="font-heading text-4xl font-semibold">Guía de estilos</h1>
         <p className="text-muted-foreground">
@@ -24,6 +23,6 @@ export default function PaginaGuiaDeEstilos() {
       <SeccionSombras />
       <SeccionEspaciados />
       <SeccionComponentes />
-    </main>
+    </div>
   );
 }
