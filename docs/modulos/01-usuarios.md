@@ -168,6 +168,14 @@ Acciones sobre una cuenta:
   Santiago (verificado el 2026-10-06 leyendo la configuración de cada uno).
 - El registro de cuentas del proyecto real quedó abierto. Cerrarlo hasta la publicación
   achica el riesgo de la regla de la primera cuenta; lo decide Santiago.
+- Los ingresos y registros salen del servidor, así que Supabase Auth los cuenta todos con la
+  IP de Vercel y su límite (unos 30 inicios cada 5 minutos) es uno solo para todo el local.
+  Alguien que pruebe contraseñas al azar podría dejar a todos sin entrar unos minutos. Antes
+  de publicar, Santiago decide: subir ese límite en el proyecto real, pasarle a Supabase la
+  IP de cada persona, o frenar los intentos por IP en Vercel.
+- Antes de aplicar las migraciones a la base real, comprobar que no tenga cuentas
+  (`select count(*) from auth.users` da 0): si hubiera alguna, quedaría como invitado y
+  nadie sería admin.
 
 ## Parte técnica
 

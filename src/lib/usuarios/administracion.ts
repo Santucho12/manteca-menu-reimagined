@@ -94,8 +94,10 @@ export async function reactivar(
 ): Promise<Resultado> {
   const previa = await prepararAccion(cliente, id);
   if (!previa.ok) return previa;
-  const cambio = await cambiarPerfil(cliente, id, { activo: true });
-  return cambio.ok ? bloquear(secreto, id, 'none') : cambio;
+  // Primero el desbloqueo: si falla, el perfil sigue inactivo y la lista sigue ofreciendo
+  // Reactivar. Al reves, la lista diria "Activa" con la cuenta todavia bloqueada.
+  const desbloqueo = await bloquear(secreto, id, 'none');
+  return desbloqueo.ok ? cambiarPerfil(cliente, id, { activo: true }) : desbloqueo;
 }
 
 export async function resetearContrasena(
