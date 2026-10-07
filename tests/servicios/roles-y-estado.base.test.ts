@@ -119,6 +119,29 @@ describe('desactivar y reactivar', () => {
       expect((await usuarioDe(cuenta.id)).banned_until).toBeFalsy();
     }));
 
+  it.each(SIN_PERMISO)('%s no puede reactivar a nadie, y la cuenta sigue bloqueada', (rol) =>
+    conCuenta({ rol: 'caja', activo: false }, async (cuenta) => {
+      const secreto = clienteSecretoDePruebas();
+      await secreto.auth.admin.updateUserById(cuenta.id, { ban_duration: '876000h' });
+      expect(await reactivar(await clienteComo(rol), secreto, cuenta.id)).toEqual(
+        fallo(MENSAJES.sinPermiso),
+      );
+      expect((await perfilDe(cuenta.id)).activo).toBe(false);
+      expect((await usuarioDe(cuenta.id)).banned_until).toBeTruthy();
+    }),
+  );
+
+  it('el admin de otro local no puede reactivar, y la cuenta sigue bloqueada', () =>
+    conCuenta({ rol: 'caja', activo: false }, async (cuenta) => {
+      const secreto = clienteSecretoDePruebas();
+      await secreto.auth.admin.updateUserById(cuenta.id, { ban_duration: '876000h' });
+      expect(await reactivar(await clienteComo('adminOtroLocal'), secreto, cuenta.id)).toEqual(
+        fallo(MENSAJES.cuentaNoEncontrada),
+      );
+      expect((await perfilDe(cuenta.id)).activo).toBe(false);
+      expect((await usuarioDe(cuenta.id)).banned_until).toBeTruthy();
+    }));
+
   it('nadie se desactiva a si mismo, y su cuenta no se bloquea', () =>
     conCuenta({ rol: 'admin' }, async (cuenta) => {
       const propio = await iniciarSesion(cuenta.email, cuenta.contrasena);

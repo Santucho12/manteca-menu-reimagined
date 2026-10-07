@@ -121,11 +121,17 @@ describe('corregir', () => {
       expect((await perfilDe(cuenta.id)).nombre).toBe('Cuenta temporal');
     }));
 
-  it('caja no puede corregir', () =>
+  it.each(SIN_PERMISO)('%s no puede corregir, y el email sigue igual', (rol) =>
     conCuenta({ rol: 'caja' }, async (cuenta) => {
-      const datos = { id: cuenta.id, nombre: 'Otro nombre', email: cuenta.email };
-      expect(await corregir(await clienteComo('caja'), clienteSecretoDePruebas(), datos)).toEqual(
+      const datos = { id: cuenta.id, nombre: 'Otro nombre', email: `otro.${cuenta.email}` };
+      expect(await corregir(await clienteComo(rol), clienteSecretoDePruebas(), datos)).toEqual(
         fallo(MENSAJES.sinPermiso),
       );
-    }));
+      expect(await perfilDe(cuenta.id)).toMatchObject({
+        nombre: 'Cuenta temporal',
+        email: cuenta.email,
+      });
+      expect(await accionesSinUsar(cuenta.id)).toBe(0);
+    }),
+  );
 });
