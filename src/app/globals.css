@@ -76,6 +76,9 @@
 
   --font-title: var(--font-family-title);
   --font-sans: var(--font-family-sans);
+  /* shadcn usa font-heading en los titulos de sus componentes: van en la
+     tipografia de texto. Manic queda para los titulos de pantalla. */
+  --font-heading: var(--font-family-sans);
 
   --shadow-suave: var(--sombra-suave);
   --shadow-media: var(--sombra-media);

@@ -1,4 +1,4 @@
-export type Token = { nombre: string; variable: string };
+export type Token = { nombre: string; variable: string; nota?: string };
 
 export const COLORES: readonly Token[] = [
   { nombre: 'Fondo', variable: '--background' },
@@ -14,7 +14,12 @@ export const COLORES: readonly Token[] = [
 ];
 
 export const TIPOGRAFIAS: readonly Token[] = [
-  { nombre: 'Manic, para títulos', variable: '--font-family-title' },
+  {
+    nombre: 'Manic, para títulos',
+    variable: '--font-family-title',
+    // El archivo de la fuente manda cada vocal acentuada y la ñ al glifo sin tilde.
+    nota: 'Manic no dibuja acentos ni la ñ: «Cafetería» se ve «Cafeteria».',
+  },
   { nombre: 'Neufile Grotesk, para texto', variable: '--font-family-sans' },
 ];
 
