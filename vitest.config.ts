@@ -28,6 +28,9 @@ export default defineConfig({
           globalSetup: ['tests/preparacion-base.ts'],
           // Los tests comparten la base de pruebas: de a un archivo por vez.
           fileParallelism: false,
+          // Cada test habla varias veces con la base de pruebas por internet: 5 segundos no
+          // siempre alcanzan.
+          testTimeout: 20_000,
         },
       },
     ],
