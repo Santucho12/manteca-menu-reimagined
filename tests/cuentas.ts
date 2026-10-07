@@ -28,7 +28,10 @@ async function crearCuenta(cliente: SupabaseClient, email: string, password: str
 }
 
 /** Crea las cuentas de prueba que falten y devuelve los emails que creo. */
-export async function sembrarCuentas(cliente: SupabaseClient, contrasena: string): Promise<string[]> {
+export async function sembrarCuentas(
+  cliente: SupabaseClient,
+  contrasena: string,
+): Promise<string[]> {
   const existentes = await emailsExistentes(cliente);
   // Supabase guarda el email en minusculas: se compara asi para no recrear adminOtroLocal.
   const faltantes = ROLES_DE_PRUEBA.map(emailDePrueba).filter(

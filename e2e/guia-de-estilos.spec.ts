@@ -96,7 +96,9 @@ test('muestra los componentes base', async ({ page }) => {
   await expect(componentes.getByRole('button', { name: 'No disponible' })).toBeDisabled();
   await expect(componentes.getByLabel('Nombre')).toBeEditable();
   await expect(componentes.getByRole('table')).toBeVisible();
-  await expect(componentes.getByRole('alert').filter({ hasText: 'Revisá los montos' })).toBeVisible();
+  await expect(
+    componentes.getByRole('alert').filter({ hasText: 'Revisá los montos' }),
+  ).toBeVisible();
   await expect(componentes.getByText('Más vendido', { exact: true })).toBeVisible();
 });
 

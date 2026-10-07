@@ -28,10 +28,14 @@ export default defineConfig([
   },
   globalIgnores([
     '.next/**',
+    'out/**',
+    '.vercel/**',
+    '.superpowers/**',
     'next-env.d.ts',
     'src/components/ui/**',
     'src/lib/supabase/tipos.ts',
     'test-results/**',
     'playwright-report/**',
+    'e2e/capturas/**',
   ]),
 ]);
