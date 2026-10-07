@@ -13,10 +13,9 @@ el rol a admin.
 > ⚠️ **La trampa que da falsa tranquilidad:** la clave secreta (rol `service_role`) saltea
 > RLS entera. Un test de acceso que la usa pasa siempre, aunque las policies estén rotas.
 
-> ⚠️ **El ejemplo de `gastos` todavía no corrió contra una base real.** `clienteComo` sí:
-> existe en `tests/clientes.ts` y lo ejercita `tests/cuentas.base.test.ts`. Con la primera
-> tabla, validar el ejemplo de `gastos` contra la base de pruebas y corregir acá lo que haga
-> falta. Cuando esté validado, se borra esta nota.
+> El ejemplo de `gastos` es ilustrativo: esa tabla todavía no existe. Las dos formas de negar
+> que describe la Gotcha 1 (`42501` sin grant, `[]` con la policy) se validaron con las tablas
+> de usuarios, en `tests/rls/`.
 
 ## La regla de hierro
 
@@ -83,8 +82,9 @@ fila en el test.
 
 - Uno por rol, fijos, en la base de pruebas: `prueba.<rol>@manteca.test`. Los crea
   `npm run sembrar:pruebas`, que crea los que faltan y repara la contraseña de los que ya
-  estaban. La preparación de Vitest y la de
-  Playwright lo corren solas antes de empezar, así que un usuario borrado se vuelve a crear.
+  estaban, y les deja su rol, su local y su estado: `adminOtroLocal` en el local B y
+  `desactivado` como un admin inactivo. La preparación de Vitest y la de Playwright lo corren
+  solas antes de empezar, así que un usuario borrado se vuelve a crear.
 - La contraseña sale de `CONTRASENA_USUARIOS_PRUEBA` en `.env.local`. Nunca se escribe en el
   repo.
 - Antes de sembrar nada, la preparación comprueba que la URL de Supabase sea la del proyecto
@@ -95,28 +95,24 @@ fila en el test.
   que es el que tiene la preparación y las variables de `.env.local`.
 
 Las cuentas y sus roles están en `tests/cuentas.ts` (`ROLES_DE_PRUEBA`, `emailDePrueba`). El
-cliente firmado es `clienteComo`, de `tests/clientes.ts`:
+cliente firmado es `clienteComo`, de `tests/sesiones.ts`. No inicia sesión: usa la que la
+preparación abrió para cada rol, así una corrida no pasa el límite de inicios de sesión de
+Supabase. Para una cuenta que crea el test, `clienteDe(cuenta)`, de
+`tests/cuentas-temporales.ts`.
 
 ```ts
-// tests/clientes.ts — cliente firmado como una cuenta de prueba.
-export async function clienteComo(rol: RolDePrueba): Promise<SupabaseClient> {
+// tests/sesiones.ts: cliente firmado como una cuenta de prueba.
+export async function clienteComo(rol: RolDePrueba): Promise<Cliente> {
   comprobarBaseDePruebas(); // aborta si la URL no es la del proyecto de pruebas
-  const entorno = leerEntornoPublico();
-  const cliente = createClient(
-    entorno.NEXT_PUBLIC_SUPABASE_URL,
-    entorno.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-    { auth: { persistSession: false, autoRefreshToken: false } },
-  );
-  const { error } = await cliente.auth.signInWithPassword({
-    email: emailDePrueba(rol),
-    password: leerEntornoPruebas().CONTRASENA_USUARIOS_PRUEBA,
-  });
-  if (error) throw new Error(`No pude entrar como ${rol}: ${error.message}`);
-  return cliente;
+  const existente = clientes.get(rol);
+  if (existente) return existente;
+  const nuevo = conLaSesionDe(rol); // setSession con la sesion que abrio la preparacion
+  clientes.set(rol, nuevo);
+  return nuevo;
 }
 ```
 
-Para sembrar y limpiar se usa `clienteSecretoDePruebas()`, del mismo archivo: comprueba la
+Para sembrar y limpiar se usa `clienteSecretoDePruebas()`, de `tests/clientes.ts`: comprueba la
 base y recién ahí arma el cliente con la clave secreta, que solo lee
 `src/lib/supabase/secreto.ts`. En los tests no se llama a `crearClienteSecreto()` directo: se
 saltearía esa comprobación.
@@ -128,7 +124,7 @@ Tablas y columnas ilustrativas: usar las del esquema real.
 ```ts
 // tests/rls/gastos.base.test.ts
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { clienteComo } from '../clientes';
+import { clienteComo } from '../sesiones';
 import { limpiarCorrida, sembrarGasto } from './siembra'; // usan clienteSecretoDePruebas
 
 const corrida = `rls-gastos-${Date.now()}`;

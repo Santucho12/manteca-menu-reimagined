@@ -31,8 +31,10 @@ se pierda en el momento.
 
 ## Base de datos
 
-Una migración, `supabase/migrations/AAAAMMDDHHMMSS_usuarios_y_auditoria.sql`, con su reversa
-y `supabase/schema.sql` al día (`migracion-supabase`).
+Tres migraciones en `supabase/migrations/`, cada una con su reversa, y `supabase/schema.sql`
+al día (`migracion-supabase`): `20261007150000_usuarios_y_auditoria` (tablas),
+`20261007150100_usuarios_funciones_y_reglas` y `20261007150200_usuarios_triggers_y_permisos`.
+Se dividió al construirla; el contenido es el mismo.
 
 ### Tablas
 
@@ -189,7 +191,7 @@ La infraestructura de pruebas cambia en cinco puntos:
 
 ## Pasos de Santiago
 
-- Aplicar la migración a la base real, cuando decida publicar.
+- Aplicar las tres migraciones a la base real, en orden, cuando decida publicar.
 
 La contraseña pide 6 caracteres como mínimo, el mismo mínimo que trae Supabase Auth: así la
 regla de la aplicación y la de Supabase coinciden sin tocar su configuración (decisión de
