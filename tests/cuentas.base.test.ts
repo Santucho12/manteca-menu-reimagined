@@ -1,35 +1,20 @@
-import { randomUUID } from 'node:crypto';
-import type { User } from '@supabase/supabase-js';
 import { describe, expect, it } from 'vitest';
-import type { Cliente } from '../src/lib/supabase/cliente';
 import { crearClienteSinSesion } from '../src/lib/supabase/sin-sesion';
 import { clienteSecretoDePruebas } from './clientes';
+import { registrosDe, usuarioDe } from './consultas-de-prueba';
 import {
+  PERFILES_DE_PRUEBA,
   ROLES_DE_PRUEBA,
   asegurarContrasenaDeSiembra,
   emailDePrueba,
   listarCuentas,
   sembrarCuentas,
 } from './cuentas';
+import { borrarCuentaTemporal, crearCuentaTemporal } from './cuentas-temporales';
 import { leerEntornoPruebas } from './entorno-pruebas';
 import { iniciarSesion } from './iniciar-sesion';
+import { NOMBRE_DEL_LOCAL_B, NOMBRE_DEL_LOCAL_PRINCIPAL } from './locales';
 import { clienteComo } from './sesiones';
-
-async function usuario(secreto: Cliente, id: string): Promise<User> {
-  const { data, error } = await secreto.auth.admin.getUserById(id);
-  if (error || !data.user) throw new Error(`No encontré la cuenta ${id}: ${error?.message}`);
-  return data.user;
-}
-
-async function crearDescartable(secreto: Cliente, email: string): Promise<string> {
-  const { data, error } = await secreto.auth.admin.createUser({
-    email,
-    password: 'una-vieja-larga',
-    email_confirm: true,
-  });
-  if (error || !data.user) throw new Error(`No pude crear la cuenta ${email}: ${error?.message}`);
-  return data.user.id;
-}
 
 describe('cuentas de prueba', () => {
   it('son seis, una por rol', () => {
@@ -46,8 +31,30 @@ describe('cuentas de prueba', () => {
   it.each(ROLES_DE_PRUEBA)('la sesion de %s es la de su cuenta', async (rol) => {
     const { data, error } = await (await clienteComo(rol)).auth.getUser();
     expect(error).toBeNull();
-    // Supabase guarda el email en minusculas.
     expect(data.user?.email).toBe(emailDePrueba(rol).toLowerCase());
+  });
+
+  it('cada cuenta de prueba queda con su nombre, rol, local y estado', async () => {
+    const { data, error } = await clienteSecretoDePruebas()
+      .from('perfiles')
+      .select('email, nombre, rol, activo, debe_cambiar_contrasena, locales(nombre)')
+      .in(
+        'email',
+        ROLES_DE_PRUEBA.map((rol) => emailDePrueba(rol).toLowerCase()),
+      );
+    expect(error).toBeNull();
+    const porEmail = new Map((data ?? []).map((perfil) => [perfil.email, perfil]));
+    for (const rol of ROLES_DE_PRUEBA) {
+      const { nombre, rol: rolDeLaBase, activo, otroLocal } = PERFILES_DE_PRUEBA[rol];
+      expect(porEmail.get(emailDePrueba(rol).toLowerCase())).toEqual({
+        email: emailDePrueba(rol).toLowerCase(),
+        nombre,
+        rol: rolDeLaBase,
+        activo,
+        debe_cambiar_contrasena: false,
+        locales: { nombre: otroLocal ? NOMBRE_DEL_LOCAL_B : NOMBRE_DEL_LOCAL_PRINCIPAL },
+      });
+    }
   });
 
   it('sembrar de nuevo no crea cuentas ni falla', async () => {
@@ -64,15 +71,25 @@ describe('cuentas de prueba', () => {
 
   it('la siembra cambia la contraseña solo cuando cambio la de .env.local', async () => {
     const secreto = clienteSecretoDePruebas();
-    const email = `siembra.${randomUUID()}@manteca.test`;
-    const id = await crearDescartable(secreto, email);
+    const cuenta = await crearCuentaTemporal();
     try {
-      await asegurarContrasenaDeSiembra(secreto, await usuario(secreto, id), 'una-nueva-larga');
-      const abierta = await iniciarSesion(email, 'una-nueva-larga');
-      await asegurarContrasenaDeSiembra(secreto, await usuario(secreto, id), 'una-nueva-larga');
-      expect((await abierta.auth.getUser()).error).toBeNull();
+      await asegurarContrasenaDeSiembra(
+        secreto,
+        await usuarioDe(cuenta.id),
+        'una-contraseña-nueva',
+      );
+      await expect(iniciarSesion(cuenta.email, 'una-contraseña-nueva')).resolves.toBeTruthy();
+      const cambios = async () =>
+        (await registrosDe(cuenta.id)).filter((r) => r.accion === 'cambio_de_contrasena').length;
+      const antes = await cambios();
+      await asegurarContrasenaDeSiembra(
+        secreto,
+        await usuarioDe(cuenta.id),
+        'una-contraseña-nueva',
+      );
+      expect(await cambios()).toBe(antes);
     } finally {
-      await secreto.auth.admin.deleteUser(id);
+      await borrarCuentaTemporal(cuenta.id);
     }
   });
 
@@ -81,9 +98,7 @@ describe('cuentas de prueba', () => {
     const deUnaPagina = await listarCuentas(secreto);
     const deADos = await listarCuentas(secreto, 2);
     expect(deUnaPagina.length).toBeGreaterThan(2);
-    expect(deADos.map((cuenta) => cuenta.id).sort()).toEqual(
-      deUnaPagina.map((cuenta) => cuenta.id).sort(),
-    );
+    expect(deADos.map((c) => c.id).sort()).toEqual(deUnaPagina.map((c) => c.id).sort());
   });
 
   it('una contraseña equivocada no entra', async () => {
