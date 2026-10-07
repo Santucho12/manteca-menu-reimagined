@@ -60,7 +60,7 @@ describe('clave secreta en los componentes', () => {
     ["import { crearClienteSecreto } from '@/lib/supabase/secreto';", 'src/app/prueba.tsx'],
     [
       "import { crearClienteSecreto } from '../../lib/supabase/secreto';",
-      'src/components/guia/prueba.tsx',
+      'src/components/panel/prueba.tsx',
     ],
   ])(
     'el lint rechaza %s en un componente',

@@ -14,7 +14,7 @@ function contrasenaDePrueba(): string {
 
 test.describe('sin sesion', () => {
   test('el panel manda al ingreso', async ({ page }) => {
-    await page.goto('/admin/guia-de-estilos');
+    await page.goto('/admin/usuarios');
     await expect(page).toHaveURL(/\/admin\/ingresar$/);
     await expect(page.getByRole('heading', { level: 1, name: 'Ingresar' })).toBeVisible();
   });
@@ -93,11 +93,6 @@ test.describe('con la sesion de caja', () => {
     await expect(page.getByRole('button', { name: 'Salir' })).toBeVisible();
   });
 
-  test('no entra a la guia de estilos', async ({ page }) => {
-    await page.goto('/admin/guia-de-estilos');
-    await expect(page).toHaveURL(/\/admin$/);
-  });
-
   test('guarda una captura de su inicio', async ({ page }, info) => {
     await page.goto('/admin');
     await page.evaluate(() => document.fonts.ready);
@@ -117,11 +112,6 @@ test.describe('con la sesion de un invitado', () => {
     await expect(page.getByRole('navigation', { name: 'Panel' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Salir' })).toBeVisible();
   });
-
-  test('no entra a la guia de estilos', async ({ page }) => {
-    await page.goto('/admin/guia-de-estilos');
-    await expect(page).toHaveURL(/\/admin$/);
-  });
 });
 
 test.describe('con la sesion del admin', () => {
@@ -134,9 +124,12 @@ test.describe('con la sesion del admin', () => {
       page.getByText(/^(No hay personas|Hay \d+ personas?) esperando un rol\.$/),
     ).toBeVisible();
     const menu = page.getByRole('navigation', { name: 'Panel' });
-    for (const enlace of [/^Inicio/, /^Usuarios/, /^Guía de estilos/, /^Mi cuenta/]) {
-      await expect(menu.getByRole('link', { name: enlace })).toBeVisible();
-    }
+    await expect(menu.getByRole('link')).toHaveText([/^Inicio/, /^Usuarios/, /^Mi cuenta/]);
+  });
+
+  test('la guia de estilos ya no existe', async ({ page }) => {
+    const respuesta = await page.goto('/admin/guia-de-estilos');
+    expect(respuesta?.status()).toBe(404);
   });
 
   test('si ya tiene sesion, el ingreso lo manda al panel', async ({ page }) => {

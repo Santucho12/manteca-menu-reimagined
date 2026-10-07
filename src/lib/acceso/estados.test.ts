@@ -80,7 +80,7 @@ describe('requiereSesion', () => {
   it.each<[string, boolean]>([
     ['/admin', true],
     ['/admin/usuarios', true],
-    ['/admin/guia-de-estilos', true],
+    ['/admin/cuenta', true],
     ['/admin/salir', true],
     ['/admin/ingresar', false],
     ['/admin/registro', false],
@@ -92,11 +92,10 @@ describe('requiereSesion', () => {
 });
 
 describe('enlacesDelPanel', () => {
-  it('el admin ve Inicio, Usuarios, la guia y Mi cuenta', () => {
+  it('el admin ve Inicio, Usuarios y Mi cuenta', () => {
     expect(enlacesDelPanel('admin').map((enlace) => enlace.texto)).toEqual([
       'Inicio',
       'Usuarios',
-      'Guía de estilos',
       'Mi cuenta',
     ]);
   });
