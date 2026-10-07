@@ -19,6 +19,11 @@ function colorDeFondo(elemento: Locator): Promise<string> {
   return elemento.evaluate((nodo) => getComputedStyle(nodo).backgroundColor);
 }
 
+async function alturaYAncho(control: Locator): Promise<[number, number]> {
+  const caja = await control.boundingBox();
+  return [caja?.height ?? 0, caja?.width ?? 0];
+}
+
 test.beforeEach(async ({ page }) => {
   const respuesta = await page.goto('/admin/guia-de-estilos');
   // Sin esto, varias comprobaciones darian verde sobre la pagina de error.
@@ -59,14 +64,21 @@ test('la muestra de tipografias trae acentos y eñe', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('avisa que Manic no dibuja acentos ni la eñe', async ({ page }) => {
-  const tipografias = page.getByRole('region', { name: 'Tipografías' });
-  await expect(tipografias.getByText(/Manic no dibuja acentos ni la ñ/)).toBeVisible();
+test('avisa que Manic no dibuja acentos ni la eñe, y que el panel no la usa', async ({ page }) => {
+  const nota = page.getByRole('region', { name: 'Tipografías' }).getByText(/Manic no dibuja/);
+  await expect(nota).toContainText('Manic no dibuja acentos ni la ñ');
+  await expect(nota).toContainText('El panel usa Neufile Grotesk para los títulos.');
 });
 
-test('el titulo usa Manic y el texto usa Neufile Grotesk', async ({ page }) => {
-  const titulo = page.getByRole('heading', { level: 1, name: 'Guía de estilos' });
-  await expect(titulo).toHaveCSS('font-family', /Manic/);
+test('los titulos del panel usan Neufile Grotesk, que dibuja los acentos', async ({ page }) => {
+  const titulos = [
+    page.getByRole('heading', { level: 1, name: 'Guía de estilos' }),
+    page.getByRole('heading', { level: 2, name: 'Tipografías' }),
+  ];
+  for (const titulo of titulos) {
+    await expect(titulo).toHaveCSS('font-family', /Neufile Grotesk/);
+    await expect(titulo).not.toHaveCSS('font-family', /Manic/);
+  }
   await expect(page.locator('body')).toHaveCSS('font-family', /Neufile Grotesk/);
 });
 
@@ -109,7 +121,8 @@ test('muestra un aviso informativo y uno de error', async ({ page }) => {
   await expect(avisos.filter({ hasText: 'No pudimos guardar el cierre' })).toBeVisible();
 });
 
-test('muestra los botones en tres tamaños, de menor a mayor', async ({ page }) => {
+test('muestra los botones en tres tamaños, de menor a mayor', async ({ page }, info) => {
+  test.skip(info.project.name === 'celular', 'En pantallas táctiles miden al menos 44 px');
   const componentes = page.getByRole('region', { name: 'Componentes' });
   const alto = async (nombre: string) => {
     const caja = await componentes.getByRole('button', { name: nombre, exact: true }).boundingBox();
@@ -119,6 +132,50 @@ test('muestra los botones en tres tamaños, de menor a mayor', async ({ page }) 
   expect(chico).toBeGreaterThan(0);
   expect(chico).toBeLessThan(normal);
   expect(normal).toBeLessThan(grande);
+});
+
+test('en pantallas tactiles, botones y campos miden al menos 44 px', async ({ page }, info) => {
+  test.skip(info.project.name !== 'celular', 'Solo en pantallas táctiles');
+  const componentes = page.getByRole('region', { name: 'Componentes' });
+  const controles = [
+    componentes.getByRole('button', { name: 'Guardar', exact: true }),
+    componentes.getByLabel('Nombre'),
+    componentes.getByLabel('Contraseña', { exact: true }),
+    componentes.getByRole('button', { name: 'Mostrar contraseña' }),
+  ];
+  for (const control of controles) {
+    const [alto, ancho] = await alturaYAncho(control);
+    expect(alto).toBeGreaterThanOrEqual(44);
+    expect(ancho).toBeGreaterThanOrEqual(44);
+  }
+});
+
+test('en la computadora, botones y campos conservan su tamaño compacto', async ({ page }, info) => {
+  test.skip(info.project.name !== 'computadora', 'Solo con mouse');
+  const componentes = page.getByRole('region', { name: 'Componentes' });
+  const altos = [
+    (await alturaYAncho(componentes.getByRole('button', { name: 'Guardar', exact: true })))[0],
+    (await alturaYAncho(componentes.getByLabel('Nombre')))[0],
+    (await alturaYAncho(componentes.getByRole('button', { name: 'Mostrar contraseña' })))[0],
+  ];
+  expect(altos).toEqual([32, 32, 32]);
+});
+
+test('muestra un campo con error, que el lector de pantalla anuncia', async ({ page }) => {
+  const monto = page.getByRole('region', { name: 'Componentes' }).getByLabel('Monto');
+  await expect(monto).toHaveAttribute('aria-invalid', 'true');
+  await expect(monto).toHaveAccessibleDescription('Ingresá un monto mayor a cero.');
+});
+
+test('el campo de contraseña se puede mostrar y volver a ocultar', async ({ page }) => {
+  const componentes = page.getByRole('region', { name: 'Componentes' });
+  const campo = componentes.getByLabel('Contraseña', { exact: true });
+  await campo.fill('medialuna');
+  await expect(campo).toHaveAttribute('type', 'password');
+  await componentes.getByRole('button', { name: 'Mostrar contraseña' }).click();
+  await expect(campo).toHaveAttribute('type', 'text');
+  await componentes.getByRole('button', { name: 'Ocultar contraseña' }).click();
+  await expect(campo).toHaveAttribute('type', 'password');
 });
 
 test('muestra la plata con el formato del sistema', async ({ page }) => {
