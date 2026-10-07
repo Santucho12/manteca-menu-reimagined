@@ -12,9 +12,11 @@ const ESPERA_MS = 120_000;
 function entornoDeTerminalNueva(): NodeJS.ProcessEnv {
   // Sin lo que cargo esta corrida, como si alguien abriera otra terminal.
   const deEstaCorrida = /SUPABASE|CONTRASENA|^VITEST|^NODE_ENV$|^TEST$/;
-  return Object.fromEntries(
-    Object.entries(process.env).filter(([nombre]) => !deEstaCorrida.test(nombre)),
-  );
+  const entorno = { ...process.env };
+  for (const nombre of Object.keys(entorno)) {
+    if (deEstaCorrida.test(nombre)) delete entorno[nombre];
+  }
+  return entorno;
 }
 
 function correrLaSonda(): string {

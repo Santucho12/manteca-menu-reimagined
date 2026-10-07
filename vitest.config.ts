@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { loadEnv } from 'vite';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
@@ -20,10 +19,11 @@ export default defineConfig({
           name: 'base',
           include: ['src/**/*.base.test.ts', 'tests/**/*.base.test.ts'],
           exclude: ['node_modules/**'],
+          // Carga .env.local y comprueba la base. Los tests heredan esas mismas
+          // variables: ningun otro archivo de entorno se carga despues.
           globalSetup: ['tests/preparacion-base.ts'],
           // Los tests comparten la base de pruebas: de a un archivo por vez.
           fileParallelism: false,
-          env: loadEnv('test', process.cwd(), ''),
         },
       },
     ],
