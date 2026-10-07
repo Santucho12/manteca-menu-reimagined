@@ -90,9 +90,17 @@ Supabase.
 Dejar conectados por MCP los dos proyectos de Supabase, Vercel, GitHub y Playwright antes
 de seguir con el armado.
 
+### 21. Arreglos de la revisión de la base técnica
+Arreglar todo lo que dejó anotado la revisión de la base técnica: tests más flojos que su
+nombre, variantes que faltan en la guía, utilidades y configuración por endurecer, la
+siembra que no repara cuentas, las tipografías en un formato liviano, y las tres decisiones
+de diseño (acentos de Manic, tamaño táctil y contraste del foco).
+
 ## Pendientes
 
-No hay pedidos pendientes.
+| # | Pedido | Qué falta |
+|---|---|---|
+| 21 | Arreglos de la revisión de la base técnica | En curso, en la rama `fix/revision-base-tecnica` |
 
 ## Completados
 

@@ -24,6 +24,10 @@ describe('esBaseDePruebas', () => {
     expect(esBaseDePruebas('https://.supabase.co', '')).toBe(false);
   });
 
+  it('rechaza la URL sin cifrar, que mandaria la clave secreta a la vista', () => {
+    expect(esBaseDePruebas(`http://${REF}.supabase.co`, REF)).toBe(false);
+  });
+
   it('rechaza algo que no es una URL', () => {
     expect(esBaseDePruebas('no es una url', REF)).toBe(false);
   });
