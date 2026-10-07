@@ -5,7 +5,7 @@ import { COLORES, ESPACIADOS, RADIOS, SOMBRAS, TIPOGRAFIAS } from './tokens';
 const css = readFileSync('src/app/globals.css', 'utf8');
 
 function estaDefinida(variable: string, hoja = css): boolean {
-  return new RegExp(`${variable}\s*:`).test(hoja);
+  return new RegExp(`${variable}\\s*:`).test(hoja);
 }
 
 describe('la comprobacion de que un token esta definido', () => {
