@@ -6,7 +6,12 @@ import {
   leerPanel,
   localDeQuienPide,
 } from '../../src/lib/menu/consultas';
-import { aplicarAumento, desactivar, guardarCategoria } from '../../src/lib/menu/escritura';
+import {
+  aplicarAumento,
+  desactivar,
+  guardarCategoria,
+  guardarProducto,
+} from '../../src/lib/menu/escritura';
 import { subirFoto } from '../../src/lib/menu/subida';
 import { crearClienteSinSesion } from '../../src/lib/supabase/sin-sesion';
 import { clienteSecretoDePruebas } from '../clientes';
@@ -70,7 +75,14 @@ describe('escrituras del menu', () => {
       icono: '🥐' as const,
       foto: '',
       precioCompartido: false,
-      presentaciones: [{ id: categoria.presentaciones[0]!.id, nombre: 'Unidad', compartido: '' }],
+      presentaciones: [
+        {
+          id: categoria.presentaciones[0]!.id,
+          nombre: 'Unidad',
+          compartido: '',
+          compartidoOriginal: '3000',
+        },
+      ],
     };
     const admin = await clienteComo('admin');
     expect(await guardarCategoria(admin, datos, false)).toEqual({
@@ -92,6 +104,33 @@ describe('escrituras del menu', () => {
       ok: false,
       mensaje: `Primero mové o desactivá estos productos: ${producto.nombre}.`,
     });
+  });
+
+  it('guardar un producto abierto antes de un aumento no lo revierte', async () => {
+    const categoria = await sembrar();
+    const producto = await sembrarProducto(categoria, { precios: [100000] });
+    const presentacion = categoria.presentaciones[0]!;
+    // Otro admin aplica un aumento mientras el formulario seguia abierto con $1.000.
+    await clienteSecretoDePruebas()
+      .from('precios')
+      .update({ monto_centavos: 110000 })
+      .eq('producto_id', producto.id);
+    const datos = {
+      id: producto.id,
+      categoriaId: categoria.id,
+      nombre: 'Otro nombre',
+      descripcion: '',
+      etiqueta: '' as const,
+      visible: true,
+      precios: [{ presentacionId: presentacion.id, monto: '1000', original: '1000' }],
+    };
+    expect((await guardarProducto(await clienteComo('admin'), datos, false)).ok).toBe(true);
+    const { data } = await clienteSecretoDePruebas()
+      .from('precios')
+      .select('monto_centavos')
+      .eq('producto_id', producto.id)
+      .single();
+    expect(data?.monto_centavos).toBe(110000);
   });
 
   it('el aumento calcula el precio nuevo en el servidor', async () => {
@@ -123,7 +162,7 @@ describe('escrituras del menu', () => {
       icono: '🥐' as const,
       foto: '',
       precioCompartido: false,
-      presentaciones: [{ id: '', nombre: 'Unidad', compartido: '' }],
+      presentaciones: [{ id: '', nombre: 'Unidad', compartido: '', compartidoOriginal: '' }],
     };
     expect(await guardarCategoria(await clienteComo('caja'), datos, false)).toEqual({
       ok: false,

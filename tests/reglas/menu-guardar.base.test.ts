@@ -87,6 +87,23 @@ describe('menu_guardar_categoria', () => {
     expect((await filaDe('categorias', (data as Guardado).id)).nombre).toBe(nombre);
   });
 
+  it('una presentacion que llega sin monto conserva su precio compartido', async () => {
+    const categoria = await sembrar({ presentaciones: ['Unidad'], compartidos: [300000] });
+    const unidad = categoria.presentaciones[0]!;
+    const datos = {
+      ...conPresentaciones(categoria, 0),
+      presentaciones: [{ id: unidad.id, nombre: 'Unidad' }],
+    };
+    expect((await guardarCategoria('admin', datos)).error).toBeNull();
+    const { data } = await clienteSecretoDePruebas()
+      .from('precios')
+      .select('monto_centavos, activo')
+      .eq('presentacion_id', unidad.id)
+      .is('producto_id', null)
+      .single();
+    expect(data).toEqual({ monto_centavos: 300000, activo: true });
+  });
+
   it('renombrar una presentacion conserva sus precios', async () => {
     const categoria = await sembrar({ presentaciones: ['Mediano'], compartidos: [300000] });
     const mediano = categoria.presentaciones[0]!;
