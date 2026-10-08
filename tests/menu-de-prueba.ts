@@ -187,6 +187,25 @@ async function idsDePrecios(secreto: Cliente, presentaciones: string[]) {
   return (data ?? []).map((fila) => fila.id);
 }
 
+/** El id de una categoria que creo una prueba en vivo desde la pantalla. */
+export async function idDeCategoriaPorNombre(nombre: string): Promise<string> {
+  const { data, error } = await clienteSecretoDePruebas()
+    .from('categorias')
+    .select('id')
+    .eq('nombre', nombre)
+    .single();
+  comprobar(error, `encontrar la categoria ${nombre}`);
+  return data!.id;
+}
+
+async function borrarFotosSubidas(secreto: Cliente, categorias: string[]) {
+  const { data } = await secreto.from('categorias').select('foto').in('id', categorias);
+  const subidas = (data ?? [])
+    .map((c) => c.foto)
+    .filter((f): f is string => !!f && !f.startsWith('/'));
+  if (subidas.length > 0) await secreto.storage.from('fotos-del-menu').remove(subidas);
+}
+
 /** Un aumento de todo el menu no tiene categoria: la limpieza del menu no lo encuentra. */
 export async function borrarAumentos(ids: string[]): Promise<void> {
   const secreto = clienteSecretoDePruebas();
@@ -199,6 +218,7 @@ export async function borrarAumentos(ids: string[]): Promise<void> {
 export async function borrarMenuDePrueba(categorias: string[]): Promise<void> {
   if (categorias.length === 0) return;
   const secreto = clienteSecretoDePruebas();
+  await borrarFotosSubidas(secreto, categorias);
   const presentaciones = await idsDe(secreto, 'presentaciones', categorias);
   const productos = await idsDe(secreto, 'productos', categorias);
   const aumentos = await idsDe(secreto, 'aumentos', categorias);
