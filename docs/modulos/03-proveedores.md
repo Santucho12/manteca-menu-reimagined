@@ -85,4 +85,16 @@ Cada alta, cambio, desactivación y reactivación, con el valor anterior y el nu
 
 ## Parte técnica
 
-Se escribe al construir el módulo: tablas, permisos, acciones de servidor y pruebas.
+Construido el 2026-10-08 (pedido 26). El detalle está en
+`docs/superpowers/specs/2026-10-08-proveedores-design.md`.
+
+- **Base:** tabla `proveedores`. El admin activo lee, carga y cambia los de su local con RLS;
+  el local lo pone la base con la sesión y nadie borra.
+- **Teléfono:** se escribe como sea y se guarda en formato internacional (`549…`); el botón
+  abre `https://wa.me/<teléfono>`. No se acepta un número con el 15 y sin característica.
+- **Pantallas:** `/admin/proveedores` (búsqueda, desactivados, paginado de a 25), alta,
+  ficha y edición.
+
+Queda para el módulo de Gastos, que lo necesita: lo pagado en el mes en la lista, los gastos
+y los totales del mes y del año en la ficha, y el aviso al desactivar un proveedor con un
+gasto recurrente activo.
