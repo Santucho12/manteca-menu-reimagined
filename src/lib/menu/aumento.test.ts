@@ -13,9 +13,19 @@ describe('precioAumentado', () => {
     expect(precioAumentado(monto, porcentaje, redondeo as 1000)).toBe(esperado);
   });
 
-  it('un precio chico con descuento fuerte no baja de un paso de redondeo', () => {
+  it('un descuento fuerte con redondeo grande nunca deja un precio en cero', () => {
     expect(precioAumentado(100000, -50, 50000)).toBe(50000);
-    expect(precioAumentado(10000, -50, 50000)).toBe(50000);
+    // $100 con -50% da $50, que al $500 mas cercano seria $0: queda como estaba.
+    expect(precioAumentado(10000, -50, 50000)).toBe(10000);
+  });
+
+  it('el redondeo nunca va en contra del porcentaje', () => {
+    // $1.300 con -1% da $1.287, que al $500 mas cercano subiria a $1.500.
+    expect(precioAumentado(130000, -1, 50000)).toBe(130000);
+    // $1.200 con +1% da $1.212, que al $500 mas cercano bajaria a $1.000.
+    expect(precioAumentado(120000, 1, 50000)).toBe(120000);
+    // $300 con -10% y redondeo a $500: no puede terminar mas caro.
+    expect(precioAumentado(30000, -10, 50000)).toBe(30000);
   });
 
   it('no pierde precision con montos grandes', () => {
