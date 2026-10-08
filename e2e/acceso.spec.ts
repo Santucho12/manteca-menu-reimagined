@@ -19,6 +19,13 @@ test.describe('sin sesion', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Ingresar' })).toBeVisible();
   });
 
+  // Un 307 repetiria el POST contra la pagina de ingreso; el 303 la pide con GET.
+  test('un POST al panel sin sesion va al ingreso con 303', async ({ request }) => {
+    const respuesta = await request.post('/admin/salir', { maxRedirects: 0 });
+    expect(respuesta.status()).toBe(303);
+    expect(respuesta.headers()['location']).toMatch(/\/admin\/ingresar$/);
+  });
+
   test('si el email o la contraseña no coinciden, da un solo mensaje', async ({ page }) => {
     await ingresarComo(page, emailDePrueba('admin'), 'no-es-la-contraseña');
     await expect(aviso(page)).toHaveText(
