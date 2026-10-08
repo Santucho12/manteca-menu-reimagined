@@ -116,10 +116,15 @@ Queda para Cierres de caja: que caja pueda leer su propio local, como dice el sp
 Construir el catálogo mínimo de productos y el menú digital definidos en
 `docs/modulos/02-menu.md`: la administración en `/admin` y la página pública en `/`.
 
+### 26. Módulo de proveedores
+Construir el módulo de proveedores definido en `docs/modulos/03-proveedores.md`: lista con
+búsqueda, ficha, alta, edición, desactivar y reactivar, y el botón de WhatsApp.
+
 ## Pendientes
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 26 | Módulo de proveedores | En diseño, en la rama `feat/proveedores` |
 | 21 | Arreglos de la revisión de la base técnica | Hecho y verificado (rama `fix/revision-base-tecnica`): montos sin precisión y URL sin cifrar se rechazan; protecciones de configuración (todo test corre en algún grupo, versión de Node, tipos de Supabase fuera de Prettier, clave secreta prohibida en componentes); la siembra repara cuentas y lee todas las páginas; un solo aviso con todas las variables que faltan; comprobación de tokens corregida; colores con contraste suficiente y anillo de foco entero. Los controles de 44 px, el campo con error y los títulos en Neufile Grotesk entraron con el pedido 22. Queda para el menú público: las tipografías en woff2. Las variantes de la guía ya no van: la guía se sacó en el pedido 23 |
 
 ## Completados
