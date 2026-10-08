@@ -52,6 +52,7 @@ export function FormularioDeCategoria({ inicial, localId }: Props) {
         {guardado.pendiente ? (
           <ConfirmacionDeOcultar
             productos={guardado.pendiente}
+            enviando={guardado.enviando}
             alConfirmar={guardado.confirmar}
             alVolver={guardado.cancelar}
           />

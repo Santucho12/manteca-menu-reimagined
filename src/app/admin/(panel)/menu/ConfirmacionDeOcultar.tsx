@@ -1,8 +1,13 @@
 import { Button } from '@/components/ui/button';
 
-type Props = { productos: string[]; alConfirmar: () => void; alVolver: () => void };
+type Props = {
+  productos: string[];
+  enviando: boolean;
+  alConfirmar: () => void;
+  alVolver: () => void;
+};
 
-export function ConfirmacionDeOcultar({ productos, alConfirmar, alVolver }: Props) {
+export function ConfirmacionDeOcultar({ productos, enviando, alConfirmar, alVolver }: Props) {
   return (
     <div
       role="alertdialog"
@@ -18,7 +23,9 @@ export function ConfirmacionDeOcultar({ productos, alConfirmar, alVolver }: Prop
         ))}
       </ul>
       <div className="flex flex-wrap gap-2">
-        <Button onClick={alConfirmar}>Confirmar</Button>
+        <Button disabled={enviando} onClick={alConfirmar}>
+          Confirmar
+        </Button>
         <Button variant="outline" onClick={alVolver}>
           Volver
         </Button>
