@@ -34,7 +34,8 @@ function alIngreso(pedido: NextRequest): NextResponse {
   const destino = pedido.nextUrl.clone();
   destino.pathname = '/admin/ingresar';
   destino.search = '';
-  return NextResponse.redirect(destino);
+  // 303 y no el 307 de siempre: un POST sin sesion pide el ingreso con GET, no lo repite.
+  return NextResponse.redirect(destino, 303);
 }
 
 /** Refresca la sesion vencida y manda al ingreso a quien pide el panel sin sesion. */
