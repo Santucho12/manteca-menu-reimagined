@@ -116,7 +116,6 @@ Queda para Cierres de caja: que caja pueda leer su propio local, como dice el sp
 
 | # | Pedido | Qué falta |
 |---|---|---|
-| 24 | Arreglos de la revisión de usuarios | En curso, en la rama `feat/usuarios` |
 | 21 | Arreglos de la revisión de la base técnica | Hecho y verificado (rama `fix/revision-base-tecnica`): montos sin precisión y URL sin cifrar se rechazan; protecciones de configuración (todo test corre en algún grupo, versión de Node, tipos de Supabase fuera de Prettier, clave secreta prohibida en componentes); la siembra repara cuentas y lee todas las páginas; un solo aviso con todas las variables que faltan; comprobación de tokens corregida; colores con contraste suficiente y anillo de foco entero. Los controles de 44 px, el campo con error y los títulos en Neufile Grotesk entraron con el pedido 22. Queda para el menú público: las tipografías en woff2. Las variantes de la guía ya no van: la guía se sacó en el pedido 23 |
 
 ## Completados
@@ -127,6 +126,7 @@ cómo se verificó cada uno.
 | # | Pedido | Fecha | Cómo se verificó |
 |---|---|---|---|
 | 22 | Módulo de usuarios y acceso | 2026-10-07 | `npm run verificar` en verde (lint, tipos, 335 tests de Vitest y build) y `npm run e2e` en verde (39 pruebas en computadora y 39 en celular, con las sesiones). Migraciones aplicadas y verificadas solo en la base de pruebas; aplicarlas a la real lo decide Santiago. Capturas revisadas en los dos tamaños. La revisión independiente de la rama queda pendiente: se cortó por el límite de uso. Tras el arreglo de reactivar y sus tests, el cierre se volvió a correr el mismo día: `npm run verificar` en verde (346 tests) y `npm run e2e` en verde (75 pruebas) |
+| 24 | Arreglos de la revisión de usuarios | 2026-10-08 | Cada arreglo con su test, que primero falló: corregir con un email que Supabase Auth rechaza no deja la acción viva; buscar `prueba_caja` no encuentra `prueba.caja` y un nombre con `_` sí se encuentra; un POST sin sesión recibe 303. `npm run verificar` en verde (348 tests) y `npm run e2e` en verde (77 pruebas). Sin migraciones. Que caja lea su local queda para Cierres de caja |
 | 23 | Sacar la guía de estilos | 2026-10-07 | Página, componentes, pruebas y regla borrados. La prueba de acceso comprueba que `/admin/guia-de-estilos` da 404 y que el menú del admin queda en Inicio, Usuarios y Mi cuenta; entra en las corridas del pedido 22 |
 | 1 | Repositorio privado en GitHub | 2026-10-06 | `gh repo view` confirma `Santucho12/sistema-manteca` como privado, con `main` sincronizada |
 | 3 | Comparar skills con otros proyectos | 2026-10-06 | Se listaron las skills de los dos proyectos y se entregó la comparación |
