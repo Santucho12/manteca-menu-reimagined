@@ -16,6 +16,8 @@ export const esquemaPresentacion = z.object({
   id: z.string(),
   nombre: nombre(50),
   compartido: pesos,
+  // Lo que tenia al abrir el formulario: si no cambio, no se manda.
+  compartidoOriginal: z.string(),
 });
 
 export const esquemaCategoria = z.object({
@@ -38,7 +40,7 @@ export const esquemaProducto = z.object({
   descripcion: z.string().trim().max(300, 'Usá hasta 300 caracteres.'),
   etiqueta: z.enum(['', 'mas_vendido', 'artesanal', 'nuevo']),
   visible: z.boolean(),
-  precios: z.array(z.object({ presentacionId: z.uuid(), monto: pesos })),
+  precios: z.array(z.object({ presentacionId: z.uuid(), monto: pesos, original: z.string() })),
 });
 
 const porcentaje = z
@@ -77,6 +79,17 @@ export function aCentavos(texto: string): number | null {
 
 const vacioANulo = (texto: string) => (texto.trim() === '' ? null : texto.trim());
 
+type Presentacion = DatosDeCategoria['presentaciones'][number];
+
+// Solo los compartidos que cambiaron: un precio que nadie toco no pisa un aumento hecho en el
+// medio. Sin la casilla de precio compartido, el nuevo es ninguno.
+function presentacionParaLaBase(p: Presentacion, conCompartido: boolean) {
+  const base = { id: vacioANulo(p.id), nombre: p.nombre.trim() };
+  const nuevo = conCompartido ? aCentavos(p.compartido) : null;
+  if (nuevo === aCentavos(p.compartidoOriginal)) return base;
+  return { ...base, monto_compartido_centavos: nuevo };
+}
+
 /** Lo que recibe menu_guardar_categoria. */
 export function categoriaParaLaBase(datos: DatosDeCategoria) {
   return {
@@ -85,11 +98,9 @@ export function categoriaParaLaBase(datos: DatosDeCategoria) {
     subtitulo: vacioANulo(datos.subtitulo),
     icono: datos.icono,
     foto: vacioANulo(datos.foto),
-    presentaciones: datos.presentaciones.map((p) => ({
-      id: vacioANulo(p.id),
-      nombre: p.nombre.trim(),
-      monto_compartido_centavos: datos.precioCompartido ? aCentavos(p.compartido) : null,
-    })),
+    presentaciones: datos.presentaciones.map((p) =>
+      presentacionParaLaBase(p, datos.precioCompartido),
+    ),
   };
 }
 
@@ -102,9 +113,8 @@ export function productoParaLaBase(datos: DatosDeProducto) {
     descripcion: vacioANulo(datos.descripcion),
     etiqueta: vacioANulo(datos.etiqueta),
     visible: datos.visible,
-    precios: datos.precios.map((p) => ({
-      presentacion_id: p.presentacionId,
-      monto_centavos: aCentavos(p.monto),
-    })),
+    precios: datos.precios
+      .filter((p) => aCentavos(p.monto) !== aCentavos(p.original))
+      .map((p) => ({ presentacion_id: p.presentacionId, monto_centavos: aCentavos(p.monto) })),
   };
 }

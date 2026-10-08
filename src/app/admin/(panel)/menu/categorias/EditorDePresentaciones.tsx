@@ -70,7 +70,7 @@ export function EditorDePresentaciones() {
       <Button
         type="button"
         variant="outline"
-        onClick={() => append({ id: '', nombre: '', compartido: '' })}
+        onClick={() => append({ id: '', nombre: '', compartido: '', compartidoOriginal: '' })}
         disabled={fields.length >= 6}
       >
         Agregar presentación

@@ -24,7 +24,7 @@ export function usePreciosSegunCategoria(opciones: OpcionDeCategoria[]) {
     if (ids.join() === actuales.join()) return;
     setValue(
       'precios',
-      ids.map((presentacionId) => ({ presentacionId, monto: '' })),
+      ids.map((presentacionId) => ({ presentacionId, monto: '', original: '' })),
     );
   }, [categoria, getValues, setValue]);
   return categoria;

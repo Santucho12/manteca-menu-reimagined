@@ -227,12 +227,16 @@ export function categoriaParaEditar(
     icono: categoria.icono,
     foto: categoria.foto ?? '',
     precioCompartido: categoria.compartidos.some((c) => c !== null),
-    presentaciones: categoria.presentaciones.map((p, i) => ({
-      id: p.id,
-      nombre: p.nombre,
-      compartido: enPesos(categoria.compartidos[i] ?? null),
-    })),
+    presentaciones: categoria.presentaciones.map((p, i) => {
+      const compartido = enPesos(categoria.compartidos[i] ?? null);
+      return { id: p.id, nombre: p.nombre, compartido, compartidoOriginal: compartido };
+    }),
   };
+}
+
+function precioParaEditar(precio: PrecioVigente) {
+  const monto = precio.origen === 'propio' ? enPesos(precio.montoCentavos) : '';
+  return { presentacionId: precio.presentacionId, monto, original: monto };
 }
 
 export function productoParaEditar(panel: CategoriaDelPanel[], id: string): DatosDeProducto | null {
@@ -246,10 +250,7 @@ export function productoParaEditar(panel: CategoriaDelPanel[], id: string): Dato
       descripcion: producto.descripcion ?? '',
       etiqueta: producto.etiqueta ?? '',
       visible: producto.visible,
-      precios: producto.precios.map((p) => ({
-        presentacionId: p.presentacionId,
-        monto: p.origen === 'propio' ? enPesos(p.montoCentavos) : '',
-      })),
+      precios: producto.precios.map(precioParaEditar),
     };
   }
   return null;
