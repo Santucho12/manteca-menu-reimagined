@@ -143,8 +143,10 @@ test('un producto visible sin precio pide confirmar y queda oculto', async ({ pa
   await page.getByLabel('Se muestra en el menú').check();
   await page.getByRole('button', { name: 'Guardar' }).click();
   await expect(page.getByRole('alertdialog')).toContainText(nombre);
-  await page.getByRole('button', { name: 'Confirmar' }).click();
+  // Un doble clic apurado no puede crear el producto dos veces.
+  await page.getByRole('button', { name: 'Confirmar' }).dblclick();
   await expect(page.getByRole('listitem').filter({ hasText: nombre })).toContainText('Oculto');
+  await expect(page.getByRole('listitem').filter({ hasText: nombre })).toHaveCount(1);
 });
 
 test('cambiar de categoria cambia los precios que se piden', async ({ page }) => {

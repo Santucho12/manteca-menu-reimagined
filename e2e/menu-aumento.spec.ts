@@ -38,6 +38,21 @@ test('muestra los cambios, ocultos incluidos, y los aplica', async ({ page }) =>
   );
 });
 
+test('un doble clic en aplicar aplica una sola vez y avisa que salio bien', async ({ page }) => {
+  const categoria = await sembrarCategoria({ compartidos: [300000] });
+  categorias.push(categoria.id);
+  await prepararAumento(page, categoria.nombre, '10');
+  await page.getByRole('button', { name: 'Aplicar aumento' }).dblclick();
+  await expect(page.getByText('Listo: se actualizaron 1 precios.')).toBeVisible();
+  await expect(aviso(page).filter({ hasText: 'cambiaron' })).toHaveCount(0);
+  const { data } = await clienteSecretoDePruebas()
+    .from('precios')
+    .select('monto_centavos')
+    .eq('presentacion_id', categoria.presentaciones[0]!.id)
+    .single();
+  expect(data?.monto_centavos).toBe(330000);
+});
+
 test('si un precio cambia despues de ver los cambios, no aplica nada', async ({ page }) => {
   const categoria = await sembrarCategoria({ compartidos: [300000] });
   categorias.push(categoria.id);
