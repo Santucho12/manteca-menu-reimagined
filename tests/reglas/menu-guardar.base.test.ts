@@ -136,7 +136,12 @@ describe('menu_guardar_categoria', () => {
   it('sacar el precio compartido oculta, con confirmacion, a los que lo heredaban', async () => {
     const categoria = await sembrar({ presentaciones: ['Unidad'], compartidos: [300000] });
     const producto = await sembrarProducto(categoria, { precios: [null] });
-    const datos = conPresentaciones(categoria, 1);
+    // Monto null es sacarlo; sin monto, la presentacion conserva el que tenia.
+    const presentaciones = categoria.presentaciones.map((p) => ({
+      ...p,
+      monto_compartido_centavos: null,
+    }));
+    const datos = { ...conPresentaciones(categoria, 1), presentaciones };
     expect((await guardarCategoria('admin', datos)).error?.code).toBe('PM101');
     await guardarCategoria('admin', datos, true);
     expect((await filaDe('productos', producto.id)).visible).toBe(false);
