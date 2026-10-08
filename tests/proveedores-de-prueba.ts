@@ -19,11 +19,9 @@ export async function sembrarProveedor(
   semilla: SemillaDeProveedor = {},
 ): Promise<ProveedorSembrado> {
   const secreto = clienteSecretoDePruebas();
-  const localId = semilla.otroLocal
-    ? await asegurarLocalB(secreto)
-    : await idDelLocalPrincipal(secreto);
+  const local = semilla.otroLocal ? asegurarLocalB : idDelLocalPrincipal;
   const fila = {
-    local_id: localId,
+    local_id: await local(secreto),
     nombre: semilla.nombre ?? nombreDeProveedor(),
     telefono: semilla.telefono ?? null,
     activo: semilla.activo ?? true,
