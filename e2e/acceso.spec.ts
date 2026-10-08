@@ -131,7 +131,12 @@ test.describe('con la sesion del admin', () => {
       page.getByText(/^(No hay personas|Hay \d+ personas?) esperando un rol\.$/),
     ).toBeVisible();
     const menu = page.getByRole('navigation', { name: 'Panel' });
-    await expect(menu.getByRole('link')).toHaveText([/^Inicio/, /^Usuarios/, /^Mi cuenta/]);
+    await expect(menu.getByRole('link')).toHaveText([
+      /^Inicio/,
+      /^Menú/,
+      /^Usuarios/,
+      /^Mi cuenta/,
+    ]);
   });
 
   test('la guia de estilos ya no existe', async ({ page }) => {
