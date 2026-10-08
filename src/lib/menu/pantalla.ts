@@ -14,3 +14,9 @@ export function textoDePrecios(precios: PrecioVigente[], categoria: string): str
 
 export const PREGUNTA_DE_DESACTIVAR = (nombre: string) =>
   `¿Desactivar ${nombre}? Deja de usarse; lo podés reactivar desde Ver desactivados.`;
+
+/** Que pasa si el admin deja vacio el precio de una presentacion. */
+export function ayudaDelPrecio(compartidoCentavos: number | null, categoria: string): string {
+  if (compartidoCentavos === null) return 'Vacío queda sin precio.';
+  return `Vacío usa el de ${categoria}: ${formatearPesosEnteros(compartidoCentavos)}.`;
+}
