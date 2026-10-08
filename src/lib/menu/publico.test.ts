@@ -20,6 +20,13 @@ function fila(cambios: Partial<FilaPublica>): FilaPublica {
   };
 }
 
+// La unica categoria que arma el menu con estas filas.
+function unica(filas: FilaPublica[]) {
+  const [categoria] = menuPublico(filas);
+  if (!categoria) throw new Error('El menu quedo vacio');
+  return categoria;
+}
+
 const FACTURAS = {
   categoria_id: 'c0',
   categoria: 'Facturas',
@@ -34,14 +41,14 @@ const FACTURAS = {
 
 describe('menuPublico', () => {
   it('una presentacion sola: el precio sin etiqueta y dos columnas', () => {
-    const [categoria] = menuPublico([fila({})]);
+    const categoria = unica([fila({})]);
     expect(categoria).toMatchObject({
       nombre: 'Laminados',
       subtitulo: 'Por unidad',
       columnas: 2,
       encabezados: null,
     });
-    expect(categoria.productos[0].precios).toEqual([{ etiqueta: null, texto: '$5.000' }]);
+    expect(categoria.productos[0]!.precios).toEqual([{ etiqueta: null, texto: '$5.000' }]);
   });
 
   it('con precio compartido el subtitulo lleva los precios y el producto no repite el heredado', () => {
@@ -49,14 +56,14 @@ describe('menuPublico', () => {
       { presentacion: 'Docena', monto_centavos: 2000000, compartido: true },
       { presentacion: 'Unidad', monto_centavos: 350000, compartido: false },
     ];
-    const [categoria] = menuPublico([fila({ ...FACTURAS, precios })]);
+    const categoria = unica([fila({ ...FACTURAS, precios })]);
     expect(categoria.subtitulo).toBe('Docena $20.000 · Unidad $3.000');
     expect(categoria.columnas).toBe(2);
-    expect(categoria.productos[0].precios).toEqual([{ etiqueta: 'Unidad', texto: '$3.500' }]);
+    expect(categoria.productos[0]!.precios).toEqual([{ etiqueta: 'Unidad', texto: '$3.500' }]);
   });
 
   it('el subtitulo con compartidos suma el texto de la categoria', () => {
-    const [categoria] = menuPublico([fila({ ...FACTURAS, subtitulo: 'Hechas hoy' })]);
+    const categoria = unica([fila({ ...FACTURAS, subtitulo: 'Hechas hoy' })]);
     expect(categoria.subtitulo).toBe('Docena $20.000 · Unidad $3.000 · Hechas hoy');
   });
 
@@ -65,9 +72,9 @@ describe('menuPublico', () => {
       { presentacion: 'Mediano', monto_centavos: null, compartido: true },
       { presentacion: 'Grande', monto_centavos: 610000, compartido: false },
     ];
-    const [categoria] = menuPublico([fila({ precios })]);
+    const categoria = unica([fila({ precios })]);
     expect(categoria).toMatchObject({ columnas: 1, encabezados: ['Mediano', 'Grande'] });
-    expect(categoria.productos[0].precios).toEqual([
+    expect(categoria.productos[0]!.precios).toEqual([
       { etiqueta: 'Mediano', texto: '—' },
       { etiqueta: 'Grande', texto: '$6.100' },
     ]);
@@ -80,12 +87,12 @@ describe('menuPublico', () => {
       fila({}),
     ]);
     expect(categorias.map((c) => c.ancla)).toEqual(['facturas', 'laminados']);
-    expect(categorias[1].productos.map((p) => p.nombre)).toEqual(['Croissant', 'Danesa']);
+    expect(categorias[1]!.productos.map((p) => p.nombre)).toEqual(['Croissant', 'Danesa']);
   });
 
   it('la etiqueta se ve con su texto', () => {
-    const [categoria] = menuPublico([fila({ etiqueta: 'mas_vendido' })]);
-    expect(categoria.productos[0].etiqueta).toBe('🔥 Más vendido');
+    const categoria = unica([fila({ etiqueta: 'mas_vendido' })]);
+    expect(categoria.productos[0]!.etiqueta).toBe('🔥 Más vendido');
   });
 
   it('sin filas no hay menu', () => {

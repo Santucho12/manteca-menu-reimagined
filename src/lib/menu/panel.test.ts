@@ -95,12 +95,14 @@ function filas(): FilasDelMenu {
 
 describe('armarPanel', () => {
   it('trae lo activo, en orden, con los precios vigentes y su origen', () => {
-    const [facturas, ...resto] = armarPanel(filas());
-    expect(resto).toEqual([]);
+    const panel = armarPanel(filas());
+    expect(panel).toHaveLength(1);
+    const facturas = panel[0]!;
     expect(facturas.presentaciones.map((p) => p.nombre)).toEqual(['Docena', 'Unidad']);
     expect(facturas.compartidos).toEqual([2000000, null]);
     expect(facturas.productos.map((p) => p.nombre)).toEqual(['Medialuna', 'Flor']);
-    const [medialuna, flor] = facturas.productos;
+    const medialuna = facturas.productos[0]!;
+    const flor = facturas.productos[1]!;
     expect(medialuna.precios.map((p) => [p.montoCentavos, p.origen])).toEqual([
       [2000000, 'compartido'],
       [null, null],
