@@ -139,3 +139,89 @@
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+/* Pagina publica del menu: estilos portados de la pagina anterior, con los colores del proyecto. */
+html {
+  scroll-behavior: smooth;
+}
+
+@layer utilities {
+  .alto-de-pantalla {
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+
+  .etiqueta-del-menu {
+    background: var(--accent);
+    color: var(--accent-foreground);
+    font-size: 0.625rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .divisor-de-seccion {
+    width: 2.5rem;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    margin: 0 auto;
+  }
+
+  .tarjeta-del-menu {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radio-grande);
+    padding: 0.875rem 1rem;
+    transition: all 0.2s ease;
+  }
+
+  @media (hover: hover) {
+    .tarjeta-del-menu:hover {
+      box-shadow: var(--sombra-media);
+      transform: translateY(-1px);
+      border-color: var(--accent);
+    }
+  }
+
+  .velo-de-portada {
+    background: linear-gradient(
+      to bottom,
+      oklch(0.12 0.02 45 / 30%) 0%,
+      oklch(0.12 0.02 45 / 65%) 50%,
+      oklch(0.12 0.02 45 / 85%) 100%
+    );
+  }
+
+  .aparece {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .aparece.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .aparece {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@keyframes subir-y-aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
