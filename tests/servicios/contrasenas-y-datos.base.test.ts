@@ -111,6 +111,20 @@ describe('corregir', () => {
       expect(await accionesSinUsar(cuenta.id)).toBe(0);
     }));
 
+  // El servicio se llama sin el esquema de la pantalla: asi Supabase Auth rechaza el email de verdad.
+  it('si Supabase Auth rechaza el email, la accion anotada no queda viva', () =>
+    conCuenta({ rol: 'caja' }, async (cuenta) => {
+      const datos = { id: cuenta.id, nombre: 'Cuenta temporal', email: 'no-es-un-email' };
+      const resultado = await corregir(
+        await clienteComo('admin'),
+        clienteSecretoDePruebas(),
+        datos,
+      );
+      expect(resultado.ok).toBe(false);
+      expect(await accionesSinUsar(cuenta.id)).toBe(0);
+      expect((await perfilDe(cuenta.id)).email).toBe(cuenta.email);
+    }));
+
   it('el admin de otro local no puede corregir', () =>
     conCuenta({ rol: 'caja' }, async (cuenta) => {
       const datos = { id: cuenta.id, nombre: 'Otro nombre', email: cuenta.email };

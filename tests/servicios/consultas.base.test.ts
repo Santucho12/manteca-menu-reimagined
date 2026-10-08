@@ -25,7 +25,10 @@ async function emailsQueVe(filtros: Partial<FiltrosDeLista>): Promise<string[]> 
 }
 
 async function ponerNombre(id: string, nombre: string) {
-  const { error } = await clienteSecretoDePruebas().from('perfiles').update({ nombre }).eq('id', id);
+  const { error } = await clienteSecretoDePruebas()
+    .from('perfiles')
+    .update({ nombre })
+    .eq('id', id);
   if (error) throw new Error(`No pude poner el nombre: ${error.message}`);
 }
 
