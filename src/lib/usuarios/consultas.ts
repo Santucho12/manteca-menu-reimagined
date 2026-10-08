@@ -38,11 +38,16 @@ export async function perfilPropio(cliente: Cliente): Promise<PerfilDeAcceso | n
   return data;
 }
 
+// En ilike el _ es comodin. Dentro de las comillas de PostgREST, \\ llega a la base como \,
+// y \_ busca el guion bajo tal cual.
+const sinComodines = (texto: string) => texto.replaceAll('_', '\\\\_');
+
 // Las comillas dejan buscar con espacios; textoDeBusqueda ya saco lo que rompe el filtro.
 function filtrar<T extends Filtrable<T>>(consulta: T, { estado, busqueda }: FiltrosDeLista): T {
   const conEstado = consulta.match(CONDICIONES_DE_ESTADO[estado]);
   if (!busqueda) return conEstado;
-  return conEstado.or(`nombre.ilike."%${busqueda}%",email.ilike."%${busqueda}%"`);
+  const patron = `"%${sinComodines(busqueda)}%"`;
+  return conEstado.or(`nombre.ilike.${patron},email.ilike.${patron}`);
 }
 
 async function contarUsuarios(cliente: Cliente, filtros: FiltrosDeLista): Promise<number> {
