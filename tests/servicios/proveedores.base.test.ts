@@ -1,5 +1,9 @@
 import { afterAll, describe, expect, it } from 'vitest';
-import { listarProveedores, proveedorPorId } from '../../src/lib/proveedores/consultas';
+import {
+  listarProveedores,
+  proveedorPorId,
+  type FiltrosDeProveedores,
+} from '../../src/lib/proveedores/consultas';
 import {
   cambiarEstadoDeProveedor,
   crearProveedor,
@@ -18,7 +22,7 @@ import { clienteComo } from '../sesiones';
 const creados: string[] = [];
 afterAll(() => borrarProveedores(creados));
 
-const TODOS = { busqueda: null, desactivados: false, pagina: 1 };
+const TODOS: FiltrosDeProveedores = { busqueda: null, desactivados: false, pagina: 1 };
 
 function datos(nombre: string): DatosDeProveedor {
   return {
