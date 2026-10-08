@@ -106,10 +106,17 @@ Por decisión de Santiago (2026-10-07): se borra la página `/admin/guia-de-esti
 componentes y sus pruebas, y deja de ser una regla del proyecto. Los colores, las tipografías
 y los componentes base que usan las pantallas quedan.
 
+### 24. Arreglos de la revisión de usuarios
+Tres arreglos que dejó la revisión de la rama de usuarios: si Supabase Auth falla al resetear
+o corregir, la marca de la acción no queda viva; el `_` de la búsqueda se busca tal cual y no
+como comodín; y el proxy manda al ingreso con 303, para que un POST sin sesión no se reenvíe.
+Queda para Cierres de caja: que caja pueda leer su propio local, como dice el spec.
+
 ## Pendientes
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 24 | Arreglos de la revisión de usuarios | En curso, en la rama `feat/usuarios` |
 | 21 | Arreglos de la revisión de la base técnica | Hecho y verificado (rama `fix/revision-base-tecnica`): montos sin precisión y URL sin cifrar se rechazan; protecciones de configuración (todo test corre en algún grupo, versión de Node, tipos de Supabase fuera de Prettier, clave secreta prohibida en componentes); la siembra repara cuentas y lee todas las páginas; un solo aviso con todas las variables que faltan; comprobación de tokens corregida; colores con contraste suficiente y anillo de foco entero. Los controles de 44 px, el campo con error y los títulos en Neufile Grotesk entraron con el pedido 22. Queda para el menú público: las tipografías en woff2. Las variantes de la guía ya no van: la guía se sacó en el pedido 23 |
 
 ## Completados
