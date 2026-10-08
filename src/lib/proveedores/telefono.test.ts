@@ -17,12 +17,9 @@ describe('normalizarTelefono', () => {
     expect(normalizarTelefono('  ')).toBeNull();
   });
 
-  it.each(['123', '11 15 2345 6789', '23456789', 'llamar al local'])(
-    '%s no se acepta',
-    (texto) => {
-      expect(normalizarTelefono(texto)).toBeUndefined();
-    },
-  );
+  it.each(['123', '11 15 2345 6789', '23456789', 'llamar al local'])('%s no se acepta', (texto) => {
+    expect(normalizarTelefono(texto)).toBeUndefined();
+  });
 });
 
 describe('WhatsApp y vista', () => {
