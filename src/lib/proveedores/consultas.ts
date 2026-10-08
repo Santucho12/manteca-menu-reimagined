@@ -24,9 +24,14 @@ type Filtrable<T> = {
   ilike(columna: string, patron: string): T;
 };
 
-/** En ilike, % y _ son comodines: se buscan tal cual. */
+// En ilike, % y _ son comodines y PostgREST lee * como %: los dos primeros se escapan y el *
+// pasa a _, un comodin de un solo caracter que despues se descarta comparando exacto.
+function escapado(texto: string): string {
+  return texto.replace(/[\\%_]/g, '\\$&').replace(/\*/g, '_');
+}
+
 export function patronDe(texto: string): string {
-  return `%${texto.replace(/[\\%_]/g, '\\$&')}%`;
+  return `%${escapado(texto)}%`;
 }
 
 function filtrar<T extends Filtrable<T>>(
@@ -61,7 +66,11 @@ export async function listarProveedores(
   return { filas: data, total, pagina };
 }
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Un id mal escrito en la URL no es un error: no hay proveedor, y la pantalla da 404. */
 export async function proveedorPorId(cliente: Cliente, id: string): Promise<Proveedor | null> {
+  if (!UUID.test(id)) return null;
   const { data, error } = await cliente
     .from('proveedores')
     .select('id, nombre, telefono, que_compra, activo, ubicacion, observaciones')
@@ -73,12 +82,12 @@ export async function proveedorPorId(cliente: Cliente, id: string): Promise<Prov
 
 /** El nombre de un proveedor del local que se llama igual, sin importar mayusculas. */
 export async function nombreRepetido(cliente: Cliente, nombre: string): Promise<string | null> {
-  const patron = nombre.trim().replace(/[\\%_]/g, '\\$&');
+  const buscado = nombre.trim().toLowerCase();
   const { data, error } = await cliente
     .from('proveedores')
     .select('nombre')
-    .ilike('nombre', patron)
-    .limit(1);
+    .ilike('nombre', escapado(nombre.trim()))
+    .limit(20);
   if (error) throw new Error(`No pudimos revisar el nombre: ${error.message}`);
-  return data[0]?.nombre ?? null;
+  return data.find((fila) => fila.nombre.toLowerCase() === buscado)?.nombre ?? null;
 }

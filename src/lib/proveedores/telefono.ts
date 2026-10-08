@@ -14,9 +14,14 @@ function nacional(digitos: string): string | undefined {
 export function normalizarTelefono(texto: string): string | null | undefined {
   if (texto.trim() === '') return null;
   const digitos = texto.replace(/\D/g, '');
-  if (digitos.length === 13 && digitos.startsWith('549')) return digitos;
-  if (digitos.length === 12 && digitos.startsWith('54')) return `549${digitos.slice(2)}`;
-  const numero = nacional(digitos);
+  // Con el 54 adelante, lo que sigue tiene que ser un numero nacional valido (sin el 15).
+  const sinPais =
+    digitos.startsWith('549') && digitos.length === 13
+      ? digitos.slice(3)
+      : digitos.startsWith('54') && digitos.length === 12
+        ? digitos.slice(2)
+        : digitos;
+  const numero = nacional(sinPais);
   return numero ? `549${numero}` : undefined;
 }
 

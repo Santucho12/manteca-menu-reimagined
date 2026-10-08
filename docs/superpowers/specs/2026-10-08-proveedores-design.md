@@ -36,7 +36,7 @@ Una sola escritura por acción y de una sola fila: no hacen falta funciones de l
 |---|---|
 | `telefono.ts` | `normalizarTelefono(texto)`: vacío es `null`; acepta 10 dígitos (con un 0 adelante opcional), `54` + 10 o `549` + 10, y devuelve `549…`; si no, `undefined` (inválido). `urlDeWhatsApp(telefono)` y `telefonoParaMostrar(telefono)` (puros) |
 | `esquemas.ts` | Esquema de Zod del formulario y conversión a la fila de la base (puro) |
-| `consultas.ts` | Lista paginada (20 por página) con búsqueda por nombre y filtro activos/desactivados; un proveedor por id |
+| `consultas.ts` | Lista paginada (25 por página, como Usuarios) con búsqueda por nombre y filtro activos/desactivados; un proveedor por id |
 | `escritura.ts` | Crear (si ya hay uno con el mismo nombre, sin importar mayúsculas, devuelve "confirmar" salvo que venga confirmado), editar, desactivar y reactivar |
 
 Acciones en `src/app/admin/(panel)/proveedores/acciones.ts`, con `ejecutarAccion('admin', …)`.

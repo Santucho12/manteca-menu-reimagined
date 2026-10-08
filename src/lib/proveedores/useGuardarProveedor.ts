@@ -7,15 +7,15 @@ import type { DatosDeProveedor } from './esquemas';
 type Guardar = (datos: DatosDeProveedor, confirmar: boolean) => Promise<Resultado<Creado>>;
 type Estado = {
   mensaje: string | null;
-  repetido: { nombre: string; datos: DatosDeProveedor } | null;
+  repetido: { nombre: string } | null;
 };
 
 const NADA: Estado = { mensaje: null, repetido: null };
 
-function estadoDe(resultado: Resultado<Creado>, datos: DatosDeProveedor): Estado {
+function estadoDe(resultado: Resultado<Creado>): Estado {
   if (!resultado.ok) return { mensaje: resultado.mensaje, repetido: null };
   if (resultado.datos.estado === 'confirmar') {
-    return { mensaje: null, repetido: { nombre: resultado.datos.nombre, datos } };
+    return { mensaje: null, repetido: { nombre: resultado.datos.nombre } };
   }
   return NADA;
 }
@@ -27,15 +27,15 @@ export function useGuardarProveedor(guardar: Guardar, alGuardar: (id: string) =>
   const correr = (datos: DatosDeProveedor, confirmar: boolean) =>
     unaVez(async () => {
       const resultado = await guardar(datos, confirmar);
-      setEstado(estadoDe(resultado, datos));
+      setEstado(estadoDe(resultado));
       if (resultado.ok && resultado.datos.estado === 'creado') alGuardar(resultado.datos.id);
     });
-  const { repetido } = estado;
   return {
     ...estado,
     enviando,
     enviar: (datos: DatosDeProveedor) => correr(datos, false),
-    confirmar: async () => (repetido ? correr(repetido.datos, true) : undefined),
+    // Con lo que esta en pantalla: la persona pudo corregir algo mientras veia el aviso.
+    confirmar: (datos: DatosDeProveedor) => correr(datos, true),
     volver: () => setEstado(NADA),
   };
 }

@@ -30,10 +30,10 @@ function Repetido({
         Ya hay un proveedor llamado {nombre}. ¿Lo cargás igual?
       </p>
       <div className="flex gap-2">
-        <Button disabled={enviando} onClick={alConfirmar}>
+        <Button type="button" disabled={enviando} onClick={alConfirmar}>
           Cargar igual
         </Button>
-        <Button variant="outline" onClick={alVolver}>
+        <Button type="button" variant="outline" onClick={alVolver}>
           Volver
         </Button>
       </div>
@@ -91,7 +91,7 @@ export function FormularioDeProveedor({ inicial, id }: Props) {
         <Repetido
           nombre={guardado.repetido.nombre}
           enviando={guardado.enviando}
-          alConfirmar={guardado.confirmar}
+          alConfirmar={handleSubmit(guardado.confirmar)}
           alVolver={guardado.volver}
         />
       ) : (
