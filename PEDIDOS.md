@@ -119,7 +119,7 @@ cómo se verificó cada uno.
 
 | # | Pedido | Fecha | Cómo se verificó |
 |---|---|---|---|
-| 22 | Módulo de usuarios y acceso | 2026-10-07 | `npm run verificar` en verde (lint, tipos, 335 tests de Vitest y build) y `npm run e2e` en verde (39 pruebas en computadora y 39 en celular, con las sesiones). Migraciones aplicadas y verificadas solo en la base de pruebas; aplicarlas a la real lo decide Santiago. Capturas revisadas en los dos tamaños. La revisión independiente de la rama queda pendiente: se cortó por el límite de uso |
+| 22 | Módulo de usuarios y acceso | 2026-10-07 | `npm run verificar` en verde (lint, tipos, 335 tests de Vitest y build) y `npm run e2e` en verde (39 pruebas en computadora y 39 en celular, con las sesiones). Migraciones aplicadas y verificadas solo en la base de pruebas; aplicarlas a la real lo decide Santiago. Capturas revisadas en los dos tamaños. La revisión independiente de la rama queda pendiente: se cortó por el límite de uso. Tras el arreglo de reactivar y sus tests, el cierre se volvió a correr el mismo día: `npm run verificar` en verde (346 tests) y `npm run e2e` en verde (75 pruebas) |
 | 23 | Sacar la guía de estilos | 2026-10-07 | Página, componentes, pruebas y regla borrados. La prueba de acceso comprueba que `/admin/guia-de-estilos` da 404 y que el menú del admin queda en Inicio, Usuarios y Mi cuenta; entra en las corridas del pedido 22 |
 | 1 | Repositorio privado en GitHub | 2026-10-06 | `gh repo view` confirma `Santucho12/sistema-manteca` como privado, con `main` sincronizada |
 | 3 | Comparar skills con otros proyectos | 2026-10-06 | Se listaron las skills de los dos proyectos y se entregó la comparación |
