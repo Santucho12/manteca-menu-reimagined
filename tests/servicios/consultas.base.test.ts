@@ -6,6 +6,7 @@ import {
   textoDeBusqueda,
   type FiltrosDeLista,
 } from '../../src/lib/usuarios/presentacion';
+import { clienteSecretoDePruebas } from '../clientes';
 import { emailDePrueba, type RolDePrueba } from '../cuentas';
 import {
   borrarCuentaTemporal,
@@ -21,6 +22,11 @@ const email = (rol: RolDePrueba) => emailDePrueba(rol).toLowerCase();
 async function emailsQueVe(filtros: Partial<FiltrosDeLista>): Promise<string[]> {
   const { filas } = await listarUsuarios(await clienteComo('admin'), { ...TODOS, ...filtros });
   return filas.map((fila) => fila.email);
+}
+
+async function ponerNombre(id: string, nombre: string) {
+  const { error } = await clienteSecretoDePruebas().from('perfiles').update({ nombre }).eq('id', id);
+  if (error) throw new Error(`No pude poner el nombre: ${error.message}`);
 }
 
 describe('perfilPropio', () => {
@@ -89,6 +95,13 @@ describe('listarUsuarios', () => {
 
   it('una busqueda con caracteres de filtro no rompe la consulta', async () => {
     expect(await emailsQueVe({ busqueda: textoDeBusqueda('caja,(%)') })).toEqual([email('caja')]);
+  });
+
+  it('el guion bajo se busca tal cual, no como comodin', async () => {
+    expect(await emailsQueVe({ busqueda: textoDeBusqueda('prueba_caja') })).toEqual([]);
+    await ponerNombre(rechazada.id, 'Cuenta_rechazada');
+    const busqueda = textoDeBusqueda('cuenta_rechazada');
+    expect(await emailsQueVe({ busqueda, estado: 'desactivados' })).toEqual([rechazada.email]);
   });
 
   it('una pagina pedida de mas muestra la ultima', async () => {
