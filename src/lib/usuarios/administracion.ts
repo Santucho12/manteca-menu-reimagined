@@ -43,17 +43,36 @@ async function bloquear(secreto: Cliente, id: string, duracion: string): Promise
   return error ? fallo(mensajeDeError(error)) : exito(undefined);
 }
 
+type Accion = { cuenta: string; tipo: 'reseteo' | 'correccion'; por: string };
+type CambioEnAuth = () => Promise<{ error: { code?: string | null } | null }>;
+
 // Le avisa a la base que el proximo cambio de contraseña o de email de la cuenta lo pidio este admin.
-async function anotarAccion(
-  secreto: Cliente,
-  cuenta: string,
-  tipo: 'reseteo' | 'correccion',
-  por: string,
-) {
-  const { error } = await secreto
+async function anotarAccion(secreto: Cliente, { cuenta, tipo, por }: Accion): Promise<string> {
+  const { data, error } = await secreto
     .from('acciones_de_cuenta')
-    .insert({ cuenta_id: cuenta, tipo, por });
+    .insert({ cuenta_id: cuenta, tipo, por })
+    .select('id')
+    .single();
   if (error) throw new Error(`No pudimos anotar la accion: ${error.message}`);
+  return data.id;
+}
+
+// Si Auth no hizo el cambio, la marca se da por usada: viva, la tomaria el proximo cambio
+// de la cuenta, aunque lo haga la persona y no el admin.
+async function conAccionAnotada(
+  secreto: Cliente,
+  accion: Accion,
+  cambio: CambioEnAuth,
+): Promise<Resultado> {
+  const id = await anotarAccion(secreto, accion);
+  const { error } = await cambio();
+  if (!error) return exito(undefined);
+  const descarte = await secreto
+    .from('acciones_de_cuenta')
+    .update({ fecha_uso: new Date().toISOString() })
+    .eq('id', id);
+  if (descarte.error) throw new Error(`No pudimos descartar la accion: ${descarte.error.message}`);
+  return fallo(mensajeDeError(error));
 }
 
 // Con la clave secreta: el email no puede repetirse en ningun local.
@@ -108,12 +127,13 @@ export async function resetearContrasena(
   const previa = await prepararAccion(cliente, id);
   if (!previa.ok) return previa;
   if (previa.datos.admin.id === id) return fallo(MENSAJES.propiaContrasena);
-  await anotarAccion(secreto, id, 'reseteo', previa.datos.admin.id);
   const temporal = crearContrasenaTemporal();
-  const { error } = await secreto.auth.admin.updateUserById(id, { password: temporal });
-  return error
-    ? fallo(mensajeDeError(error))
-    : exito({ temporal, nombre: previa.datos.cuenta.nombre });
+  const reseteo = await conAccionAnotada(
+    secreto,
+    { cuenta: id, tipo: 'reseteo', por: previa.datos.admin.id },
+    () => secreto.auth.admin.updateUserById(id, { password: temporal }),
+  );
+  return reseteo.ok ? exito({ temporal, nombre: previa.datos.cuenta.nombre }) : reseteo;
 }
 
 export async function corregir(
@@ -128,10 +148,9 @@ export async function corregir(
     return fallo(MENSAJES.emailExistente);
   const nombre = await cambiarPerfil(cliente, datos.id, { nombre: datos.nombre });
   if (!nombre.ok || !cambiaEmail) return nombre;
-  await anotarAccion(secreto, datos.id, 'correccion', previa.datos.admin.id);
-  const { error } = await secreto.auth.admin.updateUserById(datos.id, {
-    email: datos.email,
-    email_confirm: true,
-  });
-  return error ? fallo(mensajeDeError(error)) : exito(undefined);
+  return conAccionAnotada(
+    secreto,
+    { cuenta: datos.id, tipo: 'correccion', por: previa.datos.admin.id },
+    () => secreto.auth.admin.updateUserById(datos.id, { email: datos.email, email_confirm: true }),
+  );
 }
