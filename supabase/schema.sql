@@ -1,5 +1,5 @@
 -- Esquema completo de la base del Sistema Manteca, al dia con la ultima migracion
--- (20261007150200_usuarios_triggers_y_permisos). Se actualiza en el mismo cambio que cada
+-- (20261008120400_menu_carga_inicial). Se actualiza en el mismo cambio que cada
 -- migracion.
 
 -- Tipos
@@ -1210,3 +1210,6 @@ select c.id as categoria_id,
 
 revoke all on table public.menu_publico from anon, authenticated;
 grant select on table public.menu_publico to anon, authenticated;
+
+-- Menu (5 de 5): carga inicial de datos, sin cambios de esquema. Ver
+-- migrations/20261008120400_menu_carga_inicial.sql.

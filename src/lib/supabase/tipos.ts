@@ -106,6 +106,118 @@ export type Database = {
           },
         ]
       }
+      aumentos: {
+        Row: {
+          categoria_id: string | null
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          local_id: string
+          porcentaje: number
+          redondeo_centavos: number
+          usuario_id: string | null
+        }
+        Insert: {
+          categoria_id?: string | null
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id: string
+          porcentaje: number
+          redondeo_centavos: number
+          usuario_id?: string | null
+        }
+        Update: {
+          categoria_id?: string | null
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          porcentaje?: number
+          redondeo_centavos?: number
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aumentos_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "aumentos_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "menu_publico"
+            referencedColumns: ["categoria_id"]
+          },
+          {
+            foreignKeyName: "aumentos_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "aumentos_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categorias: {
+        Row: {
+          activo: boolean
+          fecha_actualizacion: string
+          fecha_creacion: string
+          foto: string | null
+          icono: string
+          id: string
+          local_id: string
+          nombre: string
+          orden: number
+          subtitulo: string | null
+          visible: boolean
+        }
+        Insert: {
+          activo?: boolean
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          foto?: string | null
+          icono: string
+          id?: string
+          local_id: string
+          nombre: string
+          orden: number
+          subtitulo?: string | null
+          visible?: boolean
+        }
+        Update: {
+          activo?: boolean
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          foto?: string | null
+          icono?: string
+          id?: string
+          local_id?: string
+          nombre?: string
+          orden?: number
+          subtitulo?: string | null
+          visible?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categorias_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       locales: {
         Row: {
           activo: boolean
@@ -177,13 +289,290 @@ export type Database = {
           },
         ]
       }
+      precios: {
+        Row: {
+          activo: boolean
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          local_id: string
+          monto_centavos: number
+          presentacion_id: string
+          producto_id: string | null
+        }
+        Insert: {
+          activo?: boolean
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id: string
+          monto_centavos: number
+          presentacion_id: string
+          producto_id?: string | null
+        }
+        Update: {
+          activo?: boolean
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          monto_centavos?: number
+          presentacion_id?: string
+          producto_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "precios_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "precios_presentacion_id_fkey"
+            columns: ["presentacion_id"]
+            isOneToOne: false
+            referencedRelation: "presentaciones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "precios_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "menu_publico"
+            referencedColumns: ["producto_id"]
+          },
+          {
+            foreignKeyName: "precios_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      presentaciones: {
+        Row: {
+          activo: boolean
+          categoria_id: string
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          local_id: string
+          nombre: string
+          orden: number
+        }
+        Insert: {
+          activo?: boolean
+          categoria_id: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id: string
+          nombre: string
+          orden: number
+        }
+        Update: {
+          activo?: boolean
+          categoria_id?: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          nombre?: string
+          orden?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presentaciones_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "presentaciones_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "menu_publico"
+            referencedColumns: ["categoria_id"]
+          },
+          {
+            foreignKeyName: "presentaciones_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      productos: {
+        Row: {
+          activo: boolean
+          categoria_id: string
+          descripcion: string | null
+          etiqueta: Database["public"]["Enums"]["etiqueta_de_producto"] | null
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          local_id: string
+          nombre: string
+          orden: number
+          visible: boolean
+        }
+        Insert: {
+          activo?: boolean
+          categoria_id: string
+          descripcion?: string | null
+          etiqueta?: Database["public"]["Enums"]["etiqueta_de_producto"] | null
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id: string
+          nombre: string
+          orden: number
+          visible?: boolean
+        }
+        Update: {
+          activo?: boolean
+          categoria_id?: string
+          descripcion?: string | null
+          etiqueta?: Database["public"]["Enums"]["etiqueta_de_producto"] | null
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          nombre?: string
+          orden?: number
+          visible?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "productos_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "productos_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "menu_publico"
+            referencedColumns: ["categoria_id"]
+          },
+          {
+            foreignKeyName: "productos_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      menu_publico: {
+        Row: {
+          categoria: string | null
+          categoria_id: string | null
+          compartidos: Json | null
+          descripcion: string | null
+          etiqueta: Database["public"]["Enums"]["etiqueta_de_producto"] | null
+          foto: string | null
+          icono: string | null
+          nombre: string | null
+          orden: number | null
+          orden_categoria: number | null
+          precios: Json | null
+          producto_id: string | null
+          subtitulo: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       es_admin_activo: { Args: never; Returns: boolean }
       local_del_usuario: { Args: never; Returns: string }
+      menu_aplicar_aumento: { Args: { datos: Json }; Returns: string }
+      menu_aumento_vigente: {
+        Args: { el_local: string; la_categoria: string; recibidos: Json }
+        Returns: boolean
+      }
+      menu_cambiar_visibilidad: {
+        Args: { el_id: string; el_tipo: string; mostrar: boolean }
+        Returns: undefined
+      }
+      menu_desactivar: {
+        Args: { el_id: string; el_tipo: string }
+        Returns: undefined
+      }
+      menu_escribir_categoria: {
+        Args: { datos: Json; el_local: string }
+        Returns: string
+      }
+      menu_escribir_precios_del_producto: {
+        Args: { el_local: string; el_producto: string; lista: Json }
+        Returns: undefined
+      }
+      menu_escribir_presentaciones: {
+        Args: { el_local: string; la_categoria: string; lista: Json }
+        Returns: undefined
+      }
+      menu_escribir_producto: {
+        Args: { datos: Json; el_local: string }
+        Returns: string
+      }
+      menu_exigir_admin: { Args: never; Returns: string }
+      menu_guardar_categoria: {
+        Args: { confirmar?: boolean; datos: Json }
+        Returns: Json
+      }
+      menu_guardar_producto: {
+        Args: { confirmar?: boolean; datos: Json }
+        Returns: Json
+      }
+      menu_intercambiar_orden: {
+        Args: { el_tipo: string; otro: string; uno: string }
+        Returns: undefined
+      }
+      menu_mover: {
+        Args: { direccion: string; el_id: string; el_tipo: string }
+        Returns: undefined
+      }
+      menu_no_encontrado: { Args: never; Returns: undefined }
+      menu_ocultar_sin_precio: {
+        Args: { confirmar: boolean; las_categorias: string[] }
+        Returns: Json
+      }
+      menu_poner_precio: {
+        Args: {
+          el_local: string
+          el_producto: string
+          la_presentacion: string
+          monto: number
+        }
+        Returns: undefined
+      }
+      menu_precios_del_alcance: {
+        Args: { el_local: string; la_categoria: string }
+        Returns: {
+          id: string
+          monto_centavos: number
+        }[]
+      }
+      menu_reactivar: {
+        Args: { el_id: string; el_tipo: string }
+        Returns: undefined
+      }
+      menu_validar_foto: {
+        Args: { el_local: string; la_foto: string }
+        Returns: string
+      }
+      menu_vecino: {
+        Args: { direccion: string; el_id: string; el_tipo: string }
+        Returns: string
+      }
       registrar_cambio_de_contrasena: {
         Args: { cuenta: string; por: string; tipo: string }
         Returns: undefined
@@ -192,12 +581,14 @@ export type Database = {
         Args: { cuentas: number }
         Returns: Database["public"]["Enums"]["rol_usuario"]
       }
+      tiene_precio: { Args: { el_producto: string }; Returns: boolean }
       usar_accion: {
         Args: { cuenta: string; tipos: string[] }
         Returns: Record<string, unknown>
       }
     }
     Enums: {
+      etiqueta_de_producto: "mas_vendido" | "artesanal" | "nuevo"
       rol_usuario: "invitado" | "caja" | "encargado" | "admin"
     }
     CompositeTypes: {
@@ -326,6 +717,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      etiqueta_de_producto: ["mas_vendido", "artesanal", "nuevo"],
       rol_usuario: ["invitado", "caja", "encargado", "admin"],
     },
   },
