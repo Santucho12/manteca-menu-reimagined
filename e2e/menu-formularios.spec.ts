@@ -6,7 +6,7 @@ import {
   sembrarCategoria,
   sembrarProducto,
 } from '../tests/menu-de-prueba';
-import { SESIONES } from './ayudas';
+import { SESIONES, aviso } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -92,4 +92,81 @@ test('guarda una captura del formulario de categoria', async ({ page }, info) =>
     path: `e2e/capturas/menu-categoria-${info.project.name}.png`,
     fullPage: true,
   });
+});
+
+async function completarProducto(page: Page, categoria: string, nombre: string) {
+  await page.goto('/admin/menu/productos/nuevo');
+  await page.getByLabel('Categoría').selectOption({ label: categoria });
+  await page.getByLabel('Nombre', { exact: true }).fill(nombre);
+  await page.getByLabel('Descripción').fill('Hecho con manteca.');
+  await page.getByLabel('Etiqueta').selectOption({ label: 'Nuevo' });
+}
+
+test('crea un producto con precio y se ve en el menu publico', async ({ page }) => {
+  const categoria = await sembrarCategoria({ presentaciones: ['Mediano', 'Grande'] });
+  categorias.push(categoria.id);
+  const nombre = nombreNuevo();
+  await completarProducto(page, categoria.nombre, nombre);
+  await page.getByLabel('Precio de Grande').fill('4200');
+  await page.getByLabel('Se muestra en el menú').check();
+  await page.getByRole('button', { name: 'Guardar' }).click();
+  await expect(page).toHaveURL(/\/admin\/menu$/);
+  await page.goto('/');
+  const fila = page
+    .getByRole('region', { name: categoria.nombre })
+    .getByRole('listitem')
+    .filter({ hasText: nombre });
+  await expect(fila).toContainText('$4.200');
+  await expect(fila).toContainText('Nuevo');
+});
+
+test('editar el precio cambia el menu publico', async ({ page }) => {
+  const categoria = await sembrarCategoria();
+  categorias.push(categoria.id);
+  const producto = await sembrarProducto(categoria, { precios: [100000] });
+  await page.goto(`/admin/menu/productos/${producto.id}`);
+  await page.getByLabel('Precio de Unidad').fill('1300');
+  await page.getByRole('button', { name: 'Guardar' }).click();
+  await expect(page).toHaveURL(/\/admin\/menu$/);
+  await page.goto('/');
+  await expect(page.getByRole('listitem').filter({ hasText: producto.nombre })).toContainText(
+    '$1.300',
+  );
+});
+
+test('un producto visible sin precio pide confirmar y queda oculto', async ({ page }) => {
+  const categoria = await sembrarCategoria();
+  categorias.push(categoria.id);
+  const nombre = nombreNuevo();
+  await completarProducto(page, categoria.nombre, nombre);
+  await expect(page.getByText('Vacío queda sin precio.')).toBeVisible();
+  await page.getByLabel('Se muestra en el menú').check();
+  await page.getByRole('button', { name: 'Guardar' }).click();
+  await expect(page.getByRole('alertdialog')).toContainText(nombre);
+  await page.getByRole('button', { name: 'Confirmar' }).click();
+  await expect(page.getByRole('listitem').filter({ hasText: nombre })).toContainText('Oculto');
+});
+
+test('cambiar de categoria cambia los precios que se piden', async ({ page }) => {
+  const facturas = await sembrarCategoria({ presentaciones: ['Docena'], compartidos: [2000000] });
+  const cafe = await sembrarCategoria({ presentaciones: ['Mediano', 'Grande'] });
+  categorias.push(facturas.id, cafe.id);
+  await page.goto('/admin/menu/productos/nuevo');
+  await page.getByLabel('Categoría').selectOption({ label: facturas.nombre });
+  await expect(page.getByText(`Vacío usa el de ${facturas.nombre}: $20.000.`)).toBeVisible();
+  await page.getByLabel('Categoría').selectOption({ label: cafe.nombre });
+  await expect(page.getByLabel('Precio de Mediano')).toBeVisible();
+  await expect(page.getByLabel('Precio de Docena')).toHaveCount(0);
+});
+
+test('un precio con puntos se explica', async ({ page }) => {
+  const categoria = await sembrarCategoria();
+  categorias.push(categoria.id);
+  await completarProducto(page, categoria.nombre, nombreNuevo());
+  await page.getByLabel('Precio de Unidad').fill('1.500');
+  await page.getByRole('button', { name: 'Guardar' }).click();
+  await expect(page.getByLabel('Precio de Unidad')).toHaveAccessibleDescription(
+    /sin puntos ni centavos/,
+  );
+  await expect(aviso(page)).toHaveCount(0);
 });

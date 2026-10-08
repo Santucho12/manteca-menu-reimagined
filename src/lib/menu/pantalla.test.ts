@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PREGUNTA_DE_DESACTIVAR, textoDePrecios } from './pantalla';
+import { PREGUNTA_DE_DESACTIVAR, ayudaDelPrecio, textoDePrecios } from './pantalla';
 
 describe('textoDePrecios', () => {
   it('dice el precio de cada presentacion y de donde sale', () => {
@@ -35,5 +35,12 @@ describe('PREGUNTA_DE_DESACTIVAR', () => {
     expect(PREGUNTA_DE_DESACTIVAR('Flor')).toBe(
       '¿Desactivar Flor? Deja de usarse; lo podés reactivar desde Ver desactivados.',
     );
+  });
+});
+
+describe('ayudaDelPrecio', () => {
+  it('dice que precio usa un campo vacio', () => {
+    expect(ayudaDelPrecio(300000, 'Facturas')).toBe('Vacío usa el de Facturas: $3.000.');
+    expect(ayudaDelPrecio(null, 'Panes')).toBe('Vacío queda sin precio.');
   });
 });
