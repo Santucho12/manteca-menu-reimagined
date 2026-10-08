@@ -92,10 +92,11 @@ describe('requiereSesion', () => {
 });
 
 describe('enlacesDelPanel', () => {
-  it('el admin ve Inicio, Menú, Usuarios y Mi cuenta', () => {
+  it('el admin ve Inicio, Menú, Proveedores, Usuarios y Mi cuenta', () => {
     expect(enlacesDelPanel('admin').map((enlace) => enlace.texto)).toEqual([
       'Inicio',
       'Menú',
+      'Proveedores',
       'Usuarios',
       'Mi cuenta',
     ]);

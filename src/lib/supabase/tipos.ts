@@ -470,6 +470,53 @@ export type Database = {
           },
         ]
       }
+      proveedores: {
+        Row: {
+          activo: boolean
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          local_id: string
+          nombre: string
+          observaciones: string | null
+          que_compra: string | null
+          telefono: string | null
+          ubicacion: string | null
+        }
+        Insert: {
+          activo?: boolean
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          nombre: string
+          observaciones?: string | null
+          que_compra?: string | null
+          telefono?: string | null
+          ubicacion?: string | null
+        }
+        Update: {
+          activo?: boolean
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          nombre?: string
+          observaciones?: string | null
+          que_compra?: string | null
+          telefono?: string | null
+          ubicacion?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proveedores_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       menu_publico: {
