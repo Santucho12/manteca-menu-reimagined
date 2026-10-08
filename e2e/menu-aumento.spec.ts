@@ -28,6 +28,8 @@ test('muestra los cambios, ocultos incluidos, y los aplica', async ({ page }) =>
     '$3.000$3.300',
   );
   await expect(tabla.getByRole('row').filter({ hasText: oculto.nombre })).toContainText('Oculto');
+  // En el celular la tabla no puede esconder el precio nuevo detras de un desplazamiento.
+  await expect(tabla.getByRole('cell', { name: '$3.300' })).toBeInViewport();
   await page.getByRole('button', { name: 'Aplicar aumento' }).click();
   await expect(page.getByText('Listo: se actualizaron 2 precios.')).toBeVisible();
   await page.goto('/admin/menu');
