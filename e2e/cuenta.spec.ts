@@ -63,6 +63,8 @@ test.describe('cambiar la contraseña', () => {
       { timeout: 15_000 },
     );
     await page.getByRole('button', { name: 'Salir' }).click();
+    // Sin esperar la salida, abrir el ingreso corta el pedido y la sesion sigue abierta.
+    await expect(page).toHaveURL(/\/admin\/ingresar$/);
     await ingresarComo(page, cuenta.email, 'la-nueva-larga');
     await expect(page).toHaveURL(/\/admin$/);
   });
