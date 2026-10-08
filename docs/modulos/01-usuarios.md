@@ -36,7 +36,7 @@ tenga el rol que tenga, y conserva todo su historial.
 ### Registro (`/admin/registro`)
 
 - Pide nombre, email y contraseña. Los tres son obligatorios.
-- La contraseña tiene 8 caracteres como mínimo.
+- La contraseña tiene 6 caracteres como mínimo.
 - El email no se confirma: funciona como nombre de usuario.
 - Al registrarse, la persona queda con la sesión iniciada.
 - **La primera cuenta que se crea en el sistema queda como admin.** Todas las siguientes
@@ -60,7 +60,7 @@ tenga el rol que tenga, y conserva todo su historial.
 ### Cambio obligado de contraseña
 
 - Aparece al entrar con una contraseña temporal.
-- Pide la contraseña nueva, de 8 caracteres como mínimo.
+- Pide la contraseña nueva, de 6 caracteres como mínimo.
 - Hasta que la cambia, la persona no puede ir a ninguna otra pantalla.
 
 ### Mi cuenta (`/admin/cuenta`)
@@ -158,6 +158,7 @@ Acciones sobre una cuenta:
 | Emails | No se usan en esta fase |
 | Sesión | Abierta hasta "Salir", con el nombre siempre a la vista |
 | Datos propios | Cada uno cambia su contraseña; nombre y email, solo el admin |
+| Largo de la contraseña | 6 caracteres como mínimo, el mismo que pide Supabase Auth (2026-10-07) |
 
 ## Para la publicación
 
@@ -167,24 +168,36 @@ Acciones sobre una cuenta:
   Santiago (verificado el 2026-10-06 leyendo la configuración de cada uno).
 - El registro de cuentas del proyecto real quedó abierto. Cerrarlo hasta la publicación
   achica el riesgo de la regla de la primera cuenta; lo decide Santiago.
+- Los ingresos y registros salen del servidor, así que Supabase Auth los cuenta todos con la
+  IP de Vercel y su límite (unos 30 inicios cada 5 minutos) es uno solo para todo el local.
+  Alguien que pruebe contraseñas al azar podría dejar a todos sin entrar unos minutos. Antes
+  de publicar, Santiago decide: subir ese límite en el proyecto real, pasarle a Supabase la
+  IP de cada persona, o frenar los intentos por IP en Vercel.
+- Antes de aplicar las migraciones a la base real, comprobar que no tenga cuentas
+  (`select count(*) from auth.users` da 0): si hubiera alguna, quedaría como invitado y
+  nadie sería admin.
 
 ## Parte técnica
 
-Se escribe al construir el módulo: tablas, permisos, acciones de servidor y pruebas.
+Construido en el pedido 22. El detalle está en
+`docs/superpowers/specs/2026-10-07-usuarios-design.md` y en su plan.
 
-Pendientes que dejó la revisión de la base técnica, para resolver al construirlo:
+- **Base:** `locales`, `perfiles` (una fila por cuenta de Supabase Auth), `acciones_de_cuenta`
+  y `auditoria`, en tres migraciones: `20261007150000_usuarios_y_auditoria` (tablas),
+  `20261007150100_usuarios_funciones_y_reglas` y `20261007150200_usuarios_triggers_y_permisos`.
+  La base decide la primera cuenta admin, frena que alguien se cambie el rol o se desactive y
+  que queden cero admins activos, y anota cada alta y cada cambio en la auditoría.
+- **Reseteos y correcciones:** antes de cambiar una contraseña o un email con la clave
+  secreta, el servidor anota la acción en `acciones_de_cuenta`. La base la usa una sola vez y
+  solo si tiene menos de 10 minutos: así sabe que lo pidió un admin y no la persona. Un email
+  cambiado sin esa acción se rechaza.
+- **Sesión:** `@supabase/ssr` con `src/proxy.ts`. Cada página y cada acción controla el
+  acceso en el servidor (`src/lib/acceso/`).
+- **Desactivar:** además de marcar el perfil, bloquea la cuenta en Supabase Auth.
+- **Pruebas:** RLS de las cuatro tablas, reglas de la base, servicios y pruebas en vivo de cada
+  pantalla. Las sesiones de prueba se abren una vez por corrida.
+- **Entorno de la aplicación:** `npm run dev` carga `.env.local` antes que cualquier otro
+  archivo de entorno, y Playwright no reutiliza un servidor que ya estaba abierto.
 
-- **Inicios de sesión de los tests.** `clienteComo` inicia sesión en cada llamada, y
-  Supabase limita los inicios de sesión por IP (150 cada 5 minutos). Antes de la primera
-  matriz de RLS, reutilizar una sesión por rol.
-- **El entorno de la aplicación.** Playwright comprueba `.env.local`, pero `next dev` lee
-  antes `.env.development.local`. Con el login, comprobar también desde la aplicación que
-  apunta a la base de pruebas.
-- **El campo con error** todavía no está en la guía: entra con el primer formulario.
-- **Controles de 44 px en pantallas táctiles.** Hoy botones y campos miden 32 px; el login es
-  lo primero que se usa desde el celular.
-- **Títulos del panel.** Manic no dibuja acentos ni la eñe: la propuesta es Neufile Grotesk
-  para los títulos del panel y Manic solo para la marca.
-
-Las pruebas de Playwright para los tres últimos ya están escritas, sin correr: quedaron
-guardadas en `git stash` como "pruebas de la guia sin implementar".
+Pendiente para la publicación, a cargo de Santiago: aplicar las tres migraciones a la base
+real, en ese orden.

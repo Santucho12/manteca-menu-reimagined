@@ -114,8 +114,8 @@
   --ring: oklch(0.6 0.115 88);
 
   /* Radios y sombras se definen aca y no solo en @theme: Tailwind emite
-     unicamente las variables de tema que alguna clase usa, y la guia las
-     muestra todas. */
+     unicamente las variables de tema que alguna clase usa.
+  */
   --radio-chico: calc(var(--radius) - 4px);
   --radio-medio: calc(var(--radius) - 2px);
   --radio-grande: var(--radius);

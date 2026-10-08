@@ -60,7 +60,7 @@ describe('clave secreta en los componentes', () => {
     ["import { crearClienteSecreto } from '@/lib/supabase/secreto';", 'src/app/prueba.tsx'],
     [
       "import { crearClienteSecreto } from '../../lib/supabase/secreto';",
-      'src/components/guia/prueba.tsx',
+      'src/components/panel/prueba.tsx',
     ],
   ])(
     'el lint rechaza %s en un componente',
@@ -73,4 +73,20 @@ describe('clave secreta en los componentes', () => {
     },
     30_000,
   );
+});
+
+describe('servidor de desarrollo', () => {
+  it('npm run dev arranca con .env.local, que manda sobre los otros archivos de entorno', () => {
+    const paquete = JSON.parse(readFileSync('package.json', 'utf8')) as {
+      scripts: Record<string, string>;
+    };
+    expect(paquete.scripts.dev).toBe('node scripts/dev.mjs');
+    // next dev lee antes .env.development.local, pero no pisa lo que ya trae el proceso: el
+    // lanzador carga .env.local y recien despues arranca Next.js.
+    const lanzador = readFileSync('scripts/dev.mjs', 'utf8');
+    const carga = lanzador.indexOf("loadEnvFile('.env.local')");
+    expect(carga).toBeGreaterThan(-1);
+    expect(carga).toBeLessThan(lanzador.indexOf('spawn('));
+    expect(lanzador).toContain("'--port', '3210'");
+  });
 });

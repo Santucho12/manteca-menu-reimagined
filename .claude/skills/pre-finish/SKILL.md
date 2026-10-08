@@ -65,12 +65,10 @@ Sobre lo que tocaste (`CLAUDE.md`, "Reglas de código"):
 - Ningún test simula la base, `fetch` ni módulos del proyecto.
 - La clave secreta no aparece fuera de su único módulo.
 
-## 4. Guía de estilos (si tocaste algo visual)
+## 4. Estilos (si tocaste algo visual)
 
-- Lo nuevo usa los tokens y componentes de la guía: nada de colores, tipografías ni medidas
-  sueltas.
-- Si cambiaste algo estético, el cambio está en la guía y su página quedó actualizada.
-- Si tocaste la guía, la prueba del paso 2 también abre su página.
+- Lo nuevo usa los colores de `globals.css` y los componentes base del proyecto. No hay guía
+  de estilos que consultar ni actualizar (pedido 23).
 
 ## 5. Reglas de negocio sensibles
 

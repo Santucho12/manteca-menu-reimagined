@@ -1,23 +1,20 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { describe, expect, it } from 'vitest';
-import { leerEntornoPublico } from '../src/lib/entorno/publico';
-import { clienteComo, clienteSecretoDePruebas } from './clientes';
+import { crearClienteSinSesion } from '../src/lib/supabase/sin-sesion';
+import { clienteSecretoDePruebas } from './clientes';
+import { registrosDe, usuarioDe } from './consultas-de-prueba';
 import {
+  PERFILES_DE_PRUEBA,
   ROLES_DE_PRUEBA,
+  asegurarContrasenaDeSiembra,
   emailDePrueba,
   listarCuentas,
   sembrarCuentas,
-  type RolDePrueba,
 } from './cuentas';
+import { borrarCuentaTemporal, crearCuentaTemporal } from './cuentas-temporales';
 import { leerEntornoPruebas } from './entorno-pruebas';
-
-async function idDeLaCuenta(secreto: SupabaseClient, rol: RolDePrueba): Promise<string> {
-  const { data, error } = await secreto.auth.admin.listUsers({ page: 1, perPage: 1000 });
-  if (error) throw new Error(`No pude listar las cuentas: ${error.message}`);
-  const cuenta = data.users.find((usuario) => usuario.email === emailDePrueba(rol).toLowerCase());
-  if (!cuenta) throw new Error(`No existe la cuenta de ${rol}`);
-  return cuenta.id;
-}
+import { iniciarSesion } from './iniciar-sesion';
+import { NOMBRE_DEL_LOCAL_B, NOMBRE_DEL_LOCAL_PRINCIPAL } from './locales';
+import { clienteComo } from './sesiones';
 
 describe('cuentas de prueba', () => {
   it('son seis, una por rol', () => {
@@ -31,31 +28,68 @@ describe('cuentas de prueba', () => {
     ]);
   });
 
-  it.each(ROLES_DE_PRUEBA)('la cuenta de %s inicia sesion con la clave publicable', async (rol) => {
-    const cliente = await clienteComo(rol);
-    const { data, error } = await cliente.auth.getUser();
+  it.each(ROLES_DE_PRUEBA)('la sesion de %s es la de su cuenta', async (rol) => {
+    const { data, error } = await (await clienteComo(rol)).auth.getUser();
     expect(error).toBeNull();
-    // Supabase guarda el email en minusculas.
     expect(data.user?.email).toBe(emailDePrueba(rol).toLowerCase());
+  });
+
+  it('cada cuenta de prueba queda con su nombre, rol, local y estado', async () => {
+    const { data, error } = await clienteSecretoDePruebas()
+      .from('perfiles')
+      .select('email, nombre, rol, activo, debe_cambiar_contrasena, locales(nombre)')
+      .in(
+        'email',
+        ROLES_DE_PRUEBA.map((rol) => emailDePrueba(rol).toLowerCase()),
+      );
+    expect(error).toBeNull();
+    const porEmail = new Map((data ?? []).map((perfil) => [perfil.email, perfil]));
+    for (const rol of ROLES_DE_PRUEBA) {
+      const { nombre, rol: rolDeLaBase, activo, otroLocal } = PERFILES_DE_PRUEBA[rol];
+      expect(porEmail.get(emailDePrueba(rol).toLowerCase())).toEqual({
+        email: emailDePrueba(rol).toLowerCase(),
+        nombre,
+        rol: rolDeLaBase,
+        activo,
+        debe_cambiar_contrasena: false,
+        locales: { nombre: otroLocal ? NOMBRE_DEL_LOCAL_B : NOMBRE_DEL_LOCAL_PRINCIPAL },
+      });
+    }
   });
 
   it('sembrar de nuevo no crea cuentas ni falla', async () => {
     const { CONTRASENA_USUARIOS_PRUEBA } = leerEntornoPruebas();
-    const creadas = await sembrarCuentas(clienteSecretoDePruebas(), CONTRASENA_USUARIOS_PRUEBA);
-    expect(creadas).toEqual([]);
+    expect(await sembrarCuentas(clienteSecretoDePruebas(), CONTRASENA_USUARIOS_PRUEBA)).toEqual([]);
   });
 
-  it('sembrar repara una cuenta que quedo con otra contraseña', async () => {
-    const secreto = clienteSecretoDePruebas();
+  it('sembrar de nuevo no cierra las sesiones abiertas de las cuentas de prueba', async () => {
     const { CONTRASENA_USUARIOS_PRUEBA } = leerEntornoPruebas();
-    const id = await idDeLaCuenta(secreto, 'caja');
-    await secreto.auth.admin.updateUserById(id, { password: 'una-contraseña-vieja' });
+    const caja = await iniciarSesion(emailDePrueba('caja'), CONTRASENA_USUARIOS_PRUEBA);
+    await sembrarCuentas(clienteSecretoDePruebas(), CONTRASENA_USUARIOS_PRUEBA);
+    expect((await caja.auth.getUser()).error).toBeNull();
+  });
+
+  it('la siembra cambia la contraseña solo cuando cambio la de .env.local', async () => {
+    const secreto = clienteSecretoDePruebas();
+    const cuenta = await crearCuentaTemporal();
     try {
-      await sembrarCuentas(secreto, CONTRASENA_USUARIOS_PRUEBA);
-      await expect(clienteComo('caja')).resolves.toBeTruthy();
+      await asegurarContrasenaDeSiembra(
+        secreto,
+        await usuarioDe(cuenta.id),
+        'una-contraseña-nueva',
+      );
+      await expect(iniciarSesion(cuenta.email, 'una-contraseña-nueva')).resolves.toBeTruthy();
+      const cambios = async () =>
+        (await registrosDe(cuenta.id)).filter((r) => r.accion === 'cambio_de_contrasena').length;
+      const antes = await cambios();
+      await asegurarContrasenaDeSiembra(
+        secreto,
+        await usuarioDe(cuenta.id),
+        'una-contraseña-nueva',
+      );
+      expect(await cambios()).toBe(antes);
     } finally {
-      // Pase lo que pase, la cuenta vuelve a la contraseña de .env.local.
-      await secreto.auth.admin.updateUserById(id, { password: CONTRASENA_USUARIOS_PRUEBA });
+      await borrarCuentaTemporal(cuenta.id);
     }
   });
 
@@ -64,19 +98,11 @@ describe('cuentas de prueba', () => {
     const deUnaPagina = await listarCuentas(secreto);
     const deADos = await listarCuentas(secreto, 2);
     expect(deUnaPagina.length).toBeGreaterThan(2);
-    expect(deADos.map((cuenta) => cuenta.id).sort()).toEqual(
-      deUnaPagina.map((cuenta) => cuenta.id).sort(),
-    );
+    expect(deADos.map((c) => c.id).sort()).toEqual(deUnaPagina.map((c) => c.id).sort());
   });
 
   it('una contraseña equivocada no entra', async () => {
-    const entorno = leerEntornoPublico();
-    const cliente = createClient(
-      entorno.NEXT_PUBLIC_SUPABASE_URL,
-      entorno.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-      { auth: { persistSession: false, autoRefreshToken: false } },
-    );
-    const { data, error } = await cliente.auth.signInWithPassword({
+    const { data, error } = await crearClienteSinSesion().auth.signInWithPassword({
       email: emailDePrueba('admin'),
       password: 'no-es-la-contraseña',
     });

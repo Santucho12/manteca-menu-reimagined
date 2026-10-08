@@ -14,3 +14,6 @@ e2e/capturas/
 
 .vercel/
 .superpowers/
+
+# Sesiones de prueba que guarda Playwright: tienen tokens.
+e2e/.sesiones/

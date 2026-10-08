@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { clienteComo, clienteSecretoDePruebas } from './clientes';
+import { clienteSecretoDePruebas } from './clientes';
+import { clienteComo } from './sesiones';
 
 // Dominio reservado que nunca resuelve: aunque la comprobacion fallara, no sale nada a otra base.
 const URL_AJENA = 'https://otroproyecto.invalid';
