@@ -34,7 +34,7 @@ describe('lecturas del menu', () => {
     const panel = await leerPanel(await clienteComo('admin'));
     const encontrada = panel.find((c) => c.id === categoria.id);
     expect(encontrada?.productos[0]).toMatchObject({ id: producto.id, conPrecio: true });
-    expect(encontrada?.productos[0].precios[0].origen).toBe('compartido');
+    expect(encontrada?.productos[0]?.precios[0]?.origen).toBe('compartido');
     expect(await leerPanel(await clienteComo('caja'))).toEqual([]);
   });
 
@@ -70,7 +70,7 @@ describe('escrituras del menu', () => {
       icono: '🥐' as const,
       foto: '',
       precioCompartido: false,
-      presentaciones: [{ id: categoria.presentaciones[0].id, nombre: 'Unidad', compartido: '' }],
+      presentaciones: [{ id: categoria.presentaciones[0]!.id, nombre: 'Unidad', compartido: '' }],
     };
     const admin = await clienteComo('admin');
     expect(await guardarCategoria(admin, datos, false)).toEqual({
@@ -96,11 +96,12 @@ describe('escrituras del menu', () => {
 
   it('el aumento calcula el precio nuevo en el servidor', async () => {
     const categoria = await sembrar({ compartidos: [300000] });
-    const [precio] = await cambiosDelAumento(await clienteComo('admin'), {
+    const cambios = await cambiosDelAumento(await clienteComo('admin'), {
       categoriaId: categoria.id,
       porcentaje: '10',
       redondeo: '10000',
     });
+    const precio = cambios[0]!;
     const datos = {
       categoriaId: categoria.id,
       porcentaje: '10',
