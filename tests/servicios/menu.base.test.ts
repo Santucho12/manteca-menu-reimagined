@@ -127,7 +127,7 @@ describe('escrituras del menu', () => {
     };
     expect(await guardarCategoria(await clienteComo('caja'), datos, false)).toEqual({
       ok: false,
-      mensaje: 'No tenés permiso para hacer esto.',
+      mensaje: 'Eso ya cambió o no está disponible. Recargá la página e intentá de nuevo.',
     });
   });
 });

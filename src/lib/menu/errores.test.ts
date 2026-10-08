@@ -17,7 +17,7 @@ describe('errores del menu', () => {
   });
 
   it.each([
-    ['PM100', MENSAJES_DEL_MENU.sinPermiso],
+    ['PM100', 'Eso ya cambió o no está disponible. Recargá la página e intentá de nuevo.'],
     ['PM102', MENSAJES_DEL_MENU.sinPrecio],
     ['PM104', MENSAJES_DEL_MENU.categoriaDesactivada],
     ['PM105', MENSAJES_DEL_MENU.preciosCambiaron],
