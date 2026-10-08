@@ -61,7 +61,7 @@ describe('esquemas del menu', () => {
       visible: true,
       precios: [],
     };
-    expect(esquemaProducto.safeParse(producto).error?.issues[0].message).toBe(
+    expect(esquemaProducto.safeParse(producto).error?.issues[0]?.message).toBe(
       'Elegí una categoría.',
     );
   });
