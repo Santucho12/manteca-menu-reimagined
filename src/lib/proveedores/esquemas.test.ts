@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { esquemaProveedor, proveedorParaLaBase, type DatosDeProveedor } from './esquemas';
+import {
+  datosParaEditar,
+  esquemaProveedor,
+  proveedorParaLaBase,
+  type DatosDeProveedor,
+} from './esquemas';
 
 const PROVEEDOR: DatosDeProveedor = {
   nombre: ' Molino del Sur ',
@@ -35,6 +40,27 @@ describe('proveedorParaLaBase', () => {
       ubicacion: null,
       que_compra: 'Harina 000',
       observaciones: 'Alias: molino.sur',
+    });
+  });
+});
+
+describe('datosParaEditar', () => {
+  it('arma el formulario con el telefono legible y vacios donde no hay dato', () => {
+    const proveedor = {
+      id: 'x',
+      nombre: 'Molino',
+      telefono: '5491123456789',
+      que_compra: null,
+      activo: true,
+      ubicacion: 'Parque',
+      observaciones: null,
+    };
+    expect(datosParaEditar(proveedor)).toEqual({
+      nombre: 'Molino',
+      telefono: '+54 9 11 2345-6789',
+      ubicacion: 'Parque',
+      queCompra: '',
+      observaciones: '',
     });
   });
 });
