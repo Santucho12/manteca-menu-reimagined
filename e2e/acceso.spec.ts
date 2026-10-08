@@ -134,6 +134,7 @@ test.describe('con la sesion del admin', () => {
     await expect(menu.getByRole('link')).toHaveText([
       /^Inicio/,
       /^Menú/,
+      /^Proveedores/,
       /^Usuarios/,
       /^Mi cuenta/,
     ]);
