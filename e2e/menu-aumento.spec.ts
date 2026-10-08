@@ -44,7 +44,7 @@ test('si un precio cambia despues de ver los cambios, no aplica nada', async ({ 
   await clienteSecretoDePruebas()
     .from('precios')
     .update({ monto_centavos: 310000 })
-    .eq('presentacion_id', categoria.presentaciones[0].id);
+    .eq('presentacion_id', categoria.presentaciones[0]!.id);
   await page.getByRole('button', { name: 'Aplicar aumento' }).click();
   await expect(aviso(page)).toHaveText(
     'Los precios cambiaron mientras mirabas. Revisá los cambios de nuevo.',
@@ -74,6 +74,7 @@ test('guarda una captura del aumento', async ({ page }, info) => {
   categorias.push(categoria.id);
   await sembrarProducto(categoria, { precios: [450000] });
   await prepararAumento(page, categoria.nombre, '10');
+  await expect(page.getByRole('table', { name: 'Cambios de precio' })).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
   await page.screenshot({
     path: `e2e/capturas/menu-aumento-${info.project.name}.png`,
