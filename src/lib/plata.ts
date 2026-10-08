@@ -11,3 +11,12 @@ export function formatearPesos(centavos: number): string {
   const resto = String(absoluto % 100).padStart(2, '0');
   return `${signo}$${pesos},${resto}`;
 }
+
+/** Un monto en pesos enteros como lo ve el publico del menu: $4.000. */
+export function formatearPesosEnteros(centavos: number): string {
+  if (!Number.isSafeInteger(centavos) || centavos % 100 !== 0) {
+    throw new Error(`Un precio del menu tiene que ser de pesos enteros y llegó: ${centavos}`);
+  }
+  const pesos = String(Math.abs(centavos) / 100).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return `${centavos < 0 ? '-' : ''}$${pesos}`;
+}

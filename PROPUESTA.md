@@ -165,7 +165,7 @@ Administración del menú digital publicado en la web de Manteca directamente de
 * **Categorías o secciones** del menú (Facturas, Laminados, Panes, Café, Clásicos, etc.): nombre, subtítulo y orden
 * **Productos del menú**, vinculados a los productos del sistema:
 
-  * Nombre público, descripción, foto
+  * Nombre público y descripción. La foto es de la categoría, como en la página actual
   * **Variantes de precio:** tamaños (mediano / grande) y presentaciones (unidad, media docena, docena). Son las mismas variantes del producto, cada una con su costo y su ganancia
   * Orden dentro de la categoría
 * **Visibilidad:** mostrar u ocultar un producto o una categoría completa

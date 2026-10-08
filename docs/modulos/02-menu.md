@@ -141,7 +141,7 @@ módulo. El dueño arranca con el menú de hoy.
 | Foto por producto | Foto solo por categoría | Decisión de Santiago: es como está la página hoy |
 | Variantes por producto | Presentaciones de la categoría, con precio compartido cuando hace falta | En Facturas el precio es de la categoría |
 
-Falta reflejar lo de la foto en `PROPUESTA.md`, con el texto que defina Santiago.
+El texto de la foto ya está en `PROPUESTA.md` (2026-10-08).
 
 ## Decisiones tomadas
 
@@ -166,4 +166,24 @@ Falta reflejar lo de la foto en `PROPUESTA.md`, con el texto que defina Santiago
 
 ## Parte técnica
 
-Se escribe al construir el módulo: tablas, permisos, acciones de servidor y pruebas.
+Construido el 2026-10-08 (pedido 25). El detalle está en
+`docs/superpowers/specs/2026-10-08-menu-design.md`.
+
+- **Base:** `categorias`, `presentaciones`, `productos`, `precios` (sin producto es el precio
+  compartido; una fila por presentación y producto) y `aumentos`. El admin activo las lee en
+  su local; nadie escribe directo.
+- **Escritura:** funciones de la base, una por acción: `menu_guardar_categoria`,
+  `menu_guardar_producto`, `menu_cambiar_visibilidad`, `menu_mover`, `menu_desactivar`,
+  `menu_reactivar` y `menu_aplicar_aumento`. Cada una exige un admin activo y hace todo o
+  nada. El ocultado por falta de precio pide confirmar (código `PM101`) y queda en la
+  auditoría.
+- **Público:** la vista `menu_publico`, lo único que lee el visitante. `/` la lee en cada
+  pedido.
+- **Fotos:** bucket `fotos-del-menu`, de lectura pública; sube solo el admin, desde el
+  navegador, a la carpeta de su local. Las de la carga inicial están en `public/menu/`.
+- **Pantallas:** `/` y `/admin/menu`, con categorías, productos, aumento y desactivados.
+- **Pruebas:** RLS de las cinco tablas y de Storage, reglas de cada función, lógica pura,
+  servicios y pruebas en vivo de cada pantalla.
+
+La página anterior tenía un botón de WhatsApp sin usar y con un número de relleno: no se
+trajo. Se suma cuando Santiago pase el número.
