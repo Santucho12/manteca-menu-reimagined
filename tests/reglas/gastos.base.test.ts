@@ -1,4 +1,5 @@
 import { afterAll, describe, expect, it } from 'vitest';
+import { clienteSecretoDePruebas } from '../clientes';
 import { idDeCuentaDePrueba, registrosDe } from '../consultas-de-prueba';
 import {
   borrarGastos,
@@ -73,8 +74,11 @@ describe('reglas de gastos', () => {
     expect((await cargar({ categoria_id: alquiler, proveedor_id: apagado })).error?.code).toBe(
       'PG203',
     );
-    const viejo = await sembrarGasto({ proveedorId: apagado });
+    // El gasto viejo se cargo cuando su proveedor estaba activo; despues se lo desactivo.
+    const antes = await proveedor();
+    const viejo = await sembrarGasto({ proveedorId: antes });
     gastos.push(viejo.id);
+    await clienteSecretoDePruebas().from('proveedores').update({ activo: false }).eq('id', antes);
     expect((await cambiar(viejo.id, { descripcion: 'Luz de octubre' })).error).toBeNull();
   });
 
