@@ -106,11 +106,31 @@ describe('RLS de proveedores: escritura', () => {
     expect(error?.code).toBe('42501');
   });
 
-  it.each(SIN_PERMISO)('%s no cambia ni carga en este local', async (rol) => {
+  it.each(SIN_PERMISO)('%s no cambia los de este local', async (rol) => {
     const cliente = await clienteComo(rol);
     await cliente.from('proveedores').update({ nombre: 'Robado' }).eq('id', delLocal.id);
     expect((await proveedorDe(delLocal.id)).nombre).toBe(delLocal.nombre);
-    const alta = await cliente.from('proveedores').insert({ nombre: nombreDeProveedor() });
+  });
+
+  it.each(['invitado', 'caja', 'encargado', 'desactivado'] as const)('%s no carga', async (rol) => {
+    const alta = await (
+      await clienteComo(rol)
+    )
+      .from('proveedores')
+      .insert({ nombre: nombreDeProveedor() });
     expect(alta.error).not.toBeNull();
+  });
+
+  it('el admin de otro local carga, pero en el suyo', async () => {
+    const { data } = await (
+      await clienteComo('adminOtroLocal')
+    )
+      .from('proveedores')
+      .insert({ nombre: nombreDeProveedor() })
+      .select('id')
+      .single();
+    creados.push(data!.id);
+    const otro = await asegurarLocalB(clienteSecretoDePruebas());
+    expect((await proveedorDe(data!.id)).local_id).toBe(otro);
   });
 });
