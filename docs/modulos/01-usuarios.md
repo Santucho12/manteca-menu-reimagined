@@ -199,5 +199,5 @@ Construido en el pedido 22. El detalle está en
 - **Entorno de la aplicación:** `npm run dev` carga `.env.local` antes que cualquier otro
   archivo de entorno, y Playwright no reutiliza un servidor que ya estaba abierto.
 
-Pendiente para la publicación, a cargo de Santiago: aplicar las tres migraciones a la base
-real, en ese orden.
+Las tres migraciones están aplicadas en la base real desde el 2026-10-08, con el OK de
+Santiago. La primera cuenta que se registre ahí queda como admin.
