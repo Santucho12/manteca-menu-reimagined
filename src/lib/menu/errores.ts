@@ -5,13 +5,17 @@ export const MENSAJES_DEL_MENU = {
   categoriaDesactivada: 'Reactivá primero su categoría.',
   preciosCambiaron: 'Los precios cambiaron mientras mirabas. Revisá los cambios de nuevo.',
   datosAjenos: 'Eso ya no está disponible. Recargá la página e intentá de nuevo.',
+  yaCambio: 'Eso ya cambió o no está disponible. Recargá la página e intentá de nuevo.',
   generico: 'No pudimos guardarlo. Revisá los datos e intentá de nuevo.',
 } as const;
 
 export type ErrorDeLaBase = { code?: string | null; details?: string | null } | null | undefined;
 
+// La base da PM100 sin permiso y tambien cuando no encuentra lo que se pidio. Al panel solo
+// llega un admin activo (el servidor frena antes al resto): para el, PM100 es que otro admin
+// lo cambio o lo desactivo en el medio.
 const POR_CODIGO: Record<string, string> = {
-  PM100: MENSAJES_DEL_MENU.sinPermiso,
+  PM100: MENSAJES_DEL_MENU.yaCambio,
   '42501': MENSAJES_DEL_MENU.sinPermiso,
   PM102: MENSAJES_DEL_MENU.sinPrecio,
   PM104: MENSAJES_DEL_MENU.categoriaDesactivada,
