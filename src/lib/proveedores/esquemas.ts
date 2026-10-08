@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { normalizarTelefono } from './telefono';
+import type { Proveedor } from './consultas';
+import { normalizarTelefono, telefonoParaMostrar } from './telefono';
 
 const opcional = (maximo: number) =>
   z.string().trim().max(maximo, `Usá hasta ${maximo} caracteres.`);
@@ -31,5 +32,16 @@ export function proveedorParaLaBase(datos: DatosDeProveedor) {
     ubicacion: vacioANulo(datos.ubicacion),
     que_compra: vacioANulo(datos.queCompra),
     observaciones: vacioANulo(datos.observaciones),
+  };
+}
+
+/** El formulario de edicion: el telefono legible, que el esquema vuelve a entender. */
+export function datosParaEditar(proveedor: Proveedor): DatosDeProveedor {
+  return {
+    nombre: proveedor.nombre,
+    telefono: proveedor.telefono ? telefonoParaMostrar(proveedor.telefono) : '',
+    ubicacion: proveedor.ubicacion ?? '',
+    queCompra: proveedor.que_compra ?? '',
+    observaciones: proveedor.observaciones ?? '',
   };
 }
