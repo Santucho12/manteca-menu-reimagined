@@ -15,20 +15,27 @@ export type PrecioDelAlcance = {
 };
 export type CambioDePrecio = PrecioDelAlcance & { nuevoCentavos: number };
 
+// Al paso mas cercano, la mitad para arriba. En BigInt para no pasar por punto flotante.
+function redondeado(montoCentavos: number, porcentaje: number, redondeo: number): number {
+  const numerador = BigInt(montoCentavos) * BigInt(100 + porcentaje);
+  const divisor = BigInt(100 * redondeo);
+  const pasos = numerador / divisor + ((numerador % divisor) * 2n >= divisor ? 1n : 0n);
+  return Number(pasos) * redondeo;
+}
+
 /**
- * El precio con el porcentaje aplicado, redondeado al paso mas cercano (la mitad, para
- * arriba). Nunca baja de un paso: un descuento no deja un precio en cero. En BigInt para no
- * pasar por punto flotante.
+ * El precio con el porcentaje aplicado y redondeado. Si el redondeo lo deja en cero o lo
+ * mueve en contra del porcentaje (un descuento que encarece, un aumento que abarata), el
+ * precio queda como estaba: la vista previa lo muestra sin cambio.
  */
 export function precioAumentado(
   montoCentavos: number,
   porcentaje: number,
   redondeoCentavos: RedondeoCentavos,
 ): number {
-  const numerador = BigInt(montoCentavos) * BigInt(100 + porcentaje);
-  const divisor = BigInt(100 * redondeoCentavos);
-  const pasos = numerador / divisor + ((numerador % divisor) * 2n >= divisor ? 1n : 0n);
-  return Number(pasos < 1n ? 1n : pasos) * redondeoCentavos;
+  const nuevo = redondeado(montoCentavos, porcentaje, redondeoCentavos);
+  const contrario = porcentaje < 0 ? nuevo > montoCentavos : nuevo < montoCentavos;
+  return nuevo === 0 || contrario ? montoCentavos : nuevo;
 }
 
 export function vistaPrevia(
