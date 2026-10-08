@@ -18,7 +18,6 @@ export function TablaDeCambios({ cambios }: { cambios: CambioDePrecio[] }) {
       <TableHeader>
         <TableRow>
           <TableHead>Qué</TableHead>
-          <TableHead>Presentación</TableHead>
           <TableHead>Ahora</TableHead>
           <TableHead>Queda</TableHead>
         </TableRow>
@@ -26,11 +25,12 @@ export function TablaDeCambios({ cambios }: { cambios: CambioDePrecio[] }) {
       <TableBody>
         {cambios.map((c) => (
           <TableRow key={c.id}>
-            <TableCell>
+            {/* El nombre se parte en renglones: en el celular los precios tienen que verse. */}
+            <TableCell className="whitespace-normal">
               {c.producto ?? `Precio compartido de ${c.categoria}`}{' '}
               {c.oculto ? <Badge variant="outline">Oculto</Badge> : null}
+              <span className="text-muted-foreground block text-xs">{c.presentacion}</span>
             </TableCell>
-            <TableCell>{c.presentacion}</TableCell>
             <TableCell>{formatearPesosEnteros(c.montoCentavos)}</TableCell>
             <TableCell className="font-medium">{formatearPesosEnteros(c.nuevoCentavos)}</TableCell>
           </TableRow>
