@@ -112,10 +112,15 @@ o corregir, la marca de la acción no queda viva; el `_` de la búsqueda se busc
 como comodín; y el proxy manda al ingreso con 303, para que un POST sin sesión no se reenvíe.
 Queda para Cierres de caja: que caja pueda leer su propio local, como dice el spec.
 
+### 25. Módulo de menú digital
+Construir el catálogo mínimo de productos y el menú digital definidos en
+`docs/modulos/02-menu.md`: la administración en `/admin` y la página pública en `/`.
+
 ## Pendientes
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 25 | Módulo de menú digital | En diseño, en la rama `feat/menu` |
 | 21 | Arreglos de la revisión de la base técnica | Hecho y verificado (rama `fix/revision-base-tecnica`): montos sin precisión y URL sin cifrar se rechazan; protecciones de configuración (todo test corre en algún grupo, versión de Node, tipos de Supabase fuera de Prettier, clave secreta prohibida en componentes); la siembra repara cuentas y lee todas las páginas; un solo aviso con todas las variables que faltan; comprobación de tokens corregida; colores con contraste suficiente y anillo de foco entero. Los controles de 44 px, el campo con error y los títulos en Neufile Grotesk entraron con el pedido 22. Queda para el menú público: las tipografías en woff2. Las variantes de la guía ya no van: la guía se sacó en el pedido 23 |
 
 ## Completados
