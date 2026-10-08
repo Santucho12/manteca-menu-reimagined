@@ -17,6 +17,7 @@ import {
   proveedorDe,
   sembrarProveedor,
 } from '../proveedores-de-prueba';
+import { filtrosDeProveedores } from '../../src/lib/proveedores/pantalla';
 import { clienteComo } from '../sesiones';
 
 const creados: string[] = [];
@@ -145,5 +146,28 @@ describe('editar, desactivar y reactivar', () => {
       mensaje: 'Ese proveedor ya no está disponible. Recargá la página.',
     });
     expect((await proveedorDe(proveedor.id)).nombre).toBe(proveedor.nombre);
+  });
+});
+
+describe('casos que encontro la revision', () => {
+  it('busca un nombre con coma y puntos tal cual', async () => {
+    const proveedor = await sembrar({ nombre: `Distribuidora Sur, S.A. ${nombreDeProveedor()}` });
+    const filtros = filtrosDeProveedores({ q: 'Sur, S.A.' });
+    const { filas } = await listarProveedores(await clienteComo('admin'), filtros);
+    expect(filas.map((f) => f.nombre)).toContain(proveedor.nombre);
+  });
+
+  it('un asterisco en el nombre no es comodin al buscar repetidos', async () => {
+    const existente = await sembrar({ nombre: `Panaderia ${nombreDeProveedor()}` });
+    const admin = await clienteComo('admin');
+    const resultado = await crearProveedor(admin, datos('Panaderia*'), false);
+    if (!resultado.ok || resultado.datos.estado !== 'creado') {
+      throw new Error(`Aviso de repetido con ${existente.nombre}`);
+    }
+    creados.push(resultado.datos.id);
+  });
+
+  it('un id que no es un uuid no es un error: no hay proveedor', async () => {
+    expect(await proveedorPorId(await clienteComo('admin'), 'abc')).toBeNull();
   });
 });

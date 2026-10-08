@@ -17,7 +17,14 @@ describe('normalizarTelefono', () => {
     expect(normalizarTelefono('  ')).toBeNull();
   });
 
-  it.each(['123', '11 15 2345 6789', '23456789', 'llamar al local'])('%s no se acepta', (texto) => {
+  it.each([
+    '123',
+    '11 15 2345 6789',
+    '23456789',
+    'llamar al local',
+    '+54 9 15 2345 6789',
+    '+54 15 2345 6789',
+  ])('%s no se acepta', (texto) => {
     expect(normalizarTelefono(texto)).toBeUndefined();
   });
 });

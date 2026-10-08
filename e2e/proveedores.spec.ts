@@ -58,6 +58,22 @@ test('un nombre repetido avisa y deja cargarlo igual', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1, name: nombre.toLowerCase() })).toBeVisible();
 });
 
+test('Volver cierra el aviso y Cargar igual guarda lo que esta en pantalla', async ({ page }) => {
+  const nombre = nuevoNombre();
+  await sembrarProveedor({ nombre });
+  await completar(page, nombre);
+  const aviso = page.getByRole('alertdialog');
+  await expect(aviso).toBeVisible();
+  await page.getByRole('button', { name: 'Volver' }).click();
+  await expect(aviso).toHaveCount(0);
+  await page.getByRole('button', { name: 'Guardar' }).click();
+  await expect(aviso).toBeVisible();
+  const otro = nuevoNombre();
+  await page.getByLabel('Nombre').fill(otro);
+  await page.getByRole('button', { name: 'Cargar igual' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: otro })).toBeVisible();
+});
+
 test('explica un telefono que no sirve', async ({ page }) => {
   await completar(page, nuevoNombre(), '15 2345 6789');
   await expect(page.getByLabel('Teléfono de WhatsApp')).toHaveAccessibleDescription(
