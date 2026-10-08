@@ -16,7 +16,9 @@ se construye. Decisiones de Santiago del 2026-10-08, después de `revision-logic
    de productos ocultos.
 5. Las fotos van del navegador directo a Supabase Storage, sin pasar por el servidor.
 6. Las columnas y el encuadre de la foto se derivan; la foto de la categoría es opcional.
-7. El aumento va de -50 % a +200 %, y ningún precio queda por debajo de un paso de redondeo.
+7. El aumento va de -50 % a +200 %. Si el redondeo deja un precio en cero o lo mueve en contra
+   del porcentaje, ese precio queda como estaba (se ajustó en la revisión: con un piso de un
+   paso, un descuento podía encarecer un precio chico).
 8. Un aviso fijo en el panel recuerda cambiar el precio también en Fudo.
 9. En `PROPUESTA.md`, "Nombre público, descripción, foto" pasa a "Nombre público y
    descripción. La foto es de la categoría, como en la página actual."
@@ -78,13 +80,18 @@ Restricciones:
 
 ### Precio vigente
 
-`precio_vigente(producto, presentacion)` devuelve el monto propio activo del producto en esa
-presentación o, si no hay, el compartido activo de la categoría. Solo cuenta si la
-presentación está activa y es de la categoría actual del producto. Un producto **tiene
-precio** si tiene al menos un precio vigente.
+El precio vigente de una presentación es el monto propio activo del producto o, si no hay, el
+compartido activo de la categoría. Solo cuenta si la presentación está activa y es de la
+categoría actual del producto. Un producto **tiene precio** si tiene al menos un precio
+vigente.
 
-La misma regla vive en TypeScript, en una función pura (`src/lib/menu/precios.ts`), para
-mostrar el origen en el panel. Las dos se prueban con los mismos casos.
+En la base, `tiene_precio(producto)` responde lo segundo para las funciones, y la vista
+pública calcula el vigente en su propia definición. En TypeScript, `src/lib/menu/precios.ts`
+lo calcula con su origen para el panel.
+
+Al construirlo cambió respecto de este diseño: las funciones de escritura quedaron en tres
+migraciones (guardar, acciones y aumento) y la página nueva no trae el botón de WhatsApp,
+porque la anterior no lo mostraba y tenía un número de relleno.
 
 ### Funciones de escritura
 
@@ -185,7 +192,7 @@ montos llegan en pesos enteros desde el formulario y se pasan a centavos en el s
 | Archivo | Qué tiene |
 |---|---|
 | `precios.ts` | Precio vigente y su origen (puro) |
-| `aumento.ts` | Cálculo del aumento con redondeo al más cercano y piso de un paso (puro, en enteros) |
+| `aumento.ts` | Cálculo del aumento con redondeo al más cercano; nunca cero ni en contra del porcentaje (puro, en enteros) |
 | `publico.ts` | Armado del menú público desde las filas de la vista: subtítulo con los precios compartidos, columnas y precios de cada producto (puro) |
 | `iconos.ts` | La lista de íconos |
 | `esquemas.ts` | Esquemas de Zod de los formularios |
