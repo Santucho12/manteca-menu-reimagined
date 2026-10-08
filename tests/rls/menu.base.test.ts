@@ -41,7 +41,7 @@ async function idsQueVe(rol: RolDePrueba, tabla: (typeof TABLAS)[number]) {
 describe('RLS del menu: lectura', () => {
   it('el admin activo ve la categoria, sus presentaciones, el producto y los precios', async () => {
     expect(await idsQueVe('admin', 'categorias')).toContain(categoria.id);
-    expect(await idsQueVe('admin', 'presentaciones')).toContain(categoria.presentaciones[0].id);
+    expect(await idsQueVe('admin', 'presentaciones')).toContain(categoria.presentaciones[0]!.id);
     expect(await idsQueVe('admin', 'productos')).toContain(producto.id);
     expect((await idsQueVe('admin', 'precios')).length).toBeGreaterThanOrEqual(2);
   });

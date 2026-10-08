@@ -124,13 +124,12 @@ export async function sembrarCategoria(
   return categoria;
 }
 
-/** Un producto de prueba. Por defecto, visible y con $1.000 en la primera presentacion. */
-export async function sembrarProducto(
+async function filaDeProducto(
+  secreto: Cliente,
   categoria: CategoriaSembrada,
-  semilla: SemillaDeProducto = {},
-): Promise<ProductoSembrado> {
-  const secreto = clienteSecretoDePruebas();
-  const fila = {
+  semilla: SemillaDeProducto,
+) {
+  return {
     local_id: categoria.localId,
     categoria_id: categoria.id,
     nombre: nombreDePrueba('Producto'),
@@ -139,6 +138,15 @@ export async function sembrarProducto(
     visible: semilla.visible ?? true,
     activo: semilla.activo ?? true,
   };
+}
+
+/** Un producto de prueba. Por defecto, visible y con $1.000 en la primera presentacion. */
+export async function sembrarProducto(
+  categoria: CategoriaSembrada,
+  semilla: SemillaDeProducto = {},
+): Promise<ProductoSembrado> {
+  const secreto = clienteSecretoDePruebas();
+  const fila = await filaDeProducto(secreto, categoria, semilla);
   const { data, error } = await secreto
     .from('productos')
     .insert(fila)
@@ -177,6 +185,14 @@ async function idsDePrecios(secreto: Cliente, presentaciones: string[]) {
     .in('presentacion_id', presentaciones);
   comprobar(error, 'leer los precios para limpiar');
   return (data ?? []).map((fila) => fila.id);
+}
+
+/** Un aumento de todo el menu no tiene categoria: la limpieza del menu no lo encuentra. */
+export async function borrarAumentos(ids: string[]): Promise<void> {
+  const secreto = clienteSecretoDePruebas();
+  await secreto.from('aumentos').delete().in('id', ids);
+  const { error } = await secreto.from('auditoria').delete().in('registro_id', ids);
+  comprobar(error, 'limpiar la auditoria de los aumentos');
 }
 
 /** Borra lo que sembro un test, con su auditoria. En la aplicacion nada se borra. */

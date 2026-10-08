@@ -3,6 +3,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import { crearClienteSinSesion } from '../../src/lib/supabase/sin-sesion';
 import { clienteSecretoDePruebas } from '../clientes';
 import { idDeCuentaDePrueba, registrosDe } from '../consultas-de-prueba';
+import type { Json } from '../../src/lib/supabase/tipos';
 import type { RolDePrueba } from '../cuentas';
 import {
   borrarMenuDePrueba,
@@ -24,7 +25,7 @@ async function sembrar(...args: Parameters<typeof sembrarCategoria>) {
   return categoria;
 }
 
-async function guardarCategoria(rol: RolDePrueba, datos: object, confirmar = false) {
+async function guardarCategoria(rol: RolDePrueba, datos: Json, confirmar = false) {
   const respuesta = await (
     await clienteComo(rol)
   ).rpc('menu_guardar_categoria', {
@@ -35,7 +36,7 @@ async function guardarCategoria(rol: RolDePrueba, datos: object, confirmar = fal
   return respuesta;
 }
 
-async function guardarProducto(rol: RolDePrueba, datos: object, confirmar = false) {
+async function guardarProducto(rol: RolDePrueba, datos: Json, confirmar = false) {
   return (await clienteComo(rol)).rpc('menu_guardar_producto', { datos, confirmar });
 }
 
@@ -88,7 +89,7 @@ describe('menu_guardar_categoria', () => {
 
   it('renombrar una presentacion conserva sus precios', async () => {
     const categoria = await sembrar({ presentaciones: ['Mediano'], compartidos: [300000] });
-    const [mediano] = categoria.presentaciones;
+    const mediano = categoria.presentaciones[0]!;
     const datos = {
       ...conPresentaciones(categoria, 0),
       presentaciones: [{ id: mediano.id, nombre: 'Chico', monto_compartido_centavos: 300000 }],
@@ -103,7 +104,7 @@ describe('menu_guardar_categoria', () => {
   it('sacar la presentacion de un producto visible pide confirmar y no aplica nada', async () => {
     const categoria = await sembrar({ presentaciones: ['Unidad', 'Docena'] });
     const producto = await sembrarProducto(categoria, { precios: [null, 900000] });
-    const docena = categoria.presentaciones[1];
+    const docena = categoria.presentaciones[1]!;
     const datos = conPresentaciones(categoria, 1);
     const { error } = await guardarCategoria('admin', datos);
     expect(error?.code).toBe('PM101');

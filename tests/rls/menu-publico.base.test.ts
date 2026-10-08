@@ -42,7 +42,7 @@ async function filasSinSesion() {
 
 describe('menu_publico', () => {
   it('el visitante ve el producto visible con sus precios y el compartido', async () => {
-    const fila = (await filasSinSesion()).find((f) => f.producto_id === productos.conPrecio.id);
+    const fila = (await filasSinSesion()).find((f) => f.producto_id === productos.conPrecio!.id);
     expect(fila).toMatchObject({
       categoria: visible.nombre,
       etiqueta: 'mas_vendido',
@@ -57,7 +57,7 @@ describe('menu_publico', () => {
   it('no trae lo oculto, lo desactivado, lo de una categoria oculta ni lo de otro local', async () => {
     const ids = (await filasSinSesion()).map((f) => f.producto_id);
     for (const clave of ['oculto', 'desactivado', 'deOculta', 'deOtroLocal']) {
-      expect(ids, clave).not.toContain(productos[clave].id);
+      expect(ids, clave).not.toContain(productos[clave]!.id);
     }
   });
 
@@ -70,7 +70,7 @@ describe('menu_publico', () => {
         visible.presentaciones.map((p) => p.id),
       );
     const ids = (await filasSinSesion()).map((f) => f.producto_id);
-    expect(ids).not.toContain(productos.conPrecio.id);
+    expect(ids).not.toContain(productos.conPrecio!.id);
     await clienteSecretoDePruebas()
       .from('precios')
       .update({ activo: true })
@@ -82,7 +82,7 @@ describe('menu_publico', () => {
 
   it('trae solo las columnas publicas', async () => {
     const [fila] = await filasSinSesion();
-    expect(Object.keys(fila).sort()).toEqual([
+    expect(Object.keys(fila!).sort()).toEqual([
       'categoria',
       'categoria_id',
       'compartidos',
@@ -106,6 +106,6 @@ describe('menu_publico', () => {
       .from('menu_publico')
       .select('producto_id');
     expect(error).toBeNull();
-    expect((data ?? []).map((f) => f.producto_id)).toContain(productos.conPrecio.id);
+    expect((data ?? []).map((f) => f.producto_id)).toContain(productos.conPrecio!.id);
   });
 });

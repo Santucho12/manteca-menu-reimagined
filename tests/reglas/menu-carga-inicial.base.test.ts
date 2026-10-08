@@ -21,8 +21,8 @@ describe('carga inicial del menu', () => {
     const categorias = await categoriasIniciales();
     expect(categorias.map((c) => c.nombre)).toEqual(CATEGORIAS);
     expect(categorias.map((c) => c.icono)).toEqual(['🥐', '🧈', '🍞', '🥨', '☕', '➕']);
-    expect(categorias[1].foto).toBe('/menu/laminados.jpeg');
-    expect(categorias[5].foto).toBeNull();
+    expect(categorias[1]?.foto).toBe('/menu/laminados.jpeg');
+    expect(categorias[5]?.foto).toBeNull();
   });
 
   it('el publico ve los 35 productos de hoy', async () => {
@@ -54,7 +54,7 @@ describe('carga inicial del menu', () => {
       .from('menu_publico')
       .select('precios')
       .eq('nombre', 'Capuccino');
-    expect(data?.[0].precios).toEqual([
+    expect(data?.[0]?.precios).toEqual([
       { presentacion: 'Mediano', monto_centavos: null, compartido: true },
       { presentacion: 'Grande', monto_centavos: 610000, compartido: false },
     ]);

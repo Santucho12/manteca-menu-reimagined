@@ -1,8 +1,10 @@
 import { afterAll, describe, expect, it } from 'vitest';
 import { clienteSecretoDePruebas } from '../clientes';
 import { idDeCuentaDePrueba, registrosDe } from '../consultas-de-prueba';
+import type { Json } from '../../src/lib/supabase/tipos';
 import type { RolDePrueba } from '../cuentas';
 import {
+  borrarAumentos,
   borrarMenuDePrueba,
   filaDe,
   sembrarCategoria,
@@ -49,7 +51,7 @@ function aumentoDe(categoria: string | null, precios: PrecioActual[], porcentaje
   };
 }
 
-async function aplicar(rol: RolDePrueba, datos: object) {
+async function aplicar(rol: RolDePrueba, datos: Json) {
   return (await clienteComo(rol)).rpc('menu_aplicar_aumento', { datos });
 }
 
@@ -71,7 +73,7 @@ describe('menu_aplicar_aumento', () => {
       porcentaje: 10,
       usuario_id: admin,
     });
-    expect(await registrosDe(precios[0].id)).toContainEqual(
+    expect(await registrosDe(precios[0]!.id)).toContainEqual(
       expect.objectContaining({ accion: 'cambio', usuario_id: admin }),
     );
   });
@@ -83,9 +85,11 @@ describe('menu_aplicar_aumento', () => {
     await clienteSecretoDePruebas()
       .from('precios')
       .update({ monto_centavos: 700000 })
-      .eq('id', precios[1].id);
+      .eq('id', precios[1]!.id);
     expect((await aplicar('admin', aumentoDe(categoria.id, precios))).error?.code).toBe('PM105');
-    expect((await filaDe('precios', precios[0].id)).monto_centavos).toBe(precios[0].monto_centavos);
+    expect((await filaDe('precios', precios[0]!.id)).monto_centavos).toBe(
+      precios[0]!.monto_centavos,
+    );
   });
 
   it('si falta un precio del alcance o sobra uno, rechaza todo', async () => {
@@ -95,18 +99,21 @@ describe('menu_aplicar_aumento', () => {
     expect((await aplicar('admin', aumentoDe(categoria.id, precios.slice(1)))).error?.code).toBe(
       'PM105',
     );
-    const duplicado = [...precios, precios[0]];
+    const duplicado = [...precios, precios[0]!];
     expect((await aplicar('admin', aumentoDe(categoria.id, duplicado))).error?.code).toBe('PM105');
   });
 
   it('todo el menu deja afuera los precios de productos desactivados', async () => {
     const categoria = await sembrar({ otroLocal: true });
     await sembrarProducto(categoria, { activo: false, visible: false, precios: [200000] });
-    const activo = await sembrarProducto(categoria, { precios: [400000] });
+    await sembrarProducto(categoria, { precios: [400000] });
     const precios = await preciosDe(categoria);
     expect(precios).toHaveLength(1);
-    expect((await aplicar('adminOtroLocal', aumentoDe(null, precios))).error).toBeNull();
-    expect(activo).toBeTruthy();
+    const { data, error } = await aplicar('adminOtroLocal', aumentoDe(null, precios));
+    expect(error).toBeNull();
+    // Sin categoria, la limpieza del menu no lo encuentra: se borra aparte.
+    await borrarAumentos([data as string]);
+    expect((await filaDe('precios', precios[0]!.id)).monto_centavos).toBe(410000);
   });
 
   it('rechaza un porcentaje fuera de los limites', async () => {
