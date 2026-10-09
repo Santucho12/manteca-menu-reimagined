@@ -73,3 +73,9 @@ export function enlaceDeAuditoria(filtros: FiltrosDeAuditoria, hoy: string): str
   const texto = parametros.toString();
   return texto ? `/admin/auditoria?${texto}` : '/admin/auditoria';
 }
+
+export const opcionesDeModulo = () =>
+  Object.entries(MODULOS).map(([valor, modulo]) => ({ valor, texto: modulo.nombre as string }));
+
+export const opcionesDeAccion = () =>
+  Object.entries(ACCIONES).map(([valor, texto]) => ({ valor, texto }));

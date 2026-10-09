@@ -103,3 +103,18 @@ const RUTAS: Record<string, (registro: RegistroDeAuditoria) => string | null> = 
 export function enlaceDe(registro: RegistroDeAuditoria): string | null {
   return RUTAS[registro.tabla]?.(registro) ?? null;
 }
+
+/** Quien hizo el registro: su nombre, el sistema si fue un proceso automatico. */
+export function personaDe(usuarioId: string | null, nombres: Nombres): string {
+  if (!usuarioId) return 'El sistema';
+  return nombres.get(usuarioId) ?? 'Dato no disponible';
+}
+
+/** En un cambio, los campos que cambiaron; en el resto, nada: la accion ya lo dice. */
+export function resumenDe(registro: RegistroDeAuditoria): string {
+  if (registro.accion !== 'cambio') return '';
+  return Object.keys(registro.despues ?? {})
+    .filter((columna) => !OCULTAS.has(columna))
+    .map(nombreDeCampo)
+    .join(', ');
+}
