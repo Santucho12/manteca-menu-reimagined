@@ -123,11 +123,14 @@ búsqueda, ficha, alta, edición, desactivar y reactivar, y el botón de WhatsAp
 ### 27. Módulo de gastos
 Construir el módulo de gastos definido en `docs/modulos/04-gastos.md`: gastos con filtros y total,
 anulación con motivo, recurrentes que se generan solos, categorías, y lo pagado en Proveedores.
+### 28. Módulo de cierres de caja
+Construir el módulo de cierres de caja definido en `docs/modulos/06-cierres-de-caja.md`: carga del cierre a ciegas desde el celular, mis cierres, control de cierres con lo esperado y la diferencia, tolerancia, y los gastos de caja que van a Gastos.
 
 ## Pendientes
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 28 | Módulo de cierres de caja | En diseño, en la rama `feat/cierres-de-caja` |
 | 21 | Arreglos de la revisión de la base técnica | Hecho y verificado (rama `fix/revision-base-tecnica`): montos sin precisión y URL sin cifrar se rechazan; protecciones de configuración (todo test corre en algún grupo, versión de Node, tipos de Supabase fuera de Prettier, clave secreta prohibida en componentes); la siembra repara cuentas y lee todas las páginas; un solo aviso con todas las variables que faltan; comprobación de tokens corregida; colores con contraste suficiente y anillo de foco entero. Los controles de 44 px, el campo con error y los títulos en Neufile Grotesk entraron con el pedido 22. Queda para el menú público: las tipografías en woff2. Las variantes de la guía ya no van: la guía se sacó en el pedido 23 |
 
 ## Completados
