@@ -765,6 +765,22 @@ export type Database = {
     Functions: {
       es_admin_activo: { Args: never; Returns: boolean }
       generar_gastos_recurrentes: { Args: { hasta: string }; Returns: number }
+      gastos_pagado_por_proveedor: {
+        Args: { desde: string; hasta: string }
+        Returns: {
+          proveedor_id: string
+          total_centavos: number
+        }[]
+      }
+      gastos_total: {
+        Args: {
+          desde: string
+          el_proveedor?: string
+          hasta: string
+          la_categoria?: string
+        }
+        Returns: number
+      }
       gastos_validar_categoria_y_proveedor: {
         Args: {
           el_local: string
