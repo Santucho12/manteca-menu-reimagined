@@ -40,25 +40,26 @@ type SemillaDeCierre = {
   quedaEnCajaCentavos?: number;
 };
 
+async function filaDeCierre(fecha: string, semilla: SemillaDeCierre) {
+  const local = semilla.otroLocal ? asegurarLocalB : idDelLocalPrincipal;
+  return {
+    local_id: await local(clienteSecretoDePruebas()),
+    fecha,
+    cargado_por: await idDeCuentaDePrueba(semilla.cargadoPor ?? 'caja'),
+    fondo_inicial_centavos: 1000000,
+    efectivo_centavos: 2000000,
+    queda_en_caja_centavos: semilla.quedaEnCajaCentavos ?? 1000000,
+  };
+}
+
 /** Un cierre escrito sin la funcion de guardar, sin retiros ni gastos. */
 export async function sembrarCierre(
   semilla: SemillaDeCierre = {},
 ): Promise<{ id: string; fecha: string }> {
   const secreto = clienteSecretoDePruebas();
   const fecha = semilla.fecha ?? diaLibre();
-  const local = semilla.otroLocal ? asegurarLocalB : idDelLocalPrincipal;
-  const { data, error } = await secreto
-    .from('cierres_de_caja')
-    .insert({
-      local_id: await local(secreto),
-      fecha,
-      cargado_por: await idDeCuentaDePrueba(semilla.cargadoPor ?? 'caja'),
-      fondo_inicial_centavos: 1000000,
-      efectivo_centavos: 2000000,
-      queda_en_caja_centavos: semilla.quedaEnCajaCentavos ?? 1000000,
-    })
-    .select('id')
-    .single();
+  const fila = await filaDeCierre(fecha, semilla);
+  const { data, error } = await secreto.from('cierres_de_caja').insert(fila).select('id').single();
   if (error) throw new Error(`No pude sembrar el cierre: ${error.message}`);
   return { id: data.id, fecha };
 }
@@ -110,4 +111,46 @@ export async function idsDeCierresDe(fechas: string[]): Promise<string[]> {
     .eq('local_id', await idDelLocalPrincipal(secreto))
     .in('fecha', fechas);
   return (data ?? []).map((cierre) => cierre.id);
+}
+
+async function sinClasificarDe(local: string): Promise<string> {
+  const { data, error } = await clienteSecretoDePruebas()
+    .from('categorias_de_gasto')
+    .select('id')
+    .eq('local_id', local)
+    .eq('de_sistema', true)
+    .single();
+  if (error) throw new Error('No encontre la categoria Sin clasificar: ' + error.message);
+  return data.id;
+}
+
+/** Un cierre de Caja con un retiro y un gasto de caja ('Hielo'), como los deja la pantalla. */
+export async function sembrarCierreConSalidas(fecha: string): Promise<string> {
+  const secreto = clienteSecretoDePruebas();
+  const { id } = await sembrarCierre({ fecha });
+  const base = { local_id: await idDelLocalPrincipal(secreto), cierre_id: id };
+  const gasto = {
+    ...base,
+    fecha,
+    categoria_id: await sinClasificarDe(base.local_id),
+    monto_centavos: 120000,
+    descripcion: 'Hielo',
+    medio_de_pago: 'efectivo_caja' as const,
+  };
+  const salidas = await Promise.all([
+    secreto.from('retiros_de_caja').insert({ ...base, monto_centavos: 500000, quien: 'Dueño' }),
+    secreto.from('gastos').insert(gasto),
+  ]);
+  const error = salidas.find((salida) => salida.error)?.error;
+  if (error) throw new Error('No pude sembrar las salidas del cierre: ' + error.message);
+  return id;
+}
+
+/** Vuelve la tolerancia del local principal a los $500 de arranque. */
+export async function restaurarTolerancia(): Promise<void> {
+  const secreto = clienteSecretoDePruebas();
+  await secreto
+    .from('configuracion_de_caja')
+    .update({ tolerancia_centavos: 50000 })
+    .eq('local_id', await idDelLocalPrincipal(secreto));
 }
