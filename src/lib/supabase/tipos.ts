@@ -764,6 +764,7 @@ export type Database = {
     }
     Functions: {
       es_admin_activo: { Args: never; Returns: boolean }
+      generar_gastos_recurrentes: { Args: { hasta: string }; Returns: number }
       gastos_validar_categoria_y_proveedor: {
         Args: {
           el_local: string
