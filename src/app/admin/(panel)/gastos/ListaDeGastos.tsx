@@ -22,6 +22,7 @@ function FilaDeLaLista({ gasto }: { gasto: FilaDeGasto }) {
       </div>
       <div className="flex items-center gap-2">
         {gasto.recurrente_id ? <Badge variant="secondary">Automático</Badge> : null}
+        {gasto.cierre_id ? <Badge variant="secondary">De caja</Badge> : null}
         {gasto.anulado ? <Badge variant="outline">Anulado</Badge> : null}
         <span className={gasto.anulado ? 'text-muted-foreground line-through' : 'font-medium'}>
           {formatearPesos(gasto.monto_centavos)}

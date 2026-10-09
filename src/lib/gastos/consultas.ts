@@ -12,6 +12,7 @@ export type FilaDeGasto = {
   medio_de_pago: MedioDePago;
   anulado: boolean;
   recurrente_id: string | null;
+  cierre_id: string | null;
   categoria: string;
   proveedor: string | null;
 };
@@ -26,7 +27,7 @@ export type OpcionDeCategoria = Opcion & { pide_proveedor: boolean };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const COLUMNAS_DE_FILA =
-  'id, fecha, monto_centavos, descripcion, medio_de_pago, anulado, recurrente_id, ' +
+  'id, fecha, monto_centavos, descripcion, medio_de_pago, anulado, recurrente_id, cierre_id, ' +
   'categoria:categorias_de_gasto(nombre), proveedor:proveedores(nombre)';
 
 type FilaLeida = Omit<FilaDeGasto, 'categoria' | 'proveedor'> & {

@@ -17,9 +17,10 @@ type Props = {
   id?: string;
   categorias: OpcionDeCategoria[];
   proveedores: Opcion[];
+  deCaja?: boolean;
 };
 
-export function FormularioDeGasto({ inicial, id, categorias, proveedores }: Props) {
+export function FormularioDeGasto({ inicial, id, categorias, proveedores, deCaja }: Props) {
   const router = useRouter();
   const guardar = (datos: DatosDeGasto) =>
     id ? editarGastoDesdeElPanel({ ...datos, id }) : crearGastoDesdeElPanel(datos);
@@ -36,6 +37,7 @@ export function FormularioDeGasto({ inicial, id, categorias, proveedores }: Prop
         id="fecha"
         etiqueta="Fecha"
         type="date"
+        readOnly={deCaja}
         error={errors.fecha?.message}
         {...register('fecha')}
       />
@@ -45,6 +47,7 @@ export function FormularioDeGasto({ inicial, id, categorias, proveedores }: Prop
         inicial={inicial}
         categorias={categorias}
         proveedores={proveedores}
+        deCaja={deCaja}
       />
       <Campo
         id="comprobante"

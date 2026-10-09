@@ -18,7 +18,7 @@ export function InicioAdmin({ pendientes }: { pendientes: number }) {
   );
 }
 
-/** Mientras no exista la carga del cierre, caja ve su nombre, Mi cuenta y Salir. */
+/** Caja entra directo a lo unico que hace aca: cargar el cierre. */
 export function InicioCaja({ nombre }: { nombre: string }) {
   return (
     <section className="space-y-6">

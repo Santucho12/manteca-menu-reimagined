@@ -25,6 +25,20 @@ function GastoAnulado({ gasto }: { gasto: Gasto }) {
   );
 }
 
+// La plata de este gasto la declaro Caja: aca solo se clasifica.
+function DeCaja({ cierreId }: { cierreId: string }) {
+  return (
+    <p className="max-w-xl text-sm">
+      Salió de un cierre de caja. Elegí la categoría y, si hace falta, el proveedor. El monto y la
+      fecha se corrigen anulando{' '}
+      <Link href={`/admin/caja/cierres/${cierreId}`} className="underline underline-offset-4">
+        el cierre
+      </Link>
+      .
+    </p>
+  );
+}
+
 export default async function FichaDeGasto({ params }: { params: Promise<{ id: string }> }) {
   const { cliente } = await exigirPagina('admin');
   const gasto = await gastoPorId(cliente, (await params).id);
@@ -37,8 +51,14 @@ export default async function FichaDeGasto({ params }: { params: Promise<{ id: s
         <GastoAnulado gasto={gasto} />
       ) : (
         <>
-          <FormularioDeGasto inicial={datosDeGastoParaEditar(gasto)} id={gasto.id} {...opciones} />
-          <BotonDeAnular id={gasto.id} />
+          {gasto.cierre_id ? <DeCaja cierreId={gasto.cierre_id} /> : null}
+          <FormularioDeGasto
+            inicial={datosDeGastoParaEditar(gasto)}
+            id={gasto.id}
+            deCaja={gasto.cierre_id !== null}
+            {...opciones}
+          />
+          {gasto.cierre_id ? null : <BotonDeAnular id={gasto.id} />}
         </>
       )}
       <Link href="/admin/gastos" className="inline-block py-2 text-sm underline underline-offset-4">

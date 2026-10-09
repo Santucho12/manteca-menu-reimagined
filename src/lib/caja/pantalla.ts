@@ -1,8 +1,9 @@
 import { z } from 'zod';
 import { mesDe } from '../gastos/pantalla';
 import { esFechaValida } from '../gastos/vencimientos';
+import { formatearPesos } from '../plata';
 import { numeroDePagina, unValor } from '../usuarios/presentacion';
-import type { Medio } from './resultado';
+import { MEDIOS, type Medio, type ResultadoDeMedio } from './resultado';
 
 export const ESTADOS = [
   'esperando_ventas',
@@ -70,4 +71,25 @@ export function enlaceDeControl(filtros: FiltrosDeControl, hoy: string): string 
   if (filtros.pagina > 1) parametros.set('pagina', String(filtros.pagina));
   const texto = parametros.toString();
   return texto ? `/admin/caja/control?${texto}` : '/admin/caja/control';
+}
+
+type MontosPorMedio = Record<`${Medio}_centavos`, number> &
+  Record<`esperado_${Medio}_centavos`, number | null>;
+
+/** Lo declarado, lo esperado y la diferencia de cada medio, como estan guardados en el cierre. */
+export function mediosDelCierre(cierre: MontosPorMedio): ResultadoDeMedio[] {
+  return MEDIOS.map((medio) => {
+    const declaradoCentavos = cierre[`${medio}_centavos`];
+    const esperadoCentavos = cierre[`esperado_${medio}_centavos`];
+    const diferenciaCentavos =
+      esperadoCentavos === null ? null : declaradoCentavos - esperadoCentavos;
+    return { medio, declaradoCentavos, esperadoCentavos, diferenciaCentavos };
+  });
+}
+
+/** La diferencia como se le dice a una persona: faltan o sobran, nunca un numero negativo. */
+export function textoDeDiferencia(centavos: number | null): string {
+  if (centavos === null) return '—';
+  if (centavos === 0) return 'Sin diferencia';
+  return `${centavos < 0 ? 'Faltan' : 'Sobran'} ${formatearPesos(Math.abs(centavos))}`;
 }
