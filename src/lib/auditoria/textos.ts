@@ -13,6 +13,11 @@ export type RegistroDeAuditoria = {
   antes: Fila | null;
   despues: Fila | null;
   motivo: string | null;
+  /**
+   * A que pertenece el dato hoy (el producto de un precio, la categoria de una presentacion).
+   * Un cambio guarda solo lo que cambio: sin esto no se sabria de que producto era el precio.
+   */
+  contexto?: Fila | null;
 };
 /** Nombre de cada categoria, proveedor, producto o persona que aparece en los registros. */
 export type Nombres = Map<string, string>;
@@ -70,9 +75,32 @@ export function cambiosDe(registro: RegistroDeAuditoria, nombres: Nombres): Camb
 }
 
 const deFila = (registro: RegistroDeAuditoria, columna: string) => {
-  const valor = registro.despues?.[columna] ?? registro.antes?.[columna];
+  const valor =
+    registro.despues?.[columna] ?? registro.antes?.[columna] ?? registro.contexto?.[columna];
   return typeof valor === 'string' ? valor : null;
 };
+
+// Tablas cuyo dato tiene nombre propio: el registro se lee "Proveedor · La Serenisima".
+const CON_NOMBRE = new Set([
+  'perfiles',
+  'proveedores',
+  'productos',
+  'categorias',
+  'presentaciones',
+  'categorias_de_gasto',
+  'cierres_de_caja',
+  'gastos_recurrentes',
+]);
+
+/** Cual dato fue: su nombre, o el producto y la presentacion de un precio; null si no tiene. */
+export function nombreDelDato(registro: RegistroDeAuditoria, nombres: Nombres): string | null {
+  if (CON_NOMBRE.has(registro.tabla)) return nombres.get(registro.registro_id) ?? null;
+  if (registro.tabla !== 'precios') return null;
+  const partes = [deFila(registro, 'producto_id'), deFila(registro, 'presentacion_id')]
+    .map((id) => (id ? nombres.get(id) : undefined))
+    .filter((nombre): nombre is string => Boolean(nombre));
+  return partes.length > 0 ? partes.join(' · ') : null;
+}
 
 const RUTAS: Record<string, (registro: RegistroDeAuditoria) => string | null> = {
   gastos: (r) => `/admin/gastos/${r.registro_id}`,

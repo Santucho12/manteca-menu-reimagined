@@ -10,6 +10,7 @@ import {
   enlaceDe,
   fechaYHora,
   nombreDeAccion,
+  nombreDelDato,
   personaDe,
   type Cambio,
 } from '@/lib/auditoria/textos';
@@ -49,10 +50,12 @@ export default async function RegistroDeAuditoria({ params }: { params: Promise<
   const nombres = await nombresDe(cliente, [registro]);
   const { modulo, dato } = datoDe(registro.tabla);
   const enlace = enlaceDe(registro);
+  const nombre = nombreDelDato(registro, nombres);
   return (
     <div className="space-y-6">
       <TituloDePagina>
         {nombreDeAccion(registro.accion)}: {dato}
+        {nombre ? ` · ${nombre}` : ''}
       </TituloDePagina>
       <p className="text-muted-foreground">
         {modulo} · {fechaYHora(registro.fecha)} · {personaDe(registro.usuario_id, nombres)}

@@ -3,6 +3,7 @@ import {
   datoDe,
   fechaYHora,
   nombreDeAccion,
+  nombreDelDato,
   personaDe,
   resumenDe,
   type Nombres,
@@ -14,11 +15,13 @@ type Props = { registros: RegistroDeAuditoria[]; nombres: Nombres };
 function Fila({ registro, nombres }: { registro: RegistroDeAuditoria; nombres: Nombres }) {
   const { modulo, dato } = datoDe(registro.tabla);
   const resumen = resumenDe(registro);
+  const nombre = nombreDelDato(registro, nombres);
   return (
     <li className="flex flex-wrap items-start justify-between gap-3 p-4">
       <div className="min-w-0 space-y-1">
         <p className="font-medium">
           {modulo} · {dato}
+          {nombre ? ` · ${nombre}` : ''}
         </p>
         <p className="text-muted-foreground text-sm">
           {fechaYHora(registro.fecha)} · {personaDe(registro.usuario_id, nombres)}

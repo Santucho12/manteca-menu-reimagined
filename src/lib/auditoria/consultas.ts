@@ -2,7 +2,7 @@ import type { Cliente } from '../supabase/cliente';
 import { POR_PAGINA, cantidadDePaginas } from '../usuarios/presentacion';
 import { DE_PERSONA } from './diccionario';
 import { tablasDe, type FiltrosDeAuditoria } from './pantalla';
-import { fechaYHora, type Nombres, type RegistroDeAuditoria } from './textos';
+import { fechaYHora, type Fila, type Nombres, type RegistroDeAuditoria } from './textos';
 
 export type ListaDeRegistros = { filas: RegistroDeAuditoria[]; total: number; pagina: number };
 
@@ -51,7 +51,7 @@ export async function listarRegistros(
     .order('id', { ascending: false })
     .range(desde, desde + POR_PAGINA - 1);
   const filas = comprobar(respuesta, 'la auditoria') as unknown as RegistroDeAuditoria[];
-  return { filas, total, pagina };
+  return { filas: await conContexto(cliente, filas), total, pagina };
 }
 
 /** Un id que no es un numero no es un error: no hay registro, y la pantalla da 404. */
@@ -66,7 +66,37 @@ export async function registroPorId(
     .select(COLUMNAS)
     .eq('id', Number(id))
     .maybeSingle();
-  return comprobar(respuesta, 'el registro') as unknown as RegistroDeAuditoria | null;
+  const registro = comprobar(respuesta, 'el registro') as unknown as RegistroDeAuditoria | null;
+  return registro ? ((await conContexto(cliente, [registro]))[0] ?? null) : null;
+}
+
+// A que pertenecen hoy los precios y las presentaciones: un cambio no lo guarda.
+const PADRES = {
+  precios: 'id, producto_id, presentacion_id',
+  presentaciones: 'id, categoria_id',
+} as const;
+type ConPadre = keyof typeof PADRES;
+
+async function padresDe(cliente: Cliente, tabla: ConPadre, ids: string[]) {
+  if (ids.length === 0) return new Map<string, Fila>();
+  const { data } = await cliente.from(tabla).select(PADRES[tabla]).in('id', ids);
+  const filas = (data ?? []) as unknown as (Fila & { id: string })[];
+  return new Map(filas.map((fila) => [fila.id, fila]));
+}
+
+/** Suma a cada registro de un precio o una presentacion el producto o la categoria a la que pertenece. */
+async function conContexto(
+  cliente: Cliente,
+  registros: RegistroDeAuditoria[],
+): Promise<RegistroDeAuditoria[]> {
+  const idsDe = (tabla: ConPadre) =>
+    registros.filter((r) => r.tabla === tabla).map((r) => r.registro_id);
+  const [precios, presentaciones] = await Promise.all([
+    padresDe(cliente, 'precios', idsDe('precios')),
+    padresDe(cliente, 'presentaciones', idsDe('presentaciones')),
+  ]);
+  const padres: Record<string, Map<string, Fila>> = { precios, presentaciones };
+  return registros.map((r) => ({ ...r, contexto: padres[r.tabla]?.get(r.registro_id) ?? null }));
 }
 
 const ES_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -76,7 +106,9 @@ function codigosDe(registros: RegistroDeAuditoria[]): string[] {
   const codigos = new Set<string>();
   for (const registro of registros) {
     if (registro.usuario_id) codigos.add(registro.usuario_id);
-    for (const fila of [registro.antes, registro.despues]) {
+    // El propio dato tambien: el registro dice cual fue.
+    if (ES_UUID.test(registro.registro_id)) codigos.add(registro.registro_id);
+    for (const fila of [registro.antes, registro.despues, registro.contexto]) {
       for (const [columna, valor] of Object.entries(fila ?? {})) {
         const guardaId = columna.endsWith('_id') || DE_PERSONA.has(columna);
         if (guardaId && typeof valor === 'string' && ES_UUID.test(valor)) codigos.add(valor);
