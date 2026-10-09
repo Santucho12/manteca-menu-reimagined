@@ -218,6 +218,233 @@ export type Database = {
           },
         ]
       }
+      categorias_de_gasto: {
+        Row: {
+          activo: boolean
+          de_sistema: boolean
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          local_id: string
+          nombre: string
+          pide_proveedor: boolean
+        }
+        Insert: {
+          activo?: boolean
+          de_sistema?: boolean
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          nombre: string
+          pide_proveedor?: boolean
+        }
+        Update: {
+          activo?: boolean
+          de_sistema?: boolean
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          nombre?: string
+          pide_proveedor?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categorias_de_gasto_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gastos: {
+        Row: {
+          anulado: boolean
+          anulado_por: string | null
+          categoria_id: string
+          comprobante: string | null
+          creado_por: string | null
+          descripcion: string | null
+          fecha: string
+          fecha_actualizacion: string
+          fecha_anulacion: string | null
+          fecha_creacion: string
+          id: string
+          local_id: string
+          medio_de_pago: Database["public"]["Enums"]["medio_de_pago"]
+          monto_centavos: number
+          motivo_anulacion: string | null
+          proveedor_id: string | null
+          recurrente_id: string | null
+          vencimiento: string | null
+        }
+        Insert: {
+          anulado?: boolean
+          anulado_por?: string | null
+          categoria_id: string
+          comprobante?: string | null
+          creado_por?: string | null
+          descripcion?: string | null
+          fecha: string
+          fecha_actualizacion?: string
+          fecha_anulacion?: string | null
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          medio_de_pago: Database["public"]["Enums"]["medio_de_pago"]
+          monto_centavos: number
+          motivo_anulacion?: string | null
+          proveedor_id?: string | null
+          recurrente_id?: string | null
+          vencimiento?: string | null
+        }
+        Update: {
+          anulado?: boolean
+          anulado_por?: string | null
+          categoria_id?: string
+          comprobante?: string | null
+          creado_por?: string | null
+          descripcion?: string | null
+          fecha?: string
+          fecha_actualizacion?: string
+          fecha_anulacion?: string | null
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          medio_de_pago?: Database["public"]["Enums"]["medio_de_pago"]
+          monto_centavos?: number
+          motivo_anulacion?: string | null
+          proveedor_id?: string | null
+          recurrente_id?: string | null
+          vencimiento?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gastos_anulado_por_fkey"
+            columns: ["anulado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias_de_gasto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_creado_por_fkey"
+            columns: ["creado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_proveedor_id_fkey"
+            columns: ["proveedor_id"]
+            isOneToOne: false
+            referencedRelation: "proveedores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_recurrente_id_fkey"
+            columns: ["recurrente_id"]
+            isOneToOne: false
+            referencedRelation: "gastos_recurrentes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gastos_recurrentes: {
+        Row: {
+          activo: boolean
+          categoria_id: string
+          creado_por: string | null
+          descripcion: string | null
+          fecha_actualizacion: string
+          fecha_creacion: string
+          frecuencia: Database["public"]["Enums"]["frecuencia_de_gasto"]
+          generar_desde: string | null
+          id: string
+          local_id: string
+          medio_de_pago: Database["public"]["Enums"]["medio_de_pago"]
+          monto_centavos: number
+          primer_vencimiento: string
+          proveedor_id: string | null
+        }
+        Insert: {
+          activo?: boolean
+          categoria_id: string
+          creado_por?: string | null
+          descripcion?: string | null
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          frecuencia: Database["public"]["Enums"]["frecuencia_de_gasto"]
+          generar_desde?: string | null
+          id?: string
+          local_id?: string
+          medio_de_pago: Database["public"]["Enums"]["medio_de_pago"]
+          monto_centavos: number
+          primer_vencimiento: string
+          proveedor_id?: string | null
+        }
+        Update: {
+          activo?: boolean
+          categoria_id?: string
+          creado_por?: string | null
+          descripcion?: string | null
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          frecuencia?: Database["public"]["Enums"]["frecuencia_de_gasto"]
+          generar_desde?: string | null
+          id?: string
+          local_id?: string
+          medio_de_pago?: Database["public"]["Enums"]["medio_de_pago"]
+          monto_centavos?: number
+          primer_vencimiento?: string
+          proveedor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gastos_recurrentes_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias_de_gasto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_recurrentes_creado_por_fkey"
+            columns: ["creado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_recurrentes_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_recurrentes_proveedor_id_fkey"
+            columns: ["proveedor_id"]
+            isOneToOne: false
+            referencedRelation: "proveedores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       locales: {
         Row: {
           activo: boolean
@@ -540,6 +767,32 @@ export type Database = {
     }
     Functions: {
       es_admin_activo: { Args: never; Returns: boolean }
+      generar_gastos_recurrentes: { Args: { hasta: string }; Returns: number }
+      gastos_pagado_por_proveedor: {
+        Args: { desde: string; hasta: string }
+        Returns: {
+          proveedor_id: string
+          total_centavos: number
+        }[]
+      }
+      gastos_total: {
+        Args: {
+          desde: string
+          el_proveedor?: string
+          hasta: string
+          la_categoria?: string
+        }
+        Returns: number
+      }
+      gastos_validar_categoria_y_proveedor: {
+        Args: {
+          el_local: string
+          el_proveedor: string
+          la_categoria: string
+          proveedor_anterior: string
+        }
+        Returns: undefined
+      }
       local_del_usuario: { Args: never; Returns: string }
       menu_aplicar_aumento: { Args: { datos: Json }; Returns: string }
       menu_aumento_vigente: {
@@ -636,6 +889,8 @@ export type Database = {
     }
     Enums: {
       etiqueta_de_producto: "mas_vendido" | "artesanal" | "nuevo"
+      frecuencia_de_gasto: "mensual" | "bimestral" | "anual"
+      medio_de_pago: "efectivo_caja" | "transferencia" | "tarjeta" | "otro"
       rol_usuario: "invitado" | "caja" | "encargado" | "admin"
     }
     CompositeTypes: {
@@ -765,6 +1020,8 @@ export const Constants = {
   public: {
     Enums: {
       etiqueta_de_producto: ["mas_vendido", "artesanal", "nuevo"],
+      frecuencia_de_gasto: ["mensual", "bimestral", "anual"],
+      medio_de_pago: ["efectivo_caja", "transferencia", "tarjeta", "otro"],
       rol_usuario: ["invitado", "caja", "encargado", "admin"],
     },
   },

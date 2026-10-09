@@ -95,6 +95,6 @@ Construido el 2026-10-08 (pedido 26). El detalle está en
 - **Pantallas:** `/admin/proveedores` (búsqueda, desactivados, paginado de a 25), alta,
   ficha y edición.
 
-Queda para el módulo de Gastos, que lo necesita: lo pagado en el mes en la lista, los gastos
-y los totales del mes y del año en la ficha, y el aviso al desactivar un proveedor con un
-gasto recurrente activo.
+Con el módulo de Gastos (pedido 27) se sumaron lo pagado en el mes en la lista, los gastos
+del año y los totales del mes y del año en la ficha, y el aviso cuando tiene gastos
+recurrentes activos: si se lo desactiva, esos recurrentes se siguen cargando.

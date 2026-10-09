@@ -135,6 +135,7 @@ test.describe('con la sesion del admin', () => {
       /^Inicio/,
       /^Menú/,
       /^Proveedores/,
+      /^Gastos/,
       /^Usuarios/,
       /^Mi cuenta/,
     ]);

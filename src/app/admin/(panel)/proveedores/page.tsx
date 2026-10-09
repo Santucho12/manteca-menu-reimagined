@@ -4,6 +4,8 @@ import { Campo } from '@/components/formularios/Campo';
 import { TituloDePagina } from '@/components/panel/TituloDePagina';
 import { Button } from '@/components/ui/button';
 import { exigirPagina } from '@/lib/acceso/servidor';
+import { diaEnArgentina } from '@/lib/fechas';
+import { pagadoPorProveedor } from '@/lib/gastos/proveedores';
 import { listarProveedores, type FiltrosDeProveedores } from '@/lib/proveedores/consultas';
 import {
   enlaceDeProveedores,
@@ -49,7 +51,10 @@ export default async function PaginaDeProveedores({
 }) {
   const { cliente } = await exigirPagina('admin');
   const filtros = filtrosDeProveedores(await searchParams);
-  const { filas, total, pagina } = await listarProveedores(cliente, filtros);
+  const [{ filas, total, pagina }, pagado] = await Promise.all([
+    listarProveedores(cliente, filtros),
+    pagadoPorProveedor(cliente, diaEnArgentina(new Date())),
+  ]);
   const otroEstado = enlaceDeProveedores({
     ...filtros,
     desactivados: !filtros.desactivados,
@@ -64,7 +69,7 @@ export default async function PaginaDeProveedores({
         <Link href="/admin/proveedores/nuevo">Nuevo proveedor</Link>
       </Button>
       <Buscador filtros={filtros} />
-      <ListaDeProveedores filas={filas} />
+      <ListaDeProveedores filas={filas} pagado={pagado} />
       <Paginas filtros={{ ...filtros, pagina }} total={total} />
       <Link href={otroEstado} className="inline-block py-2 text-sm underline underline-offset-4">
         {filtros.desactivados ? 'Ver activos' : 'Ver desactivados'}

@@ -130,5 +130,28 @@ frecuencia y día.
 
 ## Parte técnica
 
-Se escribe al construir el módulo: tablas, permisos, acciones de servidor, el proceso
-automático de los recurrentes y pruebas.
+Construido el 2026-10-08 (pedido 27). El detalle está en
+`docs/superpowers/specs/2026-10-08-gastos-design.md`.
+
+- **Base:** tablas `categorias_de_gasto`, `gastos_recurrentes` y `gastos`. El admin activo
+  lee, carga y cambia lo de su local con RLS; el local y el autor los pone la base y nadie
+  borra. Las reglas están en triggers, con códigos `PG201` a `PG206`: categoría disponible,
+  Mercadería pide proveedor, proveedor activo (un gasto viejo conserva el suyo), anulado
+  cerrado, motivo obligatorio y "Sin clasificar" fija. Cada local arranca con las 7
+  categorías y "Sin clasificar".
+- **Recurrentes:** `generar_gastos_recurrentes(hasta)` crea cada vencimiento que falte desde
+  el primero (el 31 de enero pasa al 28 de febrero y vuelve al 31 en marzo). La corre pg_cron
+  todos los días a las 3 de Argentina y el servidor al abrir Gastos, con la clave secreta y
+  solo si abre un admin. Lo generado queda a nombre del sistema y se marca "Automático" en
+  la lista. Un recurrente reactivado genera desde ese día: lo vencido mientras estuvo
+  desactivado no aparece.
+- **Totales:** `gastos_total` y `gastos_pagado_por_proveedor` suman sin anulados, con RLS.
+- **Montos:** se escriben con coma para los centavos y punto de miles opcional (12.345,50);
+  se rechazan el punto decimal, más de dos decimales y el cero.
+- **Pantallas:** `/admin/gastos` (filtros por fechas, categoría y proveedor; el mes en curso
+  por defecto; total; paginado de a 25), carga, edición y anulación, `/admin/gastos/recurrentes`
+  y `/admin/gastos/categorias`.
+
+Queda para el módulo de Cierres: los gastos sin clasificar que llegan de la caja (el aviso
+arriba de la lista y la carga en "Sin clasificar", que hoy nadie puede hacer a mano) y la
+regla 3.
