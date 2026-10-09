@@ -5,6 +5,8 @@ import {
   enlaceDe,
   fechaYHora,
   nombreDeAccion,
+  personaDe,
+  resumenDe,
   type RegistroDeAuditoria,
 } from './textos';
 
@@ -115,5 +117,22 @@ describe('nombres y fechas', () => {
   it('la fecha y hora en Argentina', () => {
     expect(fechaYHora('2026-10-09T15:30:00Z')).toBe('09/10/2026 12:30');
     expect(fechaYHora('2026-10-09T02:05:00Z')).toBe('08/10/2026 23:05');
+  });
+});
+
+describe('personaDe y resumenDe', () => {
+  it('la persona, el sistema o un dato que ya no esta', () => {
+    expect(personaDe(PERSONA, nombres)).toBe('Prueba Admin');
+    expect(personaDe(null, nombres)).toBe('El sistema');
+    expect(personaDe('00000000-0000-4000-8000-000000000000', nombres)).toBe('Dato no disponible');
+  });
+
+  it('el resumen de un cambio son los campos que cambiaron; el de un alta, nada', () => {
+    const cambio = registro({
+      antes: { monto_centavos: 1, anulado: false },
+      despues: { monto_centavos: 2, anulado: true },
+    });
+    expect(resumenDe(cambio)).toBe('Monto, Anulado');
+    expect(resumenDe(registro({ accion: 'alta', despues: { monto_centavos: 2 } }))).toBe('');
   });
 });

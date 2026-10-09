@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { enlaceDeAuditoria, filtrosDeAuditoria, tablasDe } from './pantalla';
+import {
+  enlaceDeAuditoria,
+  filtrosDeAuditoria,
+  opcionesDeAccion,
+  opcionesDeModulo,
+  tablasDe,
+} from './pantalla';
 
 const HOY = '2026-10-09';
 const PERSONA = '7a2d2f1b-3c2e-4d2f-8b7c-2a3b4c5d6e7f';
@@ -42,5 +48,15 @@ describe('tablasDe', () => {
       'configuracion_de_caja',
     ]);
     expect(tablasDe('menu')).toContain('precios');
+  });
+});
+
+describe('opciones de los filtros', () => {
+  it('modulos y acciones, con su nombre', () => {
+    expect(opcionesDeModulo()).toContainEqual({ valor: 'gastos', texto: 'Gastos' });
+    expect(opcionesDeAccion()).toContainEqual({
+      valor: 'reseteo_de_contrasena',
+      texto: 'Reseteo de contraseña',
+    });
   });
 });
