@@ -40,7 +40,8 @@ describe('RLS de cierres: lectura', () => {
     )
       .from('configuracion_de_caja')
       .select('tolerancia_centavos');
-    expect(data).toEqual([{ tolerancia_centavos: 50000 }]);
+    // El valor lo cambian otros tests: aca importa que vea una sola fila, la de su local.
+    expect(data).toHaveLength(1);
   });
 
   it('caja ve solo sus cierres y no la tolerancia', async () => {
@@ -101,13 +102,14 @@ describe('RLS de cierres: escritura', () => {
       await clienteComo('caja')
     )
       .from('configuracion_de_caja')
-      .update({ tolerancia_centavos: 1 });
+      .update({ tolerancia_centavos: 1 })
+      .not('id', 'is', null);
     const { data } = await (
       await clienteComo('admin')
     )
       .from('configuracion_de_caja')
       .select('tolerancia_centavos');
-    expect(data?.[0]?.tolerancia_centavos).toBe(50000);
+    expect(data?.[0]?.tolerancia_centavos).not.toBe(1);
   });
 });
 

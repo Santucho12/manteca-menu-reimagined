@@ -95,3 +95,19 @@ export async function borrarCierres(ids: string[]) {
   const todos = [...ids, ...gastos.map((g) => g.id), ...retiros.map((r) => r.id)];
   await secreto.from('auditoria').delete().in('registro_id', todos);
 }
+
+/** El dia siguiente a una fecha AAAA-MM-DD. */
+export function diaSiguiente(fecha: string, dias = 1): string {
+  return new Date(Date.parse(`${fecha}T12:00:00Z`) + dias * 86400000).toISOString().slice(0, 10);
+}
+
+/** Los cierres de esos dias en el local principal, tambien los cargados por pantalla. */
+export async function idsDeCierresDe(fechas: string[]): Promise<string[]> {
+  const secreto = clienteSecretoDePruebas();
+  const { data } = await secreto
+    .from('cierres_de_caja')
+    .select('id')
+    .eq('local_id', await idDelLocalPrincipal(secreto))
+    .in('fecha', fechas);
+  return (data ?? []).map((cierre) => cierre.id);
+}
