@@ -374,6 +374,7 @@ export type Database = {
           fecha_actualizacion: string
           fecha_creacion: string
           frecuencia: Database["public"]["Enums"]["frecuencia_de_gasto"]
+          generar_desde: string | null
           id: string
           local_id: string
           medio_de_pago: Database["public"]["Enums"]["medio_de_pago"]
@@ -389,6 +390,7 @@ export type Database = {
           fecha_actualizacion?: string
           fecha_creacion?: string
           frecuencia: Database["public"]["Enums"]["frecuencia_de_gasto"]
+          generar_desde?: string | null
           id?: string
           local_id?: string
           medio_de_pago: Database["public"]["Enums"]["medio_de_pago"]
@@ -404,6 +406,7 @@ export type Database = {
           fecha_actualizacion?: string
           fecha_creacion?: string
           frecuencia?: Database["public"]["Enums"]["frecuencia_de_gasto"]
+          generar_desde?: string | null
           id?: string
           local_id?: string
           medio_de_pago?: Database["public"]["Enums"]["medio_de_pago"]
