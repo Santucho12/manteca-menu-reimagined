@@ -56,9 +56,11 @@ test('el cambio de un gasto se ve con nombres y pesos, y lleva al gasto', async 
 });
 
 test('filtra lo del sistema y explica que no hay nada', async ({ page }) => {
-  proveedores.push((await sembrarProveedor()).id);
+  const proveedor = await sembrarProveedor();
+  proveedores.push(proveedor.id);
   await page.goto('/admin/auditoria?persona=sistema&modulo=proveedores');
   const registro = page.getByRole('list', { name: 'Registros' }).getByRole('listitem').first();
+  await expect(registro).toContainText(`Proveedores · Proveedor · ${proveedor.nombre}`);
   await expect(registro).toContainText('El sistema');
   await expect(registro).toContainText('Alta');
   await page.goto('/admin/auditoria?desde=2001-01-01&hasta=2001-01-02');
