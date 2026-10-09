@@ -152,6 +152,6 @@ Construido el 2026-10-08 (pedido 27). El detalle está en
   por defecto; total; paginado de a 25), carga, edición y anulación, `/admin/gastos/recurrentes`
   y `/admin/gastos/categorias`.
 
-Queda para el módulo de Cierres: los gastos sin clasificar que llegan de la caja (el aviso
-arriba de la lista y la carga en "Sin clasificar", que hoy nadie puede hacer a mano) y la
-regla 3.
+Con el módulo de Cierres (pedido 28) llegan los gastos pagados con la caja: entran en "Sin
+clasificar", marcados "De caja", y la regla 3 quedó en la base (`PC305` y `PC306`). Falta
+el aviso de los sin clasificar arriba de la lista.
