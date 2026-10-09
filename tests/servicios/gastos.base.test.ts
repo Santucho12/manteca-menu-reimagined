@@ -18,7 +18,7 @@ import {
   MENSAJES_DE_GASTOS,
 } from '../../src/lib/gastos/escritura';
 import type { DatosDeGasto } from '../../src/lib/gastos/esquemas';
-import { generarAtrasados } from '../../src/lib/gastos/generacion';
+import { generarAlAbrir, generarAtrasados } from '../../src/lib/gastos/generacion';
 import {
   pagadoPorProveedor,
   recurrentesActivosDelProveedor,
@@ -194,6 +194,13 @@ describe('recurrentes', () => {
       3,
     );
     expect(await generarAtrasados(clienteSecretoDePruebas(), '2031-03-20')).toBe(0);
+  });
+
+  it('al abrir Gastos genera solo si quien abre es admin', async () => {
+    const { id } = await sembrarRecurrente({ primerVencimiento: '2032-01-20' });
+    recurrentes.push(id);
+    expect(await generarAlAbrir('caja', '2032-01-20')).toBe(0);
+    expect(await generarAlAbrir('admin', '2032-01-20')).toBeGreaterThanOrEqual(1);
   });
 });
 
