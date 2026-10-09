@@ -5,12 +5,19 @@ import {
   nombreDeProveedor,
   sembrarProveedor,
 } from '../tests/proveedores-de-prueba';
+import { diaEnArgentina } from '../src/lib/fechas';
+import { borrarGastos, sembrarGasto, sembrarRecurrente } from '../tests/gastos-de-prueba';
 import { SESIONES } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
 let nombres: string[] = [];
+let gastos: string[] = [];
+let recurrentes: string[] = [];
 test.afterEach(async () => {
+  await borrarGastos({ gastos, recurrentes });
+  gastos = [];
+  recurrentes = [];
   await borrarProveedores(await idsDeProveedoresLlamados(nombres));
   nombres = [];
 });
@@ -107,6 +114,35 @@ test('edita, desactiva y reactiva', async ({ page }) => {
   await fila(page, nombre).getByRole('link', { name: nombre }).click();
   await page.getByRole('button', { name: 'Reactivar' }).click();
   await expect(page.getByRole('button', { name: 'Desactivar' })).toBeVisible();
+});
+
+test('muestra lo pagado en el mes en la lista y los gastos y totales en la ficha', async ({
+  page,
+}) => {
+  const nombre = nuevoNombre();
+  const proveedor = await sembrarProveedor({ nombre });
+  const hoy = diaEnArgentina(new Date());
+  const pago = { categoria: 'Mercadería', proveedorId: proveedor.id, fecha: hoy };
+  gastos.push((await sembrarGasto({ ...pago, montoCentavos: 300000 })).id);
+  gastos.push((await sembrarGasto({ ...pago, montoCentavos: 999, anulado: true })).id);
+  await page.goto(`/admin/proveedores?q=${encodeURIComponent(nombre)}`);
+  await expect(fila(page, nombre)).toContainText('Pagado este mes: $3.000,00');
+  await fila(page, nombre).getByRole('link', { name: nombre }).click();
+  await expect(page.getByText('Este mes: $3.000,00')).toBeVisible();
+  await expect(page.getByText('Este año: $3.000,00')).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Gastos' }).getByRole('listitem')).toHaveCount(2);
+});
+
+test('avisa si tiene gastos recurrentes activos', async ({ page }) => {
+  const proveedor = await sembrarProveedor({ nombre: nuevoNombre() });
+  const recurrente = await sembrarRecurrente({
+    categoria: 'Mercadería',
+    proveedorId: proveedor.id,
+    primerVencimiento: '2099-01-01',
+  });
+  recurrentes.push(recurrente.id);
+  await page.goto(`/admin/proveedores/${proveedor.id}`);
+  await expect(page.getByText(/Tiene 1 gasto recurrente activo/)).toBeVisible();
 });
 
 test('guarda capturas de la lista y la ficha', async ({ page }, info) => {
