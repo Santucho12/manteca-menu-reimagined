@@ -219,3 +219,23 @@ export async function listarCategorias(cliente: Cliente): Promise<FilaDeCategori
     .order('nombre');
   return comprobar(respuesta, 'las categorias');
 }
+
+/** Cuantos gastos de caja esperan categoria, y la categoria del sistema donde estan. */
+export async function sinClasificar(
+  cliente: Cliente,
+): Promise<{ cantidad: number; categoriaId: string | null }> {
+  const categoria = await cliente
+    .from('categorias_de_gasto')
+    .select('id')
+    .eq('de_sistema', true)
+    .maybeSingle();
+  const categoriaId = comprobar(categoria, 'la categoria sin clasificar')?.id ?? null;
+  if (!categoriaId) return { cantidad: 0, categoriaId };
+  const { count, error } = await cliente
+    .from('gastos')
+    .select('id', { count: 'exact', head: true })
+    .eq('categoria_id', categoriaId)
+    .eq('anulado', false);
+  if (error) throw new Error(`No pudimos contar los gastos sin clasificar: ${error.message}`);
+  return { cantidad: count ?? 0, categoriaId };
+}

@@ -153,5 +153,5 @@ Construido el 2026-10-08 (pedido 27). El detalle está en
   y `/admin/gastos/categorias`.
 
 Con el módulo de Cierres (pedido 28) llegan los gastos pagados con la caja: entran en "Sin
-clasificar", marcados "De caja", y la regla 3 quedó en la base (`PC305` y `PC306`). Falta
-el aviso de los sin clasificar arriba de la lista.
+clasificar", marcados "De caja", y la regla 3 quedó en la base (`PC305` y `PC306`). Arriba
+de la lista se avisa cuántos esperan categoría, con el enlace para verlos.

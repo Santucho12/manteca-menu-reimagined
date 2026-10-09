@@ -91,3 +91,8 @@ export const opcionesDeMedio = (): OpcionDeLista[] =>
 
 export const opcionesDeFrecuencia = (): OpcionDeLista[] =>
   Object.entries(FRECUENCIAS_EN_TEXTO).map(([valor, texto]) => ({ valor, texto }));
+
+export function textoDeSinClasificar(cantidad: number): string {
+  const gastos = cantidad === 1 ? 'gasto' : 'gastos';
+  return `Hay ${cantidad} ${gastos} de caja sin clasificar`;
+}
