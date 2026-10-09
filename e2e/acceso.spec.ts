@@ -99,9 +99,9 @@ test.describe('con la sesion de caja', () => {
       'Mis cierres',
       'Mi cuenta',
     ]);
+    await expect(page.getByRole('button', { name: 'Salir' })).toBeVisible();
     await page.getByRole('main').getByRole('link', { name: 'Cargar el cierre de caja' }).click();
     await expect(page).toHaveURL(/\/admin\/caja$/);
-    await expect(page.getByRole('button', { name: 'Salir' })).toBeVisible();
   });
 
   test('guarda una captura de su inicio', async ({ page }, info) => {
