@@ -44,6 +44,10 @@ export default async function FichaDeGasto({ params }: { params: Promise<{ id: s
   const gasto = await gastoPorId(cliente, (await params).id);
   if (!gasto) notFound();
   const opciones = await opcionesDeGasto(cliente);
+  const datos = datosDeGastoParaEditar(gasto);
+  // Sin clasificar no se ofrece: el selector arranca vacio y pide elegir una categoria.
+  const seOfrece = opciones.categorias.some((categoria) => categoria.id === datos.categoriaId);
+  const inicial = { ...datos, categoriaId: seOfrece ? datos.categoriaId : '' };
   return (
     <div className="space-y-6">
       <TituloDePagina>Gasto</TituloDePagina>
@@ -53,7 +57,7 @@ export default async function FichaDeGasto({ params }: { params: Promise<{ id: s
         <>
           {gasto.cierre_id ? <DeCaja cierreId={gasto.cierre_id} /> : null}
           <FormularioDeGasto
-            inicial={datosDeGastoParaEditar(gasto)}
+            inicial={inicial}
             id={gasto.id}
             deCaja={gasto.cierre_id !== null}
             {...opciones}

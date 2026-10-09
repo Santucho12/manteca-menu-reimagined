@@ -60,6 +60,7 @@ test('el gasto de caja llega a Gastos sin clasificar y solo se clasifica', async
   await gasto.getByRole('link').click();
   await expect(page.getByText(/Salió de un cierre de caja/)).toBeVisible();
   await expect(page.getByLabel('Monto')).toHaveAttribute('readonly', '');
+  await expect(page.getByLabel('Categoría')).toHaveValue('');
   await expect(page.getByRole('button', { name: 'Anular' })).toHaveCount(0);
   await page.getByLabel('Categoría').selectOption({ label: 'Mantenimiento' });
   await page.getByRole('button', { name: 'Guardar' }).click();
