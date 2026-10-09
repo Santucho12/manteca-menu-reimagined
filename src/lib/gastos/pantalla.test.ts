@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { enlaceDeGastos, filtrosDeGastos, nombreDeFrecuencia, nombreDeMedio } from './pantalla';
+import {
+  enlaceDeGastos,
+  fechaParaMostrar,
+  filtrosDeGastos,
+  nombreDeFrecuencia,
+  nombreDeMedio,
+  opcionesDeFrecuencia,
+  opcionesDeMedio,
+  opcionesParaElegir,
+} from './pantalla';
 
 const HOY = '2026-10-08';
 const CATEGORIA = '6f1c1e0a-2b1d-4c1e-9a6b-1f2e3d4c5b6a';
@@ -55,5 +64,39 @@ describe('nombres', () => {
   it('del medio de pago y la frecuencia', () => {
     expect(nombreDeMedio('efectivo_caja')).toBe('Efectivo de la caja');
     expect(nombreDeFrecuencia('bimestral')).toBe('Cada dos meses');
+  });
+});
+
+describe('opcionesParaElegir', () => {
+  const lista = [
+    { id: 'a', nombre: 'Alquiler', activo: true },
+    { id: 'b', nombre: 'Viejo', activo: false },
+    { id: 'c', nombre: 'Otro viejo', activo: false },
+  ];
+
+  it('ofrece lo activo y, de lo desactivado, solo lo que ya tenia', () => {
+    expect(opcionesParaElegir(lista, 'b', 'Elegí una categoría')).toEqual([
+      { valor: '', texto: 'Elegí una categoría' },
+      { valor: 'a', texto: 'Alquiler' },
+      { valor: 'b', texto: 'Viejo (desactivado)' },
+    ]);
+  });
+});
+
+describe('fechaParaMostrar', () => {
+  it('dia, mes y año', () => {
+    expect(fechaParaMostrar('2026-10-08')).toBe('08/10/2026');
+  });
+});
+
+describe('opcionesDeMedio y opcionesDeFrecuencia', () => {
+  it('todas, con su nombre', () => {
+    expect(opcionesDeMedio().map((o) => o.texto)).toEqual([
+      'Efectivo de la caja',
+      'Transferencia',
+      'Tarjeta',
+      'Otro',
+    ]);
+    expect(opcionesDeFrecuencia()[0]).toEqual({ valor: 'mensual', texto: 'Todos los meses' });
   });
 });
