@@ -119,6 +119,7 @@ export type Gasto = {
   anulado: boolean;
   motivo_anulacion: string | null;
   recurrente_id: string | null;
+  cierre_id: string | null;
 };
 
 /** Un id mal escrito en la URL no es un error: no hay gasto, y la pantalla da 404. */
@@ -128,7 +129,7 @@ export async function gastoPorId(cliente: Cliente, id: string): Promise<Gasto | 
     .from('gastos')
     .select(
       'id, fecha, categoria_id, monto_centavos, descripcion, proveedor_id, medio_de_pago, ' +
-        'comprobante, anulado, motivo_anulacion, recurrente_id',
+        'comprobante, anulado, motivo_anulacion, recurrente_id, cierre_id',
     )
     .eq('id', id)
     .maybeSingle();

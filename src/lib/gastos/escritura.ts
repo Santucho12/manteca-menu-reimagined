@@ -18,6 +18,9 @@ export const MENSAJES_DE_GASTOS = {
   sinMotivo: 'Escribí el motivo de la anulación.',
   deSistema: '"Sin clasificar" no se puede renombrar ni desactivar.',
   categoriaRepetida: 'Ya hay una categoría con ese nombre.',
+  deCierre:
+    'Este gasto salió de un cierre de caja: el monto, la fecha y el medio de pago se corrigen anulando el cierre.',
+  anularDeCierre: 'Este gasto salió de un cierre de caja: se anula anulando el cierre.',
   generico: 'No pudimos guardarlo. Revisá los datos e intentá de nuevo.',
 } as const;
 
@@ -30,6 +33,8 @@ const POR_CODIGO: Record<string, string> = {
   PG205: MENSAJES_DE_GASTOS.sinMotivo,
   PG206: MENSAJES_DE_GASTOS.deSistema,
   '23505': MENSAJES_DE_GASTOS.categoriaRepetida,
+  PC305: MENSAJES_DE_GASTOS.deCierre,
+  PC306: MENSAJES_DE_GASTOS.anularDeCierre,
 };
 
 type Respuesta = {
