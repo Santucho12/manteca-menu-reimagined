@@ -50,6 +50,9 @@ test('ve el cierre de caja en el control y lo marca como revisado', async ({ pag
 test('el gasto de caja llega a Gastos sin clasificar y solo se clasifica', async ({ page }) => {
   const fecha = dia();
   await sembrarCierreConSalidas(fecha);
+  await page.goto('/admin/gastos');
+  await page.getByRole('link', { name: /gastos? de caja sin clasificar/ }).click();
+  await expect(page).toHaveURL(/categoria=/);
   await page.goto(`/admin/gastos?${delDia(fecha)}`);
   const gasto = fila(page, 'Gastos', 'Hielo');
   await expect(gasto).toContainText('Sin clasificar');

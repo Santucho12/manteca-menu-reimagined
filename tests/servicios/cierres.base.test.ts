@@ -18,7 +18,7 @@ import {
 import type { DatosDeCierre } from '../../src/lib/caja/esquemas';
 import type { FiltrosDeControl } from '../../src/lib/caja/pantalla';
 import { diaEnArgentina } from '../../src/lib/fechas';
-import { gastoPorId } from '../../src/lib/gastos/consultas';
+import { gastoPorId, sinClasificar } from '../../src/lib/gastos/consultas';
 import { editarGasto, MENSAJES_DE_GASTOS } from '../../src/lib/gastos/escritura';
 import { datosDeGastoParaEditar } from '../../src/lib/gastos/esquemas';
 import { sumarMeses } from '../../src/lib/gastos/vencimientos';
@@ -173,6 +173,9 @@ describe('el gasto de un cierre, desde Gastos', () => {
     const id = await guardarComo('caja', diaLibre());
     const [fila] = await gastosDelCierre(id);
     const admin = await clienteComo('admin');
+    const pendientes = await sinClasificar(admin);
+    expect(pendientes.cantidad).toBeGreaterThanOrEqual(1);
+    expect(pendientes.categoriaId).toBe(fila!.categoria_id);
     const gasto = await gastoPorId(admin, fila!.id);
     expect(gasto?.cierre_id).toBe(id);
     const cambiado = { ...datosDeGastoParaEditar(gasto!), monto: '1' };
