@@ -54,7 +54,9 @@ test('lo vencido aparece en Gastos al abrir', async ({ page }) => {
   const { id, nombre } = await categoria();
   await sembrarRecurrente({ categoria: nombre, primerVencimiento: HOY });
   await page.goto(`/admin/gastos?categoria=${id}`);
-  await expect(page.getByRole('list', { name: 'Gastos' }).getByRole('listitem')).toHaveCount(1);
+  const filas = page.getByRole('list', { name: 'Gastos' }).getByRole('listitem');
+  await expect(filas).toHaveCount(1);
+  await expect(filas).toContainText('Automático');
   await expect(page.getByText('Total: $500.000,00')).toBeVisible();
 });
 
