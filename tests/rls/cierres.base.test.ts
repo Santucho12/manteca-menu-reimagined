@@ -1,6 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { crearClienteSinSesion } from '../../src/lib/supabase/sin-sesion';
-import { borrarCierres, cierreDe, diaLibre, sembrarCierre } from '../cierres-de-prueba';
+import {
+  borrarCierres,
+  cierreDe,
+  datosDeCierre,
+  diaLibre,
+  sembrarCierre,
+} from '../cierres-de-prueba';
 import type { RolDePrueba } from '../cuentas';
 import { clienteComo } from '../sesiones';
 
@@ -102,5 +108,22 @@ describe('RLS de cierres: escritura', () => {
       .from('configuracion_de_caja')
       .select('tolerancia_centavos');
     expect(data?.[0]?.tolerancia_centavos).toBe(50000);
+  });
+});
+
+describe('RLS de gastos: los que salieron de un cierre', () => {
+  const guardados: string[] = [];
+  afterAll(() => borrarCierres(guardados));
+
+  it('caja ve los gastos de sus cierres, y ninguno mas', async () => {
+    const caja = await clienteComo('caja');
+    const { data: id } = await caja.rpc('cierres_guardar', { datos: datosDeCierre(diaLibre()) });
+    guardados.push(id!);
+    const { data: delAdmin } = await (
+      await clienteComo('admin')
+    ).rpc('cierres_guardar', { datos: datosDeCierre(diaLibre()) });
+    guardados.push(delAdmin!);
+    const { data } = await caja.from('gastos').select('cierre_id');
+    expect(data).toEqual([{ cierre_id: id }]);
   });
 });

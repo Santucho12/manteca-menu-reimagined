@@ -43,8 +43,15 @@ describe('RLS de gastos: lectura', () => {
     expect((await idsQueVe('admin', 'categorias_de_gasto')).length).toBeGreaterThanOrEqual(8);
   });
 
-  it.each(SIN_PERMISO)('%s no ve nada', async (rol) => {
+  it.each(SIN_PERMISO.filter((rol) => rol !== 'caja'))('%s no ve nada', async (rol) => {
     for (const tabla of TABLAS) expect(await idsQueVe(rol, tabla), tabla).toEqual([]);
+  });
+
+  // Caja ve solo los gastos que salieron de sus propios cierres (tests/rls/cierres).
+  it('caja no ve los gastos del local, ni recurrentes ni categorias', async () => {
+    expect(await idsQueVe('caja', 'gastos')).not.toContain(delLocal.id);
+    expect(await idsQueVe('caja', 'gastos_recurrentes')).toEqual([]);
+    expect(await idsQueVe('caja', 'categorias_de_gasto')).toEqual([]);
   });
 
   it('el visitante no puede leer', async () => {
