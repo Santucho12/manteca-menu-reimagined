@@ -11,11 +11,14 @@ export type PerfilDeAcceso = {
 
 export type EstadoDeAcceso = 'sin-sesion' | 'desactivado' | 'cambiar-contrasena' | Rol;
 
-/** Lo que pide cada pagina: publica (ingreso y registro), panel, cuenta, admin o el cambio obligado. */
-export type Pagina = 'publica' | 'panel' | 'cuenta' | 'admin' | 'cambiar-contrasena';
+/**
+ * Lo que pide cada pagina: publica (ingreso y registro), panel, cuenta, caja (cargar y ver los
+ * cierres propios), admin o el cambio obligado.
+ */
+export type Pagina = 'publica' | 'panel' | 'cuenta' | 'caja' | 'admin' | 'cambiar-contrasena';
 
 export type EnlaceDelPanel = {
-  clave: 'inicio' | 'menu' | 'proveedores' | 'gastos' | 'usuarios' | 'cuenta';
+  clave: 'inicio' | 'menu' | 'proveedores' | 'gastos' | 'caja' | 'cierres' | 'usuarios' | 'cuenta';
   href: string;
   texto: string;
 };
@@ -28,17 +31,23 @@ const RUTAS_ABIERTAS = ['/admin/ingresar', '/admin/registro'];
 const PERMITIDOS: Record<Exclude<Pagina, 'publica'>, readonly EstadoDeAcceso[]> = {
   panel: ['invitado', 'encargado', 'caja', 'admin'],
   cuenta: ['caja', 'admin'],
+  caja: ['caja', 'admin'],
   admin: ['admin'],
   'cambiar-contrasena': ['cambiar-contrasena'],
 };
 
 const ENLACES: Record<'caja' | 'admin', EnlaceDelPanel[]> = {
-  caja: [{ clave: 'cuenta', href: '/admin/cuenta', texto: 'Mi cuenta' }],
+  caja: [
+    { clave: 'caja', href: '/admin/caja', texto: 'Cargar cierre' },
+    { clave: 'cierres', href: '/admin/caja/mis-cierres', texto: 'Mis cierres' },
+    { clave: 'cuenta', href: '/admin/cuenta', texto: 'Mi cuenta' },
+  ],
   admin: [
     { clave: 'inicio', href: '/admin', texto: 'Inicio' },
     { clave: 'menu', href: '/admin/menu', texto: 'Menú' },
     { clave: 'proveedores', href: '/admin/proveedores', texto: 'Proveedores' },
     { clave: 'gastos', href: '/admin/gastos', texto: 'Gastos' },
+    { clave: 'caja', href: '/admin/caja/control', texto: 'Caja' },
     { clave: 'usuarios', href: '/admin/usuarios', texto: 'Usuarios' },
     { clave: 'cuenta', href: '/admin/cuenta', texto: 'Mi cuenta' },
   ],
