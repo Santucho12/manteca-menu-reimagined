@@ -12,6 +12,7 @@ export type FilaDeGasto = {
   medio_de_pago: MedioDePago;
   anulado: boolean;
   recurrente_id: string | null;
+  cierre_id: string | null;
   categoria: string;
   proveedor: string | null;
 };
@@ -26,7 +27,7 @@ export type OpcionDeCategoria = Opcion & { pide_proveedor: boolean };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const COLUMNAS_DE_FILA =
-  'id, fecha, monto_centavos, descripcion, medio_de_pago, anulado, recurrente_id, ' +
+  'id, fecha, monto_centavos, descripcion, medio_de_pago, anulado, recurrente_id, cierre_id, ' +
   'categoria:categorias_de_gasto(nombre), proveedor:proveedores(nombre)';
 
 type FilaLeida = Omit<FilaDeGasto, 'categoria' | 'proveedor'> & {
@@ -119,6 +120,7 @@ export type Gasto = {
   anulado: boolean;
   motivo_anulacion: string | null;
   recurrente_id: string | null;
+  cierre_id: string | null;
 };
 
 /** Un id mal escrito en la URL no es un error: no hay gasto, y la pantalla da 404. */
@@ -128,7 +130,7 @@ export async function gastoPorId(cliente: Cliente, id: string): Promise<Gasto | 
     .from('gastos')
     .select(
       'id, fecha, categoria_id, monto_centavos, descripcion, proveedor_id, medio_de_pago, ' +
-        'comprobante, anulado, motivo_anulacion, recurrente_id',
+        'comprobante, anulado, motivo_anulacion, recurrente_id, cierre_id',
     )
     .eq('id', id)
     .maybeSingle();
@@ -216,4 +218,24 @@ export async function listarCategorias(cliente: Cliente): Promise<FilaDeCategori
     .order('activo', { ascending: false })
     .order('nombre');
   return comprobar(respuesta, 'las categorias');
+}
+
+/** Cuantos gastos de caja esperan categoria, y la categoria del sistema donde estan. */
+export async function sinClasificar(
+  cliente: Cliente,
+): Promise<{ cantidad: number; categoriaId: string | null }> {
+  const categoria = await cliente
+    .from('categorias_de_gasto')
+    .select('id')
+    .eq('de_sistema', true)
+    .maybeSingle();
+  const categoriaId = comprobar(categoria, 'la categoria sin clasificar')?.id ?? null;
+  if (!categoriaId) return { cantidad: 0, categoriaId };
+  const { count, error } = await cliente
+    .from('gastos')
+    .select('id', { count: 'exact', head: true })
+    .eq('categoria_id', categoriaId)
+    .eq('anulado', false);
+  if (error) throw new Error(`No pudimos contar los gastos sin clasificar: ${error.message}`);
+  return { cantidad: count ?? 0, categoriaId };
 }

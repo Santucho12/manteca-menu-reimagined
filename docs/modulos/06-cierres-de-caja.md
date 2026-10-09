@@ -139,15 +139,42 @@ esperado.
 | La diferencia después de guardar | Se muestra, y el empleado puede comentar |
 | Corregir un cierre | Lo anula el admin y se carga de nuevo |
 | Diferencias chicas | Tolerancia que define el admin |
-| Fondo de cambio | Se declara en cada cierre |
+| Fondo de cambio | Se declara en cada cierre, precargado con lo que quedó en la caja el día anterior |
+| Turnos | Un cierre por día (Santiago, 2026-10-09) |
+| Tolerancia de arranque | $500; el admin la cambia |
+| Fecha del cierre | Se ve, con hoy por defecto; no acepta días futuros |
+| Quién retiró | Texto libre |
+| Gasto que sale de un cierre | En Gastos se clasifica; su monto, su fecha y su medio se corrigen anulando el cierre |
+| Antes de que exista Ventas | El cierre se guarda y queda "Esperando ventas" |
 
 ## Sin decidir
 
 | Qué | De qué depende |
 |---|---|
-| Si hay un cierre por día o uno por turno | Del cliente. Se asume uno por día |
+| Si el cliente necesita un cierre por turno | Del cliente. Hoy es uno por día |
 
 ## Parte técnica
 
-Se escribe al construir el módulo: tablas, permisos, el cálculo de lo esperado, acciones de
-servidor y pruebas.
+Construido el 2026-10-09 (pedido 28). El detalle está en
+`docs/superpowers/specs/2026-10-09-cierres-de-caja-design.md`.
+
+- **Base:** tablas `cierres_de_caja`, `retiros_de_caja` y `configuracion_de_caja`, y la
+  columna `cierre_id` en `gastos`. Un índice único deja un solo cierre sin anular por día.
+- **Guardar:** `cierres_guardar` crea el cierre a nombre de la sesión, sus retiros y un
+  gasto "Sin clasificar" por cada gasto de caja, todo junto o nada. Rechaza un día futuro
+  (`PC301`) y un segundo cierre del día (`PC302`). Caja no escribe en Gastos.
+- **Permisos:** Caja ve sus cierres, sus retiros y los gastos que declaró; el admin ve los
+  de su local, los revisa y los anula. Nadie inserta directo ni borra.
+- **Reglas:** un cierre anulado no se cambia (`PC303`); anular pide motivo (`PC304`) y anula
+  sus gastos; un gasto de caja no cambia monto, fecha ni medio (`PC305`) ni se anula suelto
+  (`PC306`).
+- **Cálculo:** `resultadoDelCierre` (`src/lib/caja/resultado.ts`) da lo esperado, la
+  diferencia y el estado por medio, con la tolerancia. Está probado; todavía no se usa
+  porque no hay ventas.
+- **Pantallas:** `/admin/caja` (carga), `/admin/caja/mis-cierres`, `/admin/caja/control`
+  (tolerancia, filtros, días sin cierre) y `/admin/caja/cierres/[id]`.
+
+Queda para el módulo de Ventas: traer las ventas del día al guardar, completar lo esperado,
+pasar el cierre a "Cierra" o "Con diferencia", recalcular cuando cambian las ventas (reglas
+6 y 9, y "hubo ventas después del cierre") y pedir el comentario si hay diferencia. El aviso
+de días sin cierre en Inicio entra con Inicio.

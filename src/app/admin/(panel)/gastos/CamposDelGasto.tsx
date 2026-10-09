@@ -20,6 +20,8 @@ export type PropsDeCampos = {
   inicial: Campos;
   categorias: OpcionDeCategoria[];
   proveedores: Opcion[];
+  /** El gasto salio de un cierre: su monto se corrige anulando el cierre. */
+  deCaja?: boolean;
 };
 
 export function CamposDelGasto({
@@ -28,6 +30,7 @@ export function CamposDelGasto({
   inicial,
   categorias,
   proveedores,
+  deCaja = false,
 }: PropsDeCampos) {
   return (
     <>
@@ -42,6 +45,7 @@ export function CamposDelGasto({
         id="monto"
         etiqueta="Monto"
         inputMode="decimal"
+        readOnly={deCaja}
         error={errors.monto?.message}
         {...register('monto')}
       />

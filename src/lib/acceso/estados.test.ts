@@ -68,6 +68,10 @@ describe('destinoDe', () => {
     ['caja', 'panel', null],
     ['caja', 'cuenta', null],
     ['caja', 'admin', '/admin'],
+    ['caja', 'caja', null],
+    ['admin', 'caja', null],
+    ['invitado', 'caja', '/admin'],
+    ['encargado', 'caja', '/admin'],
     ['admin', 'panel', null],
     ['admin', 'cuenta', null],
     ['admin', 'admin', null],
@@ -92,19 +96,27 @@ describe('requiereSesion', () => {
 });
 
 describe('enlacesDelPanel', () => {
-  it('el admin ve Inicio, Menú, Proveedores, Gastos, Usuarios y Mi cuenta', () => {
+  it('el admin ve Inicio, Menú, Proveedores, Gastos, Caja, Usuarios y Mi cuenta', () => {
     expect(enlacesDelPanel('admin').map((enlace) => enlace.texto)).toEqual([
       'Inicio',
       'Menú',
       'Proveedores',
       'Gastos',
+      'Caja',
       'Usuarios',
       'Mi cuenta',
     ]);
   });
 
-  it('caja ve solo Mi cuenta', () => {
-    expect(enlacesDelPanel('caja').map((enlace) => enlace.href)).toEqual(['/admin/cuenta']);
+  it('caja ve Cargar cierre, Mis cierres y Mi cuenta', () => {
+    expect(enlacesDelPanel('caja').map((enlace) => enlace.href)).toEqual([
+      '/admin/caja',
+      '/admin/caja/mis-cierres',
+      '/admin/cuenta',
+    ]);
+    expect(enlacesDelPanel('admin').find((enlace) => enlace.clave === 'caja')?.href).toBe(
+      '/admin/caja/control',
+    );
   });
 
   it.each(['invitado', 'encargado', 'sin-sesion'] as const)('%s no ve enlaces', (estado) => {

@@ -8,6 +8,7 @@ import {
   opcionesDeFrecuencia,
   opcionesDeMedio,
   opcionesParaElegir,
+  textoDeSinClasificar,
 } from './pantalla';
 
 const HOY = '2026-10-08';
@@ -98,5 +99,12 @@ describe('opcionesDeMedio y opcionesDeFrecuencia', () => {
       'Otro',
     ]);
     expect(opcionesDeFrecuencia()[0]).toEqual({ valor: 'mensual', texto: 'Todos los meses' });
+  });
+});
+
+describe('textoDeSinClasificar', () => {
+  it('en singular y en plural', () => {
+    expect(textoDeSinClasificar(1)).toBe('Hay 1 gasto de caja sin clasificar');
+    expect(textoDeSinClasificar(3)).toBe('Hay 3 gastos de caja sin clasificar');
   });
 });

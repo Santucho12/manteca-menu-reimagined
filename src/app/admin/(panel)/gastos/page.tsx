@@ -6,13 +6,14 @@ import { TituloDePagina } from '@/components/panel/TituloDePagina';
 import { Button } from '@/components/ui/button';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
-import { listarGastos, opcionesDeGasto, type Opcion } from '@/lib/gastos/consultas';
+import { listarGastos, opcionesDeGasto, sinClasificar, type Opcion } from '@/lib/gastos/consultas';
 import { generarAlAbrir } from '@/lib/gastos/generacion';
 import {
   enlaceDeGastos,
   filtrosDeGastos,
   type FiltrosDeGastos,
   type ParametrosDeGastos,
+  textoDeSinClasificar,
 } from '@/lib/gastos/pantalla';
 import { formatearPesos } from '@/lib/plata';
 import { cantidadDePaginas } from '@/lib/usuarios/presentacion';
@@ -74,6 +75,21 @@ function Paginas({
   );
 }
 
+type Pendientes = { cantidad: number; categoriaId: string | null; hasta: string };
+
+// Los gastos que Caja pago con la caja esperan su categoria: el enlace los muestra todos.
+function SinClasificar({ cantidad, categoriaId, hasta }: Pendientes) {
+  if (cantidad === 0 || !categoriaId) return null;
+  const enlace = '/admin/gastos?desde=2000-01-01&hasta=' + hasta + '&categoria=' + categoriaId;
+  return (
+    <p>
+      <Link href={enlace} className="font-medium underline underline-offset-4">
+        {textoDeSinClasificar(cantidad)}
+      </Link>
+    </p>
+  );
+}
+
 function Accesos() {
   return (
     <div className="flex flex-wrap gap-2">
@@ -100,14 +116,16 @@ export default async function PaginaDeGastos({
   // Lo vencido aparece al abrir, sin esperar al proceso de la madrugada.
   await generarAlAbrir(estado, hoy);
   const filtros = filtrosDeGastos(await searchParams, hoy);
-  const [lista, opciones] = await Promise.all([
+  const [lista, opciones, pendientes] = await Promise.all([
     listarGastos(cliente, filtros),
     opcionesDeGasto(cliente),
+    sinClasificar(cliente),
   ]);
   return (
     <div className="space-y-6">
       <TituloDePagina>Gastos</TituloDePagina>
       <Accesos />
+      <SinClasificar {...pendientes} hasta={filtros.hasta} />
       <Filtros filtros={filtros} {...opciones} />
       <p className="text-lg font-semibold">Total: {formatearPesos(lista.totalCentavos)}</p>
       <ListaDeGastos filas={lista.filas} />
