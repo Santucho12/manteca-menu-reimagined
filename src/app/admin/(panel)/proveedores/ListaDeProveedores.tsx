@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import type { FilaDeProveedor } from '@/lib/proveedores/consultas';
+import { formatearPesos } from '@/lib/plata';
 import { telefonoParaMostrar, urlDeWhatsApp } from '@/lib/proveedores/telefono';
 
-function FilaDeLaLista({ proveedor }: { proveedor: FilaDeProveedor }) {
+function FilaDeLaLista({ proveedor, pagado }: { proveedor: FilaDeProveedor; pagado?: number }) {
   return (
     <li className="flex flex-wrap items-center justify-between gap-3 p-4">
       <div className="min-w-0 space-y-1">
@@ -19,6 +20,7 @@ function FilaDeLaLista({ proveedor }: { proveedor: FilaDeProveedor }) {
         {proveedor.telefono ? (
           <p className="text-sm">{telefonoParaMostrar(proveedor.telefono)}</p>
         ) : null}
+        {pagado ? <p className="text-sm">Pagado este mes: {formatearPesos(pagado)}</p> : null}
       </div>
       {proveedor.telefono ? (
         <Button asChild variant="outline" size="sm">
@@ -31,13 +33,15 @@ function FilaDeLaLista({ proveedor }: { proveedor: FilaDeProveedor }) {
   );
 }
 
-export function ListaDeProveedores({ filas }: { filas: FilaDeProveedor[] }) {
+type Props = { filas: FilaDeProveedor[]; pagado: Map<string, number> };
+
+export function ListaDeProveedores({ filas, pagado }: Props) {
   if (filas.length === 0)
     return <p className="text-muted-foreground">No hay proveedores para mostrar.</p>;
   return (
     <ul aria-label="Proveedores" className="bg-card divide-y rounded-xl border">
       {filas.map((proveedor) => (
-        <FilaDeLaLista key={proveedor.id} proveedor={proveedor} />
+        <FilaDeLaLista key={proveedor.id} proveedor={proveedor} pagado={pagado.get(proveedor.id)} />
       ))}
     </ul>
   );

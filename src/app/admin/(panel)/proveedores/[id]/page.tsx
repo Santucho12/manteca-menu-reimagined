@@ -5,9 +5,12 @@ import { TituloDePagina } from '@/components/panel/TituloDePagina';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { exigirPagina } from '@/lib/acceso/servidor';
+import { diaEnArgentina } from '@/lib/fechas';
+import { recurrentesActivosDelProveedor } from '@/lib/gastos/proveedores';
 import { proveedorPorId, type Proveedor } from '@/lib/proveedores/consultas';
 import { telefonoParaMostrar, urlDeWhatsApp } from '@/lib/proveedores/telefono';
 import { BotonDeEstado } from '../BotonDeEstado';
+import { PagosDelProveedor } from './PagosDelProveedor';
 
 export const metadata: Metadata = { title: 'Proveedor' };
 
@@ -32,10 +35,26 @@ function Datos({ proveedor }: { proveedor: Proveedor }) {
   );
 }
 
+// Un recurrente sigue cargandose aunque su proveedor se desactive: se avisa antes.
+function AvisoDeRecurrentes({ cantidad }: { cantidad: number }) {
+  const texto =
+    cantidad === 1 ? '1 gasto recurrente activo' : `${cantidad} gastos recurrentes activos`;
+  return (
+    <p className="text-sm">
+      Tiene {texto}. Si lo desactivás, se siguen cargando: desactivalos en{' '}
+      <Link href="/admin/gastos/recurrentes" className="underline underline-offset-4">
+        Recurrentes
+      </Link>{' '}
+      si ya no le pagás.
+    </p>
+  );
+}
+
 export default async function FichaDeProveedor({ params }: { params: Promise<{ id: string }> }) {
   const { cliente } = await exigirPagina('admin');
   const proveedor = await proveedorPorId(cliente, (await params).id);
   if (!proveedor) notFound();
+  const recurrentes = await recurrentesActivosDelProveedor(cliente, proveedor.id);
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3">
@@ -56,9 +75,12 @@ export default async function FichaDeProveedor({ params }: { params: Promise<{ i
         </Button>
         <BotonDeEstado id={proveedor.id} activo={proveedor.activo} />
       </div>
-      <p className="text-muted-foreground text-sm">
-        Los gastos pagados a este proveedor se van a ver acá cuando esté el módulo de Gastos.
-      </p>
+      {proveedor.activo && recurrentes > 0 ? <AvisoDeRecurrentes cantidad={recurrentes} /> : null}
+      <PagosDelProveedor
+        cliente={cliente}
+        proveedorId={proveedor.id}
+        hoy={diaEnArgentina(new Date())}
+      />
       <Link
         href="/admin/proveedores"
         className="inline-block py-2 text-sm underline underline-offset-4"
