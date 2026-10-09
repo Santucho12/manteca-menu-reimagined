@@ -16,11 +16,14 @@ describe('enlacesDelMarco', () => {
       null,
       null,
       null,
+      null,
     ]);
   });
 
-  it('caja ve solo Mi cuenta, sin numero', () => {
+  it('caja ve sus tres enlaces, sin numero', () => {
     expect(enlacesDelMarco('caja', 3)).toEqual([
+      { clave: 'caja', href: '/admin/caja', texto: 'Cargar cierre', insignia: null },
+      { clave: 'cierres', href: '/admin/caja/mis-cierres', texto: 'Mis cierres', insignia: null },
       { clave: 'cuenta', href: '/admin/cuenta', texto: 'Mi cuenta', insignia: null },
     ]);
   });
