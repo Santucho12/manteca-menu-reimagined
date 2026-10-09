@@ -5,6 +5,7 @@ import {
   enlaceDe,
   fechaYHora,
   nombreDeAccion,
+  nombreDelDato,
   personaDe,
   resumenDe,
   type RegistroDeAuditoria,
@@ -134,5 +135,42 @@ describe('personaDe y resumenDe', () => {
     });
     expect(resumenDe(cambio)).toBe('Monto, Anulado');
     expect(resumenDe(registro({ accion: 'alta', despues: { monto_centavos: 2 } }))).toBe('');
+  });
+});
+
+describe('nombreDelDato y el contexto de un cambio', () => {
+  const PROVEEDOR = '8b3e3a2c-4d3f-4e3a-9c8d-3b4c5d6e7f80';
+  const PRODUCTO = '9c4f4b3d-5e4a-4f4b-8d9e-4c5d6e7f8091';
+  const PRESENTACION = 'ad5a5c4e-6f5b-4a5c-9e0f-5d6e7f8091a2';
+  const conNombres = new Map([
+    [PROVEEDOR, 'La Serenísima'],
+    [PRODUCTO, 'Medialuna'],
+    [PRESENTACION, 'Docena'],
+    [PERSONA, 'Prueba Admin'],
+  ]);
+
+  it('dice cual dato fue: el proveedor, la persona, el producto del precio', () => {
+    expect(
+      nombreDelDato(registro({ tabla: 'proveedores', registro_id: PROVEEDOR }), conNombres),
+    ).toBe('La Serenísima');
+    expect(nombreDelDato(registro({ tabla: 'perfiles', registro_id: PERSONA }), conNombres)).toBe(
+      'Prueba Admin',
+    );
+    const precio = registro({
+      tabla: 'precios',
+      despues: { monto_centavos: 2 },
+      contexto: { producto_id: PRODUCTO, presentacion_id: PRESENTACION },
+    });
+    expect(nombreDelDato(precio, conNombres)).toBe('Medialuna · Docena');
+    expect(nombreDelDato(registro({ tabla: 'locales' }), conNombres)).toBeNull();
+  });
+
+  it('un cambio de precio sin su producto enlaza igual, con el contexto', () => {
+    const precio = registro({
+      tabla: 'precios',
+      despues: { monto_centavos: 2 },
+      contexto: { producto_id: PRODUCTO },
+    });
+    expect(enlaceDe(precio)).toBe(`/admin/menu/productos/${PRODUCTO}`);
   });
 });

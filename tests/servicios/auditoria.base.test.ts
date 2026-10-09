@@ -10,8 +10,10 @@ import type { FiltrosDeAuditoria } from '../../src/lib/auditoria/pantalla';
 import { diaEnArgentina } from '../../src/lib/fechas';
 import { crearGasto, editarGasto } from '../../src/lib/gastos/escritura';
 import type { DatosDeGasto } from '../../src/lib/gastos/esquemas';
+import { clienteSecretoDePruebas } from '../clientes';
 import { idDeCuentaDePrueba } from '../consultas-de-prueba';
 import { borrarGastos, sembrarCategoriaDeGasto } from '../gastos-de-prueba';
+import { borrarMenuDePrueba, sembrarCategoria, sembrarProducto } from '../menu-de-prueba';
 import { borrarProveedores, sembrarProveedor } from '../proveedores-de-prueba';
 import { clienteComo } from '../sesiones';
 
@@ -130,5 +132,34 @@ describe('detalle, nombres y alta', () => {
     const personas = await personasDeAuditoria(await clienteComo('admin'));
     const nombres = personas.map((persona) => persona.nombre);
     expect(nombres).toEqual(expect.arrayContaining(['Prueba Admin', 'Prueba Desactivado']));
+  });
+});
+
+describe('cual dato fue y su contexto', () => {
+  const menu: string[] = [];
+  afterAll(() => borrarMenuDePrueba(menu));
+
+  it('el cambio de un precio trae su producto, y los nombres incluyen el propio dato', async () => {
+    const categoriaDelMenu = await sembrarCategoria();
+    menu.push(categoriaDelMenu.id);
+    const producto = await sembrarProducto(categoriaDelMenu);
+    const { data: precio } = await clienteSecretoDePruebas()
+      .from('precios')
+      .select('id')
+      .eq('producto_id', producto.id)
+      .single();
+    await clienteSecretoDePruebas()
+      .from('precios')
+      .update({ monto_centavos: 123400 })
+      .eq('id', precio!.id);
+    const admin = await clienteComo('admin');
+    const { filas } = await listarRegistros(admin, filtros({ modulo: 'menu', accion: 'cambio' }));
+    const cambio = filas.find((fila) => fila.registro_id === precio!.id);
+    expect(cambio?.contexto).toMatchObject({ producto_id: producto.id });
+    const nombres = await nombresDe(admin, [cambio!]);
+    expect(nombres.get(producto.id)).toBe(producto.nombre);
+    const { filas: altas } = await listarRegistros(admin, filtros({ modulo: 'proveedores' }));
+    const delProveedor = altas.filter((fila) => fila.registro_id === proveedorId);
+    expect((await nombresDe(admin, delProveedor)).has(proveedorId)).toBe(true);
   });
 });
