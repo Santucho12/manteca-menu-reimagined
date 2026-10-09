@@ -123,6 +123,15 @@ export async function gastoDe(id: string) {
   return data as Record<string, unknown>;
 }
 
+/** Las categorias de prueba y todos sus gastos, tambien los que se cargaron por pantalla. */
+export async function borrarCategoriasConSusGastos(categorias: string[]) {
+  const { data } = await clienteSecretoDePruebas()
+    .from('gastos')
+    .select('id')
+    .in('categoria_id', categorias);
+  await borrarGastos({ gastos: (data ?? []).map((g) => g.id), categorias });
+}
+
 /** Borra lo que creo un test, con su auditoria. En la aplicacion nada se borra. */
 export async function borrarGastos(ids: {
   gastos?: string[];
