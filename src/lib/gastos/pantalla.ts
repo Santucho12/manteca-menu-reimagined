@@ -62,3 +62,32 @@ export function enlaceDeGastos(filtros: FiltrosDeGastos, hoy: string): string {
   const texto = parametros.toString();
   return texto ? `/admin/gastos?${texto}` : '/admin/gastos';
 }
+
+export type OpcionDeLista = { valor: string; texto: string };
+
+/** Lo activo, y lo desactivado solo si es lo que ya tenia: asi un gasto viejo no lo pierde. */
+export function opcionesParaElegir(
+  lista: { id: string; nombre: string; activo: boolean }[],
+  actual: string,
+  vacio: string,
+): OpcionDeLista[] {
+  const elegibles = lista.filter((item) => item.activo || item.id === actual);
+  return [
+    { valor: '', texto: vacio },
+    ...elegibles.map((item) => ({
+      valor: item.id,
+      texto: item.activo ? item.nombre : `${item.nombre} (desactivado)`,
+    })),
+  ];
+}
+
+/** AAAA-MM-DD como se lee aca: 08/10/2026. */
+export function fechaParaMostrar(fecha: string): string {
+  return fecha.split('-').reverse().join('/');
+}
+
+export const opcionesDeMedio = (): OpcionDeLista[] =>
+  Object.entries(MEDIOS).map(([valor, texto]) => ({ valor, texto }));
+
+export const opcionesDeFrecuencia = (): OpcionDeLista[] =>
+  Object.entries(FRECUENCIAS_EN_TEXTO).map(([valor, texto]) => ({ valor, texto }));
