@@ -100,7 +100,7 @@ test.describe('con la sesion de caja', () => {
       'Mi cuenta',
     ]);
     await page.getByRole('main').getByRole('link', { name: 'Cargar el cierre de caja' }).click();
-    await expect(page).toHaveURL(//admin/caja$/);
+    await expect(page).toHaveURL(/\/admin\/caja$/);
     await expect(page.getByRole('button', { name: 'Salir' })).toBeVisible();
   });
 
