@@ -125,11 +125,25 @@ export async function gastoDe(id: string) {
 
 /** Las categorias de prueba y todos sus gastos, tambien los que se cargaron por pantalla. */
 export async function borrarCategoriasConSusGastos(categorias: string[]) {
+  const secreto = clienteSecretoDePruebas();
+  const [gastos, recurrentes] = await Promise.all([
+    secreto.from('gastos').select('id').in('categoria_id', categorias),
+    secreto.from('gastos_recurrentes').select('id').in('categoria_id', categorias),
+  ]);
+  await borrarGastos({
+    gastos: (gastos.data ?? []).map((g) => g.id),
+    recurrentes: (recurrentes.data ?? []).map((r) => r.id),
+    categorias,
+  });
+}
+
+/** Los ids de las categorias cargadas por pantalla con esos nombres. */
+export async function idsDeCategoriasLlamadas(nombres: string[]): Promise<string[]> {
   const { data } = await clienteSecretoDePruebas()
-    .from('gastos')
+    .from('categorias_de_gasto')
     .select('id')
-    .in('categoria_id', categorias);
-  await borrarGastos({ gastos: (data ?? []).map((g) => g.id), categorias });
+    .in('nombre', nombres);
+  return (data ?? []).map((c) => c.id);
 }
 
 /** Borra lo que creo un test, con su auditoria. En la aplicacion nada se borra. */
