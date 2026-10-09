@@ -1,4 +1,6 @@
 import { afterAll, describe, expect, it } from 'vitest';
+import { diaEnArgentina } from '../../src/lib/fechas';
+import { sumarMeses } from '../../src/lib/gastos/vencimientos';
 import { clienteSecretoDePruebas } from '../clientes';
 import { borrarGastos, sembrarRecurrente, type SemillaDeRecurrente } from '../gastos-de-prueba';
 import { clienteComo } from '../sesiones';
@@ -40,7 +42,10 @@ describe('generacion de gastos recurrentes', () => {
   });
 
   it('bimestral cada dos meses y anual del 29 de febrero', async () => {
-    const bimestral = await recurrente({ primerVencimiento: '2026-01-15', frecuencia: 'bimestral' });
+    const bimestral = await recurrente({
+      primerVencimiento: '2026-01-15',
+      frecuencia: 'bimestral',
+    });
     const anual = await recurrente({ primerVencimiento: '2028-02-29', frecuencia: 'anual' });
     await generar('2030-03-01');
     expect((await vencimientos(bimestral)).slice(0, 3)).toEqual([
@@ -77,6 +82,19 @@ describe('generacion de gastos recurrentes', () => {
     const id = await recurrente({ primerVencimiento: '2026-06-01', activo: false });
     await generar('2026-09-01');
     expect(await vencimientos(id)).toEqual([]);
+  });
+
+  it('reactivar no genera lo que vencio mientras estaba desactivado', async () => {
+    const id = await recurrente({ primerVencimiento: '2025-01-10', activo: false });
+    await clienteSecretoDePruebas()
+      .from('gastos_recurrentes')
+      .update({ activo: true })
+      .eq('id', id);
+    const hoy = diaEnArgentina(new Date());
+    await generar(sumarMeses(hoy, 2));
+    const generadas = await vencimientos(id);
+    expect(generadas.length).toBeGreaterThanOrEqual(1);
+    expect(generadas.every((vencimiento) => vencimiento! >= hoy)).toBe(true);
   });
 
   it('cambiar la plantilla no toca lo ya generado', async () => {
