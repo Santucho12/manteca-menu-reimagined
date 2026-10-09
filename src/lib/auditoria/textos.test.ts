@@ -75,7 +75,9 @@ describe('cambiosDe', () => {
   });
 
   it('un codigo que ya no existe no rompe, y una columna nueva se muestra tal cual', () => {
+    // Un cambio siempre trae el antes: aca, vacio.
     const raro = registro({
+      antes: {},
       despues: { proveedor_id: '00000000-0000-4000-8000-000000000000', columna_nueva: 'x' },
     });
     expect(cambiosDe(raro, nombres)).toEqual([
