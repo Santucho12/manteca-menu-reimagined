@@ -106,6 +106,7 @@ test('guarda capturas de la lista y el detalle', async ({ page }, info) => {
     .getByRole('link', { name: 'Ver el detalle' })
     .first()
     .click();
+  await expect(page.getByRole('list', { name: 'Cambios' })).toBeVisible({ timeout: 15_000 });
   await page.screenshot({
     path: `e2e/capturas/auditoria-registro-${info.project.name}.png`,
     fullPage: true,
