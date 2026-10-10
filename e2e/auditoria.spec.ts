@@ -48,6 +48,8 @@ test('el cambio de un gasto se ve con nombres y pesos, y lleva al gasto', async 
   await expect(registro).toContainText('Prueba Admin');
   await expect(registro).toContainText('Gastos · Gasto');
   await registro.getByRole('link', { name: 'Ver el detalle' }).click();
+  // El detalle resuelve nombres en la base: con la maquina cargada tarda mas que la espera comun.
+  await expect(page).toHaveURL(/\/admin\/auditoria\/\d+$/, { timeout: 15_000 });
   const cambios = page.getByRole('list', { name: 'Cambios' });
   await expect(cambios).toContainText(`Categoría${antes.nombre}${despues.nombre}`);
   await expect(cambios).toContainText('Monto$500,00$600,00');
