@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { CargadoPor } from '@/components/panel/CargadoPor';
 import { TituloDePagina } from '@/components/panel/TituloDePagina';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -61,6 +62,7 @@ export default async function FichaDeProveedor({ params }: { params: Promise<{ i
         <TituloDePagina>{proveedor.nombre}</TituloDePagina>
         {proveedor.activo ? null : <Badge variant="outline">Desactivado</Badge>}
       </div>
+      <CargadoPor cliente={cliente} tabla="proveedores" id={proveedor.id} />
       <Datos proveedor={proveedor} />
       <div className="flex flex-wrap items-start gap-2">
         {proveedor.telefono ? (

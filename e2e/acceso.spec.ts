@@ -142,6 +142,7 @@ test.describe('con la sesion del admin', () => {
       /^Gastos/,
       /^Caja/,
       /^Usuarios/,
+      /^Auditoría/,
       /^Mi cuenta/,
     ]);
   });

@@ -18,7 +18,16 @@ export type EstadoDeAcceso = 'sin-sesion' | 'desactivado' | 'cambiar-contrasena'
 export type Pagina = 'publica' | 'panel' | 'cuenta' | 'caja' | 'admin' | 'cambiar-contrasena';
 
 export type EnlaceDelPanel = {
-  clave: 'inicio' | 'menu' | 'proveedores' | 'gastos' | 'caja' | 'cierres' | 'usuarios' | 'cuenta';
+  clave:
+    | 'inicio'
+    | 'menu'
+    | 'proveedores'
+    | 'gastos'
+    | 'caja'
+    | 'cierres'
+    | 'usuarios'
+    | 'auditoria'
+    | 'cuenta';
   href: string;
   texto: string;
 };
@@ -49,6 +58,7 @@ const ENLACES: Record<'caja' | 'admin', EnlaceDelPanel[]> = {
     { clave: 'gastos', href: '/admin/gastos', texto: 'Gastos' },
     { clave: 'caja', href: '/admin/caja/control', texto: 'Caja' },
     { clave: 'usuarios', href: '/admin/usuarios', texto: 'Usuarios' },
+    { clave: 'auditoria', href: '/admin/auditoria', texto: 'Auditoría' },
     { clave: 'cuenta', href: '/admin/cuenta', texto: 'Mi cuenta' },
   ],
 };

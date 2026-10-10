@@ -79,5 +79,18 @@ entrar a Auditoría. La historia completa de ese dato se ve en Auditoría, filtr
 
 ## Parte técnica
 
-Se escribe al construir el mecanismo, en el paso de Usuarios: la tabla, el registro
-automático y sus permisos.
+El mecanismo se construyó con Usuarios (pedido 22): la tabla `auditoria`, el trigger
+`auditar()` en cada tabla operativa y la lectura solo para el admin de su local. La pantalla
+se construyó el 2026-10-09 (pedido 29); el detalle está en
+`docs/superpowers/specs/2026-10-09-auditoria-design.md`.
+
+- **Lectura legible:** `src/lib/auditoria/diccionario.ts` traduce cada tabla a su módulo y
+  dato y cada columna a su nombre; la plata se ve en pesos, sí/no, fechas de Argentina, y los
+  códigos de categoría, proveedor, producto, cierre y persona, con su nombre. Una tabla o
+  columna nueva se muestra igual, con el nombre técnico.
+- **Enlaces:** cada registro lleva al dato o a la pantalla que lo contiene.
+- **Pantallas:** `/admin/auditoria` (últimos 7 días por defecto; persona, "El sistema",
+  módulo y acción; paginada) y `/admin/auditoria/[id]` con el antes y el después.
+- **Fichas:** gasto, proveedor y producto muestran "Cargado por", leído del registro de
+  alta; el cierre ya mostraba quién lo cargó.
+- También se registran y se filtran el reseteo y el cambio de contraseña.

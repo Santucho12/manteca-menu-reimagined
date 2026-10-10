@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { CargadoPor } from '@/components/panel/CargadoPor';
 import { TituloDePagina } from '@/components/panel/TituloDePagina';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { gastoPorId, opcionesDeGasto, type Gasto } from '@/lib/gastos/consultas';
@@ -51,6 +52,7 @@ export default async function FichaDeGasto({ params }: { params: Promise<{ id: s
   return (
     <div className="space-y-6">
       <TituloDePagina>Gasto</TituloDePagina>
+      <CargadoPor cliente={cliente} tabla="gastos" id={gasto.id} />
       {gasto.anulado ? (
         <GastoAnulado gasto={gasto} />
       ) : (
