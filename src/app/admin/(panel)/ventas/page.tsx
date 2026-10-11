@@ -8,12 +8,12 @@ import { exigirPagina } from '@/lib/acceso/servidor';
 import { MEDIOS } from '@/lib/caja/resultado';
 import { nombreDeMedio } from '@/lib/caja/pantalla';
 import { diaEnArgentina } from '@/lib/fechas';
-import { formatearPesos } from '@/lib/plata';
 import { cantidadDePaginas } from '@/lib/usuarios/presentacion';
-import { listarVentas, type Totales } from '@/lib/ventas/consultas';
+import { listarVentas } from '@/lib/ventas/consultas';
 import {
   enlaceDeVentas,
   filtrosDeVentas,
+  lineasDelResumen,
   nombreDeOrigen,
   ORIGENES,
   type FiltrosDeVentas,
@@ -64,19 +64,18 @@ function Filtros({ filtros }: { filtros: FiltrosDeVentas }) {
   );
 }
 
-const ventas = (cantidad: number) => `${cantidad} ${cantidad === 1 ? 'venta' : 'ventas'}`;
-
-function Resumen({ totales }: { totales: Totales }) {
+// La primera linea es el total de lo que se ve; la segunda, si la hay, lo cancelado aparte.
+function Resumen({ lineas }: { lineas: string[] }) {
   return (
     <div className="space-y-1">
-      <p className="text-lg font-semibold">
-        Cobrado: {formatearPesos(totales.cobradoCentavos)} en {ventas(totales.cobradas)}
-      </p>
-      {totales.canceladas > 0 ? (
-        <p className="text-muted-foreground text-sm">
-          Canceladas: {formatearPesos(totales.canceladoCentavos)} en {ventas(totales.canceladas)}
+      {lineas.map((linea, i) => (
+        <p
+          key={linea}
+          className={i === 0 ? 'text-lg font-semibold' : 'text-muted-foreground text-sm'}
+        >
+          {linea}
         </p>
-      ) : null}
+      ))}
     </div>
   );
 }
@@ -128,7 +127,7 @@ export default async function PaginaDeVentas({
         </Button>
       </div>
       <Filtros filtros={filtros} />
-      <Resumen totales={lista.totales} />
+      <Resumen lineas={lineasDelResumen(lista.totales, filtros.estado)} />
       <ListaDeVentas filas={lista.filas} />
       <Paginas filtros={{ ...filtros, pagina: lista.pagina }} total={lista.total} hoy={hoy} />
     </div>

@@ -1038,6 +1038,7 @@ export type Database = {
           anulado_por: string | null
           canal_id: string | null
           cerrada_en: string | null
+          clave: string | null
           comentario: string | null
           creado_por: string | null
           estado: Database["public"]["Enums"]["estado_de_venta"]
@@ -1057,6 +1058,7 @@ export type Database = {
           anulado_por?: string | null
           canal_id?: string | null
           cerrada_en?: string | null
+          clave?: string | null
           comentario?: string | null
           creado_por?: string | null
           estado?: Database["public"]["Enums"]["estado_de_venta"]
@@ -1076,6 +1078,7 @@ export type Database = {
           anulado_por?: string | null
           canal_id?: string | null
           cerrada_en?: string | null
+          clave?: string | null
           comentario?: string | null
           creado_por?: string | null
           estado?: Database["public"]["Enums"]["estado_de_venta"]
@@ -1152,6 +1155,8 @@ export type Database = {
           hasta: string
         }
         Returns: {
+          anulado_centavos: number
+          anuladas: number
           cancelado_centavos: number
           canceladas: number
           cobradas: number

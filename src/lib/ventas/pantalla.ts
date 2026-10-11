@@ -1,6 +1,7 @@
 import { MEDIOS, type Medio } from '../caja/resultado';
 import { mesDe } from '../gastos/pantalla';
 import { esFechaValida } from '../gastos/vencimientos';
+import { formatearPesos } from '../plata';
 import { numeroDePagina, unValor } from '../usuarios/presentacion';
 
 export const ORIGENES = ['manual', 'fudo'] as const;
@@ -63,4 +64,27 @@ export function enlaceDeVentas(filtros: FiltrosDeVentas, hoy: string): string {
   if (filtros.pagina > 1) parametros.set('pagina', String(filtros.pagina));
   const texto = parametros.toString();
   return texto ? `/admin/ventas?${texto}` : '/admin/ventas';
+}
+
+const ventas = (cantidad: number) => `${cantidad} ${cantidad === 1 ? 'venta' : 'ventas'}`;
+
+type Totales = {
+  cobradoCentavos: number;
+  cobradas: number;
+  canceladoCentavos: number;
+  canceladas: number;
+  anuladoCentavos: number;
+  anuladas: number;
+};
+
+/** El total de lo que se esta viendo: con un estado elegido, solo el de ese estado. */
+export function lineasDelResumen(totales: Totales, estado: EstadoDeLista | null): string[] {
+  const cobrado = `Cobrado: ${formatearPesos(totales.cobradoCentavos)} en ${ventas(totales.cobradas)}`;
+  const canceladas = `Canceladas: ${formatearPesos(totales.canceladoCentavos)} en ${ventas(totales.canceladas)}`;
+  if (estado === 'anulada') {
+    return [`Anuladas: ${formatearPesos(totales.anuladoCentavos)} en ${ventas(totales.anuladas)}`];
+  }
+  if (estado === 'cancelada') return [canceladas];
+  if (estado === 'cerrada' || totales.canceladas === 0) return [cobrado];
+  return [cobrado, canceladas];
 }

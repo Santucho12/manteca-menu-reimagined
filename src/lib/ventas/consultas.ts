@@ -20,6 +20,8 @@ export type Totales = {
   cobradas: number;
   canceladoCentavos: number;
   canceladas: number;
+  anuladoCentavos: number;
+  anuladas: number;
 };
 export type ListaDeVentas = {
   filas: FilaDeVenta[];
@@ -71,6 +73,8 @@ async function totalesDe(cliente: Cliente, filtros: FiltrosDeVentas): Promise<To
     cobradas: fila?.cobradas ?? 0,
     canceladoCentavos: fila?.cancelado_centavos ?? 0,
     canceladas: fila?.canceladas ?? 0,
+    anuladoCentavos: fila?.anulado_centavos ?? 0,
+    anuladas: fila?.anuladas ?? 0,
   };
 }
 

@@ -27,6 +27,8 @@ const renglon = z.object({
 });
 
 export const esquemaVenta = z.object({
+  // La pone el formulario al abrirse: la misma venta mandada dos veces no se duplica.
+  clave: z.uuid(),
   fecha: z.string().refine(esFechaValida, 'Elegí una fecha válida.'),
   canalId: z.uuid('Elegí el canal.'),
   medio: z.enum(MEDIOS, 'Elegí cómo se cobró.'),
@@ -58,6 +60,7 @@ function renglonParaLaBase(r: RenglonDeVenta) {
 /** Lo que recibe la funcion de la base: los totales los calcula ella. */
 export function ventaParaLaBase(datos: DatosDeVenta) {
   return {
+    clave: datos.clave,
     fecha: datos.fecha,
     canal_id: datos.canalId,
     medio: datos.medio,

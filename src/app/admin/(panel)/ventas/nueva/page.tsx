@@ -15,6 +15,8 @@ export default async function NuevaVenta() {
     opcionesParaVender(cliente),
   ]);
   const inicial = {
+    // Una clave por formulario abierto: guardar dos veces la misma venta no la duplica.
+    clave: crypto.randomUUID(),
     fecha: diaEnArgentina(new Date()),
     canalId: '',
     // Vacio a proposito: la persona elige como se cobro, el formulario no lo supone.
