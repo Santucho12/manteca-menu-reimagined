@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   cierresDelPeriodo,
+  datosDelResultado,
   gastosPorDia,
   ventasPorCategoria,
   ventasPorDia,
@@ -81,6 +82,17 @@ describe('consultas de los reportes', () => {
         diferenciaCentavos: null,
       },
     ]);
+  });
+
+  it('junta ventas y gastos y calcula el resultado', async () => {
+    const datos = await datosDelResultado(await clienteComo('admin'), PERIODO);
+    expect(datos.vacio).toBe(false);
+    expect(datos.resultado.resultadoCentavos).toBe(160000);
+    const nada = await datosDelResultado(await clienteComo('admin'), {
+      desde: '2017-01-01',
+      hasta: '2017-01-31',
+    });
+    expect(nada.vacio).toBe(true);
   });
 
   it('a caja le avisa que no puede', async () => {
