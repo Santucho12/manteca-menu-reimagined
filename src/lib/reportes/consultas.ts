@@ -13,14 +13,39 @@ function leido<T>(respuesta: Respuesta): T[] {
   return (respuesta.data ?? []) as T[];
 }
 
-export const ventasPorDia = async (cliente: Cliente, p: Periodo) =>
-  leido<VentaDelDia>(await cliente.rpc('reporte_ventas_por_dia', p));
-export const ventasPorProducto = async (cliente: Cliente, p: Periodo) =>
-  leido<RenglonDeProducto>(await cliente.rpc('reporte_ventas_por_producto', p));
-export const ventasPorCategoria = async (cliente: Cliente, p: Periodo) =>
-  leido<VentaDeCategoria>(await cliente.rpc('reporte_ventas_por_categoria', p));
-export const gastosPorDia = async (cliente: Cliente, p: Periodo) =>
-  leido<GastoDelDia>(await cliente.rpc('reporte_gastos', p));
+const POR_TANDA = 1000;
+
+/**
+ * Supabase devuelve como mucho 1000 filas por respuesta y corta el resto sin avisar: se pide
+ * de a tandas hasta que una venga incompleta. Cada consulta ordena de forma unica, para que
+ * las tandas no se pisen.
+ */
+async function todas<T>(pedir: (desde: number, hasta: number) => PromiseLike<Respuesta>) {
+  const filas: T[] = [];
+  for (let desde = 0; ; desde += POR_TANDA) {
+    const tanda = leido<T>(await pedir(desde, desde + POR_TANDA - 1));
+    filas.push(...tanda);
+    if (tanda.length < POR_TANDA) return filas;
+  }
+}
+
+type Reporte =
+  | 'reporte_ventas_por_dia'
+  | 'reporte_ventas_por_producto'
+  | 'reporte_ventas_por_categoria'
+  | 'reporte_gastos';
+
+const reporte = <T>(cliente: Cliente, funcion: Reporte, p: Periodo) =>
+  todas<T>((desde, hasta) => cliente.rpc(funcion, p).range(desde, hasta));
+
+export const ventasPorDia = (cliente: Cliente, p: Periodo) =>
+  reporte<VentaDelDia>(cliente, 'reporte_ventas_por_dia', p);
+export const ventasPorProducto = (cliente: Cliente, p: Periodo) =>
+  reporte<RenglonDeProducto>(cliente, 'reporte_ventas_por_producto', p);
+export const ventasPorCategoria = (cliente: Cliente, p: Periodo) =>
+  reporte<VentaDeCategoria>(cliente, 'reporte_ventas_por_categoria', p);
+export const gastosPorDia = (cliente: Cliente, p: Periodo) =>
+  reporte<GastoDelDia>(cliente, 'reporte_gastos', p);
 
 const COLUMNAS_DE_CIERRE =
   'fecha, efectivo_centavos, credito_centavos, debito_centavos, qr_centavos, ' +
@@ -51,14 +76,18 @@ function aCierre(c: CierreLeido): CierreDelReporte {
 
 /** Los cierres sin anular del periodo. RLS deja leer todos solo al admin. */
 export async function cierresDelPeriodo(cliente: Cliente, p: Periodo): Promise<CierreDelReporte[]> {
-  const respuesta = await cliente
-    .from('cierres_de_caja')
-    .select(COLUMNAS_DE_CIERRE)
-    .eq('anulado', false)
-    .gte('fecha', p.desde)
-    .lte('fecha', p.hasta)
-    .order('fecha', { ascending: false });
-  return leido<CierreLeido>(respuesta).map(aCierre);
+  // Hay un solo cierre sin anular por dia: ordenar por fecha ya es un orden unico.
+  const cierres = await todas<CierreLeido>((desde, hasta) =>
+    cliente
+      .from('cierres_de_caja')
+      .select(COLUMNAS_DE_CIERRE)
+      .eq('anulado', false)
+      .gte('fecha', p.desde)
+      .lte('fecha', p.hasta)
+      .order('fecha', { ascending: false })
+      .range(desde, hasta),
+  );
+  return cierres.map(aCierre);
 }
 
 /** Ventas y gastos del periodo con su resultado; vacio si no hay ni una cosa ni la otra. */

@@ -2576,7 +2576,7 @@ begin
        and v.fecha between desde and hasta
      group by r.producto_id, coalesce(p.nombre, r.descripcion), c.id, c.nombre,
               coalesce(pr.nombre, '')
-     order by 7 desc, 2;
+     order by 7 desc, 2, 5, 1;
 end
 $$;
 
@@ -2600,7 +2600,7 @@ begin
      where v.local_id = public.local_del_usuario() and v.estado = 'cerrada' and not v.anulado
        and v.fecha between desde and hasta
      group by c.id, c.nombre
-     order by 4 desc, 2;
+     order by 4 desc, 2, 1;
 end
 $$;
 
@@ -2621,7 +2621,7 @@ begin
      where g.local_id = public.local_del_usuario() and not g.anulado
        and g.fecha between desde and hasta
      group by g.fecha, g.categoria_id, cg.nombre
-     order by g.fecha, cg.nombre;
+     order by g.fecha, cg.nombre, g.categoria_id;
 end
 $$;
 
