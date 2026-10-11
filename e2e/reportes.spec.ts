@@ -81,6 +81,31 @@ test('el atajo del mes pasado cambia el periodo', async ({ page }) => {
   await expect(page).not.toHaveURL(new RegExp(DE_ABRIL));
 });
 
+test('gastos por categoria: cada categoria y el total', async ({ page }) => {
+  await page.goto(`/admin/reportes/gastos?${DE_ABRIL}`);
+  const categoria = siembra.categorias[0]!.nombre;
+  await expect(page.getByRole('row', { name: new RegExp(categoria) })).toContainText('$1.000,00');
+  await expect(total(page, '$1.700,00')).toBeVisible();
+});
+
+test('gastos por periodo: cada dia', async ({ page }) => {
+  await page.goto(`/admin/reportes/gastos-por-periodo?${DE_ABRIL}`);
+  await expect(page.getByRole('row', { name: /04\/04\/2018/ })).toContainText('$700,00');
+});
+
+test('resultado: ventas menos gastos', async ({ page }) => {
+  await page.goto(`/admin/reportes/resultado?${DE_ABRIL}`);
+  await expect(total(page, '$5.000,00')).toBeVisible();
+  await expect(total(page, '$1.700,00')).toBeVisible();
+  await expect(total(page, '$3.300,00')).toBeVisible();
+  await expect(page.getByText(/margen/i)).toHaveCount(0);
+});
+
+test('resultado: sin gastos cargados no lo calcula', async ({ page }) => {
+  await page.goto('/admin/reportes/resultado?desde=2018-03-01&hasta=2018-03-31');
+  await expect(page.getByText('Sin gastos cargados: el resultado no se calcula.')).toBeVisible();
+});
+
 for (const rol of ['caja', 'invitado'] as const) {
   test.describe(`con la sesion de ${rol}`, () => {
     test.use({ storageState: SESIONES[rol] });
