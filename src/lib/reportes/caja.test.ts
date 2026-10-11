@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { filasDeCaja, resumenPorEmpleado, textoDeDiferencia } from './caja';
+import { diferenciasDelGrafico, filasDeCaja, resumenPorEmpleado, textoDeDiferencia } from './caja';
 
 const cierre = (fecha: string, persona: string, diferenciaCentavos: number | null) => ({
   fecha,
@@ -40,5 +40,20 @@ describe('reporte de caja', () => {
   it('dice esperando ventas mientras no hay diferencia', () => {
     expect(textoDeDiferencia(null)).toBe('Esperando ventas');
     expect(textoDeDiferencia(-5000)).toBe('-$50,00');
+  });
+});
+
+describe('diferenciasDelGrafico', () => {
+  it('lleva solo los cierres que ya tienen diferencia, del mas viejo al mas nuevo', () => {
+    expect(
+      diferenciasDelGrafico([
+        cierre('2026-10-04', 'Beto', -5000),
+        cierre('2026-10-03', 'Ana', null),
+        cierre('2026-10-02', 'Ana', 2000),
+      ]),
+    ).toEqual([
+      { nombre: '02/10/2026', montoCentavos: 2000 },
+      { nombre: '04/10/2026', montoCentavos: -5000 },
+    ]);
   });
 });
