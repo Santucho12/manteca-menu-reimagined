@@ -106,6 +106,31 @@ test('resultado: sin gastos cargados no lo calcula', async ({ page }) => {
   await expect(page.getByText('Sin gastos cargados: el resultado no se calcula.')).toBeVisible();
 });
 
+test('caja: cada cierre esperando ventas, el dia sin cierre y el resumen por empleado', async ({
+  page,
+}) => {
+  await page.goto('/admin/reportes/caja?desde=2018-04-10&hasta=2018-04-12');
+  await expect(page.getByRole('row', { name: /11\/04\/2018/ })).toContainText('Sin cierre');
+  const cierre = page.getByRole('row', { name: /10\/04\/2018/ });
+  await expect(cierre).toContainText('Prueba Caja');
+  await expect(cierre).toContainText('$20.000,00');
+  await expect(cierre).toContainText('Esperando ventas');
+  const resumen = page.getByRole('table', { name: 'Por empleado' });
+  await expect(resumen.getByRole('row', { name: /Prueba Caja/ })).toContainText('2');
+  await expect(page.getByLabel('Comparar desde')).toHaveCount(0);
+});
+
+test('guarda capturas de los reportes', async ({ page }, info) => {
+  for (const ruta of ['ventas', 'productos', 'resultado', 'caja']) {
+    await page.goto(`/admin/reportes/${ruta}?${DE_ABRIL}`);
+    await page.evaluate(() => document.fonts.ready);
+    await page.screenshot({
+      path: `e2e/capturas/reportes-${ruta}-${info.project.name}.png`,
+      fullPage: true,
+    });
+  }
+});
+
 for (const rol of ['caja', 'invitado'] as const) {
   test.describe(`con la sesion de ${rol}`, () => {
     test.use({ storageState: SESIONES[rol] });
