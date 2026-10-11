@@ -25,6 +25,7 @@ export type EnlaceDelPanel = {
     | 'proveedores'
     | 'gastos'
     | 'caja'
+    | 'reportes'
     | 'cierres'
     | 'usuarios'
     | 'auditoria'
@@ -59,6 +60,7 @@ const ENLACES: Record<'caja' | 'admin', EnlaceDelPanel[]> = {
     { clave: 'proveedores', href: '/admin/proveedores', texto: 'Proveedores' },
     { clave: 'gastos', href: '/admin/gastos', texto: 'Gastos' },
     { clave: 'caja', href: '/admin/caja/control', texto: 'Caja' },
+    { clave: 'reportes', href: '/admin/reportes', texto: 'Reportes' },
     { clave: 'usuarios', href: '/admin/usuarios', texto: 'Usuarios' },
     { clave: 'auditoria', href: '/admin/auditoria', texto: 'Auditoría' },
     { clave: 'cuenta', href: '/admin/cuenta', texto: 'Mi cuenta' },
