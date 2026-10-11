@@ -32,13 +32,16 @@ beforeAll(async () => {
   });
   await sembrarGasto({ categoriaId: categoria.id, fecha: '2018-05-11', montoCentavos: 40000 });
   cierre = await sembrarCierre({ fecha: '2018-05-12' });
-});
+}, 30_000);
 
+// Borrar habla muchas veces con la base de pruebas: los 10 segundos de un hook no alcanzan.
 afterAll(async () => {
-  await borrarVentas([venta], { categoriasDelMenu: [producto.categoriaId] });
-  await borrarCategoriasConSusGastos([categoria.id]);
-  await borrarCierres([cierre.id]);
-});
+  await Promise.all([
+    borrarVentas([venta], { categoriasDelMenu: [producto.categoriaId] }),
+    borrarCategoriasConSusGastos([categoria.id]),
+    borrarCierres([cierre.id]),
+  ]);
+}, 30_000);
 
 describe('consultas de los reportes', () => {
   it('lee las ventas por dia, producto y categoria con la sesion del admin', async () => {

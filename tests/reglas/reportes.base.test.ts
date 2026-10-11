@@ -50,15 +50,18 @@ async function sembrarGastos() {
   ]);
 }
 
+// Sembrar y borrar hablan muchas veces con la base de pruebas: 10 segundos no siempre alcanzan.
 beforeAll(async () => {
   [a, b] = await Promise.all([productoParaVender(), productoParaVender()]);
   await Promise.all([sembrarVentas(), sembrarGastos()]);
-});
+}, 30_000);
 
 afterAll(async () => {
-  await borrarVentas(ventas, { categoriasDelMenu: [a.categoriaId, b.categoriaId] });
-  await borrarCategoriasConSusGastos(categorias.map((c) => c.id));
-});
+  await Promise.all([
+    borrarVentas(ventas, { categoriasDelMenu: [a.categoriaId, b.categoriaId] }),
+    borrarCategoriasConSusGastos(categorias.map((c) => c.id)),
+  ]);
+}, 30_000);
 
 async function leer(funcion: string) {
   const cliente = await clienteComo('admin');
