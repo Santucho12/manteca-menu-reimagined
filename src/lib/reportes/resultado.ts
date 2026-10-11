@@ -1,3 +1,4 @@
+import { variacion, type Variacion } from './comparacion';
 import { gastosPorCategoria, totalDeGastos, type FilaDeGasto, type GastoDelDia } from './gastos';
 import type { VentaDelDia } from './ventas';
 
@@ -44,4 +45,27 @@ export function resultadoPorMes(dias: VentaDelDia[], gastos: GastoDelDia[]): Res
     );
     return { mes, ventasCentavos, gastosCentavos, resultadoCentavos };
   });
+}
+
+export type ComparacionDelResultado = {
+  ventas: Variacion;
+  gastos: Variacion;
+  resultado: Variacion;
+};
+
+/** Sin gastos del otro periodo, gastos y resultado no comparan: faltaba cargarlos. */
+export function comparacionDelResultado(
+  actual: ResultadoDelPeriodo,
+  anterior: ResultadoDelPeriodo | null,
+): ComparacionDelResultado {
+  const conGastos = anterior?.resultadoCentavos != null ? anterior : null;
+  const resultado =
+    actual.resultadoCentavos === null || !conGastos
+      ? null
+      : variacion(actual.resultadoCentavos, conGastos.resultadoCentavos);
+  return {
+    ventas: variacion(actual.ventasCentavos, anterior?.ventasCentavos ?? null),
+    gastos: variacion(actual.gastosCentavos, conGastos?.gastosCentavos ?? null),
+    resultado,
+  };
 }

@@ -3,6 +3,7 @@ import type { Cliente } from '../supabase/cliente';
 import type { CierreDelReporte } from './caja';
 import type { GastoDelDia } from './gastos';
 import type { Periodo } from './periodos';
+import { resultadoDelPeriodo } from './resultado';
 import type { RenglonDeProducto, VentaDeCategoria, VentaDelDia } from './ventas';
 
 type Respuesta = { data: unknown; error: { message: string } | null };
@@ -58,4 +59,15 @@ export async function cierresDelPeriodo(cliente: Cliente, p: Periodo): Promise<C
     .lte('fecha', p.hasta)
     .order('fecha', { ascending: false });
   return leido<CierreLeido>(respuesta).map(aCierre);
+}
+
+/** Ventas y gastos del periodo con su resultado; vacio si no hay ni una cosa ni la otra. */
+export async function datosDelResultado(cliente: Cliente, p: Periodo) {
+  const [ventas, gastos] = await Promise.all([ventasPorDia(cliente, p), gastosPorDia(cliente, p)]);
+  return {
+    ventas,
+    gastos,
+    resultado: resultadoDelPeriodo(ventas, gastos),
+    vacio: ventas.length === 0 && gastos.length === 0,
+  };
 }
