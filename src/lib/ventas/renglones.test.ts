@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { cantidadDe, subtotalDe, totalDe, totalEscrito } from './renglones';
+import {
+  cantidadDe,
+  cantidadParaMostrar,
+  subtotalDe,
+  totalDe,
+  totalEscrito,
+} from './renglones';
 
 describe('cantidadDe', () => {
   it.each([
@@ -46,5 +52,13 @@ describe('totalEscrito', () => {
         { cantidad: '3', precio: 'abc' },
       ]),
     ).toBe(250000);
+  });
+});
+
+describe('cantidadParaMostrar', () => {
+  it('con coma y sin ceros de mas', () => {
+    expect(cantidadParaMostrar(2)).toBe('2');
+    expect(cantidadParaMostrar(1.5)).toBe('1,5');
+    expect(cantidadParaMostrar(0.125)).toBe('0,125');
   });
 });
