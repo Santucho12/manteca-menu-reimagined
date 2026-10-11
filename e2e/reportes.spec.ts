@@ -28,7 +28,7 @@ for (const rol of ['caja', 'invitado'] as const) {
     test.use({ storageState: SESIONES[rol] });
 
     test('no entra a reportes', async ({ page }) => {
-      await page.goto('/admin/reportes/ventas');
+      await page.goto('/admin/reportes');
       await expect(page).toHaveURL(/\/admin$/);
     });
   });
