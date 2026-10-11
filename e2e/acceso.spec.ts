@@ -138,6 +138,7 @@ test.describe('con la sesion del admin', () => {
     await expect(menu.getByRole('link')).toHaveText([
       /^Inicio/,
       /^Menú/,
+      /^Ventas/,
       /^Proveedores/,
       /^Gastos/,
       /^Caja/,
