@@ -58,6 +58,7 @@ export default async function ReporteDeVentas({
     { periodo: periodos.actual, puntos: puntosDeVentas(actual) },
     { periodo: periodos.comparacion, puntos: puntosDeVentas(anterior) },
     escala,
+    hoy,
   );
   return (
     <div className="space-y-6">

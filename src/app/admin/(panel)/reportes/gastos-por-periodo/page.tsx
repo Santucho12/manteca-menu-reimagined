@@ -36,6 +36,7 @@ export default async function ReporteDeGastosPorPeriodo({
     { periodo: periodos.actual, puntos: puntosDeGastos(actual) },
     { periodo: periodos.comparacion, puntos: puntosDeGastos(anterior) },
     escala,
+    hoy,
   );
   const anteriorTotal = anterior.length ? totalDeGastos(anterior) : null;
   return (

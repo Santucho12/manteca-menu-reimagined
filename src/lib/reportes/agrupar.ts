@@ -5,7 +5,7 @@ export type Punto = { clave: string; montoCentavos: number; cantidad: number };
 export type PuntoSuperpuesto = {
   posicion: number;
   etiqueta: string;
-  actual: number;
+  actual: number | null;
   comparacion: number | null;
 };
 
@@ -61,18 +61,26 @@ function montosDe(lado: Lado, escala: Escala): number[] {
   return clavesDe(lado.periodo, escala).map((clave) => montos.get(clave) ?? 0);
 }
 
-/** Los dos periodos uno sobre otro: el dia 1 de cada uno en la misma posicion. */
+// Un dia o un mes que todavia no llego no vendio cero: no tiene punto.
+const yaPaso = (clave: string, hoy: string | undefined) =>
+  !hoy || clave <= hoy.slice(0, clave.length);
+
+/**
+ * Los dos periodos uno sobre otro: el dia 1 de cada uno en la misma posicion. Con hoy, lo
+ * que viene despues queda sin punto.
+ */
 export function serieSuperpuesta(
   actual: Lado,
   comparado: Lado,
   escala: Escala,
+  hoy?: string,
 ): PuntoSuperpuesto[] {
   const otros = montosDe(comparado, escala);
   const claves = clavesDe(actual.periodo, escala);
   return montosDe(actual, escala).map((monto, i) => ({
     posicion: i + 1,
     etiqueta: etiquetaDe(claves[i]!, escala),
-    actual: monto,
+    actual: yaPaso(claves[i]!, hoy) ? monto : null,
     comparacion: otros[i] ?? null,
   }));
 }
