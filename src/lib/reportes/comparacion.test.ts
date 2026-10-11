@@ -10,6 +10,14 @@ describe('variacion', () => {
     });
   });
 
+  it('contra un resultado negativo, mejorar da un porcentaje positivo', () => {
+    expect(variacion(100000, -100000)).toEqual({ diferenciaCentavos: 200000, porcentaje: 200 });
+    expect(variacion(-300000, -100000)).toEqual({
+      diferenciaCentavos: -200000,
+      porcentaje: -200,
+    });
+  });
+
   it('sin datos del otro periodo no compara', () => {
     expect(variacion(150000, null)).toBeNull();
   });
