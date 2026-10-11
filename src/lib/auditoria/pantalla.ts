@@ -11,6 +11,10 @@ export const MODULOS = {
   },
   proveedores: { nombre: 'Proveedores', tablas: ['proveedores'] },
   gastos: { nombre: 'Gastos', tablas: ['gastos', 'gastos_recurrentes', 'categorias_de_gasto'] },
+  ventas: {
+    nombre: 'Ventas',
+    tablas: ['ventas', 'renglones_de_venta', 'pagos_de_venta', 'canales_de_venta'],
+  },
   caja: { nombre: 'Caja', tablas: ['cierres_de_caja', 'retiros_de_caja', 'configuracion_de_caja'] },
 } as const;
 

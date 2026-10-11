@@ -917,6 +917,192 @@ export type Database = {
           },
         ]
       }
+      canales_de_venta: {
+        Row: {
+          activo: boolean
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          local_id: string
+          nombre: string
+        }
+        Insert: {
+          activo?: boolean
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          nombre: string
+        }
+        Update: {
+          activo?: boolean
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          nombre?: string
+        }
+        Relationships: []
+      }
+      pagos_de_venta: {
+        Row: {
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          local_id: string
+          medio: Database["public"]["Enums"]["medio_de_caja"]
+          monto_centavos: number
+          venta_id: string
+        }
+        Insert: {
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id: string
+          medio: Database["public"]["Enums"]["medio_de_caja"]
+          monto_centavos: number
+          venta_id: string
+        }
+        Update: {
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          medio?: Database["public"]["Enums"]["medio_de_caja"]
+          monto_centavos?: number
+          venta_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pagos_de_venta_venta_id_fkey"
+            columns: ["venta_id"]
+            isOneToOne: false
+            referencedRelation: "ventas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      renglones_de_venta: {
+        Row: {
+          cantidad: number
+          descripcion: string
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          local_id: string
+          precio_unitario_centavos: number
+          presentacion_id: string | null
+          producto_id: string | null
+          subtotal_centavos: number
+          venta_id: string
+        }
+        Insert: {
+          cantidad: number
+          descripcion: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id: string
+          precio_unitario_centavos: number
+          presentacion_id?: string | null
+          producto_id?: string | null
+          subtotal_centavos: number
+          venta_id: string
+        }
+        Update: {
+          cantidad?: number
+          descripcion?: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          precio_unitario_centavos?: number
+          presentacion_id?: string | null
+          producto_id?: string | null
+          subtotal_centavos?: number
+          venta_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "renglones_de_venta_venta_id_fkey"
+            columns: ["venta_id"]
+            isOneToOne: false
+            referencedRelation: "ventas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ventas: {
+        Row: {
+          anulado: boolean
+          anulado_por: string | null
+          canal_id: string | null
+          cerrada_en: string | null
+          clave: string | null
+          comentario: string | null
+          creado_por: string | null
+          estado: Database["public"]["Enums"]["estado_de_venta"]
+          fecha: string
+          fecha_actualizacion: string
+          fecha_anulacion: string | null
+          fecha_creacion: string
+          fudo_id: string | null
+          id: string
+          local_id: string
+          motivo_anulacion: string | null
+          origen: Database["public"]["Enums"]["origen_de_venta"]
+          total_centavos: number
+        }
+        Insert: {
+          anulado?: boolean
+          anulado_por?: string | null
+          canal_id?: string | null
+          cerrada_en?: string | null
+          clave?: string | null
+          comentario?: string | null
+          creado_por?: string | null
+          estado?: Database["public"]["Enums"]["estado_de_venta"]
+          fecha: string
+          fecha_actualizacion?: string
+          fecha_anulacion?: string | null
+          fecha_creacion?: string
+          fudo_id?: string | null
+          id?: string
+          local_id?: string
+          motivo_anulacion?: string | null
+          origen?: Database["public"]["Enums"]["origen_de_venta"]
+          total_centavos: number
+        }
+        Update: {
+          anulado?: boolean
+          anulado_por?: string | null
+          canal_id?: string | null
+          cerrada_en?: string | null
+          clave?: string | null
+          comentario?: string | null
+          creado_por?: string | null
+          estado?: Database["public"]["Enums"]["estado_de_venta"]
+          fecha?: string
+          fecha_actualizacion?: string
+          fecha_anulacion?: string | null
+          fecha_creacion?: string
+          fudo_id?: string | null
+          id?: string
+          local_id?: string
+          motivo_anulacion?: string | null
+          origen?: Database["public"]["Enums"]["origen_de_venta"]
+          total_centavos?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ventas_canal_id_fkey"
+            columns: ["canal_id"]
+            isOneToOne: false
+            referencedRelation: "canales_de_venta"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       menu_publico: {
@@ -959,6 +1145,23 @@ export type Database = {
           la_categoria?: string
         }
         Returns: number
+      }
+      ventas_guardar_manual: { Args: { datos: Json }; Returns: string }
+      ventas_totales: {
+        Args: {
+          desde: string
+          el_medio?: string
+          el_origen?: string
+          hasta: string
+        }
+        Returns: {
+          anulado_centavos: number
+          anuladas: number
+          cancelado_centavos: number
+          canceladas: number
+          cobradas: number
+          cobrado_centavos: number
+        }[]
       }
       gastos_validar_categoria_y_proveedor: {
         Args: {
@@ -1070,6 +1273,9 @@ export type Database = {
         | "con_diferencia"
         | "revisado"
         | "anulado"
+      estado_de_venta: "cerrada" | "cancelada" | "en_curso"
+      medio_de_caja: "efectivo" | "credito" | "debito" | "qr" | "transferencia"
+      origen_de_venta: "manual" | "fudo"
       etiqueta_de_producto: "mas_vendido" | "artesanal" | "nuevo"
       frecuencia_de_gasto: "mensual" | "bimestral" | "anual"
       medio_de_pago: "efectivo_caja" | "transferencia" | "tarjeta" | "otro"
@@ -1208,6 +1414,9 @@ export const Constants = {
         "revisado",
         "anulado",
       ],
+      estado_de_venta: ["cerrada", "cancelada", "en_curso"],
+      medio_de_caja: ["efectivo", "credito", "debito", "qr", "transferencia"],
+      origen_de_venta: ["manual", "fudo"],
       etiqueta_de_producto: ["mas_vendido", "artesanal", "nuevo"],
       frecuencia_de_gasto: ["mensual", "bimestral", "anual"],
       medio_de_pago: ["efectivo_caja", "transferencia", "tarjeta", "otro"],

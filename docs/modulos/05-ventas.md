@@ -169,5 +169,25 @@ Ventas no se construye hasta que la primera fila esté confirmada.
 
 ## Parte técnica
 
-Se escribe al construir el módulo: tablas, permisos, el proceso de sincronización, acciones
-de servidor y pruebas.
+Primera parte construida el 2026-10-11 (pedido 30), sin las credenciales de Fudo, por
+excepción de Santiago a la regla de "Sin confirmar". El detalle está en
+`docs/superpowers/specs/2026-10-10-ventas-design.md`.
+
+- **Base:** tablas `ventas` (origen a mano o Fudo, identificador de Fudo único por local,
+  estado, total), `renglones_de_venta`, `pagos_de_venta` (uno de los cinco medios del cierre)
+  y `canales_de_venta` (Cheaf, Encargo, Venta a comercios y Otro). Solo el admin activo de
+  su local las ve; nadie inserta directo ni borra.
+- **Venta a mano:** `ventas_guardar_manual` calcula cada subtotal (cantidad por precio,
+  redondeado a centavos) y el total, y guarda venta, renglones y pago juntos. Rechaza un día
+  futuro (`PV301`), una venta sin productos (`PV302`) y un canal o producto que ya no está
+  disponible (`PV303`, `PV304`). Se anula con motivo (`PV306`) y no se cambia después
+  (`PV305`); una de Fudo no se anula (`PV307`).
+- **Totales:** `ventas_totales` suma lo cobrado y, aparte, lo cancelado, sin lo anulado; con
+  un medio, solo lo pagado con él.
+- **Pantallas:** `/admin/ventas` (filtros, totales, paginada), `/admin/ventas/nueva` (varios
+  productos, el precio del menú editable, el total mientras se escribe), `/admin/ventas/[id]` y
+  `/admin/ventas/canales`.
+
+Queda para cuando estén las credenciales de Fudo: traer las ventas (la noche, "Actualizar
+ahora" y al guardar un cierre), vincular productos y medios de pago de Fudo, y calcular lo
+esperado en los cierres. Hasta entonces los cierres siguen "Esperando ventas".

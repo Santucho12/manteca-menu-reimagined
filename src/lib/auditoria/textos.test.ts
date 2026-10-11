@@ -38,6 +38,8 @@ describe('datoDe', () => {
     expect(datoDe('gastos')).toEqual({ modulo: 'Gastos', dato: 'Gasto' });
     expect(datoDe('retiros_de_caja')).toEqual({ modulo: 'Caja', dato: 'Retiro' });
     expect(datoDe('perfiles')).toEqual({ modulo: 'Usuarios', dato: 'Usuario' });
+    expect(datoDe('ventas')).toEqual({ modulo: 'Ventas', dato: 'Venta' });
+    expect(datoDe('renglones_de_venta')).toEqual({ modulo: 'Ventas', dato: 'Producto vendido' });
   });
 
   it('una tabla que no conoce se muestra igual, con su nombre', () => {
