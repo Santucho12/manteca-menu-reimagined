@@ -1,3 +1,4 @@
+import { fechaParaMostrar } from '../gastos/pantalla';
 import { diasSinCierre } from '../caja/dias';
 import { formatearPesos } from '../plata';
 import { sumarDias, type Periodo } from './periodos';
@@ -59,3 +60,10 @@ export function resumenPorEmpleado(cierres: CierreDelReporte[]): ResumenDeEmplea
 
 export const textoDeDiferencia = (diferencia: number | null) =>
   diferencia === null ? 'Esperando ventas' : formatearPesos(diferencia);
+
+/** Los cierres que ya tienen diferencia, del mas viejo al mas nuevo, para el grafico. */
+export const diferenciasDelGrafico = (cierres: CierreDelReporte[]) =>
+  cierres
+    .filter((c) => c.diferenciaCentavos !== null)
+    .sort((a, b) => a.fecha.localeCompare(b.fecha))
+    .map((c) => ({ nombre: fechaParaMostrar(c.fecha), montoCentavos: c.diferenciaCentavos! }));
