@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resultadoDelPeriodo, resultadoPorMes } from './resultado';
+import { comparacionDelResultado, resultadoDelPeriodo, resultadoPorMes } from './resultado';
 
 const ventas = [
   { dia: '2026-09-10', ventas: 1, monto_centavos: 500000 },
@@ -28,5 +28,38 @@ describe('resultado', () => {
       { mes: '2026-09', ventasCentavos: 500000, gastosCentavos: 0, resultadoCentavos: null },
       { mes: '2026-10', ventasCentavos: 300000, gastosCentavos: 100000, resultadoCentavos: 200000 },
     ]);
+  });
+});
+
+describe('comparacionDelResultado', () => {
+  const con = (ventasCentavos: number, gastosCentavos: number | null) => ({
+    ventasCentavos,
+    gastosCentavos: gastosCentavos ?? 0,
+    resultadoCentavos: gastosCentavos === null ? null : ventasCentavos - gastosCentavos,
+    categorias: [],
+  });
+
+  it('compara ventas, gastos y resultado', () => {
+    expect(comparacionDelResultado(con(1000, 400), con(500, 200))).toEqual({
+      ventas: { diferenciaCentavos: 500, porcentaje: 100 },
+      gastos: { diferenciaCentavos: 200, porcentaje: 100 },
+      resultado: { diferenciaCentavos: 300, porcentaje: 100 },
+    });
+  });
+
+  it('sin gastos del otro lado, gastos y resultado no comparan', () => {
+    expect(comparacionDelResultado(con(1000, 400), con(500, null))).toEqual({
+      ventas: { diferenciaCentavos: 500, porcentaje: 100 },
+      gastos: null,
+      resultado: null,
+    });
+  });
+
+  it('sin nada del otro periodo, nada compara', () => {
+    expect(comparacionDelResultado(con(1000, 400), null)).toEqual({
+      ventas: null,
+      gastos: null,
+      resultado: null,
+    });
   });
 });
