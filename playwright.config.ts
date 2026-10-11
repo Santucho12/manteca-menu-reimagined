@@ -9,15 +9,16 @@ export default defineConfig({
   testDir: 'e2e',
   testMatch: '**/*.spec.ts',
   globalSetup: './e2e/preparacion.ts',
-  // De a un navegador. Sin ventana: Santiago no quiere verla abrirse (pedido 32). Con
-  // E2E_A_LA_VISTA=1 se abre y va despacio, para mirarlo.
+  // De a un navegador. Sin ventana: Santiago no quiere verla abrirse (pedido 32); con
+  // E2E_A_LA_VISTA=1 se abre. El slowMo queda igual sin ventana: las pruebas cuentan con que
+  // React termine de cargar antes de cada toque.
   workers: 1,
   fullyParallel: false,
   reporter: 'list',
   use: {
     baseURL: URL_LOCAL,
     headless: !A_LA_VISTA,
-    launchOptions: { slowMo: A_LA_VISTA ? 300 : 0 },
+    launchOptions: { slowMo: 300 },
     screenshot: 'only-on-failure',
   },
   projects: [
