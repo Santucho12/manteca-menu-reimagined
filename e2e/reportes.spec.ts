@@ -53,7 +53,8 @@ test('ventas por periodo: elige las fechas y ve el total, el ticket y la variaci
   await expect(page.getByText('+$2.500,00 (+100 %)')).toBeVisible();
   await expect(total(page, '$2.500,00')).toBeVisible();
   await expect(page.getByRole('row', { name: /03\/04\/2018/ })).toContainText('$5.000,00');
-  await expect(page.getByRole('figure', { name: 'Gráfico del período' })).toBeVisible();
+  const grafico = page.getByRole('figure', { name: 'Gráfico del período' });
+  await expect(grafico.locator('.recharts-line')).toHaveCount(2);
 });
 
 test('ventas por producto: monto por producto y cantidad por presentacion', async ({ page }) => {
@@ -124,6 +125,10 @@ test('guarda capturas de los reportes', async ({ page }, info) => {
   for (const ruta of ['ventas', 'productos', 'resultado', 'caja']) {
     await page.goto(`/admin/reportes/${ruta}?${DE_ABRIL}`);
     await page.evaluate(() => document.fonts.ready);
+    // El grafico se dibuja recien despues de cargar la pagina: la captura espera a que este.
+    const listo =
+      ruta === 'caja' ? page.getByRole('table').first() : page.locator('figure svg').first();
+    await expect(listo).toBeVisible();
     await page.screenshot({
       path: `e2e/capturas/reportes-${ruta}-${info.project.name}.png`,
       fullPage: true,
