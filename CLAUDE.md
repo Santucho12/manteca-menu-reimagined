@@ -79,7 +79,7 @@ Hecho es **probado en local**: en la máquina de desarrollo, con la aplicación 
 base de pruebas, pasaron los dos pasos.
 
 1. **`npm run verificar`**: lint, tipos, **todos** los tests y build.
-2. **`npm run e2e`**: la prueba en vivo con Playwright. El navegador se ve en pantalla, toca
+2. **`npm run e2e`**: la prueba en vivo con Playwright. Un navegador sin ventana toca
    los botones del flujo y comprueba el resultado.
 
 Los dos, siempre. Si uno no se pudo correr, no está hecho.
@@ -212,7 +212,7 @@ El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
 | `npm run dev` | Levanta la aplicación en local, contra la base de pruebas, en `http://localhost:3210`: carga `.env.local` antes que cualquier otro archivo de entorno |
 | `npm test` | Todos los tests de Vitest |
 | `npm run verificar` | Lint, tipos, todos los tests y build, en ese orden; se corta en el primer error |
-| `npm run e2e` | Las pruebas de Playwright, con el navegador a la vista |
+| `npm run e2e` | Las pruebas de Playwright, sin abrir ventana (con `E2E_A_LA_VISTA=1`, a la vista) |
 | `npm run sembrar:pruebas` | Crea en la base de pruebas los usuarios de prueba que falten y repara la contraseña de los que ya estaban; a todos les deja su rol, su local y su estado |
 
 El lint es ESLint más el control de formato de Prettier. Si falla por formato, lo corrige
@@ -220,7 +220,8 @@ El lint es ESLint más el control de formato de Prettier. Si falla por formato, 
 
 La aplicación usa el puerto 3210 y no el 3000, que suele estar ocupado por otro proyecto.
 
-Playwright se configura para verse en vivo: `headless: false`, `slowMo` de 300 ms y un
+Playwright corre sin ventana: Santiago no quiere verla abrirse (2026-10-11, pedido 32). Con
+`E2E_A_LA_VISTA=1` se abre la ventana con `slowMo` de 300 ms, para mirarlo. Va un
 navegador a la vez (`workers: 1`). Levanta su propio servidor con `npm run dev` y no reutiliza
 uno que ya estaba abierto, que pudo arrancar con otras variables y otra base: si el puerto
 3210 está ocupado, se cierra ese servidor antes de correr las pruebas. El servidor de

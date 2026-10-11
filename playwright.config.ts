@@ -3,19 +3,21 @@ import { defineConfig, devices } from '@playwright/test';
 // Puerto propio del proyecto: el 3000 suele estar ocupado por otra aplicacion.
 const PUERTO = 3210;
 const URL_LOCAL = `http://localhost:${PUERTO}`;
+const A_LA_VISTA = process.env.E2E_A_LA_VISTA === '1';
 
 export default defineConfig({
   testDir: 'e2e',
   testMatch: '**/*.spec.ts',
   globalSetup: './e2e/preparacion.ts',
-  // Se prueba a la vista y de a un navegador, para que Santiago pueda mirarlo.
+  // De a un navegador. Sin ventana: Santiago no quiere verla abrirse (pedido 32). Con
+  // E2E_A_LA_VISTA=1 se abre y va despacio, para mirarlo.
   workers: 1,
   fullyParallel: false,
   reporter: 'list',
   use: {
     baseURL: URL_LOCAL,
-    headless: false,
-    launchOptions: { slowMo: 300 },
+    headless: !A_LA_VISTA,
+    launchOptions: { slowMo: A_LA_VISTA ? 300 : 0 },
     screenshot: 'only-on-failure',
   },
   projects: [
