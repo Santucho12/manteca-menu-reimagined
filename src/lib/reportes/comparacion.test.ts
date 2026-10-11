@@ -52,4 +52,8 @@ describe('compararFilas', () => {
   it('sin el otro periodo ninguna fila compara', () => {
     expect(comparar([fila('a', 200)], null)).toEqual([null]);
   });
+
+  it('un periodo sin filas es lo mismo que no tener datos para comparar', () => {
+    expect(comparar([fila('a', 200)], [])).toEqual([null]);
+  });
 });
