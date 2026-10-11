@@ -129,11 +129,14 @@ Construir el módulo de cierres de caja definido en `docs/modulos/06-cierres-de-
 Construir la pantalla de auditoría definida en `docs/modulos/07-auditoria.md`: lista filtrable de lo que pasó, con nombres y valores legibles, el detalle de cada cambio y el enlace al dato, y quién cargó cada gasto, proveedor y producto.
 ### 30. Ventas a mano y lista de ventas
 Construir la parte de `docs/modulos/05-ventas.md` que no depende de Fudo: ventas cargadas a mano con varios renglones, canales, la lista de ventas con filtros y total, el detalle y la anulación. La tabla queda con la forma de una venta de Fudo. **Excepción decidida por Santiago el 2026-10-10:** el módulo dice que no se construye hasta probar la API de Fudo con credenciales; se construye ahora lo que no depende de ella. Queda sin hacer: la sincronización con Fudo, la vinculación de productos y medios, "Actualizar ahora" y lo esperado en los cierres.
+### 31. Módulo de reportes
+Construir el módulo de reportes definido en `docs/modulos/08-reportes.md`: ventas por período, producto y categoría, gastos por categoría y período, caja y resultado del mes, con filtro de fechas, comparación contra otro período, tabla, gráfico y total.
 
 ## Pendientes
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 31 | Módulo de reportes | En construcción (rama `feat/reportes`) |
 | 30 | Ventas: la parte de Fudo | Construida la parte a mano (ver Completados). Falta, cuando estén las credenciales: traer las ventas de Fudo, vincular productos y medios, "Actualizar ahora" y lo esperado en los cierres |
 | 21 | Arreglos de la revisión de la base técnica | Hecho y verificado (rama `fix/revision-base-tecnica`): montos sin precisión y URL sin cifrar se rechazan; protecciones de configuración (todo test corre en algún grupo, versión de Node, tipos de Supabase fuera de Prettier, clave secreta prohibida en componentes); la siembra repara cuentas y lee todas las páginas; un solo aviso con todas las variables que faltan; comprobación de tokens corregida; colores con contraste suficiente y anillo de foco entero. Los controles de 44 px, el campo con error y los títulos en Neufile Grotesk entraron con el pedido 22. Queda para el menú público: las tipografías en woff2. Las variantes de la guía ya no van: la guía se sacó en el pedido 23 |
 
