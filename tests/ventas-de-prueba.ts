@@ -4,7 +4,13 @@ import { clienteSecretoDePruebas } from './clientes';
 import { asegurarLocalB, idDelLocalPrincipal } from './locales';
 import { borrarMenuDePrueba, sembrarCategoria, sembrarProducto } from './menu-de-prueba';
 
-export type ParaVender = { productoId: string; presentacionId: string; categoriaId: string };
+export type ParaVender = {
+  productoId: string;
+  presentacionId: string;
+  categoriaId: string;
+  /** Como aparece en el selector de la venta: producto · presentacion. */
+  texto: string;
+};
 
 /** Un producto del menu con precio, listo para venderse. Se limpia con borrarMenuDePrueba. */
 export async function productoParaVender(activo = true): Promise<ParaVender> {
@@ -14,6 +20,7 @@ export async function productoParaVender(activo = true): Promise<ParaVender> {
     productoId: producto.id,
     presentacionId: categoria.presentaciones[0]!.id,
     categoriaId: categoria.id,
+    texto: `${producto.nombre} · ${categoria.presentaciones[0]!.nombre}`,
   };
 }
 
@@ -128,4 +135,22 @@ export async function borrarVentas(
     .delete()
     .in('registro_id', [...ventas, ...(extras.canales ?? [])]);
   await borrarMenuDePrueba(extras.categoriasDelMenu ?? []);
+}
+
+/** Las ventas cargadas por pantalla con ese comentario. */
+export async function idsDeVentasComentadas(comentario: string): Promise<string[]> {
+  const { data } = await clienteSecretoDePruebas()
+    .from('ventas')
+    .select('id')
+    .eq('comentario', comentario);
+  return (data ?? []).map((venta) => venta.id);
+}
+
+/** Los canales cargados por pantalla con esos nombres. */
+export async function idsDeCanalesLlamados(nombres: string[]): Promise<string[]> {
+  const { data } = await clienteSecretoDePruebas()
+    .from('canales_de_venta')
+    .select('id')
+    .in('nombre', nombres);
+  return (data ?? []).map((canal) => canal.id);
 }
