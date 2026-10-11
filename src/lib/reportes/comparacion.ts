@@ -7,7 +7,7 @@ export function variacion(actual: number, anterior: number | null): Variacion {
   if (anterior === null) return null;
   const diferenciaCentavos = actual - anterior;
   const porcentaje =
-    anterior === 0 ? null : Math.round((diferenciaCentavos * 1000) / anterior) / 10;
+    anterior === 0 ? null : Math.round((diferenciaCentavos * 1000) / Math.abs(anterior)) / 10;
   return { diferenciaCentavos, porcentaje };
 }
 
