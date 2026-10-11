@@ -37,11 +37,13 @@ function FilaDelDia({ fila }: { fila: FilaDeCaja }) {
   return (
     <TableRow>
       <TableCell>{fechaParaMostrar(fila.fecha)}</TableCell>
-      <TableCell>{cierre ? cierre.persona : <Badge variant="outline">Sin cierre</Badge>}</TableCell>
+      <TableCell className="whitespace-normal">
+        {cierre ? cierre.persona : <Badge variant="outline">Sin cierre</Badge>}
+      </TableCell>
       <TableCell className="text-right">
         {cierre ? formatearPesos(cierre.declaradoCentavos) : ''}
       </TableCell>
-      <TableCell className="text-right">
+      <TableCell className="text-right whitespace-normal">
         {cierre ? textoDeDiferencia(cierre.diferenciaCentavos) : ''}
       </TableCell>
     </TableRow>
@@ -56,7 +58,7 @@ function CierresPorDia({ filas }: { filas: FilaDeCaja[] }) {
           <TableHead>Día</TableHead>
           <TableHead>Empleado</TableHead>
           <TableHead className="text-right">Declarado</TableHead>
-          <TableHead className="text-right">Diferencia</TableHead>
+          <TableHead className="text-right whitespace-normal">Diferencia</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

@@ -31,7 +31,13 @@ export function GraficoDeBarras({ datos }: { datos: { nombre: string; montoCenta
             fontSize={12}
           />
           <Tooltip formatter={pesos} />
-          <Bar name="Monto" dataKey="montoCentavos" fill="var(--primary)" radius={4} />
+          <Bar
+            name="Monto"
+            dataKey="montoCentavos"
+            fill="var(--primary)"
+            radius={4}
+            isAnimationActive={false}
+          />
         </BarChart>
       </ResponsiveContainer>
     </figure>

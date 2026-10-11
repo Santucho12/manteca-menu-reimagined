@@ -28,13 +28,26 @@ export function GraficoPorMes({ datos }: { datos: ResultadoDelMes[] }) {
           <YAxis tickFormatter={pesos} width={90} stroke="var(--muted-foreground)" fontSize={12} />
           <Tooltip formatter={pesos} />
           <Legend />
-          <Bar name="Ventas" dataKey="ventasCentavos" fill="var(--primary)" radius={4} />
-          <Bar name="Gastos" dataKey="gastosCentavos" fill="var(--accent)" radius={4} />
+          <Bar
+            name="Ventas"
+            dataKey="ventasCentavos"
+            fill="var(--primary)"
+            radius={4}
+            isAnimationActive={false}
+          />
+          <Bar
+            name="Gastos"
+            dataKey="gastosCentavos"
+            fill="var(--accent)"
+            radius={4}
+            isAnimationActive={false}
+          />
           <Bar
             name="Resultado"
             dataKey="resultadoCentavos"
             fill="var(--muted-foreground)"
             radius={4}
+            isAnimationActive={false}
           />
         </BarChart>
       </ResponsiveContainer>

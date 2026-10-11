@@ -32,6 +32,7 @@ export function GraficoDeLineas({ datos }: { datos: PuntoSuperpuesto[] }) {
             stroke="var(--primary)"
             strokeWidth={2}
             dot={false}
+            isAnimationActive={false}
           />
           <Line
             name="Comparación"
@@ -40,6 +41,7 @@ export function GraficoDeLineas({ datos }: { datos: PuntoSuperpuesto[] }) {
             strokeWidth={2}
             strokeDasharray="4 4"
             dot={false}
+            isAnimationActive={false}
           />
         </LineChart>
       </ResponsiveContainer>
