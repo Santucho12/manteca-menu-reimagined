@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  cantidadDe,
-  cantidadParaMostrar,
-  subtotalDe,
-  totalDe,
-  totalEscrito,
-} from './renglones';
+import { cantidadDe, cantidadParaMostrar, subtotalDe, totalDe, totalEscrito } from './renglones';
 
 describe('cantidadDe', () => {
   it.each([
