@@ -114,7 +114,7 @@ leer sus cierres y los gastos de su cierre.
 - `src/components/reportes/`: encabezado común, totales, tablas y gráficos de Recharts sin
   animación, con los colores de `globals.css`.
 - Pantallas en `/admin/reportes` y sus siete rutas.
-- **Inicio usa lo mismo:** `ventasPorDia`, `gastosPorDia`, `totalesDeVentas`,
+- **Inicio va a usar lo mismo:** `ventasPorDia`, `gastosPorDia`, `totalesDeVentas`,
   `resultadoDelPeriodo` y `resultadoPorMes`, para que el mismo dato no dé distinto.
 
 ### Pruebas
