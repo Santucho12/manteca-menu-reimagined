@@ -36,3 +36,8 @@ export function totalEscrito(renglones: { cantidad: string; precio: string }[]):
   });
   return totalDe(completos);
 }
+
+/** Una cantidad como se lee aca: 1,5 y no 1.5. */
+export function cantidadParaMostrar(cantidad: number): string {
+  return String(Number(cantidad)).replace('.', ',');
+}
