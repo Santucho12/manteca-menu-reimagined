@@ -51,6 +51,27 @@ describe('agrupar', () => {
     ]);
   });
 
+  it('los dias que todavia no pasaron no tienen punto, en vez de caer a cero', () => {
+    const serie = serieSuperpuesta(
+      { periodo: { desde: '2026-10-01', hasta: '2026-10-03' }, puntos: [punto('2026-10-01', 500)] },
+      { periodo: { desde: '2026-09-28', hasta: '2026-09-30' }, puntos: [] },
+      'dia',
+      '2026-10-02',
+    );
+    expect(serie.map((p) => p.actual)).toEqual([500, 0, null]);
+    expect(serie.map((p) => p.comparacion)).toEqual([0, 0, 0]);
+  });
+
+  it('por mes, el mes que todavia no empezo no tiene punto', () => {
+    const serie = serieSuperpuesta(
+      { periodo: { desde: '2026-10-01', hasta: '2026-12-31' }, puntos: [] },
+      { periodo: { desde: '2026-07-01', hasta: '2026-09-30' }, puntos: [] },
+      'mes',
+      '2026-11-15',
+    );
+    expect(serie.map((p) => p.actual)).toEqual([0, 0, null]);
+  });
+
   it('etiqueta los meses con su nombre corto', () => {
     expect(etiquetaDe('2026-10', 'mes')).toBe('oct 2026');
   });
