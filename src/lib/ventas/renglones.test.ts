@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cantidadDe, subtotalDe, totalDe } from './renglones';
+import { cantidadDe, subtotalDe, totalDe, totalEscrito } from './renglones';
 
 describe('cantidadDe', () => {
   it.each([
@@ -33,5 +33,18 @@ describe('subtotalDe y totalDe', () => {
       ]),
     ).toBe(250000);
     expect(totalDe([])).toBe(0);
+  });
+});
+
+describe('totalEscrito', () => {
+  it('suma lo que ya se entiende y deja afuera lo que todavia no', () => {
+    expect(
+      totalEscrito([
+        { cantidad: '2', precio: '1.000' },
+        { cantidad: '1,5', precio: '333,33' },
+        { cantidad: '', precio: '500' },
+        { cantidad: '3', precio: 'abc' },
+      ]),
+    ).toBe(250000);
   });
 });
