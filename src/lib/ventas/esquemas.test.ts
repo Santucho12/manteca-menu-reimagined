@@ -11,7 +11,10 @@ const CANAL = '6f1c1e0a-2b1d-4c1e-9a6b-1f2e3d4c5b6a';
 const PRODUCTO = '7a2d2f1b-3c2e-4d2f-8b7c-2a3b4c5d6e7f';
 const PRESENTACION = '8b3e3a2c-4d3f-4e3a-9c8d-3b4c5d6e7f80';
 
+const CLAVE = '9c4f4b3d-5e4a-4f4b-8d9e-4c5d6e7f8091';
+
 const venta: DatosDeVenta = {
+  clave: CLAVE,
   fecha: '2026-10-10',
   canalId: CANAL,
   medio: 'transferencia',
@@ -25,6 +28,7 @@ const venta: DatosDeVenta = {
 describe('esquemaVenta', () => {
   it('pasa a la base con cantidades y precios en numeros', () => {
     expect(ventaParaLaBase(esquemaVenta.parse(venta))).toEqual({
+      clave: CLAVE,
       fecha: '2026-10-10',
       canal_id: CANAL,
       medio: 'transferencia',

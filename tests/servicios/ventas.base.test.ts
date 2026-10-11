@@ -42,6 +42,7 @@ beforeAll(async () => {
 afterAll(() => borrarVentas(ventas, { canales, categoriasDelMenu }));
 
 const datos = (fecha: string, cambios: Partial<DatosDeVenta> = {}): DatosDeVenta => ({
+  clave: crypto.randomUUID(),
   fecha,
   canalId: encargo,
   medio: 'transferencia',
@@ -112,7 +113,12 @@ describe('lista y totales', () => {
     expect((await anularVenta(admin, anulada, 'Duplicada')).ok).toBe(true);
     const todo = await listarVentas(admin, filtros(dia));
     expect(todo.filas).toHaveLength(3);
-    expect(todo.totales).toMatchObject({ cobradoCentavos: 600000, cobradas: 2 });
+    expect(todo.totales).toMatchObject({
+      cobradoCentavos: 600000,
+      cobradas: 2,
+      anuladoCentavos: 300000,
+      anuladas: 1,
+    });
     const conQr = await listarVentas(admin, filtros(dia, { medio: 'qr' }));
     expect(conQr.totales.cobradoCentavos).toBe(300000);
     const anuladas = await listarVentas(admin, filtros(dia, { estado: 'anulada' }));

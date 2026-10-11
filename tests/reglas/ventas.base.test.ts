@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { diaEnArgentina } from '../../src/lib/fechas';
 import { sumarMeses } from '../../src/lib/gastos/vencimientos';
 import type { Json } from '../../src/lib/supabase/tipos';
+import { clienteSecretoDePruebas } from '../clientes';
 import { idDeCuentaDePrueba, registrosDe } from '../consultas-de-prueba';
 import type { RolDePrueba } from '../cuentas';
 import { clienteComo } from '../sesiones';
@@ -136,5 +137,21 @@ describe('canales', () => {
       .from('canales_de_venta')
       .insert({ nombre: 'CHEAF' });
     expect(error?.code).toBe('23505');
+  });
+});
+
+describe('la misma venta mandada dos veces', () => {
+  it('con la misma clave de carga devuelve la misma venta y no crea otra', async () => {
+    const clave = crypto.randomUUID();
+    const datos = datosDeVenta(HOY, cheaf, dosRenglones(), { clave });
+    const primera = await guardar('admin', datos);
+    const segunda = await guardar('admin', datos);
+    expect(segunda.error).toBeNull();
+    expect(segunda.data).toBe(primera.data);
+    const { count } = await clienteSecretoDePruebas()
+      .from('ventas')
+      .select('id', { count: 'exact', head: true })
+      .eq('clave', clave);
+    expect(count).toBe(1);
   });
 });
