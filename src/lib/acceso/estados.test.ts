@@ -96,7 +96,7 @@ describe('requiereSesion', () => {
 });
 
 describe('enlacesDelPanel', () => {
-  it('el admin ve Inicio, Menú, Ventas, Proveedores, Gastos, Caja, Usuarios, Auditoría y Mi cuenta', () => {
+  it('el admin ve Inicio, Menú, Ventas, Proveedores, Gastos, Caja, Reportes, Usuarios, Auditoría y Mi cuenta', () => {
     expect(enlacesDelPanel('admin').map((enlace) => enlace.texto)).toEqual([
       'Inicio',
       'Menú',
@@ -104,6 +104,7 @@ describe('enlacesDelPanel', () => {
       'Proveedores',
       'Gastos',
       'Caja',
+      'Reportes',
       'Usuarios',
       'Auditoría',
       'Mi cuenta',

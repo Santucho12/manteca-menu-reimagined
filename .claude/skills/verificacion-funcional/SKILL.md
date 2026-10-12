@@ -164,7 +164,7 @@ vincular, columnas faltantes, filas con cantidad cero o negativa, un archivo vac
 
 ```bash
 npx vitest run <archivo>    # un archivo de tests, contra la base de pruebas
-npm run e2e -- <archivo>    # una prueba de Playwright, con el navegador a la vista
+npm run e2e -- <archivo>    # una prueba de Playwright, sin abrir ventana
 npm run sembrar:pruebas     # si faltan los usuarios de prueba
 ```
 

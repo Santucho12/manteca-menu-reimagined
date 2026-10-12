@@ -28,7 +28,7 @@ Corre lint, tipos, **todos** los tests y build, en ese orden, y se corta en el p
 ## 2. 🔴 Prueba en vivo con Playwright (siempre)
 
 Los tests en verde no alcanzan. Hay que usar lo que se hizo como lo usaría la persona del
-local, con el navegador a la vista para que Santiago pueda verlo.
+local, con un navegador sin ventana (con `E2E_A_LA_VISTA=1` se ve).
 
 1. Cada flujo tiene su prueba en `e2e/`. Si la tarea agregó o cambió un flujo, se escribe o
    se actualiza esa prueba: entra con el rol que corresponde, toca los botones, completa los

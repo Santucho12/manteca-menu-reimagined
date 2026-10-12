@@ -30,8 +30,11 @@ Solo Admin.
 
 - Un filtro de fechas, con atajos: este mes, el mes pasado, los últimos 7 días.
 - Una tabla, un gráfico simple y el total.
-- La comparación: por defecto, contra el período anterior del mismo largo. Se puede elegir
-  otro período a mano, por ejemplo dos meses.
+- Sin fechas elegidas, el reporte va del 1 del mes a hoy.
+- La comparación: por defecto, un período que empieza el día 1 se compara con los mismos días
+  del mes anterior (el 11 compara del 1 al 11 de cada mes; un mes entero, con el mes anterior
+  entero), igual que Inicio. Cualquier otro período, con el anterior del mismo largo. Se puede
+  elegir otro período a mano, por ejemplo dos meses.
 - Cada número comparado muestra su variación, en pesos y en porcentaje.
 
 ## Reglas
@@ -73,10 +76,55 @@ Solo Admin.
 | Tema | Decisión |
 |---|---|
 | Qué reportes | Los de la propuesta, más Resultado del mes |
-| Comparación | Contra el período anterior del mismo largo, o uno elegido a mano |
+| Comparación | Del día 1: contra los mismos días del mes anterior (decidido por Santiago el 2026-10-12). Otro período: contra el anterior del mismo largo. O uno elegido a mano |
 | Exportar | No |
 
 ## Parte técnica
 
-Se escribe al construir el módulo: las consultas, el cálculo compartido con Inicio y las
-pruebas.
+Construido el 2026-10-11 (pedido 31). Diseño en `docs/superpowers/specs/2026-10-11-reportes-design.md`.
+
+### Decisiones al construirlo
+
+- Caja se construye antes que la sincronización con Fudo: muestra lo declarado, los días sin
+  cierre (desde el primer cierre hasta ayer) y "Esperando ventas" donde todavía no hay
+  diferencia. No tiene comparación con otro período.
+- "Hasta cuándo están sincronizadas las ventas" (regla 7) entra con la parte de Fudo.
+- Por producto: una fila por producto con su monto y, debajo, la cantidad de cada presentación.
+  Lo no vinculado va junto en "Sin vincular", siempre al final.
+- La comparación se hace sobre el total y sobre las filas que existen en los dos períodos. Los
+  días o meses se comparan en el gráfico, superpuestos (el día 1 con el día 1).
+- Por día si el período tiene hasta 62 días; por mes si es más largo.
+- En el resultado, si el otro período no tiene gastos, gastos y resultado no se comparan.
+
+### Base
+
+Migración `20261011120000_reportes`: cuatro funciones `security invoker` que arrancan
+cortando con `42501` si no es un admin activo (`reportes_exigir_admin`), porque Caja puede
+leer sus cierres y los gastos de su cierre.
+
+| Función | Devuelve |
+|---|---|
+| `reporte_ventas_por_dia(desde, hasta)` | Día, cantidad de ventas y monto, de lo cerrado y sin anular |
+| `reporte_ventas_por_producto(desde, hasta)` | Producto, categoría de hoy, presentación, cantidad y monto; sin producto, la descripción del renglón |
+| `reporte_ventas_por_categoria(desde, hasta)` | Categoría de hoy (o "Sin vincular"), ventas distintas y monto |
+| `reporte_gastos(desde, hasta)` | Día, categoría y monto de los gastos sin anular |
+
+### Código
+
+- `src/lib/reportes/`: `periodos` (URL, período anterior, atajos), `comparacion` (variación),
+  `agrupar` (día o mes, serie superpuesta), `ventas`, `gastos`, `resultado`, `caja`,
+  `paginas` (de a 50), `lista` y `consultas` (con la sesión del usuario).
+- `src/components/reportes/`: encabezado común, totales, tablas y gráficos de Recharts sin
+  animación, con los colores de `globals.css`.
+- Pantallas en `/admin/reportes` y sus siete rutas.
+- **Inicio va a usar lo mismo:** `ventasPorDia`, `gastosPorDia`, `totalesDeVentas`,
+  `resultadoDelPeriodo` y `resultadoPorMes`, para que el mismo dato no dé distinto.
+
+### Pruebas
+
+- Puros: cada archivo de `src/lib/reportes/`.
+- Base: `tests/reglas/reportes.base.test.ts` (lo que devuelven las funciones, lo cancelado,
+  lo anulado, lo no vinculado y otro local), `tests/rls/reportes.base.test.ts` (rechazo para
+  invitado, caja, encargado, desactivado y visitante) y `tests/servicios/reportes.base.test.ts`.
+- En vivo: `e2e/reportes.spec.ts`, con datos de abril de 2018 que siembra
+  `e2e/reportes-de-prueba.ts`.
