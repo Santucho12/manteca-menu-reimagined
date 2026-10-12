@@ -18,13 +18,20 @@ export function EnlaceDelPanel({ enlace, activo, alTocar }: Props) {
         // Plan Reminder Pro tiene 5 secciones y aca son 10: en una pantalla baja se achica el alto.
         'flex w-full items-center gap-3 rounded-2xl px-4 py-3.5 text-sm font-semibold transition-all duration-300 [@media(max-height:820px)]:py-2.5',
         activo
-          ? 'text-primary bg-primary/10 ring-primary/20 shadow-sm ring-1'
+          ? 'text-foreground bg-accent/15 ring-accent/40 shadow-sm ring-1'
           : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50',
       )}
     >
-      <Icono size={20} strokeWidth={activo ? 2.5 : 2} aria-hidden />
+      <Icono
+        size={20}
+        strokeWidth={activo ? 2.5 : 2}
+        className={activo ? 'text-accent' : undefined}
+        aria-hidden
+      />
       <span>{enlace.texto}</span>
-      {enlace.insignia ? <Badge className="ml-auto">{enlace.insignia}</Badge> : null}
+      {enlace.insignia ? (
+        <Badge className="bg-accent text-accent-foreground ml-auto">{enlace.insignia}</Badge>
+      ) : null}
     </Link>
   );
 }

@@ -96,8 +96,10 @@
   --card-foreground: oklch(0.22 0.035 45);
   --popover: oklch(0.98 0.01 85);
   --popover-foreground: oklch(0.22 0.035 45);
-  --primary: oklch(0.32 0.065 45);
-  --primary-foreground: oklch(0.97 0.008 75);
+  /* La marca son el crema del fondo y el dorado del nombre: los botones van en dorado, con la
+     letra oscura (el blanco sobre el dorado no se lee). */
+  --primary: #bfa042;
+  --primary-foreground: oklch(0.22 0.035 45);
   --secondary: oklch(0.935 0.018 85);
   --secondary-foreground: oklch(0.32 0.065 45);
   --muted: oklch(0.92 0.015 85);

@@ -39,9 +39,14 @@ function Abajo({ enlace, activo }: { enlace: EnlaceDelMarco; activo: boolean }) 
     <Link
       href={enlace.href}
       aria-current={activo ? 'page' : undefined}
-      className={cn(BOTON, activo ? 'text-primary' : 'text-muted-foreground')}
+      className={cn(BOTON, activo ? 'text-foreground' : 'text-muted-foreground')}
     >
-      <Icono size={20} strokeWidth={activo ? 2.5 : 2} aria-hidden />
+      <Icono
+        size={20}
+        strokeWidth={activo ? 2.5 : 2}
+        className={activo ? 'text-accent' : undefined}
+        aria-hidden
+      />
       <span className="max-w-full truncate px-0.5">{enlace.texto}</span>
     </Link>
   );
@@ -94,9 +99,13 @@ export function BarrasDelCelular({ nombre, enlaces }: Props) {
             type="button"
             aria-expanded={abierto}
             onClick={() => setAbierto(!abierto)}
-            className={cn(BOTON, abierto || enMas ? 'text-primary' : 'text-muted-foreground')}
+            className={cn(BOTON, abierto || enMas ? 'text-foreground' : 'text-muted-foreground')}
           >
-            <Ellipsis size={20} aria-hidden />
+            <Ellipsis
+              size={20}
+              className={abierto || enMas ? 'text-accent' : undefined}
+              aria-hidden
+            />
             <span>Más</span>
           </button>
         ) : null}
