@@ -19,8 +19,24 @@ export const sumarDias = (dia: string, dias: number) => aDia(aTiempo(dia) + dias
 export const diasDe = (periodo: Periodo) =>
   Math.round((aTiempo(periodo.hasta) - aTiempo(periodo.desde)) / UN_DIA) + 1;
 
-/** El periodo del mismo largo que termina el dia antes de que empiece este. */
+const empiezaElDiaUno = (p: Periodo) =>
+  p.desde.slice(8) === '01' && p.desde.slice(0, 7) === p.hasta.slice(0, 7);
+
+/**
+ * Del 1 a un dia del mes contra los mismos dias del mes anterior, como Inicio: el 11 compara
+ * del 1 al 11 de cada mes. Un mes entero, o un dia que el mes anterior no tiene, contra el mes
+ * anterior entero.
+ */
+function mismosDiasDelMesAnterior(periodo: Periodo): Periodo {
+  const anterior = mesDe(sumarDias(periodo.desde, -1));
+  if (periodo.hasta === mesDe(periodo.hasta).hasta) return anterior;
+  const hasta = `${anterior.desde.slice(0, 8)}${periodo.hasta.slice(8)}`;
+  return { desde: anterior.desde, hasta: hasta < anterior.hasta ? hasta : anterior.hasta };
+}
+
+/** Con que se compara un periodo si no se elige otro. */
 export function periodoAnterior(periodo: Periodo): Periodo {
+  if (empiezaElDiaUno(periodo)) return mismosDiasDelMesAnterior(periodo);
   return {
     desde: sumarDias(periodo.desde, -diasDe(periodo)),
     hasta: sumarDias(periodo.desde, -1),
@@ -37,15 +53,14 @@ function elegida(parametros: ParametrosDeReporte): Periodo | null {
   return desde && hasta ? ordenado(desde, hasta) : null;
 }
 
-/** El periodo y la comparacion, leidos de la URL; sin fechas, el mes de hoy en Argentina. */
+/** El periodo y la comparacion, leidos de la URL; sin fechas, del 1 a hoy en Argentina. */
 export function periodosDelReporte(
   parametros: ParametrosDeReporte,
   hoy: string,
 ): PeriodosDelReporte {
-  const mes = mesDe(hoy);
   const actual = ordenado(
-    fechaDe(unValor(parametros.desde)) ?? mes.desde,
-    fechaDe(unValor(parametros.hasta)) ?? mes.hasta,
+    fechaDe(unValor(parametros.desde)) ?? mesDe(hoy).desde,
+    fechaDe(unValor(parametros.hasta)) ?? hoy,
   );
   const comparacion = elegida(parametros);
   return {
@@ -59,7 +74,7 @@ export function periodosDelReporte(
 export function atajos(hoy: string): { texto: string; periodo: Periodo }[] {
   const mes = mesDe(hoy);
   return [
-    { texto: 'Este mes', periodo: mes },
+    { texto: 'Este mes', periodo: { desde: mes.desde, hasta: hoy } },
     { texto: 'Mes pasado', periodo: mesDe(sumarDias(mes.desde, -1)) },
     { texto: 'Últimos 7 días', periodo: { desde: sumarDias(hoy, -6), hasta: hoy } },
   ];
