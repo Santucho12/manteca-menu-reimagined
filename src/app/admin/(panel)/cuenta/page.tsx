@@ -10,7 +10,7 @@ export default async function PaginaMiCuenta() {
   const { perfil } = await exigirPagina('cuenta');
   return (
     <div className="max-w-md space-y-8">
-      <TituloDePagina>Mi cuenta</TituloDePagina>
+      <TituloDePagina subtitulo="Tus datos y tu contraseña.">Mi cuenta</TituloDePagina>
       <DatosDeLaCuenta perfil={perfil} />
       <section aria-labelledby="titulo-contrasena" className="space-y-4">
         <h2 id="titulo-contrasena" className="font-heading text-xl font-semibold">

@@ -31,7 +31,9 @@ function Bloque({
 export function InicioAdmin({ datos }: { datos: DatosDelInicio }) {
   return (
     <div className="space-y-8">
-      <TituloDePagina>Inicio</TituloDePagina>
+      <TituloDePagina subtitulo="Cómo viene el mes y lo que hay para atender.">
+        Inicio
+      </TituloDePagina>
       <Avisos avisos={datos.avisos} />
       <Bloque id="este-mes" titulo="Este mes">
         <p className="text-muted-foreground text-sm">

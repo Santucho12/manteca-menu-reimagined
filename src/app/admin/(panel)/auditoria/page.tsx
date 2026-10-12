@@ -93,7 +93,9 @@ export default async function PaginaDeAuditoria({
   const nombres = await nombresDe(cliente, lista.filas);
   return (
     <div className="space-y-6">
-      <TituloDePagina>Auditoría</TituloDePagina>
+      <TituloDePagina subtitulo="Lo que se cargó, cambió o anuló, y quién lo hizo.">
+        Auditoría
+      </TituloDePagina>
       <p className="text-muted-foreground max-w-xl text-sm">
         Todo lo que se cargó, cambió, anuló o desactivó, y quién lo hizo. No se puede editar ni
         borrar.

@@ -22,7 +22,7 @@ test.describe('con la sesion del admin', () => {
 
   test('la marca y el hero de Gastos, con la seccion marcada', async ({ page }) => {
     await page.goto('/admin/gastos/nuevo');
-    await expect(page.getByText('Manteca').first()).toBeVisible();
+    await expect(page.getByText('Manteca', { exact: true }).locator('visible=true')).toHaveCount(1);
     const gastos = panel(page).getByRole('link', { name: /^Gastos/ });
     await expect(gastos).toHaveAttribute('aria-current', 'page');
     await page.goto('/admin/gastos');

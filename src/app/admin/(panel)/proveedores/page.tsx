@@ -62,7 +62,7 @@ export default async function PaginaDeProveedores({
   });
   return (
     <div className="space-y-6">
-      <TituloDePagina>
+      <TituloDePagina subtitulo="A quién se le compra y cuánto se le pagó.">
         {filtros.desactivados ? 'Proveedores desactivados' : 'Proveedores'}
       </TituloDePagina>
       <Button asChild>

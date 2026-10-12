@@ -14,7 +14,9 @@ export default async function PaginaDelMenu() {
   const categorias = await leerPanel(cliente);
   return (
     <div className="space-y-6">
-      <TituloDePagina>Menú</TituloDePagina>
+      <TituloDePagina subtitulo="Lo que ve el cliente en la carta: categorías, productos y precios.">
+        Menú
+      </TituloDePagina>
       <AvisoDeFudo />
       <div className="flex flex-wrap gap-2">
         <Button asChild>

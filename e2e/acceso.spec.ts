@@ -46,7 +46,9 @@ test.describe('sin sesion', () => {
   test('el admin ingresa, ve su nombre y sale', async ({ page }) => {
     await ingresarComo(page, emailDePrueba('admin'), contrasenaDePrueba());
     await expect(page).toHaveURL(/\/admin$/);
-    await expect(page.getByRole('banner').getByText('Prueba Admin', { exact: true })).toBeVisible();
+    await expect(
+      page.getByText('Prueba Admin', { exact: true }).locator('visible=true').first(),
+    ).toBeVisible();
     await page.getByRole('button', { name: 'Salir' }).click();
     await expect(page).toHaveURL(/\/admin\/ingresar$/);
     await page.goto('/admin');

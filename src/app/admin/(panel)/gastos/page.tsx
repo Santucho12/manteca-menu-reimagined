@@ -123,7 +123,7 @@ export default async function PaginaDeGastos({
   ]);
   return (
     <div className="space-y-6">
-      <TituloDePagina>Gastos</TituloDePagina>
+      <TituloDePagina subtitulo="Lo que se pagó, por categoría y proveedor.">Gastos</TituloDePagina>
       <Accesos />
       <SinClasificar {...pendientes} hasta={filtros.hasta} />
       <Filtros filtros={filtros} {...opciones} />

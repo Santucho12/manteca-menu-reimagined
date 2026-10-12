@@ -134,7 +134,9 @@ export default async function ControlDeCierres({
     await datosDelControl(searchParams);
   return (
     <div className="space-y-6">
-      <TituloDePagina>Control de cierres</TituloDePagina>
+      <TituloDePagina subtitulo="Los cierres de cada día, quién los cargó y si cierran.">
+        Control de cierres
+      </TituloDePagina>
       <Button asChild>
         <Link href="/admin/caja">Cargar cierre</Link>
       </Button>

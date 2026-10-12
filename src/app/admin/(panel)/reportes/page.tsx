@@ -10,7 +10,9 @@ export default async function PaginaDeReportes() {
   await exigirPagina('admin');
   return (
     <div className="space-y-6">
-      <TituloDePagina>Reportes</TituloDePagina>
+      <TituloDePagina subtitulo="Para entender por qué un mes fue mejor o peor.">
+        Reportes
+      </TituloDePagina>
       <ul className="grid gap-3 sm:grid-cols-2">
         {REPORTES.map((r) => (
           <li key={r.ruta} className="bg-card space-y-1 rounded-xl border p-4">

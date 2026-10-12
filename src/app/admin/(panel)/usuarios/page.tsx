@@ -17,7 +17,9 @@ export default async function PaginaUsuarios({ searchParams }: Props) {
   const { filas, total, pagina } = await listarUsuarios(cliente, filtros);
   return (
     <div className="space-y-6">
-      <TituloDePagina>Usuarios</TituloDePagina>
+      <TituloDePagina subtitulo="Quién entra al sistema y qué puede hacer.">
+        Usuarios
+      </TituloDePagina>
       <Filtros filtros={filtros} />
       <ListaDeUsuarios filas={filas} yo={perfil.id} />
       <Paginacion filtros={{ ...filtros, pagina }} total={total} />

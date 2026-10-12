@@ -13,7 +13,7 @@ export default async function MisCierres() {
   const filas = await misCierres(cliente, perfil.id);
   return (
     <div className="space-y-6">
-      <TituloDePagina>Mis cierres</TituloDePagina>
+      <TituloDePagina subtitulo="Los cierres que cargaste.">Mis cierres</TituloDePagina>
       <Button asChild>
         <Link href="/admin/caja">Cargar cierre</Link>
       </Button>
