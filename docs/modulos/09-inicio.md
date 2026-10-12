@@ -98,5 +98,42 @@ Falta reflejarlo en `PROPUESTA.md`, con el texto que defina Santiago.
 
 ## Parte técnica
 
-Se escribe al construir el módulo: las consultas, el cálculo compartido con Reportes y las
-pruebas.
+Construido el 2026-10-12 (pedido 33). Diseño en `docs/superpowers/specs/2026-10-12-inicio-design.md`.
+
+### Decisiones al construirlo
+
+- "Productos de Fudo sin vincular", "Las ventas no se sincronizan" y la fecha de la última
+  sincronización (regla 4) entran con la parte de Fudo.
+- Más vendidos: cada producto con su monto y la cantidad por presentación ("3 Unidad · 2
+  Docena"), porque las cantidades de distintas presentaciones no se suman.
+- "Ayer no se cargó el cierre" sale todos los días; no se avisa si el local todavía no cargó
+  ningún cierre.
+- Cada aviso lleva la fecha del caso más viejo: el control de cierres y la lista de gastos
+  muestran por defecto solo el mes en curso.
+
+### Avisos
+
+| Aviso | Cuenta | Lleva a |
+|---|---|---|
+| Cierres con diferencia sin revisar | Cierres en estado `con_diferencia` (revisado y anulado tienen otro estado) | `/admin/caja/control?estado=con_diferencia&desde=…` |
+| Ayer no se cargó el cierre | Ayer sin cierre sin anular, con algún cierre anterior | `/admin/caja/control?desde=<ayer>&hasta=<ayer>` |
+| Personas esperando un rol | `contarPendientes` | `/admin/usuarios?estado=pendientes` |
+| Gastos sin clasificar | Gastos sin anular de la categoría de sistema | `/admin/gastos?categoria=…&desde=…` |
+
+### Código
+
+- `src/lib/inicio/`: `avisos` (la lista de avisos, pura), `meses` (mes en curso, últimos 12
+  meses, más vendidos), `numeros` (los cuatro números con su variación) y `consultas`
+  (`datosDeAvisos` y `datosDelInicio`, con la sesión del admin).
+- Usa el cálculo de Reportes: `datosDelResultado`, `ventasPorProducto`, `periodoAnterior`,
+  `resultadoPorMes`, `productosDelReporte` y `comparacionDelResultado`. Sin migración.
+- `src/components/inicio/`: `InicioAdmin`, `Avisos`, `MasVendidos`; reusa `Totales` y
+  `GraficoPorMes` de Reportes.
+
+### Pruebas
+
+- Puros: `src/lib/inicio/*.test.ts`.
+- Base: `tests/servicios/inicio.base.test.ts` (cada aviso cuenta lo que tiene que contar y no
+  lo revisado ni lo anulado; ayer con y sin cierre; los datos del mes).
+- En vivo: `e2e/inicio-admin.spec.ts` (el aviso y su enlace, los números, los más vendidos y
+  las capturas) y `e2e/acceso.spec.ts` (Caja y el invitado siguen igual).
