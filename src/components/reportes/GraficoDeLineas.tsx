@@ -37,7 +37,7 @@ export function GraficoDeLineas({ datos }: { datos: PuntoSuperpuesto[] }) {
           <Line
             name="Comparación"
             dataKey="comparacion"
-            stroke="var(--accent)"
+            stroke="var(--muted-foreground)"
             strokeWidth={2}
             strokeDasharray="4 4"
             dot={false}
