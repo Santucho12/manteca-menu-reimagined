@@ -135,11 +135,14 @@ Construir el módulo de reportes definido en `docs/modulos/08-reportes.md`: vent
 Que las pruebas de Playwright no abran la ventana del navegador mientras corren. Se puede volver a ver con `E2E_A_LA_VISTA=1`.
 ### 33. Módulo de inicio
 Construir el inicio del admin definido en `docs/modulos/09-inicio.md`: lo que requiere acción, los números del mes contra los mismos días del mes anterior, el gráfico de los últimos 12 meses y los más vendidos, con el mismo cálculo que Reportes.
+### 34. Arreglos de la revisión lógica de la primera fase
+Lo que salió de revisar cada módulo: el control de cierres marca el fondo inicial que no coincide con lo que quedó el día anterior y muestra lo retirado; el efectivo de la caja deja de poder cargarse como gasto a mano o recurrente (sale por el cierre); la misma carga de un gasto mandada dos veces no lo duplica.
 
 ## Pendientes
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 34 | Arreglos de la revisión lógica de la primera fase | En construcción (rama `fix/revision-fase-1`). Queda sin decidir, con el cliente: a qué hora cierra el local (si es después de medianoche, la fecha del cierre tiene que venir con el día anterior). Al publicar: crear la cuenta del dueño en la base real antes de compartir la dirección, porque la primera cuenta queda como admin |
 | 30 | Ventas: la parte de Fudo | Construida la parte a mano (ver Completados). Falta, cuando estén las credenciales: traer las ventas de Fudo, vincular productos y medios, "Actualizar ahora" y lo esperado en los cierres. En Reportes: mostrar hasta cuándo están sincronizadas las ventas, y resolver los descuentos de Fudo para que "por producto" cierre con "por período". En Inicio: los avisos "Productos de Fudo sin vincular" y "Las ventas no se sincronizan desde hace más de un día", y la fecha de la última sincronización |
 | 21 | Arreglos de la revisión de la base técnica | Hecho y verificado (rama `fix/revision-base-tecnica`): montos sin precisión y URL sin cifrar se rechazan; protecciones de configuración (todo test corre en algún grupo, versión de Node, tipos de Supabase fuera de Prettier, clave secreta prohibida en componentes); la siembra repara cuentas y lee todas las páginas; un solo aviso con todas las variables que faltan; comprobación de tokens corregida; colores con contraste suficiente y anillo de foco entero. Los controles de 44 px, el campo con error y los títulos en Neufile Grotesk entraron con el pedido 22. Queda para el menú público: las tipografías en woff2. Las variantes de la guía ya no van: la guía se sacó en el pedido 23 |
 
