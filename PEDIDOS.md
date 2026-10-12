@@ -137,11 +137,14 @@ Que las pruebas de Playwright no abran la ventana del navegador mientras corren.
 Construir el inicio del admin definido en `docs/modulos/09-inicio.md`: lo que requiere acción, los números del mes contra los mismos días del mes anterior, el gráfico de los últimos 12 meses y los más vendidos, con el mismo cálculo que Reportes.
 ### 34. Arreglos de la revisión lógica de la primera fase
 Lo que salió de revisar cada módulo: el control de cierres marca el fondo inicial que no coincide con lo que quedó el día anterior y muestra lo retirado; el efectivo de la caja deja de poder cargarse como gasto a mano o recurrente (sale por el cierre); la misma carga de un gasto mandada dos veces no lo duplica.
+### 35. Sidebar y hero con la estética de Plan Reminder Pro
+Cambiar la barra de arriba del panel por una sidebar, y el encabezado de cada pantalla (el hero), con la misma estética que Plan Reminder Pro (Sistema CobrarWpp), conservando los colores y la tipografía de Manteca. Armar una skill con esa estética y aplicarla.
 
 ## Pendientes
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 35 | Sidebar y hero con la estética de Plan Reminder Pro | En diseño (rama `feat/sidebar-y-hero`) |
 | 30 | Ventas: la parte de Fudo | Construida la parte a mano (ver Completados). Falta, cuando estén las credenciales: traer las ventas de Fudo, vincular productos y medios, "Actualizar ahora" y lo esperado en los cierres. En Reportes: mostrar hasta cuándo están sincronizadas las ventas, y resolver los descuentos de Fudo para que "por producto" cierre con "por período". En Inicio: los avisos "Productos de Fudo sin vincular" y "Las ventas no se sincronizan desde hace más de un día", y la fecha de la última sincronización |
 | 21 | Arreglos de la revisión de la base técnica | Hecho y verificado (rama `fix/revision-base-tecnica`): montos sin precisión y URL sin cifrar se rechazan; protecciones de configuración (todo test corre en algún grupo, versión de Node, tipos de Supabase fuera de Prettier, clave secreta prohibida en componentes); la siembra repara cuentas y lee todas las páginas; un solo aviso con todas las variables que faltan; comprobación de tokens corregida; colores con contraste suficiente y anillo de foco entero. Los controles de 44 px, el campo con error y los títulos en Neufile Grotesk entraron con el pedido 22. Queda para el menú público: las tipografías en woff2. Las variantes de la guía ya no van: la guía se sacó en el pedido 23 |
 
