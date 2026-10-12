@@ -30,8 +30,11 @@ Solo Admin.
 
 - Un filtro de fechas, con atajos: este mes, el mes pasado, los últimos 7 días.
 - Una tabla, un gráfico simple y el total.
-- La comparación: por defecto, contra el período anterior del mismo largo. Se puede elegir
-  otro período a mano, por ejemplo dos meses.
+- Sin fechas elegidas, el reporte va del 1 del mes a hoy.
+- La comparación: por defecto, un período que empieza el día 1 se compara con los mismos días
+  del mes anterior (el 11 compara del 1 al 11 de cada mes; un mes entero, con el mes anterior
+  entero), igual que Inicio. Cualquier otro período, con el anterior del mismo largo. Se puede
+  elegir otro período a mano, por ejemplo dos meses.
 - Cada número comparado muestra su variación, en pesos y en porcentaje.
 
 ## Reglas
@@ -73,7 +76,7 @@ Solo Admin.
 | Tema | Decisión |
 |---|---|
 | Qué reportes | Los de la propuesta, más Resultado del mes |
-| Comparación | Contra el período anterior del mismo largo, o uno elegido a mano |
+| Comparación | Del día 1: contra los mismos días del mes anterior (decidido por Santiago el 2026-10-12). Otro período: contra el anterior del mismo largo. O uno elegido a mano |
 | Exportar | No |
 
 ## Parte técnica

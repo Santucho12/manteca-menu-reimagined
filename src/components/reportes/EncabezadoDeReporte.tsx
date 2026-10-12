@@ -34,7 +34,7 @@ function Comparacion({ periodos }: { periodos: PeriodosDelReporte }) {
   return (
     <fieldset className="grid gap-3 sm:grid-cols-2">
       <legend className="text-muted-foreground mb-2 text-sm">
-        Comparar con otro período (vacío: el anterior del mismo largo)
+        Comparar con otro período (si lo dejás vacío, se compara con el período de antes)
       </legend>
       <Campo
         id="cdesde"

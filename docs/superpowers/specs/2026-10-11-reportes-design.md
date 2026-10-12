@@ -17,6 +17,10 @@ Decisiones:
    se ven en el gráfico, con los dos períodos superpuestos (día 1 con día 1).
 5. Por período: por día si el período tiene hasta 62 días, por mes si es más largo.
 6. Los descuentos de Fudo (renglones que no suman el total) se resuelven con la parte de Fudo.
+7. Decidido por Santiago el 2026-10-12, después de la revisión: sin fechas, el reporte va del 1
+   a hoy. Un período que empieza el día 1 se compara con los mismos días del mes anterior (un mes
+   entero, o un día que el mes anterior no tiene, con el mes anterior entero), igual que Inicio.
+   Cualquier otro período, con el anterior del mismo largo.
 
 ## Base
 
@@ -38,7 +42,7 @@ Sin tablas nuevas, sin grants de tablas, sin cambios en policies.
 ## Lógica pura (`src/lib/reportes/`)
 
 - `periodos.ts`: leer el período y la comparación de la URL (`desde`, `hasta`, `cdesde`,
-  `chasta`; sin fechas, el mes de hoy en Argentina); el período anterior del mismo largo; los
+  `chasta`; sin fechas, del 1 a hoy en Argentina); el período con que se compara (ver decisión 7); los
   atajos (este mes, mes pasado, últimos 7 días) y el enlace de cada uno; días de un período.
 - `comparacion.ts`: `variacion(actual, anterior)` devuelve diferencia en centavos y porcentaje
   con un decimal, o `null` si el otro período no tiene datos ("sin datos para comparar");
@@ -74,7 +78,7 @@ quien los cargó. Cada consulta recibe el cliente y el período.
 | `/admin/reportes/resultado` | Ventas, gastos por categoría y resultado, con variación; barras por mes de ventas, gastos y resultado |
 
 Encabezado común (componente): título, desde y hasta, atajos, "Comparar con" (desde y hasta;
-vacío es el período anterior del mismo largo), y la línea "Comparado con el DD/MM al DD/MM".
+vacío es el período de la decisión 7), y la línea "Comparado con el DD/MM al DD/MM".
 Período sin datos: "No hay ventas en este período" (o gastos, o cierres) en vez de la tabla.
 Gráficos con Recharts (versión exacta en `package.json`) y los colores de `globals.css`.
 
