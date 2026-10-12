@@ -128,7 +128,7 @@ test.describe('con la sesion de un invitado', () => {
 test.describe('con la sesion del admin', () => {
   test.use({ storageState: SESIONES.admin });
 
-  // Las personas que esperan un rol son un aviso del inicio: lo prueba inicio-admin.spec.ts.
+  // Las personas que esperan un rol son un aviso del inicio: lo prueba src/lib/inicio/avisos.test.ts.
   test('ve el inicio y su barra', async ({ page }) => {
     await page.goto('/admin');
     await expect(page.getByRole('heading', { level: 1, name: 'Inicio' })).toBeVisible();
