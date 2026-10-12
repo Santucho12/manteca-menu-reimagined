@@ -1,5 +1,6 @@
 import type { Cliente } from '../supabase/cliente';
 import { POR_PAGINA, cantidadDePaginas } from '../usuarios/presentacion';
+import { totalDeRetiros } from './fondo';
 import type { EstadoDeCierre, FiltrosDeControl } from './pantalla';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -10,7 +11,9 @@ const ESPERADOS =
 const DECLARADOS =
   'fondo_inicial_centavos, efectivo_centavos, credito_centavos, debito_centavos, qr_centavos, ' +
   'transferencia_centavos, queda_en_caja_centavos';
-const COLUMNAS_DE_FILA = `id, fecha, estado, ${DECLARADOS}, ${ESPERADOS}, ${PERSONA}`;
+// Las salidas se leen con otro nombre: el detalle del cierre ya trae "retiros" con quien.
+const SALIDAS = 'salidas:retiros_de_caja(monto_centavos)';
+const COLUMNAS_DE_FILA = `id, fecha, estado, ${DECLARADOS}, ${ESPERADOS}, ${PERSONA}, ${SALIDAS}`;
 
 type Montos = {
   fondo_inicial_centavos: number;
@@ -31,6 +34,7 @@ type Leida = Montos & {
   fecha: string;
   estado: EstadoDeCierre;
   persona: { nombre: string } | null;
+  salidas: { monto_centavos: number }[];
 };
 
 export type FilaDeCierre = {
@@ -39,6 +43,8 @@ export type FilaDeCierre = {
   estado: EstadoDeCierre;
   persona: string;
   diferenciaTotalCentavos: number | null;
+  fondoInicialCentavos: number;
+  retirosCentavos: number;
 };
 export type ListaDeCierres = { filas: FilaDeCierre[]; total: number; pagina: number };
 
@@ -75,6 +81,8 @@ function aFila(leida: Leida): FilaDeCierre {
     estado: leida.estado,
     persona: leida.persona?.nombre ?? '',
     diferenciaTotalCentavos: diferenciaTotalDe(leida),
+    fondoInicialCentavos: leida.fondo_inicial_centavos,
+    retirosCentavos: totalDeRetiros(leida.salidas ?? []),
   };
 }
 
@@ -202,4 +210,15 @@ export async function personasDeCaja(cliente: Cliente): Promise<{ id: string; no
     .in('rol', ['caja', 'admin'])
     .order('nombre');
   return comprobar(respuesta, 'las personas');
+}
+
+/** Lo que quedo en la caja en el cierre anterior a cada uno; solo el admin lo puede leer. */
+export async function fondosAnteriores(
+  cliente: Cliente,
+  ids: string[],
+): Promise<Map<string, number | null>> {
+  if (ids.length === 0) return new Map();
+  const respuesta = await cliente.rpc('cierres_fondos_anteriores', { ids });
+  const filas = comprobar(respuesta, 'los fondos anteriores');
+  return new Map(filas.map((f) => [f.id, f.fondo_anterior_centavos]));
 }

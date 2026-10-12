@@ -454,6 +454,7 @@ export type Database = {
           anulado_por: string | null
           categoria_id: string
           cierre_id: string | null
+          clave: string | null
           comprobante: string | null
           creado_por: string | null
           descripcion: string | null
@@ -475,6 +476,7 @@ export type Database = {
           anulado_por?: string | null
           categoria_id: string
           cierre_id?: string | null
+          clave?: string | null
           comprobante?: string | null
           creado_por?: string | null
           descripcion?: string | null
@@ -496,6 +498,7 @@ export type Database = {
           anulado_por?: string | null
           categoria_id?: string
           cierre_id?: string | null
+          clave?: string | null
           comprobante?: string | null
           creado_por?: string | null
           descripcion?: string | null
@@ -1227,6 +1230,13 @@ export type Database = {
     Functions: {
       cierres_exigir_quien_carga: { Args: never; Returns: undefined }
       cierres_fondo_sugerido: { Args: { la_fecha: string }; Returns: number }
+      cierres_fondos_anteriores: {
+        Args: { ids: string[] }
+        Returns: {
+          fondo_anterior_centavos: number
+          id: string
+        }[]
+      }
       cierres_guardar: { Args: { datos: Json }; Returns: string }
       cierres_insertar: {
         Args: { datos: Json; el_local: string }
@@ -1234,6 +1244,10 @@ export type Database = {
       }
       es_admin_activo: { Args: never; Returns: boolean }
       es_caja_activa: { Args: never; Returns: boolean }
+      gastos_exigir_medio: {
+        Args: { anterior: string; nuevo: string }
+        Returns: undefined
+      }
       gastos_pagado_por_proveedor: {
         Args: { desde: string; hasta: string }
         Returns: {
