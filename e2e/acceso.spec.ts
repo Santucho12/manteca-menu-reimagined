@@ -132,19 +132,8 @@ test.describe('con la sesion del admin', () => {
   test('ve el inicio y su barra', async ({ page }) => {
     await page.goto('/admin');
     await expect(page.getByRole('heading', { level: 1, name: 'Inicio' })).toBeVisible();
-    const menu = page.getByRole('navigation', { name: 'Panel' });
-    await expect(menu.getByRole('link')).toHaveText([
-      /^Inicio/,
-      /^Menú/,
-      /^Ventas/,
-      /^Proveedores/,
-      /^Gastos/,
-      /^Caja/,
-      /^Reportes/,
-      /^Usuarios/,
-      /^Auditoría/,
-      /^Mi cuenta/,
-    ]);
+    // Que enlace va en cada lugar, en la computadora y en el celular, lo prueba sidebar.spec.ts.
+    await expect(page.getByRole('navigation', { name: 'Panel' })).toBeVisible();
   });
 
   test('la guia de estilos ya no existe', async ({ page }) => {

@@ -32,3 +32,24 @@ export async function ingresarComo(page: Page, email: string, contrasena: string
   await page.getByLabel('Contraseña', { exact: true }).fill(contrasena);
   await page.getByRole('button', { name: 'Ingresar' }).click();
 }
+
+const deSeccion = (nombre: string) => ({ name: new RegExp(`^${nombre}`) });
+
+/**
+ * El enlace de una seccion del panel. En el celular abajo van solo cuatro: si no esta, abre
+ * "Mas" y lo busca ahi.
+ */
+export async function enlaceDeSeccion(page: Page, nombre: string): Promise<Locator> {
+  const enlace = page
+    .getByRole('navigation', { name: 'Panel' })
+    .getByRole('link', deSeccion(nombre));
+  if (await enlace.isVisible()) return enlace;
+  await page.getByRole('button', { name: 'Más' }).click();
+  return page
+    .getByRole('navigation', { name: 'Más secciones' })
+    .getByRole('link', deSeccion(nombre));
+}
+
+export async function abrirSeccion(page: Page, nombre: string): Promise<void> {
+  await (await enlaceDeSeccion(page, nombre)).click();
+}

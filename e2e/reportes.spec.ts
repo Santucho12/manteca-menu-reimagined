@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { SESIONES } from './ayudas';
+import { SESIONES, abrirSeccion } from './ayudas';
 import {
   borrarReportes,
   PERIODO_E2E,
@@ -33,7 +33,7 @@ const total = (page: Page, texto: string) =>
 
 test('la lista lleva a cada reporte', async ({ page }) => {
   await page.goto('/admin');
-  await page.getByRole('link', { name: 'Reportes' }).first().click();
+  await abrirSeccion(page, 'Reportes');
   await expect(page.getByRole('heading', { level: 1, name: 'Reportes' })).toBeVisible();
   const lista = page.getByRole('main').getByRole('list');
   for (const titulo of TITULOS) {
