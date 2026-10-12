@@ -128,12 +128,10 @@ test.describe('con la sesion de un invitado', () => {
 test.describe('con la sesion del admin', () => {
   test.use({ storageState: SESIONES.admin });
 
-  test('ve el inicio con las personas que esperan un rol', async ({ page }) => {
+  // Las personas que esperan un rol son un aviso del inicio: lo prueba inicio-admin.spec.ts.
+  test('ve el inicio y su barra', async ({ page }) => {
     await page.goto('/admin');
     await expect(page.getByRole('heading', { level: 1, name: 'Inicio' })).toBeVisible();
-    await expect(
-      page.getByText(/^(No hay personas|Hay \d+ personas?) esperando un rol\.$/),
-    ).toBeVisible();
     const menu = page.getByRole('navigation', { name: 'Panel' });
     await expect(menu.getByRole('link')).toHaveText([
       /^Inicio/,
