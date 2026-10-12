@@ -6,7 +6,7 @@ import {
   diaLibre,
 } from '../cierres-de-prueba';
 import { clienteSecretoDePruebas } from '../clientes';
-import { borrarGastos, idDeCategoria, sembrarGasto } from '../gastos-de-prueba';
+import { borrarGastos, idDeCategoria, sembrarGasto, sembrarRecurrente } from '../gastos-de-prueba';
 import { clienteComo } from '../sesiones';
 
 const gastos: string[] = [];
@@ -60,14 +60,65 @@ describe('el efectivo de la caja sale por el cierre', () => {
     expect(delCierre).toHaveLength(1);
     // Como quedaria un gasto a mano cargado antes de la regla: con el medio y sin cierre.
     const viejo = delCierre![0]!.id;
+    // Sin el cierre, borrarCierres ya no lo encuentra: se borra como gasto.
+    gastos.push(viejo);
     await secreto.from('gastos').update({ cierre_id: null }).eq('id', viejo);
+    const admin = await clienteComo('admin');
+    const editado = await admin
+      .from('gastos')
+      .update({ descripcion: 'Hielo para el local' })
+      .eq('id', viejo);
+    expect(editado.error).toBeNull();
+    const anulado = await admin
+      .from('gastos')
+      .update({ anulado: true, motivo_anulacion: 'Prueba' })
+      .eq('id', viejo);
+    expect(anulado.error).toBeNull();
+  });
+
+  it('a un gasto de un recurrente no se le cambia el medio a efectivo de la caja', async () => {
+    const plantilla = await sembrarRecurrente({ primerVencimiento: '2031-07-01' });
+    recurrentes.push(plantilla.id);
+    const secreto = clienteSecretoDePruebas();
+    const { data: generado } = await secreto
+      .from('gastos')
+      .insert({
+        local_id: (
+          await secreto
+            .from('gastos_recurrentes')
+            .select('local_id')
+            .eq('id', plantilla.id)
+            .single()
+        ).data!.local_id,
+        fecha: '2031-07-01',
+        vencimiento: '2031-07-01',
+        recurrente_id: plantilla.id,
+        categoria_id: await idDeCategoria('Alquiler'),
+        monto_centavos: 100000,
+        medio_de_pago: 'transferencia',
+      })
+      .select('id')
+      .single();
+    gastos.push(generado!.id);
     const { error } = await (
       await clienteComo('admin')
     )
       .from('gastos')
-      .update({ descripcion: 'Hielo para el local' })
-      .eq('id', viejo);
-    expect(error).toBeNull();
+      .update({ medio_de_pago: 'efectivo_caja' })
+      .eq('id', generado!.id);
+    expect(error?.code).toBe('PG207');
+  });
+
+  it('a una plantilla no se le cambia el medio a efectivo de la caja', async () => {
+    const plantilla = await sembrarRecurrente({ primerVencimiento: '2031-08-01' });
+    recurrentes.push(plantilla.id);
+    const { error } = await (
+      await clienteComo('admin')
+    )
+      .from('gastos_recurrentes')
+      .update({ medio_de_pago: 'efectivo_caja' })
+      .eq('id', plantilla.id);
+    expect(error?.code).toBe('PG207');
   });
 
   it('una plantilla recurrente no se crea con el efectivo de la caja', async () => {
