@@ -108,6 +108,9 @@ esperado.
 - El empleado carga el cierre y después se sigue vendiendo: el cierre se recalcula en la
   próxima sincronización y queda marcado con "hubo ventas después del cierre".
 - Día sin ninguna venta: lo esperado es el fondo inicial menos retiros y gastos.
+- Bajar el fondo inicial o declarar un retiro de más tapa un faltante: el control muestra lo
+  retirado en cada cierre y marca "Fondo distinto"; el detalle dice cuánto (Santiago,
+  2026-10-12).
 - El fondo inicial de hoy no coincide con lo que se dejó ayer: el control lo marca como
   dato, sin tratarlo como diferencia.
 - Un día sin cierre: aparece marcado en el control y avisado en Inicio.

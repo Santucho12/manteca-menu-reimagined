@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import type { Cierre } from '@/lib/caja/consultas';
 import { mediosDelCierre, nombreDeMedio, textoDeDiferencia } from '@/lib/caja/pantalla';
+import { diferenciaDeFondo, textoDeFondo } from '@/lib/caja/fondo';
 import { formatearPesos } from '@/lib/plata';
 
 const pesos = (centavos: number | null) => (centavos === null ? '—' : formatearPesos(centavos));
@@ -51,7 +52,14 @@ function Salidas({ cierre }: { cierre: Cierre }) {
 }
 
 /** Lo que se declaro en el cierre y, cuando entren las ventas, lo esperado y la diferencia. */
-export function DetalleDelCierre({ cierre }: { cierre: Cierre }) {
+export function DetalleDelCierre({
+  cierre,
+  fondoAnterior,
+}: {
+  cierre: Cierre;
+  fondoAnterior: number | null;
+}) {
+  const fondo = diferenciaDeFondo(cierre.fondo_inicial_centavos, fondoAnterior);
   return (
     <div className="space-y-6">
       {cierre.estado === 'esperando_ventas' ? (
@@ -65,6 +73,7 @@ export function DetalleDelCierre({ cierre }: { cierre: Cierre }) {
       <Seccion titulo="Efectivo de la caja">
         <p>Fondo inicial: {formatearPesos(cierre.fondo_inicial_centavos)}</p>
         <p>Queda en la caja: {formatearPesos(cierre.queda_en_caja_centavos)}</p>
+        {fondo ? <p className="font-medium">{textoDeFondo(fondo)}</p> : null}
       </Seccion>
       <Seccion titulo="Retiros y gastos pagados con la caja">
         <Salidas cierre={cierre} />

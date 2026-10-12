@@ -91,14 +91,13 @@ describe('fechaParaMostrar', () => {
 });
 
 describe('opcionesDeMedio y opcionesDeFrecuencia', () => {
-  it('todas, con su nombre', () => {
-    expect(opcionesDeMedio().map((o) => o.texto)).toEqual([
-      'Efectivo de la caja',
-      'Transferencia',
-      'Tarjeta',
-      'Otro',
-    ]);
+  it('sin el efectivo de la caja, que sale por el cierre', () => {
+    expect(opcionesDeMedio().map((o) => o.texto)).toEqual(['Transferencia', 'Tarjeta', 'Otro']);
     expect(opcionesDeFrecuencia()[0]).toEqual({ valor: 'mensual', texto: 'Todos los meses' });
+  });
+
+  it('con el efectivo de la caja en un gasto que ya lo tenia', () => {
+    expect(opcionesDeMedio('efectivo_caja').map((o) => o.valor)).toContain('efectivo_caja');
   });
 });
 

@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { TituloDePagina } from '@/components/panel/TituloDePagina';
 import { Badge } from '@/components/ui/badge';
 import { exigirPagina } from '@/lib/acceso/servidor';
-import { cierrePorId, type Cierre } from '@/lib/caja/consultas';
+import { cierrePorId, fondosAnteriores, type Cierre } from '@/lib/caja/consultas';
 import { nombreDeEstado } from '@/lib/caja/pantalla';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import { AccionesDelCierre } from './AccionesDelCierre';
@@ -31,6 +31,10 @@ export default async function FichaDeCierre({ params }: { params: Promise<{ id: 
   const cierre = await cierrePorId(cliente, (await params).id);
   if (!cierre) notFound();
   const esAdmin = estado === 'admin';
+  // Solo el admin ve con que se compara el fondo: Caja no lee los cierres de los demas.
+  const anterior = esAdmin
+    ? ((await fondosAnteriores(cliente, [cierre.id])).get(cierre.id) ?? null)
+    : null;
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3">
@@ -39,7 +43,7 @@ export default async function FichaDeCierre({ params }: { params: Promise<{ id: 
       </div>
       <p className="text-muted-foreground">Cargado por {cierre.persona}</p>
       <Marcas cierre={cierre} />
-      <DetalleDelCierre cierre={cierre} />
+      <DetalleDelCierre cierre={cierre} fondoAnterior={anterior} />
       {esAdmin && cierre.estado !== 'anulado' ? (
         <AccionesDelCierre id={cierre.id} revisado={cierre.estado === 'revisado'} />
       ) : null}

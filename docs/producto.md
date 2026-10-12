@@ -105,4 +105,5 @@ productos ni tickets. No se construye la subida de Excel.
 | Qué | De qué depende | Qué cambia |
 |---|---|---|
 | Cuántos turnos hay por día | Del cliente. Se asume uno | Si hay un cierre por día o uno por turno |
+| A qué hora cierra el local | Del cliente | Si cierra después de medianoche, la fecha del cierre tiene que venir con el día anterior: hoy viene con el día de hoy y el cierre quedaría en el día equivocado |
 | Qué son las ventas sin medio de pago | En el Excel de un mes, la suma por medio de pago da menos que el total vendido. Se ve con la API | Cómo se calcula lo esperado de la caja |

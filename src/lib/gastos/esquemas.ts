@@ -21,7 +21,13 @@ const camposDeGasto = {
   medioDePago: z.enum(MEDIOS_DE_PAGO, 'Elegí cómo se pagó.'),
 };
 
-export const esquemaGasto = z.object({ fecha, ...camposDeGasto, comprobante: texto(60) });
+export const esquemaGasto = z.object({
+  fecha,
+  ...camposDeGasto,
+  comprobante: texto(60),
+  // Una clave por formulario abierto: guardar dos veces el mismo gasto no lo duplica.
+  clave: z.uuid().optional(),
+});
 export const esquemaRecurrente = z.object({
   ...camposDeGasto,
   frecuencia: z.enum(FRECUENCIAS, 'Elegí cada cuánto se repite.'),

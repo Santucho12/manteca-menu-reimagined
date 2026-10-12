@@ -86,8 +86,11 @@ export function fechaParaMostrar(fecha: string): string {
   return fecha.split('-').reverse().join('/');
 }
 
-export const opcionesDeMedio = (): OpcionDeLista[] =>
-  Object.entries(MEDIOS).map(([valor, texto]) => ({ valor, texto }));
+/** El efectivo de la caja sale por el cierre: solo se ve en un gasto que ya lo tenia. */
+export const opcionesDeMedio = (actual?: MedioDePago | ''): OpcionDeLista[] =>
+  Object.entries(MEDIOS)
+    .filter(([valor]) => valor !== 'efectivo_caja' || actual === 'efectivo_caja')
+    .map(([valor, texto]) => ({ valor, texto }));
 
 export const opcionesDeFrecuencia = (): OpcionDeLista[] =>
   Object.entries(FRECUENCIAS_EN_TEXTO).map(([valor, texto]) => ({ valor, texto }));

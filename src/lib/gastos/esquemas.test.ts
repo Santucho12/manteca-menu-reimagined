@@ -36,6 +36,14 @@ describe('esquemaGasto', () => {
     });
   });
 
+  it('acepta la clave de carga y no la pasa con las columnas del gasto', () => {
+    const clave = '9b1c2d3e-4f5a-4b6c-8d7e-0f1a2b3c4d5e';
+    const datos = esquemaGasto.parse({ ...gasto, clave });
+    expect(datos.clave).toBe(clave);
+    expect(gastoParaLaBase(datos)).not.toHaveProperty('clave');
+    expect(esquemaGasto.safeParse({ ...gasto, clave: 'x' }).success).toBe(false);
+  });
+
   it('explica un monto mal escrito', () => {
     const resultado = esquemaGasto.safeParse({ ...gasto, monto: '12,345' });
     expect(resultado.error?.issues[0]?.message).toBe(

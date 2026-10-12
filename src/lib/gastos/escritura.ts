@@ -21,6 +21,8 @@ export const MENSAJES_DE_GASTOS = {
   deCierre:
     'Este gasto salió de un cierre de caja: el monto, la fecha y el medio de pago se corrigen anulando el cierre.',
   anularDeCierre: 'Este gasto salió de un cierre de caja: se anula anulando el cierre.',
+  efectivoDeCaja:
+    'El efectivo de la caja sale por el cierre del día: que lo cargue quien cierra la caja.',
   generico: 'No pudimos guardarlo. Revisá los datos e intentá de nuevo.',
 } as const;
 
@@ -35,6 +37,7 @@ const POR_CODIGO: Record<string, string> = {
   '23505': MENSAJES_DE_GASTOS.categoriaRepetida,
   PC305: MENSAJES_DE_GASTOS.deCierre,
   PC306: MENSAJES_DE_GASTOS.anularDeCierre,
+  PG207: MENSAJES_DE_GASTOS.efectivoDeCaja,
 };
 
 type Respuesta = {
@@ -58,8 +61,16 @@ function alCambiar({ data, error }: Respuesta): Resultado {
     : fallo(MENSAJES_DE_GASTOS.noDisponible);
 }
 
+async function gastoDeLaClave(cliente: Cliente, clave: string) {
+  return alCrear(await cliente.from('gastos').select('id').eq('clave', clave).single());
+}
+
+/** La misma carga mandada dos veces (un toque repetido, un reintento) devuelve el mismo gasto. */
 export async function crearGasto(cliente: Cliente, datos: DatosDeGasto) {
-  return alCrear(await cliente.from('gastos').insert(gastoParaLaBase(datos)).select('id').single());
+  const fila = { ...gastoParaLaBase(datos), clave: datos.clave ?? null };
+  const creado = await cliente.from('gastos').insert(fila).select('id').single();
+  if (creado.error?.code === '23505' && datos.clave) return gastoDeLaClave(cliente, datos.clave);
+  return alCrear(creado);
 }
 
 export async function editarGasto(cliente: Cliente, id: string, datos: DatosDeGasto) {

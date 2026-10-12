@@ -20,6 +20,8 @@ export default async function NuevoGasto() {
     // Vacio a proposito: la persona elige como pago, el formulario no lo supone.
     medioDePago: '' as DatosDeGasto['medioDePago'],
     comprobante: '',
+    // Una clave por formulario abierto: guardar dos veces el mismo gasto no lo duplica.
+    clave: crypto.randomUUID(),
   };
   return (
     <div className="space-y-6">

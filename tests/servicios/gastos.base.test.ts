@@ -70,7 +70,7 @@ const datos = (cambios: Partial<DatosDeGasto>): DatosDeGasto => ({
   monto: '1.500,25',
   descripcion: '',
   proveedorId: '',
-  medioDePago: 'efectivo_caja',
+  medioDePago: 'transferencia',
   comprobante: '',
   ...cambios,
 });
