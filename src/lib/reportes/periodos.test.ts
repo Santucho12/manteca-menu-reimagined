@@ -23,18 +23,41 @@ describe('periodos', () => {
     expect(diasDe({ desde: '2026-10-05', hasta: '2026-10-05' })).toBe(1);
   });
 
-  it('el periodo anterior tiene el mismo largo y termina el dia antes', () => {
-    expect(periodoAnterior(OCTUBRE)).toEqual({ desde: '2026-08-31', hasta: '2026-09-30' });
-    expect(periodoAnterior({ desde: '2027-01-01', hasta: '2027-01-07' })).toEqual({
-      desde: '2026-12-25',
-      hasta: '2026-12-31',
+  it('un mes entero se compara con el mes anterior entero', () => {
+    expect(periodoAnterior(OCTUBRE)).toEqual({ desde: '2026-09-01', hasta: '2026-09-30' });
+    expect(periodoAnterior({ desde: '2026-03-01', hasta: '2026-03-31' })).toEqual({
+      desde: '2026-02-01',
+      hasta: '2026-02-28',
     });
   });
 
-  it('sin fechas en la URL es el mes de hoy contra el periodo anterior', () => {
+  it('del 1 a un dia del mes se compara con los mismos dias del mes anterior', () => {
+    expect(periodoAnterior({ desde: '2027-01-01', hasta: '2027-01-07' })).toEqual({
+      desde: '2026-12-01',
+      hasta: '2026-12-07',
+    });
+    // El 30 de marzo no tiene par en febrero: se compara con febrero entero.
+    expect(periodoAnterior({ desde: '2026-03-01', hasta: '2026-03-30' })).toEqual({
+      desde: '2026-02-01',
+      hasta: '2026-02-28',
+    });
+  });
+
+  it('otro periodo se compara con el anterior del mismo largo', () => {
+    expect(periodoAnterior({ desde: '2026-10-05', hasta: '2026-10-11' })).toEqual({
+      desde: '2026-09-28',
+      hasta: '2026-10-04',
+    });
+    expect(periodoAnterior({ desde: '2026-09-15', hasta: '2026-10-14' })).toEqual({
+      desde: '2026-08-16',
+      hasta: '2026-09-14',
+    });
+  });
+
+  it('sin fechas en la URL es del 1 a hoy contra los mismos dias del mes anterior', () => {
     expect(periodosDelReporte({}, '2026-10-11')).toEqual({
-      actual: OCTUBRE,
-      comparacion: { desde: '2026-08-31', hasta: '2026-09-30' },
+      actual: { desde: '2026-10-01', hasta: '2026-10-11' },
+      comparacion: { desde: '2026-09-01', hasta: '2026-09-11' },
       comparacionElegida: false,
       pagina: 1,
     });
@@ -67,7 +90,7 @@ describe('periodos', () => {
 
   it('arma los atajos de hoy', () => {
     expect(atajos('2026-01-15')).toEqual([
-      { texto: 'Este mes', periodo: { desde: '2026-01-01', hasta: '2026-01-31' } },
+      { texto: 'Este mes', periodo: { desde: '2026-01-01', hasta: '2026-01-15' } },
       { texto: 'Mes pasado', periodo: { desde: '2025-12-01', hasta: '2025-12-31' } },
       { texto: 'Últimos 7 días', periodo: { desde: '2026-01-09', hasta: '2026-01-15' } },
     ]);
