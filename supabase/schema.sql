@@ -1,5 +1,5 @@
 -- Esquema completo de la base del Sistema Manteca, al dia con la ultima migracion
--- (20261010120100_ventas_clave_y_anuladas). Se actualiza en el mismo cambio que cada
+-- (20261012120000_revision_fase_1). Se actualiza en el mismo cambio que cada
 -- migracion.
 
 -- Tipos
@@ -2655,7 +2655,7 @@ begin
 end
 $$;
 
-revoke all on function public.gastos_exigir_medio(text, text) from public, anon;
+revoke all on function public.gastos_exigir_medio(text, text) from public, anon, authenticated;
 
 create or replace function public.reglas_de_gastos()
 returns trigger
@@ -2684,7 +2684,8 @@ begin
     new.fecha_anulacion := now();
     return new;
   end if;
-  if new.cierre_id is null and new.recurrente_id is null then
+  -- Lo que genera un recurrente entra con el medio de su plantilla; despues, como cualquiera.
+  if new.cierre_id is null and not (tg_op = 'INSERT' and new.recurrente_id is not null) then
     perform public.gastos_exigir_medio(new.medio_de_pago::text,
       case when tg_op = 'UPDATE' then old.medio_de_pago::text end);
   end if;
