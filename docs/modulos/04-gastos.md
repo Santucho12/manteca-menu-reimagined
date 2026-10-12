@@ -81,6 +81,11 @@ frecuencia y día.
 7. Editar una plantilla cambia los gastos futuros, no los ya generados.
 8. Si el día elegido no existe en un mes (el 31 en abril), se genera el último día del mes.
 9. Una categoría desactivada no aparece para cargar gastos nuevos y conserva los que tiene.
+10. El efectivo de la caja sale por el cierre del día: un gasto a mano o un recurrente no se
+    carga con ese medio, porque nunca llegaría a la caja y la dejaría con un faltante. Un gasto
+    que ya lo tenía se edita sin cambiárselo (Santiago, 2026-10-12).
+11. La misma carga de un gasto mandada dos veces (un toque repetido, un reintento) no lo
+    duplica: cada formulario lleva su clave.
 
 ## Casos de borde
 
