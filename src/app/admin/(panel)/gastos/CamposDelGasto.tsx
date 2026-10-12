@@ -65,7 +65,10 @@ export function CamposDelGasto({
       <CampoDeSeleccion
         id="medio-de-pago"
         etiqueta="Medio de pago"
-        opciones={[{ valor: '', texto: 'Elegí cómo se pagó' }, ...opcionesDeMedio()]}
+        opciones={[
+          { valor: '', texto: 'Elegí cómo se pagó' },
+          ...opcionesDeMedio(inicial.medioDePago),
+        ]}
         error={errors.medioDePago?.message}
         {...register('medioDePago')}
       />

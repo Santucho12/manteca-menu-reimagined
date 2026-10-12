@@ -8,6 +8,7 @@ import { exigirPagina } from '@/lib/acceso/servidor';
 import {
   diasConCierre,
   listarCierres,
+  fondosAnteriores,
   personasDeCaja,
   primerDiaConCierre,
   toleranciaDeCaja,
@@ -117,7 +118,11 @@ async function datosDelControl(searchParams: Promise<ParametrosDeControl>) {
     primero,
     hoy,
   });
-  return { hoy, filtros, lista, personas, tolerancia, faltan };
+  const fondos = await fondosAnteriores(
+    cliente,
+    lista.filas.map((fila) => fila.id),
+  );
+  return { hoy, filtros, lista, personas, tolerancia, faltan, fondos };
 }
 
 export default async function ControlDeCierres({
@@ -125,7 +130,8 @@ export default async function ControlDeCierres({
 }: {
   searchParams: Promise<ParametrosDeControl>;
 }) {
-  const { hoy, filtros, lista, personas, tolerancia, faltan } = await datosDelControl(searchParams);
+  const { hoy, filtros, lista, personas, tolerancia, faltan, fondos } =
+    await datosDelControl(searchParams);
   return (
     <div className="space-y-6">
       <TituloDePagina>Control de cierres</TituloDePagina>
@@ -135,7 +141,7 @@ export default async function ControlDeCierres({
       <FormularioDeTolerancia inicial={montoParaEditar(tolerancia)} />
       <Filtros filtros={filtros} personas={personas} />
       <DiasSinCierre dias={filtros.estado || filtros.personaId ? [] : faltan} />
-      <ListaDeCierres filas={lista.filas} conPersona />
+      <ListaDeCierres filas={lista.filas} conPersona fondos={fondos} />
       <Paginas filtros={{ ...filtros, pagina: lista.pagina }} total={lista.total} hoy={hoy} />
     </div>
   );

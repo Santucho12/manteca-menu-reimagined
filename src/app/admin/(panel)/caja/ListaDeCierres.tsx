@@ -1,12 +1,38 @@
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import type { FilaDeCierre } from '@/lib/caja/consultas';
+import { diferenciaDeFondo } from '@/lib/caja/fondo';
 import { nombreDeEstado, textoDeDiferencia } from '@/lib/caja/pantalla';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
+import { formatearPesos } from '@/lib/plata';
 
-type Props = { filas: FilaDeCierre[]; conPersona?: boolean };
+/** fondos: lo que quedo en el cierre anterior a cada uno; solo lo pide el control del admin. */
+type Props = { filas: FilaDeCierre[]; conPersona?: boolean; fondos?: Map<string, number | null> };
 
-function Fila({ cierre, conPersona }: { cierre: FilaDeCierre; conPersona: boolean }) {
+// Bajar el fondo o inventar un retiro tapan un faltante: el control los deja a la vista.
+function ParaControlar({ cierre, anterior }: { cierre: FilaDeCierre; anterior: number | null }) {
+  const fondo = diferenciaDeFondo(cierre.fondoInicialCentavos, anterior);
+  return (
+    <>
+      {cierre.retirosCentavos > 0 ? (
+        <span className="text-muted-foreground text-sm">
+          Retiros: {formatearPesos(cierre.retirosCentavos)}
+        </span>
+      ) : null}
+      {fondo ? <Badge variant="outline">Fondo distinto</Badge> : null}
+    </>
+  );
+}
+
+function Fila({
+  cierre,
+  conPersona,
+  anterior,
+}: {
+  cierre: FilaDeCierre;
+  conPersona: boolean;
+  anterior: number | null;
+}) {
   const atencion = cierre.estado === 'con_diferencia';
   return (
     <li className="flex flex-wrap items-center justify-between gap-3 p-4">
@@ -20,6 +46,7 @@ function Fila({ cierre, conPersona }: { cierre: FilaDeCierre; conPersona: boolea
         {conPersona ? <p className="text-muted-foreground text-sm">{cierre.persona}</p> : null}
       </div>
       <div className="flex flex-wrap items-center gap-2">
+        {conPersona ? <ParaControlar cierre={cierre} anterior={anterior} /> : null}
         <span className="text-sm">{textoDeDiferencia(cierre.diferenciaTotalCentavos)}</span>
         <Badge variant={atencion ? 'destructive' : 'outline'}>
           {nombreDeEstado(cierre.estado)}
@@ -29,13 +56,18 @@ function Fila({ cierre, conPersona }: { cierre: FilaDeCierre; conPersona: boolea
   );
 }
 
-export function ListaDeCierres({ filas, conPersona = false }: Props) {
+export function ListaDeCierres({ filas, conPersona = false, fondos }: Props) {
   if (filas.length === 0)
     return <p className="text-muted-foreground">No hay cierres para mostrar.</p>;
   return (
     <ul aria-label="Cierres" className="bg-card divide-y rounded-xl border">
       {filas.map((cierre) => (
-        <Fila key={cierre.id} cierre={cierre} conPersona={conPersona} />
+        <Fila
+          key={cierre.id}
+          cierre={cierre}
+          conPersona={conPersona}
+          anterior={fondos?.get(cierre.id) ?? null}
+        />
       ))}
     </ul>
   );
