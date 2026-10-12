@@ -17,14 +17,12 @@ test.beforeAll(async () => {
     .select('local_id')
     .eq('id', hoy.id)
     .single();
-  await clienteSecretoDePruebas()
-    .from('retiros_de_caja')
-    .insert({
-      local_id: data!.local_id,
-      cierre_id: hoy.id,
-      monto_centavos: 500000,
-      quien: 'Dueño',
-    });
+  await clienteSecretoDePruebas().from('retiros_de_caja').insert({
+    local_id: data!.local_id,
+    cierre_id: hoy.id,
+    monto_centavos: 500000,
+    quien: 'Dueño',
+  });
 });
 
 test.afterAll(async () => {
