@@ -1,6 +1,7 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { borrarCierres, sembrarCierre } from '../tests/cierres-de-prueba';
 import { clienteSecretoDePruebas } from '../tests/clientes';
+import { borrarCategoriasConSusGastos, sembrarCategoriaDeGasto } from '../tests/gastos-de-prueba';
 import { SESIONES } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
@@ -41,6 +42,38 @@ test('el control marca el fondo distinto y muestra lo retirado', async ({ page }
   await expect(
     page.getByText('Arrancó con $5.000,00 menos de lo que quedó en el cierre anterior.'),
   ).toBeVisible();
+});
+
+test.describe('cargar dos gastos seguidos volviendo atras', () => {
+  let categoria: { id: string; nombre: string };
+  test.beforeAll(async () => {
+    categoria = await sembrarCategoriaDeGasto();
+  });
+  test.afterAll(async () => {
+    await borrarCategoriasConSusGastos([categoria.id]);
+  });
+
+  async function cargar(page: Page, descripcion: string) {
+    await page.getByLabel('Categoría').selectOption({ label: categoria.nombre });
+    await page.getByLabel('Monto').fill('100');
+    await page.getByLabel('Descripción').fill(descripcion);
+    await page.getByLabel('Medio de pago').selectOption({ label: 'Transferencia' });
+    await page.getByRole('button', { name: 'Guardar' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Gastos' })).toBeVisible();
+  }
+
+  test('guarda los dos: el formulario de vuelta no reusa la clave', async ({ page }) => {
+    await page.goto('/admin/gastos/nuevo');
+    await cargar(page, 'Primero');
+    await page.goBack();
+    await expect(page.getByRole('heading', { level: 1, name: 'Cargar gasto' })).toBeVisible();
+    await cargar(page, 'Segundo');
+    const { data } = await clienteSecretoDePruebas()
+      .from('gastos')
+      .select('descripcion')
+      .eq('categoria_id', categoria.id);
+    expect((data ?? []).map((g) => g.descripcion).sort()).toEqual(['Primero', 'Segundo']);
+  });
 });
 
 test('cargar gasto no ofrece el efectivo de la caja', async ({ page }) => {
