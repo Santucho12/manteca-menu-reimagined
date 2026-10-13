@@ -16,7 +16,9 @@ son los de Manteca.
   nombre (`accent`, que es también `primary`). Donde Plan Reminder Pro usa su verde o su
   esmeralda, va el dorado. La letra queda oscura (`foreground`, `muted-foreground`): el dorado
   sobre crema da 2,5 a 1 y no se lee como texto, así que se usa en fondos tenues, bordes,
-  íconos y el nombre de la marca. Nada de colores sueltos (`slate-*`, `emerald-*`, `#hex`).
+  íconos y el nombre de la marca. Nada de colores sueltos (`slate-*`, `emerald-*`, `#hex`). Tampoco `text-primary`, `text-accent`
+  ni un borde de selección en dorado para marcar algo: sobre crema no llegan al contraste
+  pedido. Para marcar lo elegido, borde oscuro (`border-foreground`) y fondo dorado tenue.
 - **Tipografía:** la marca en Manic (`font-title`); títulos y texto en Neufile Grotesk. Plan
   Reminder Pro usa `font-extrabold` en los títulos: acá va `font-bold`, porque Neufile Grotesk
   llega hasta 700.

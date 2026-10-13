@@ -19,6 +19,13 @@ Decisiones (las recomendadas, aprobadas por Santiago):
    en las pantallas principales de cada sección; dos manchas de color difuminadas en el fondo
    (`primary` arriba a la derecha, `accent` abajo a la izquierda).
 
+## Cambio de colores (Santiago, 2026-10-12, después del primer diseño)
+
+La marca son dos colores: el crema del fondo y el dorado del nombre. El color principal
+(`--primary`) pasa a ser el dorado, con la letra oscura, en todo el sistema: botones, globitos y
+la sidebar. El dorado no se usa como color de letra (sobre crema no se lee): va en fondos, bordes,
+íconos y el nombre de la marca. Donde abajo dice `primary` marrón o "en blanco", vale esto.
+
 ## La estética, traducida a Manteca
 
 | Plan Reminder Pro | Manteca |
