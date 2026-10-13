@@ -114,7 +114,7 @@ export default async function PaginaDeVentas({
   const lista = await listarVentas(cliente, filtros);
   return (
     <div className="space-y-6">
-      <TituloDePagina>Ventas</TituloDePagina>
+      <TituloDePagina subtitulo="Las ventas del período, con su total.">Ventas</TituloDePagina>
       <p className="text-muted-foreground max-w-xl text-sm">
         Fudo todavía no está conectado: por ahora se ven las ventas cargadas a mano.
       </p>

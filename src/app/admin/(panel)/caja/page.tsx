@@ -47,7 +47,9 @@ export default async function CargarCierre({ searchParams }: { searchParams: Par
   };
   return (
     <div className="space-y-6">
-      <TituloDePagina>Cierre de caja</TituloDePagina>
+      <TituloDePagina subtitulo="Contá lo que hay en la caja y cargalo al terminar el día.">
+        Cierre de caja
+      </TituloDePagina>
       <QuienCarga nombre={perfil.nombre} />
       <FormularioDeCierre inicial={inicial} />
     </div>

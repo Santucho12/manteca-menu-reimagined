@@ -44,6 +44,14 @@ describe('contraste de los colores de la guia', () => {
   });
 });
 
+// La marca son dos colores: el crema del fondo y el dorado del nombre (Santiago, 2026-10-12).
+describe('colores de la marca', () => {
+  it('el color principal es el dorado de la marca, con la letra oscura', () => {
+    expect(color('--primary')).toBe(color('--accent'));
+    expect(color('--primary-foreground')).toBe(color('--accent-foreground'));
+  });
+});
+
 describe('anillo de foco', () => {
   it('ningun componente lo pinta transparente', () => {
     const carpeta = 'src/components/ui';

@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { emailDePrueba } from '../tests/cuentas';
 import { borrarCuentaTemporal, crearCuentaTemporal } from '../tests/cuentas-temporales';
-import { SESIONES, abrirSinSesion, aviso, ingresarComo } from './ayudas';
+import { SESIONES, abrirSinSesion, aviso, enlaceDeSeccion, ingresarComo } from './ayudas';
 
 const DESACTIVADA = 'Tu cuenta está desactivada. Hablá con el administrador.';
 const ESPERA = 'Tu cuenta ya está creada. Un administrador tiene que darte acceso.';
@@ -73,8 +73,7 @@ test('el filtro Esperando rol y la busqueda encuentran a quien espera', async ({
     await page.getByRole('button', { name: 'Buscar' }).click();
     await expect(page.getByRole('list', { name: 'Cuentas' }).getByRole('listitem')).toHaveCount(1);
     await expect(tarjeta(page, cuenta.email)).toBeVisible();
-    const menu = page.getByRole('navigation', { name: 'Panel' });
-    await expect(menu.getByRole('link', { name: /^Usuarios/ })).toContainText(/\d+/);
+    await expect(await enlaceDeSeccion(page, 'Usuarios')).toContainText(/\d+/);
   } finally {
     await borrarCuentaTemporal(cuenta.id);
   }

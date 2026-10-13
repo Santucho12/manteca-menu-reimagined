@@ -183,6 +183,8 @@ El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
 - Las pantallas usan los colores y tipografías de `src/app/globals.css` y los componentes
   base de `src/components/ui/` y `src/components/formularios/`, para que se vean iguales
   entre sí.
+- La sidebar, las barras del celular y el hero siguen la skill `estetica-panel`: la estética de
+  Plan Reminder Pro con los colores y la tipografía de Manteca (Santiago, 2026-10-12).
 
 ## Stack
 
@@ -264,6 +266,7 @@ Están en `.claude/skills/` y se usan dentro del flujo de superpowers.
 | `endpoint-staff` | Al escribir o revisar código de servidor que lee o escribe datos |
 | `pre-finish` | Al terminar cualquier cambio de código, antes de decir que está hecho |
 | `verificacion-funcional` | Para revisar a fondo un módulo ya hecho; detecta y no arregla |
+| `estetica-panel` | Al tocar la sidebar, las barras del celular o el encabezado (hero) de una pantalla del panel |
 
 Las reglas viven en este archivo; las skills las repiten donde las aplican. Al cambiar una,
 se busca en todas (`pre-finish`, paso 7).

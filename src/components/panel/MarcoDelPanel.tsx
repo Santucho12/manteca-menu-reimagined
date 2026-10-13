@@ -1,47 +1,24 @@
-import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import type { EnlaceDelMarco } from '@/lib/acceso/marco';
+import { BarraLateral } from './BarraLateral';
+import { BarrasDelCelular } from './BarrasDelCelular';
 
 type Props = { nombre: string; enlaces: EnlaceDelMarco[]; children: ReactNode };
 
-function Menu({ enlaces }: { enlaces: EnlaceDelMarco[] }) {
-  return (
-    <nav aria-label="Panel" className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-      {enlaces.map((enlace) => (
-        <Link
-          key={enlace.clave}
-          href={enlace.href}
-          className="inline-flex items-center gap-2 py-2 underline-offset-4 hover:underline"
-        >
-          {enlace.texto}
-          {enlace.insignia ? <Badge>{enlace.insignia}</Badge> : null}
-        </Link>
-      ))}
-    </nav>
-  );
-}
-
-/** El marco de cada pantalla del panel: la marca, el menu, quien tiene la sesion y Salir. */
+/**
+ * El marco de cada pantalla del panel: la sidebar en la computadora, las barras fijas en el
+ * celular y el contenido con las manchas de color del fondo (skill estetica-panel).
+ */
 export function MarcoDelPanel({ nombre, enlaces, children }: Props) {
   return (
-    <div className="min-h-dvh">
-      <header className="bg-card border-b">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
-          <span className="font-title text-2xl">Manteca</span>
-          {enlaces.length > 0 ? <Menu enlaces={enlaces} /> : null}
-          <div className="ml-auto flex items-center gap-3">
-            <span className="text-sm">{nombre}</span>
-            <form action="/admin/salir" method="post">
-              <Button type="submit" variant="outline">
-                Salir
-              </Button>
-            </form>
-          </div>
-        </div>
-      </header>
-      <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+    <div className="bg-background min-h-dvh">
+      <BarraLateral nombre={nombre} enlaces={enlaces} />
+      <BarrasDelCelular nombre={nombre} enlaces={enlaces} />
+      <main className="relative min-h-dvh overflow-clip px-4 pt-20 pb-28 md:px-8 lg:ml-[260px] lg:p-10">
+        <div className="bg-accent/10 absolute top-0 right-0 -z-10 h-[500px] w-[500px] translate-x-1/2 -translate-y-1/2 rounded-full blur-[100px]" />
+        <div className="bg-accent/5 absolute bottom-0 left-0 -z-10 h-[300px] w-[300px] -translate-x-1/2 translate-y-1/2 rounded-full blur-[80px]" />
+        <div className="mx-auto max-w-7xl">{children}</div>
+      </main>
     </div>
   );
 }

@@ -13,7 +13,7 @@ export function SelectorDeIcono() {
         {ICONOS.map((icono) => (
           <label
             key={icono}
-            className="has-checked:border-primary has-checked:bg-secondary has-focus-visible:ring-ring relative flex size-11 cursor-pointer items-center justify-center rounded-lg border text-xl has-focus-visible:ring-2"
+            className="has-checked:border-foreground has-checked:bg-accent/25 has-focus-visible:ring-ring relative flex size-11 cursor-pointer items-center justify-center rounded-lg border text-xl has-focus-visible:ring-2"
           >
             {/* Transparente y encima de toda la opcion: se toca en cualquier parte y se ve el foco. */}
             <input

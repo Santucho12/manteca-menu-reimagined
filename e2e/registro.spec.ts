@@ -23,7 +23,7 @@ test('una persona se registra y queda esperando que le den acceso', async ({ pag
       page.getByText('Tu cuenta ya está creada. Un administrador tiene que darte acceso.'),
     ).toBeVisible();
     await expect(
-      page.getByRole('banner').getByText('Lucía Registro', { exact: true }),
+      page.getByText('Lucía Registro', { exact: true }).locator('visible=true').first(),
     ).toBeVisible();
   } finally {
     await borrarCuentaPorEmail(email);

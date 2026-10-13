@@ -38,14 +38,14 @@ export function GraficoPorMes({ datos }: { datos: ResultadoDelMes[] }) {
           <Bar
             name="Gastos"
             dataKey="gastosCentavos"
-            fill="var(--accent)"
+            fill="var(--foreground)"
             radius={4}
             isAnimationActive={false}
           />
           <Bar
             name="Resultado"
             dataKey="resultadoCentavos"
-            fill="var(--muted-foreground)"
+            fill="var(--input)"
             radius={4}
             isAnimationActive={false}
           />
