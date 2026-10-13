@@ -31,3 +31,9 @@ export function repartirParaCelular<T extends { clave: string }>(enlaces: T[]) {
     mas: enlaces.filter((e) => !ABAJO_EN_EL_CELULAR.includes(e.clave)),
   };
 }
+
+/** Lo que avisan los enlaces que quedaron en "Mas": se ve sobre el boton aunque este cerrado. */
+export function insigniaDeMas(mas: { insignia: number | null }[]): number | null {
+  const total = mas.reduce((suma, enlace) => suma + (enlace.insignia ?? 0), 0);
+  return total > 0 ? total : null;
+}
