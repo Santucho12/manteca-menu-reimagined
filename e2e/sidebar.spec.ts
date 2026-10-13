@@ -53,6 +53,37 @@ test.describe('con la sesion del admin', () => {
   });
 });
 
+test.describe('Más en el celular', () => {
+  test.use({ storageState: SESIONES.admin });
+
+  test('se cierra al tocar un icono de abajo, al tocar afuera y con Escape', async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name !== 'celular', 'solo en el celular');
+    await page.goto('/admin');
+    const mas = page.getByRole('navigation', { name: 'Más secciones' });
+    await page.getByRole('button', { name: /^Más/ }).click();
+    await panel(page)
+      .getByRole('link', { name: /^Ventas/ })
+      .click();
+    await expect(page).toHaveURL(/\/admin\/ventas$/);
+    await expect(mas).toHaveCount(0);
+    await page.getByRole('button', { name: /^Más/ }).click();
+    await page.getByRole('heading', { level: 1 }).click({ force: true });
+    await expect(mas).toHaveCount(0);
+    await page.getByRole('button', { name: /^Más/ }).click();
+    await page.keyboard.press('Escape');
+    await expect(mas).toHaveCount(0);
+  });
+
+  test('avisa con un numero que hay personas esperando, sin abrir Más', async ({ page }, info) => {
+    test.skip(info.project.name !== 'celular', 'solo en el celular');
+    // Las cuentas de prueba siempre dejan alguna pendiente: el invitado espera un rol.
+    await page.goto('/admin');
+    await expect(page.getByRole('button', { name: /^Más/ })).toContainText(/\d+/);
+  });
+});
+
 test.describe('con la sesion de caja', () => {
   test.use({ storageState: SESIONES.caja });
 

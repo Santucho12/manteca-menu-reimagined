@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { enlaceActivo, repartirParaCelular } from './navegacion';
+import { enlaceActivo, insigniaDeMas, repartirParaCelular } from './navegacion';
 
 const enlaces = [
   { clave: 'inicio', href: '/admin' },
@@ -46,5 +46,13 @@ describe('repartirParaCelular', () => {
   it('con 5 o menos, todos abajo', () => {
     const pocos = ['caja', 'cierres', 'cuenta'].map((clave) => ({ clave }));
     expect(repartirParaCelular(pocos)).toEqual({ abajo: pocos, mas: [] });
+  });
+});
+
+describe('insigniaDeMas', () => {
+  it('suma lo que avisan los enlaces que quedaron en Mas', () => {
+    expect(insigniaDeMas([{ insignia: 3 }, { insignia: null }, { insignia: 2 }])).toBe(5);
+    expect(insigniaDeMas([{ insignia: null }])).toBeNull();
+    expect(insigniaDeMas([])).toBeNull();
   });
 });
