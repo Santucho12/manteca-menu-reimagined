@@ -140,14 +140,14 @@ Lo que salió de revisar cada módulo: el control de cierres marca el fondo inic
 ### 35. Sidebar y hero con la estética de Plan Reminder Pro
 Cambiar la barra de arriba del panel por una sidebar, y el encabezado de cada pantalla (el hero), con la misma estética que Plan Reminder Pro (Sistema CobrarWpp), conservando los colores y la tipografía de Manteca. Armar una skill con esa estética y aplicarla.
 
-### 36. Publicar el sistema en un subdominio
-Publicar el sistema en Vercel en `admin.mantecabakeryar.com`. La web actual del menú (otro repo) sigue en `mantecabakeryar.com`. Es una excepción que decidió Santiago el 2026-10-17 a la regla de CLAUDE.md "todo vive en un dominio": así la web que ya está en línea no se toca. Queda sin hacer: el menú público de este repo no reemplaza todavía a la web actual.
+### 36. Publicar el sistema en el dominio
+Publicar el sistema en `mantecabakeryar.com`: el menú nuevo, que sale de la base, en `/` y el panel en `/admin`. El proyecto de Vercel `manteca-menu-reimagined` ya está conectado a este repo y sigue sirviendo el deploy del 2 de julio; el deploy del merge del PR #19 falló. La base real ya tiene las 6 categorías y los 35 productos de la página de julio, con los mismos nombres, precios y descripciones, y las fotos están en `public/menu/`.
 
 ## Pendientes
 
 | # | Pedido | Qué falta |
 |---|---|---|
-| 36 | Publicar el sistema en un subdominio | Crear el proyecto en Vercel conectado al repo, cargar las variables de la base real, sumar `admin.mantecabakeryar.com` con su registro DNS y crear la cuenta del dueño en la base real |
+| 36 | Publicar el sistema en el dominio | Cargar en Vercel las variables de la base real, volver a publicar, crear la cuenta del dueño en la base real y comprobar `/` y `/admin` en el dominio |
 | 30 | Ventas: la parte de Fudo | Construida la parte a mano (ver Completados). Falta, cuando estén las credenciales: traer las ventas de Fudo, vincular productos y medios, "Actualizar ahora" y lo esperado en los cierres. En Reportes: mostrar hasta cuándo están sincronizadas las ventas, y resolver los descuentos de Fudo para que "por producto" cierre con "por período". En Inicio: los avisos "Productos de Fudo sin vincular" y "Las ventas no se sincronizan desde hace más de un día", y la fecha de la última sincronización |
 | 21 | Arreglos de la revisión de la base técnica | Hecho y verificado (rama `fix/revision-base-tecnica`): montos sin precisión y URL sin cifrar se rechazan; protecciones de configuración (todo test corre en algún grupo, versión de Node, tipos de Supabase fuera de Prettier, clave secreta prohibida en componentes); la siembra repara cuentas y lee todas las páginas; un solo aviso con todas las variables que faltan; comprobación de tokens corregida; colores con contraste suficiente y anillo de foco entero. Los controles de 44 px, el campo con error y los títulos en Neufile Grotesk entraron con el pedido 22. Queda para el menú público: las tipografías en woff2. Las variantes de la guía ya no van: la guía se sacó en el pedido 23 |
 
