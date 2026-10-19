@@ -25,6 +25,15 @@ test('muestra el menu de hoy con sus precios', async ({ page }) => {
   ).toContainText('$7.000');
 });
 
+test('la pestaña muestra la medialuna como ícono', async ({ page, request }) => {
+  await page.goto('/');
+  const icono = await page.locator('link[rel="icon"]').first().getAttribute('href');
+  expect(icono).toBeTruthy();
+  const respuesta = await request.get(icono!);
+  expect(respuesta.ok()).toBe(true);
+  expect(await respuesta.text()).toContain('🥐');
+});
+
 test('tocar un producto muestra su descripcion', async ({ page }) => {
   await page.goto('/');
   const croissant = seccion(page, 'Laminados')
