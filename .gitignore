@@ -17,3 +17,4 @@ e2e/capturas/
 
 # Sesiones de prueba que guarda Playwright: tienen tokens.
 e2e/.sesiones/
+.vercel
