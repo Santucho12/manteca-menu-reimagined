@@ -227,3 +227,9 @@ html {
     transform: translateY(0);
   }
 }
+
+/* Todo el panel se ve al 90 %, como el zoom del navegador: a diferencia de transform: scale no
+   deja huecos ni mueve lo fijo. El alto minimo de la pantalla se divide por la misma escala. */
+.escala-del-panel {
+  zoom: 0.9;
+}
