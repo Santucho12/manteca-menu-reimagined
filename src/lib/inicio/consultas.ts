@@ -41,7 +41,9 @@ async function idDeSinClasificar(cliente: Cliente): Promise<string | null> {
   return respuesta.data?.id ?? null;
 }
 
-export async function gastosSinClasificar(cliente: Cliente): Promise<DatosDeAvisos['sinClasificar']> {
+export async function gastosSinClasificar(
+  cliente: Cliente,
+): Promise<DatosDeAvisos['sinClasificar']> {
   const categoriaId = await idDeSinClasificar(cliente);
   if (!categoriaId) return { cantidad: 0, desde: null, categoriaId };
   const gastos = await cliente
