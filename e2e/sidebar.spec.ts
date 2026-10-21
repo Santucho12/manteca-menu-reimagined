@@ -56,6 +56,17 @@ test.describe('con la sesion del admin', () => {
     });
   }
 
+  test('el panel usa la letra y los colores de plan-reminder-pro, y el menu publico no', async ({
+    page,
+  }) => {
+    await page.goto('/admin');
+    const raiz = page.locator('.escala-del-panel');
+    await expect(raiz).toHaveCSS('font-family', /Inter/);
+    await expect(raiz).toHaveCSS('background-color', 'rgb(249, 250, 251)');
+    await page.goto('/');
+    await expect(page.locator('body')).toHaveCSS('font-family', /Neufile Grotesk/);
+  });
+
   test('todo el panel se ve al 85 %', async ({ page }) => {
     await page.goto('/admin');
     await expect(page.locator('.escala-del-panel')).toHaveCSS('zoom', '0.85');

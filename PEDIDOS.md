@@ -152,6 +152,9 @@ Santiago eligió el 2026-10-21, entre 20 propuestas, la sidebar con las seccione
 ### 39. Rediseño de Inicio y de la sidebar
 Rediseño completo, desde cero, de la estética de Inicio (admin) y de la sidebar, con colores y estilo moderno a criterio de Claude (pedido de Santiago, 2026-10-21): sidebar oscura flotante, Inicio en bloques tipo bento, acento índigo. Los colores valen solo dentro del panel, el menú público no cambia. Sin cambios en qué hace cada pantalla.
 
+### 42. Colores y letra de Plan Reminder Pro en el panel
+El panel (`/admin`) usa los colores exactos y las tipografías (Inter y Outfit) de plan-reminder-pro, aplicados solo dentro de `.escala-del-panel`: el menú público sigue con el crema, el dorado y la letra de Manteca. Excepción a "colores y tipografía de Manteca" (CLAUDE.md, skill `estetica-panel`) por decisión de Santiago (2026-10-21); deshace la vuelta a Manteca del pedido 40. Falta actualizar CLAUDE.md y la skill, y los colores fijos que quedaron en Inicio (rojo de Para atender, dorado en los textos).
+
 ### 38. Estética de Plan Reminder Pro en Inicio, Menú y Ventas
 Llevar al cuerpo de Inicio, Menú y Ventas la estética de FiestaCobra (tarjetas con ícono, bloque oscuro de "Ventas del mes", paneles con cabecera, tabla, filtros en tarjeta, acciones como íconos), con los colores y la tipografía de Manteca. Diseño en `docs/superpowers/specs/2026-10-19-estetica-de-pantallas-design.md`.
 
@@ -164,6 +167,7 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 42 | Colores y letra de Plan Reminder Pro en el panel | Todo |
 | 38 | Estética de Plan Reminder Pro en Inicio, Menú y Ventas | Todo |
 | 41 | Playwright en otro puerto | Todo |
 | 40 | Sidebar elegida y vuelta a la paleta de Manteca | Todo |
