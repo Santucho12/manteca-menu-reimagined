@@ -1,7 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// Puerto propio del proyecto: el 3000 suele estar ocupado por otra aplicacion.
-const PUERTO = 3210;
+// El 3210 es del servidor de quien trabaja (npm run dev) y las pruebas no lo tocan: levantan
+// el suyo en el 3211, con su propia carpeta de compilacion.
+const PUERTO = 3211;
 const URL_LOCAL = `http://localhost:${PUERTO}`;
 const A_LA_VISTA = process.env.E2E_A_LA_VISTA === '1';
 
@@ -35,6 +36,7 @@ export default defineConfig({
     port: PUERTO,
     // Nunca uno que ya estaba abierto: pudo arrancar con otras variables y otra base.
     reuseExistingServer: false,
+    env: { PUERTO_DEV: String(PUERTO), NEXT_DIST_DIR: '.next-e2e' },
     timeout: 120_000,
   },
 });

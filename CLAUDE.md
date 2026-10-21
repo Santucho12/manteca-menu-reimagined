@@ -225,10 +225,12 @@ La aplicación usa el puerto 3210 y no el 3000, que suele estar ocupado por otro
 Playwright corre sin ventana: Santiago no quiere verla abrirse (2026-10-11, pedido 32). Con
 `E2E_A_LA_VISTA=1` se abre la ventana, para mirarlo. Con o sin ventana va con `slowMo` de 300 ms,
 porque las pruebas cuentan con que React termine de cargar antes de cada toque. Va un
-navegador a la vez (`workers: 1`). Levanta su propio servidor con `npm run dev` y no reutiliza
-uno que ya estaba abierto, que pudo arrancar con otras variables y otra base: si el puerto
-3210 está ocupado, se cierra ese servidor antes de correr las pruebas. El servidor de
-Playwright para Claude (`.mcp.json`) también abre la ventana a la vista.
+navegador a la vez (`workers: 1`). Levanta su propio servidor con `npm run dev`, en el puerto
+3211 y con su propia carpeta de compilación (`.next-e2e`), y no reutiliza uno que ya estaba
+abierto, que pudo arrancar con otras variables y otra base. Así no toca el servidor del 3210,
+que es el de quien trabaja: no se lo cierra para correr las pruebas (Santiago, 2026-10-21,
+pedido 41). Si el 3211 está ocupado, se cierra ese. El servidor de Playwright para Claude
+(`.mcp.json`) también abre la ventana a la vista.
 
 ## Git
 

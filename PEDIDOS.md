@@ -143,6 +143,9 @@ Cambiar la barra de arriba del panel por una sidebar, y el encabezado de cada pa
 ### 36. Publicar el sistema en el dominio
 Publicar el sistema en `mantecabakeryar.com`: el menú nuevo, que sale de la base, en `/` y el panel en `/admin`. El proyecto de Vercel `manteca-menu-reimagined` ya está conectado a este repo y sigue sirviendo el deploy del 2 de julio; el deploy del merge del PR #19 falló. La base real ya tiene las 6 categorías y los 35 productos de la página de julio, con los mismos nombres, precios y descripciones, y las fotos están en `public/menu/`.
 
+### 41. Playwright en otro puerto
+Que las pruebas de Playwright levanten su servidor en el puerto 3211, con su propia carpeta de compilación, para no tumbar el `npm run dev` del 3210 (pedido de Santiago, 2026-10-21).
+
 ### 40. Sidebar elegida y vuelta a la paleta de Manteca
 Santiago eligió el 2026-10-21, entre 20 propuestas, la sidebar con las secciones en tres grupos ("Día a día", "Plata", "Ajustes"), el número de pendientes en Caja, Gastos y Usuarios, la sección activa marcada con una pestaña dorada al costado, el logo de Manteca arriba y Mi cuenta al pie. Decidió también que todo el panel vuelva al crema, el dorado y el marrón con Neufile Grotesk: se saca la paleta índigo y las tipografías Inter y Outfit del pedido 39.
 
@@ -162,6 +165,7 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 | # | Pedido | Qué falta |
 |---|---|---|
 | 38 | Estética de Plan Reminder Pro en Inicio, Menú y Ventas | Todo |
+| 41 | Playwright en otro puerto | Todo |
 | 40 | Sidebar elegida y vuelta a la paleta de Manteca | Todo |
 | 39 | Rediseño de Inicio y de la sidebar | La paleta índigo y las tipografías Inter y Outfit se sacan en el pedido 40, por decisión de Santiago (2026-10-21); queda la organización de Inicio |
 | 37 | Ícono de la pestaña | Hecho con su prueba en `src/app/icon.svg`. Falta que `npm run verificar` y `npm run e2e` den verde enteros: en la primera corrida dos archivos de tests de base se cortaron por tiempo y la segunda se frenó por falta de memoria |
