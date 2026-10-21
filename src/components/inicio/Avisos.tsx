@@ -12,12 +12,12 @@ function Cabecera({ cantidad }: { cantidad: number }) {
         id="avisos"
         className="flex items-center gap-3 text-xs font-bold tracking-[0.18em] uppercase"
       >
-        <span className="grid size-9 place-items-center rounded-xl bg-rose-100 text-rose-600">
+        <span className="grid size-9 place-items-center rounded-xl bg-rose-100 text-[#9b1c1c]">
           <AlertTriangle size={18} aria-hidden="true" />
         </span>
         Para atender
       </h2>
-      <span className="rounded-full bg-rose-500 px-3 py-1 text-xs font-bold text-white">
+      <span className="rounded-full bg-[#9b1c1c] px-3 py-1 text-xs font-bold text-white">
         {cantidad}
       </span>
     </>
@@ -33,7 +33,7 @@ export function Avisos({ avisos, className = '' }: { avisos: Aviso[]; className?
   return (
     <Panel
       etiquetadoPor="avisos"
-      className={`border-rose-100 bg-rose-50/40 shadow-[0_12px_30px_-16px_rgba(251,113,133,0.3)] ${className}`}
+      className={`border-rose-100 bg-rose-50/40 shadow-[0_12px_30px_-16px_rgba(155,28,28,0.3)] ${className}`}
       etiqueta={<Cabecera cantidad={avisos.length} />}
     >
       <ul className="space-y-3 p-4">
@@ -41,7 +41,7 @@ export function Avisos({ avisos, className = '' }: { avisos: Aviso[]; className?
           <li key={a.texto}>
             <Link href={a.enlace} className={BOTON}>
               {a.texto}
-              <span className="grid size-8 shrink-0 place-items-center rounded-full bg-rose-500 text-white">
+              <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#9b1c1c] text-white">
                 <ChevronRight size={18} aria-hidden="true" />
               </span>
             </Link>
