@@ -78,6 +78,18 @@ test('el bloque de ventas del mes muestra el monto y cuantas ventas van', async 
   await expect(bloque).toContainText('Balance');
 });
 
+test('el mes a mes arranca con 4 meses y se amplia a todo el año', async ({ page }) => {
+  await page.goto('/admin');
+  const barras = page.locator('[aria-label="Gráfico por mes"] .recharts-bar-rectangle');
+  await expect(barras).toHaveCount(12); // 4 meses x 3 series
+  await page.getByRole('button', { name: 'Ver todo el año' }).click();
+  await expect(page.getByRole('button', { name: 'Ver 4 meses' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  expect(await barras.count()).toBeGreaterThan(12);
+});
+
 test('guarda capturas del inicio', async ({ page }, info) => {
   await page.goto('/admin');
   await expect(grafico(page)).toBeVisible();
