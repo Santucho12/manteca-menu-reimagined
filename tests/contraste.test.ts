@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { contraste, sobreFondo, tokensDe } from './colores';
@@ -54,8 +54,11 @@ describe('colores de la marca', () => {
 
 describe('anillo de foco', () => {
   it('ningun componente lo pinta transparente', () => {
+    // Mientras se rehace el panel puede no haber componentes de shadcn: los que se instalen de
+    // nuevo traen el anillo tenue de fabrica, y esta prueba lo frena.
     const carpeta = 'src/components/ui';
-    const conAnilloTenue = readdirSync(carpeta).filter((archivo) =>
+    const archivos = existsSync(carpeta) ? readdirSync(carpeta) : [];
+    const conAnilloTenue = archivos.filter((archivo) =>
       readFileSync(path.join(carpeta, archivo), 'utf8').includes('ring-ring/'),
     );
     expect(conAnilloTenue).toEqual([]);

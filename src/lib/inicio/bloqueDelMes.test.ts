@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  anchoDelBloque,
-  porcionDelResultado,
-  textoDeLaPorcion,
-  textoDeVentasDelMes,
-} from './bloqueDelMes';
+import { porcionDelResultado, textoDeLaPorcion, textoDeVentasDelMes } from './bloqueDelMes';
 
 const r = (ventasCentavos: number, gastosCentavos: number, resultadoCentavos: number | null) => ({
   ventasCentavos,
@@ -33,11 +28,4 @@ describe('textoDeVentasDelMes', () => {
     expect(textoDeVentasDelMes(1)).toBe('Del 1 a hoy · 1 venta'));
   it('varias van en plural', () =>
     expect(textoDeVentasDelMes(569)).toBe('Del 1 a hoy · 569 ventas'));
-});
-
-describe('anchoDelBloque', () => {
-  it('con avisos el bloque comparte la fila', () =>
-    expect(anchoDelBloque(true)).toBe('lg:col-span-8'));
-  it('sin avisos el bloque ocupa todo el ancho', () =>
-    expect(anchoDelBloque(false)).toBe('lg:col-span-12'));
 });

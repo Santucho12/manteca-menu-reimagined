@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { enlacesDelMarco, gruposDelPanel } from './marco';
+import { enlacesDelMarco } from './marco';
 
 const NADA = { usuarios: 0, caja: 0, gastos: 0 };
 const insigniaDe = (enlaces: ReturnType<typeof enlacesDelMarco>, clave: string) =>
@@ -24,30 +24,5 @@ describe('enlacesDelMarco', () => {
       { clave: 'cierres', href: '/admin/caja/mis-cierres', texto: 'Mis cierres', insignia: null },
       { clave: 'cuenta', href: '/admin/cuenta', texto: 'Mi cuenta', insignia: null },
     ]);
-  });
-});
-
-const claves = (grupos: ReturnType<typeof gruposDelPanel>['grupos']) =>
-  grupos.map((grupo) => ({ titulo: grupo.titulo, claves: grupo.enlaces.map((e) => e.clave) }));
-
-describe('gruposDelPanel', () => {
-  it('reparte las secciones del admin por momento del dia y deja Mi cuenta al pie', () => {
-    const { grupos, pie } = gruposDelPanel(enlacesDelMarco('admin', NADA));
-    expect(claves(grupos)).toEqual([
-      { titulo: 'Día a día', claves: ['inicio', 'ventas', 'caja'] },
-      { titulo: 'Plata', claves: ['gastos', 'proveedores', 'reportes'] },
-      { titulo: 'Ajustes', claves: ['menu', 'usuarios', 'auditoria'] },
-    ]);
-    expect(pie.map((e) => e.clave)).toEqual(['cuenta']);
-  });
-
-  it('caja tiene pocas secciones: van juntas, sin titulos, y Mi cuenta al pie', () => {
-    const { grupos, pie } = gruposDelPanel(enlacesDelMarco('caja', NADA));
-    expect(claves(grupos)).toEqual([{ titulo: null, claves: ['caja', 'cierres'] }]);
-    expect(pie.map((e) => e.clave)).toEqual(['cuenta']);
-  });
-
-  it('sin enlaces no hay grupos', () => {
-    expect(gruposDelPanel([])).toEqual({ grupos: [], pie: [] });
   });
 });

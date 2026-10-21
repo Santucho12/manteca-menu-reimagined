@@ -15,8 +15,3 @@ export function textoDeLaPorcion(porcion: number | null): string {
 export function textoDeVentasDelMes(cantidad: number): string {
   return `Del 1 a hoy · ${cantidad} ${cantidad === 1 ? 'venta' : 'ventas'}`;
 }
-
-/** Sin avisos no hay panel "Para atender": el bloque de ventas ocupa toda la fila. */
-export function anchoDelBloque(hayAvisos: boolean): string {
-  return hayAvisos ? 'lg:col-span-8' : 'lg:col-span-12';
-}
