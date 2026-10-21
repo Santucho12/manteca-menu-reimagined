@@ -1,3 +1,4 @@
+import { Etiqueta, Panel } from '@/components/panel/Piezas';
 import { textoDePresentaciones } from '@/lib/inicio/meses';
 import { formatearPesos } from '@/lib/plata';
 import type { ProductoDelReporte } from '@/lib/reportes/ventas';
@@ -5,25 +6,35 @@ import type { ProductoDelReporte } from '@/lib/reportes/ventas';
 /** Los 5 productos que mas plata dejaron en el mes, con la cantidad de cada presentacion. */
 export function MasVendidos({ productos }: { productos: ProductoDelReporte[] }) {
   return (
-    <section aria-labelledby="mas-vendidos" className="space-y-2">
-      <h2 id="mas-vendidos" className="font-heading text-xl font-semibold">
-        Más vendidos
-      </h2>
+    <Panel
+      etiquetadoPor="mas-vendidos"
+      className="bg-white"
+      etiqueta={
+        <Etiqueta as="h2" id="mas-vendidos">
+          Más vendidos
+        </Etiqueta>
+      }
+    >
       {productos.length === 0 ? (
-        <p className="text-muted-foreground">Todavía no hay ventas este mes.</p>
+        <p className="text-muted-foreground px-6 py-10 text-center">
+          Todavía no hay ventas este mes.
+        </p>
       ) : (
-        <ol aria-label="Más vendidos" className="bg-card divide-y rounded-xl border">
+        <ol aria-label="Más vendidos">
           {productos.map((p) => (
-            <li key={p.clave} className="flex items-start justify-between gap-3 p-4">
+            <li
+              key={p.clave}
+              className="flex items-start justify-between gap-3 border-b px-6 py-4 last:border-b-0"
+            >
               <div className="min-w-0">
-                <p className="font-medium">{p.nombre}</p>
+                <p className="font-bold">{p.nombre}</p>
                 <p className="text-muted-foreground text-sm">{textoDePresentaciones(p)}</p>
               </div>
-              <span className="font-medium">{formatearPesos(p.montoCentavos)}</span>
+              <span className="font-bold">{formatearPesos(p.montoCentavos)}</span>
             </li>
           ))}
         </ol>
       )}
-    </section>
+    </Panel>
   );
 }
