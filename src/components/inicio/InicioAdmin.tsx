@@ -1,6 +1,4 @@
 import { TituloDePagina } from '@/components/panel/TituloDePagina';
-import { Etiqueta, Panel } from '@/components/panel/Piezas';
-import { GraficoPorMes } from '@/components/reportes/GraficoPorMes';
 import { anchoDelBloque } from '@/lib/inicio/bloqueDelMes';
 import type { datosDelInicio } from '@/lib/inicio/consultas';
 import { numerosDelMes } from '@/lib/inicio/numeros';
@@ -8,6 +6,7 @@ import { totalesDeVentas } from '@/lib/reportes/ventas';
 import { Avisos } from './Avisos';
 import { BloqueDelMes } from './BloqueDelMes';
 import { MasVendidos } from './MasVendidos';
+import { MesAMes } from './MesAMes';
 import { TarjetasDelMes } from './TarjetasDelMes';
 
 type DatosDelInicio = Awaited<ReturnType<typeof datosDelInicio>>;
@@ -35,19 +34,7 @@ export function InicioAdmin({ datos }: { datos: DatosDelInicio }) {
         <Avisos avisos={datos.avisos} className="lg:col-span-4" />
       </div>
       <div className="grid gap-6 lg:grid-cols-12">
-        <Panel
-          etiquetadoPor="mes-a-mes"
-          className="lg:col-span-7"
-          etiqueta={
-            <Etiqueta as="h2" id="mes-a-mes">
-              Mes a mes
-            </Etiqueta>
-          }
-        >
-          <div className="p-6">
-            <GraficoPorMes datos={datos.meses} />
-          </div>
-        </Panel>
+        <MesAMes datos={datos.meses} className="lg:col-span-7" />
         <MasVendidos productos={datos.masVendidos} className="lg:col-span-5" />
       </div>
     </div>
