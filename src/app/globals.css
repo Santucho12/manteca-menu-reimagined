@@ -76,9 +76,9 @@
 
   --font-title: var(--font-family-title);
   --font-sans: var(--font-family-sans);
-  /* shadcn usa font-heading en los titulos de sus componentes: van en la
-     tipografia de texto. Manic queda para los titulos de pantalla. */
-  --font-heading: var(--font-family-sans);
+  /* Los titulos y las cifras grandes van en Outfit, como en plan-reminder-pro; Manic queda
+     para el nombre de la marca. */
+  --font-heading: var(--font-family-display);
 
   --shadow-suave: var(--sombra-suave);
   --shadow-media: var(--sombra-media);
@@ -88,7 +88,8 @@
 :root {
   --radius: 0.75rem;
   --font-family-title: 'Manic', sans-serif;
-  --font-family-sans: 'Neufile Grotesk', sans-serif;
+  --font-family-sans: var(--fuente-inter), 'Inter', sans-serif;
+  --font-family-display: var(--fuente-outfit), 'Outfit', sans-serif;
 
   --background: hsl(210 20% 98%);
   --foreground: hsl(220 40% 12%);

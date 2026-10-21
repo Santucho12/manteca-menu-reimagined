@@ -34,7 +34,7 @@ export function BloqueDelMes({
           Ventas del mes
         </p>
         <p className="mt-2 text-slate-500">{textoDeVentasDelMes(cantidad)}</p>
-        <p className="mt-2 text-4xl font-bold tracking-tight break-words md:text-6xl">
+        <p className="font-heading mt-2 text-4xl font-extrabold tracking-tight break-words md:text-6xl">
           {formatearPesos(resultado.ventasCentavos)}
         </p>
       </div>
@@ -42,7 +42,7 @@ export function BloqueDelMes({
         <div className="grid grid-cols-2 gap-4">
           <Dato etiqueta="Gastos" valor={formatearPesos(resultado.gastosCentavos)} />
           <Dato
-            etiqueta="Resultado"
+            etiqueta="Balance"
             valor={final === null ? 'Sin calcular' : formatearPesos(final)}
           />
         </div>
