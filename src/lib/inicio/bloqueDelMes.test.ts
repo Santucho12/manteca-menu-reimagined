@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  columnasDeAbajo,
+  anchoDelBloque,
   porcionDelResultado,
   textoDeLaPorcion,
   textoDeVentasDelMes,
@@ -35,8 +35,9 @@ describe('textoDeVentasDelMes', () => {
     expect(textoDeVentasDelMes(569)).toBe('Del 1 a hoy · 569 ventas'));
 });
 
-describe('columnasDeAbajo', () => {
-  it('con avisos son tres paneles', () => expect(columnasDeAbajo(true)).toBe('lg:grid-cols-3'));
-  it('sin avisos los otros dos ocupan el ancho', () =>
-    expect(columnasDeAbajo(false)).toBe('lg:grid-cols-2'));
+describe('anchoDelBloque', () => {
+  it('con avisos el bloque comparte la fila', () =>
+    expect(anchoDelBloque(true)).toBe('lg:col-span-8'));
+  it('sin avisos el bloque ocupa todo el ancho', () =>
+    expect(anchoDelBloque(false)).toBe('lg:col-span-12'));
 });

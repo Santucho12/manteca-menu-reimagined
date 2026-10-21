@@ -143,6 +143,9 @@ Cambiar la barra de arriba del panel por una sidebar, y el encabezado de cada pa
 ### 36. Publicar el sistema en el dominio
 Publicar el sistema en `mantecabakeryar.com`: el menú nuevo, que sale de la base, en `/` y el panel en `/admin`. El proyecto de Vercel `manteca-menu-reimagined` ya está conectado a este repo y sigue sirviendo el deploy del 2 de julio; el deploy del merge del PR #19 falló. La base real ya tiene las 6 categorías y los 35 productos de la página de julio, con los mismos nombres, precios y descripciones, y las fotos están en `public/menu/`.
 
+### 39. Rediseño de Inicio y de la sidebar
+Rediseño completo, desde cero, de la estética de Inicio (admin) y de la sidebar, con colores y estilo moderno a criterio de Claude (pedido de Santiago, 2026-10-21): sidebar oscura flotante, Inicio en bloques tipo bento, acento índigo. Los colores valen solo dentro del panel, el menú público no cambia. Sin cambios en qué hace cada pantalla.
+
 ### 38. Estética de Plan Reminder Pro en Inicio, Menú y Ventas
 Llevar al cuerpo de Inicio, Menú y Ventas la estética de FiestaCobra (tarjetas con ícono, bloque oscuro de "Ventas del mes", paneles con cabecera, tabla, filtros en tarjeta, acciones como íconos), con los colores y la tipografía de Manteca. Diseño en `docs/superpowers/specs/2026-10-19-estetica-de-pantallas-design.md`.
 
@@ -156,6 +159,7 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 | # | Pedido | Qué falta |
 |---|---|---|
 | 38 | Estética de Plan Reminder Pro en Inicio, Menú y Ventas | Todo |
+| 39 | Rediseño de Inicio y de la sidebar | Todo |
 | 37 | Ícono de la pestaña | Hecho con su prueba en `src/app/icon.svg`. Falta que `npm run verificar` y `npm run e2e` den verde enteros: en la primera corrida dos archivos de tests de base se cortaron por tiempo y la segunda se frenó por falta de memoria |
 | 36 | Publicar el sistema en el dominio | Cargar en Vercel las variables de la base real, volver a publicar, crear la cuenta del dueño en la base real y comprobar `/` y `/admin` en el dominio |
 | 30 | Ventas: la parte de Fudo | Construida la parte a mano (ver Completados). Falta, cuando estén las credenciales: traer las ventas de Fudo, vincular productos y medios, "Actualizar ahora" y lo esperado en los cierres. En Reportes: mostrar hasta cuándo están sincronizadas las ventas, y resolver los descuentos de Fudo para que "por producto" cierre con "por período". En Inicio: los avisos "Productos de Fudo sin vincular" y "Las ventas no se sincronizan desde hace más de un día", y la fecha de la última sincronización |
