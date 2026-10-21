@@ -56,6 +56,11 @@ test.describe('con la sesion del admin', () => {
     });
   }
 
+  test('todo el panel se ve al 90 %', async ({ page }) => {
+    await page.goto('/admin');
+    await expect(page.locator('.escala-del-panel')).toHaveCSS('zoom', '0.9');
+  });
+
   test('en la computadora, las secciones en tres grupos', async ({ page }, info) => {
     test.skip(info.project.name !== 'computadora', 'solo en la computadora');
     await page.goto('/admin');
