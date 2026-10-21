@@ -90,7 +90,7 @@
   --font-family-title: 'Manic', sans-serif;
   --font-family-sans: 'Neufile Grotesk', sans-serif;
 
-  --background: oklch(0.955 0.015 85);
+  --background: oklch(1 0 0);
   --foreground: oklch(0.22 0.035 45);
   --card: oklch(0.985 0.008 85);
   --card-foreground: oklch(0.22 0.035 45);

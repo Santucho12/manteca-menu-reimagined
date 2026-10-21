@@ -7,26 +7,26 @@ import { textoDeVariacion } from '@/lib/reportes/comparacion';
 const TONOS = {
   Ventas: {
     icono: ShoppingBag,
-    tarjeta: 'border-green-200',
-    cuadro: 'bg-green-50 text-green-700',
+    tarjeta: 'border-green-300 bg-green-100',
+    cuadro: 'bg-white text-green-700',
     punto: 'bg-green-600',
   },
   Gastos: {
     icono: Receipt,
-    tarjeta: 'border-red-200',
-    cuadro: 'bg-red-50 text-red-700',
+    tarjeta: 'border-red-300 bg-red-100',
+    cuadro: 'bg-white text-red-700',
     punto: 'bg-red-600',
   },
   Resultado: {
     icono: TrendingUp,
-    tarjeta: 'border-blue-200',
-    cuadro: 'bg-blue-50 text-blue-700',
+    tarjeta: 'border-blue-300 bg-blue-100',
+    cuadro: 'bg-white text-blue-700',
     punto: 'bg-blue-600',
   },
   'Ticket promedio': {
     icono: Ticket,
-    tarjeta: 'border-border',
-    cuadro: 'bg-neutral-100 text-neutral-700',
+    tarjeta: 'border-border bg-neutral-100',
+    cuadro: 'bg-white text-neutral-700',
     punto: 'bg-neutral-500',
   },
 };
@@ -37,7 +37,7 @@ export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
       {items.map((item) => {
         const { icono: Icono, tarjeta, cuadro, punto } = TONOS[item.etiqueta as keyof typeof TONOS];
         return (
-          <div key={item.etiqueta} className={`rounded-3xl border bg-white p-6 ${tarjeta}`}>
+          <div key={item.etiqueta} className={`rounded-3xl border p-6 ${tarjeta}`}>
             <div className="flex items-start justify-between gap-3">
               <Etiqueta as="dt">{item.etiqueta}</Etiqueta>
               <span className={`grid size-10 shrink-0 place-items-center rounded-xl ${cuadro}`}>
