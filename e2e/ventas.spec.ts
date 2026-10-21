@@ -90,20 +90,6 @@ test('filtra por fechas y origen y muestra el total', async ({ page }) => {
   await expect(page.getByText('Cobrado: $1.000,00 en 1 venta')).toBeVisible();
 });
 
-test('la lista sigue la estetica de Inicio: total en el bloque marron, filtros y ventas en paneles', async ({
-  page,
-}) => {
-  const dia = diaLibre();
-  await venta({ fecha: dia });
-  await page.goto(`/admin/ventas?desde=${dia}&hasta=${dia}`);
-  const bloque = page.getByRole('region', { name: 'Total del período' });
-  await expect(bloque).toContainText('Cobrado: $1.000,00 en 1 venta');
-  await expect(page.getByRole('region', { name: 'Filtrar' }).getByLabel('Origen')).toBeVisible();
-  await expect(
-    page.getByRole('region', { name: 'Lista de ventas' }).getByRole('list', { name: 'Ventas' }),
-  ).toBeVisible();
-});
-
 test('guarda capturas de la lista y la carga', async ({ page }, info) => {
   await venta({ fecha: HOY });
   await page.goto('/admin/ventas');

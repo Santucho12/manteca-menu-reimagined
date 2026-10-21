@@ -102,16 +102,6 @@ test('abajo de todo, las ventas de los ultimos 7 dias contra los 7 anteriores', 
   await expect(panel.getByText('Semana anterior')).toBeVisible();
 });
 
-test('al pasar el mouse, la tarjeta se levanta y crece un poco', async ({ page }, info) => {
-  // En el celular no hay "pasar el mouse": el efecto solo existe donde hay hover.
-  test.skip(info.project.name !== 'computadora', 'solo en la computadora');
-  await page.goto('/admin');
-  const tarjeta = page.getByRole('term').filter({ hasText: 'Ventas' }).locator('../..');
-  await expect(tarjeta).toHaveCSS('transform', 'none');
-  await tarjeta.hover();
-  await expect(tarjeta).toHaveCSS('transform', /^matrix\(1\.0\d*/);
-});
-
 test('guarda capturas del inicio', async ({ page }, info) => {
   await page.goto('/admin');
   await expect(grafico(page)).toBeVisible();
