@@ -228,3 +228,21 @@ html {
     transform: translateY(0);
   }
 }
+
+/* La estetica moderna del panel (pedido 39). Va acotada al panel: el menu publico conserva la
+   marca de Manteca. */
+.panel-moderno {
+  --background: #f4f5fa;
+  --foreground: #0b0d14;
+  --card: #ffffff;
+  --card-foreground: #0b0d14;
+  --muted-foreground: #5b6275;
+  --border: #e4e6ef;
+  --secondary: #eceef6;
+  --secondary-foreground: #0b0d14;
+  --primary: #5b5bf0;
+  --primary-foreground: #ffffff;
+  --accent: #5b5bf0;
+  --accent-foreground: #ffffff;
+  --ring: #5b5bf0;
+}

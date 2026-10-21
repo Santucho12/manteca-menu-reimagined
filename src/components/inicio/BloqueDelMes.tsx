@@ -1,4 +1,5 @@
-﻿import {
+﻿import { Sparkles } from 'lucide-react';
+import {
   porcionDelResultado,
   textoDeLaPorcion,
   textoDeVentasDelMes,
@@ -9,52 +10,53 @@ import type { ResultadoDelPeriodo } from '@/lib/reportes/resultado';
 function Dato({ etiqueta, valor }: { etiqueta: string; valor: string }) {
   return (
     <div>
-      <p className="text-[11px] font-bold tracking-[0.18em] uppercase text-slate-500">{etiqueta}</p>
-      <p className="text-lg font-bold whitespace-nowrap">{valor}</p>
+      <p className="text-[11px] font-bold tracking-[0.18em] text-white/75 uppercase">{etiqueta}</p>
+      <p className="font-heading text-xl font-bold whitespace-nowrap">{valor}</p>
     </div>
   );
 }
 
-export function BloqueDelMes({
-  resultado,
-  cantidad,
-}: {
-  resultado: ResultadoDelPeriodo;
-  cantidad: number;
-}) {
+type Props = { resultado: ResultadoDelPeriodo; cantidad: number; className?: string };
+
+export function BloqueDelMes({ resultado, cantidad, className = '' }: Props) {
   const porcion = porcionDelResultado(resultado);
   const final = resultado.resultadoCentavos;
   return (
     <section
       aria-label="Ventas del mes"
-      className="border border-slate-800 bg-[#0F172A] text-white shadow-2xl flex flex-col gap-6 rounded-2xl p-6 md:p-8 lg:flex-row lg:items-center lg:justify-between"
+      className={`relative overflow-hidden rounded-[28px] bg-gradient-to-br from-indigo-600 via-indigo-500 to-violet-500 p-7 text-white shadow-xl shadow-indigo-500/25 md:p-9 ${className}`}
     >
-      <div className="min-w-0">
-        <p className="text-slate-400 text-xs font-bold tracking-[0.25em] uppercase">
-          Ventas del mes
-        </p>
-        <p className="mt-2 text-slate-500">{textoDeVentasDelMes(cantidad)}</p>
-        <p className="font-heading mt-2 text-4xl font-extrabold tracking-tight break-words md:text-6xl">
-          {formatearPesos(resultado.ventasCentavos)}
-        </p>
-      </div>
-      <div className="border-slate-800/50 bg-slate-900/50 space-y-4 rounded-2xl border p-5 lg:w-96">
-        <div className="grid grid-cols-2 gap-4">
-          <Dato etiqueta="Gastos" valor={formatearPesos(resultado.gastosCentavos)} />
-          <Dato
-            etiqueta="Balance"
-            valor={final === null ? 'Sin calcular' : formatearPesos(final)}
-          />
+      <div className="absolute -top-24 -right-16 size-72 rounded-full bg-white/10 blur-2xl" />
+      <div className="absolute -bottom-28 left-1/3 size-64 rounded-full bg-violet-300/20 blur-3xl" />
+      <div className="relative flex flex-col gap-8">
+        <div>
+          <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold tracking-[0.2em] uppercase">
+            <Sparkles size={14} aria-hidden="true" />
+            Ventas del mes
+          </p>
+          <p className="mt-4 font-medium text-white/80">{textoDeVentasDelMes(cantidad)}</p>
+          <p className="font-heading mt-1 text-4xl font-extrabold tracking-tighter break-words md:text-6xl">
+            {formatearPesos(resultado.ventasCentavos)}
+          </p>
         </div>
-        {porcion === null ? null : (
-          <div className="bg-slate-800 h-1.5 overflow-hidden rounded-full">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.4)]"
-              style={{ width: `${porcion}%` }}
+        <div className="space-y-4 rounded-2xl bg-white/15 p-5 backdrop-blur">
+          <div className="grid grid-cols-2 gap-4">
+            <Dato etiqueta="Gastos" valor={formatearPesos(resultado.gastosCentavos)} />
+            <Dato
+              etiqueta="Balance"
+              valor={final === null ? 'Sin calcular' : formatearPesos(final)}
             />
           </div>
-        )}
-        <p className="text-xs text-slate-500">{textoDeLaPorcion(porcion)}</p>
+          {porcion === null ? null : (
+            <div className="h-2 overflow-hidden rounded-full bg-white/25">
+              <div
+                className="h-full rounded-full bg-emerald-300"
+                style={{ width: `${porcion}%` }}
+              />
+            </div>
+          )}
+          <p className="text-xs font-medium text-white/85">{textoDeLaPorcion(porcion)}</p>
+        </div>
       </div>
     </section>
   );

@@ -4,11 +4,17 @@ import { formatearPesos } from '@/lib/plata';
 import type { ProductoDelReporte } from '@/lib/reportes/ventas';
 
 /** Los 5 productos que mas plata dejaron en el mes, con la cantidad de cada presentacion. */
-export function MasVendidos({ productos }: { productos: ProductoDelReporte[] }) {
+export function MasVendidos({
+  productos,
+  className = '',
+}: {
+  productos: ProductoDelReporte[];
+  className?: string;
+}) {
   return (
     <Panel
       etiquetadoPor="mas-vendidos"
-      className="bg-white"
+      className={className}
       etiqueta={
         <Etiqueta as="h2" id="mas-vendidos">
           Más vendidos

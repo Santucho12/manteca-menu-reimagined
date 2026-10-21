@@ -16,7 +16,7 @@ export function textoDeVentasDelMes(cantidad: number): string {
   return `Del 1 a hoy · ${cantidad} ${cantidad === 1 ? 'venta' : 'ventas'}`;
 }
 
-/** Sin avisos no hay panel "Para atender": los otros dos se reparten el ancho. */
-export function columnasDeAbajo(hayAvisos: boolean): string {
-  return hayAvisos ? 'lg:grid-cols-3' : 'lg:grid-cols-2';
+/** Sin avisos no hay panel "Para atender": el bloque de ventas ocupa toda la fila. */
+export function anchoDelBloque(hayAvisos: boolean): string {
+  return hayAvisos ? 'lg:col-span-8' : 'lg:col-span-12';
 }

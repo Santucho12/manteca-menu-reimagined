@@ -2,47 +2,32 @@
 import { Etiqueta } from '@/components/panel/Piezas';
 import type { NumeroDelMes } from '@/lib/inicio/numeros';
 
-// Excepcion de colores decidida por Santiago (2026-10-20): Inicio lleva verde, rojo y azul.
+// Un color por dato, como en un tablero: indigo, coral, menta y ambar.
 const TONOS = {
-  Ventas: {
-    icono: ShoppingBag,
-    tarjeta: 'border-emerald-100 bg-white',
-    cuadro: 'border border-emerald-100 bg-emerald-50 text-emerald-600',
-  },
-  Gastos: {
-    icono: Receipt,
-    tarjeta: 'border-rose-100 bg-white',
-    cuadro: 'border border-rose-100 bg-rose-50 text-rose-600',
-  },
-  Balance: {
-    icono: TrendingUp,
-    tarjeta: 'border-blue-100 bg-white',
-    cuadro: 'border border-blue-100 bg-blue-50 text-blue-600',
-  },
-  'Ticket promedio': {
-    icono: Ticket,
-    tarjeta: 'border-slate-100 bg-white',
-    cuadro: 'border border-slate-100 bg-slate-50 text-slate-600',
-  },
+  Ventas: { icono: ShoppingBag, cuadro: 'bg-indigo-50 text-indigo-600', barra: 'bg-indigo-500' },
+  Gastos: { icono: Receipt, cuadro: 'bg-rose-50 text-rose-600', barra: 'bg-rose-500' },
+  Balance: { icono: TrendingUp, cuadro: 'bg-emerald-50 text-emerald-600', barra: 'bg-emerald-500' },
+  'Ticket promedio': { icono: Ticket, cuadro: 'bg-amber-50 text-amber-600', barra: 'bg-amber-500' },
 };
 
 export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
   return (
     <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {items.map((item) => {
-        const { icono: Icono, tarjeta, cuadro } = TONOS[item.etiqueta as keyof typeof TONOS];
+        const { icono: Icono, cuadro, barra } = TONOS[item.etiqueta as keyof typeof TONOS];
         return (
           <div
             key={item.etiqueta}
-            className={`rounded-xl border p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] ${tarjeta}`}
+            className="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white p-6 shadow-sm"
           >
-            <div className="flex items-start justify-between gap-3">
+            <span className={`absolute inset-x-6 top-0 h-1 rounded-b-full ${barra}`} />
+            <div className="flex items-center justify-between gap-3">
               <Etiqueta as="dt">{item.etiqueta}</Etiqueta>
-              <span className={`grid size-10 shrink-0 place-items-center rounded-xl ${cuadro}`}>
+              <span className={`grid size-11 shrink-0 place-items-center rounded-2xl ${cuadro}`}>
                 <Icono size={20} aria-hidden="true" />
               </span>
             </div>
-            <dd className="font-heading mt-3 text-lg font-bold whitespace-nowrap sm:text-xl lg:text-lg 2xl:text-2xl">
+            <dd className="font-heading mt-4 text-xl font-bold tracking-tight whitespace-nowrap xl:text-2xl">
               {item.valor}
             </dd>
           </div>

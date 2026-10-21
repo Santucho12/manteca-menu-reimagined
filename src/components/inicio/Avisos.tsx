@@ -22,12 +22,12 @@ function Cabecera({ cantidad }: { cantidad: number }) {
 }
 
 /** Solo aparece si hay algo que atender; cada aviso lleva a donde se resuelve. */
-export function Avisos({ avisos }: { avisos: Aviso[] }) {
+export function Avisos({ avisos, className = '' }: { avisos: Aviso[]; className?: string }) {
   if (avisos.length === 0) return null;
   return (
     <Panel
       etiquetadoPor="avisos"
-      className="border-amber-300 bg-amber-50/60 shadow-[0_8px_24px_-12px_rgba(217,119,6,0.35)]"
+      className={`border-amber-300 bg-amber-50/60 shadow-[0_8px_24px_-12px_rgba(217,119,6,0.35)] ${className}`}
       etiqueta={<Cabecera cantidad={avisos.length} />}
     >
       <ul className="space-y-3 p-4">

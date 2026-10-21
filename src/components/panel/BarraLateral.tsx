@@ -9,34 +9,53 @@ import { MarcaDelPanel } from './MarcaDelPanel';
 
 type Props = { nombre: string; enlaces: EnlaceDelMarco[] };
 
-/** La sidebar de la computadora: la marca, las secciones y, abajo, quien esta y Salir. */
+function UsuarioYSalir({ nombre }: { nombre: string }) {
+  return (
+    <div className="flex items-center gap-3 rounded-2xl bg-white/5 p-3">
+      <span
+        aria-hidden
+        className="grid size-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 text-sm font-bold text-white"
+      >
+        {nombre.charAt(0).toUpperCase()}
+      </span>
+      <p className="min-w-0 flex-1 truncate text-xs font-semibold text-white/80">{nombre}</p>
+      <form action="/admin/salir" method="post">
+        <button
+          type="submit"
+          className="flex min-h-9 items-center gap-2 rounded-xl px-2.5 text-xs font-semibold text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+        >
+          <LogOut size={16} aria-hidden />
+          Salir
+        </button>
+      </form>
+    </div>
+  );
+}
+
+/** La sidebar de la computadora: un panel oscuro flotante con la marca, las secciones y quien esta. */
 export function BarraLateral({ nombre, enlaces }: Props) {
   const activo = enlaceActivo(enlaces, usePathname());
   return (
-    <aside className="bg-card fixed top-0 left-0 z-50 hidden h-full w-[260px] flex-col border-r lg:flex">
-      <div className="p-8 pb-6">
+    <aside className="fixed top-3 bottom-3 left-3 z-50 hidden w-[252px] flex-col rounded-[28px] bg-[#0b0d14] shadow-2xl shadow-slate-900/30 lg:flex">
+      <div className="p-6 pb-4">
         <MarcaDelPanel />
       </div>
       <nav
         aria-label="Panel"
         hidden={enlaces.length === 0}
-        className="mt-4 min-h-0 flex-1 space-y-1 overflow-y-auto p-4"
+        className="min-h-0 flex-1 space-y-1 overflow-y-auto px-3 py-2"
       >
         {enlaces.map((enlace) => (
-          <EnlaceDelPanel key={enlace.clave} enlace={enlace} activo={enlace.clave === activo} />
+          <EnlaceDelPanel
+            key={enlace.clave}
+            enlace={enlace}
+            activo={enlace.clave === activo}
+            oscura
+          />
         ))}
       </nav>
-      <div className="space-y-2 p-4">
-        <p className="text-muted-foreground truncate px-4 text-xs font-semibold">{nombre}</p>
-        <form action="/admin/salir" method="post">
-          <button
-            type="submit"
-            className="text-muted-foreground hover:text-foreground hover:bg-secondary/50 flex w-full items-center gap-3 rounded-2xl px-4 py-3.5 text-sm font-semibold transition-all duration-300 [@media(max-height:820px)]:py-2.5"
-          >
-            <LogOut size={20} aria-hidden />
-            Salir
-          </button>
-        </form>
+      <div className="p-3">
+        <UsuarioYSalir nombre={nombre} />
       </div>
     </aside>
   );
