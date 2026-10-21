@@ -7,7 +7,7 @@ import {
 } from '../tests/gastos-de-prueba';
 import { borrarMenuDePrueba, sembrarCategoria, sembrarProducto } from '../tests/menu-de-prueba';
 import { borrarProveedores, sembrarProveedor } from '../tests/proveedores-de-prueba';
-import { SESIONES, abrirSeccion } from './ayudas';
+import { SESIONES } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -39,7 +39,7 @@ test('el cambio de un gasto se ve con nombres y pesos, y lleva al gasto', async 
   await page.getByLabel('Monto').fill('600');
   await page.getByRole('button', { name: 'Guardar' }).click();
   await expect(page).toHaveURL(/\/admin\/gastos$/);
-  await abrirSeccion(page, 'Auditoría');
+  await page.goto('/admin/auditoria');
   await page.getByLabel('Módulo').selectOption({ label: 'Gastos' });
   await page.getByLabel('Acción').selectOption({ label: 'Cambio' });
   await page.getByRole('button', { name: 'Filtrar' }).click();

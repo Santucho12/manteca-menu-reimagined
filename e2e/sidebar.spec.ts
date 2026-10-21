@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { SESIONES } from './ayudas';
+import { SESIONES, enlaceDeSeccion } from './ayudas';
 
 const TODAS = [
   'Inicio',
@@ -44,6 +44,18 @@ test.describe('con la sesion del admin', () => {
     await expect(page.getByText('Lo que se pagó, por categoría y proveedor.')).toBeVisible();
   });
 
+  for (const nombre of ['Proveedores', 'Reportes', 'Auditoría', 'Mi cuenta']) {
+    test(`${nombre} muestra Próximamente en vez de abrirse`, async ({ page }) => {
+      await page.goto('/admin');
+      await (await enlaceDeSeccion(page, nombre)).click();
+      const cartel = page.getByRole('dialog', { name: 'Próximamente' });
+      await expect(cartel).toBeVisible();
+      await expect(page).toHaveURL(/\/admin$/);
+      await cartel.getByRole('button', { name: 'Entendido' }).click();
+      await expect(cartel).toBeHidden();
+    });
+  }
+
   test('en la computadora, las secciones en tres grupos', async ({ page }, info) => {
     test.skip(info.project.name !== 'computadora', 'solo en la computadora');
     await page.goto('/admin');
@@ -70,8 +82,8 @@ test.describe('con la sesion del admin', () => {
     await expect(mas.getByRole('link')).toHaveText(
       enLista(TODAS.filter((n) => !ABAJO.includes(n))),
     );
-    await mas.getByRole('link', { name: 'Reportes' }).click();
-    await expect(page).toHaveURL(/\/admin\/reportes$/);
+    await mas.getByRole('link', { name: 'Usuarios' }).click();
+    await expect(page).toHaveURL(/\/admin\/usuarios$/);
     await expect(mas).toHaveCount(0);
   });
 });
