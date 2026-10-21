@@ -61,7 +61,7 @@ test('un monto de 8 cifras entra en su tarjeta, sin desbordar la pantalla', asyn
 
 test('ve los numeros del mes y el producto que mas vendio', async ({ page }) => {
   await page.goto('/admin');
-  for (const etiqueta of ['Ventas', 'Gastos', 'Resultado', 'Ticket promedio']) {
+  for (const etiqueta of ['Ventas', 'Gastos', 'Balance', 'Ticket promedio']) {
     await expect(page.getByRole('term').filter({ hasText: etiqueta })).toBeVisible();
   }
   const lista = page.getByRole('list', { name: 'Más vendidos' });
@@ -75,7 +75,7 @@ test('el bloque de ventas del mes muestra el monto y cuantas ventas van', async 
   await expect(bloque).toContainText(/Del 1 a hoy · \d+ ventas?/);
   await expect(bloque).toContainText(/\$[\d.]{9,},\d{2}/);
   await expect(bloque).toContainText('Gastos');
-  await expect(bloque).toContainText('Resultado');
+  await expect(bloque).toContainText('Balance');
 });
 
 test('guarda capturas del inicio', async ({ page }, info) => {

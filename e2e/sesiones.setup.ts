@@ -7,7 +7,8 @@ import { SESIONES, ingresarComo } from './ayudas';
 for (const rol of Object.keys(SESIONES) as (keyof typeof SESIONES)[]) {
   preparar(`abre la sesion de ${rol}`, async ({ page }) => {
     await ingresarComo(page, emailDePrueba(rol), leerEntornoPruebas().CONTRASENA_USUARIOS_PRUEBA);
-    await expect(page).toHaveURL(/\/admin$/);
+    // La primera vez el servidor compila /admin en frio y la redireccion tarda mas de 5 s.
+    await expect(page).toHaveURL(/\/admin$/, { timeout: 30_000 });
     await page.context().storageState({ path: SESIONES[rol] });
   });
 }
