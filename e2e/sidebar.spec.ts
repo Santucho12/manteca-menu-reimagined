@@ -56,9 +56,9 @@ test.describe('con la sesion del admin', () => {
     });
   }
 
-  test('todo el panel se ve al 90 %', async ({ page }) => {
+  test('todo el panel se ve al 85 %', async ({ page }) => {
     await page.goto('/admin');
-    await expect(page.locator('.escala-del-panel')).toHaveCSS('zoom', '0.9');
+    await expect(page.locator('.escala-del-panel')).toHaveCSS('zoom', '0.85');
   });
 
   test('en la computadora, las secciones en tres grupos', async ({ page }, info) => {
