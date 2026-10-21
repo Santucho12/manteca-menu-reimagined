@@ -20,7 +20,7 @@ function conFecha(r: Respuesta): ConFecha {
 }
 
 // Un cierre anulado o revisado ya no esta en con_diferencia: el estado alcanza.
-async function cierresConDiferencia(cliente: Cliente): Promise<ConFecha> {
+export async function cierresConDiferencia(cliente: Cliente): Promise<ConFecha> {
   return conFecha(
     await cliente
       .from('cierres_de_caja')
@@ -41,7 +41,7 @@ async function idDeSinClasificar(cliente: Cliente): Promise<string | null> {
   return respuesta.data?.id ?? null;
 }
 
-async function gastosSinClasificar(cliente: Cliente): Promise<DatosDeAvisos['sinClasificar']> {
+export async function gastosSinClasificar(cliente: Cliente): Promise<DatosDeAvisos['sinClasificar']> {
   const categoriaId = await idDeSinClasificar(cliente);
   if (!categoriaId) return { cantidad: 0, desde: null, categoriaId };
   const gastos = await cliente
