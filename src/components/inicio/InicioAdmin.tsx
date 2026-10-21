@@ -7,11 +7,12 @@ import { Avisos } from './Avisos';
 import { BloqueDelMes } from './BloqueDelMes';
 import { MasVendidos } from './MasVendidos';
 import { MesAMes } from './MesAMes';
+import { SemanaContraSemana } from './SemanaContraSemana';
 import { TarjetasDelMes } from './TarjetasDelMes';
 
 type DatosDelInicio = Awaited<ReturnType<typeof datosDelInicio>>;
 
-/** Los numeros del mes, el bloque de ventas, lo que hay para atender, el mes a mes y los mas vendidos. */
+/** Los numeros del mes, el bloque de ventas, lo que hay para atender, el mes a mes, los mas vendidos y la semana contra la anterior. */
 export function InicioAdmin({ datos }: { datos: DatosDelInicio }) {
   const cantidad = totalesDeVentas(datos.actual.ventas).ventas;
   return (
@@ -37,6 +38,7 @@ export function InicioAdmin({ datos }: { datos: DatosDelInicio }) {
         <MesAMes datos={datos.meses} className="lg:col-span-7" />
         <MasVendidos productos={datos.masVendidos} className="lg:col-span-5" />
       </div>
+      <SemanaContraSemana datos={datos.semana} />
     </div>
   );
 }
