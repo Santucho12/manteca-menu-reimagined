@@ -7,7 +7,7 @@ import type { Cliente } from '../supabase/cliente';
 import { contarPendientes } from '../usuarios/consultas';
 import { avisosDeInicio, type ConFecha, type DatosDeAvisos } from './avisos';
 import { masVendidos, mesEnCurso, ultimosDoceMeses } from './meses';
-import { semanaContraSemana, ultimosCatorceDias } from './semana';
+import { semanaContraSemana, rangoDeSemanas } from './semana';
 
 type Respuesta = {
   data: { fecha: string }[] | null;
@@ -86,7 +86,7 @@ export async function datosDelInicio(cliente: Cliente, hoy: string) {
     datosDelResultado(cliente, periodoAnterior(mes)),
     datosDelResultado(cliente, ultimosDoceMeses(hoy)),
     ventasPorProducto(cliente, mes),
-    ventasPorDia(cliente, ultimosCatorceDias(hoy)),
+    ventasPorDia(cliente, rangoDeSemanas(hoy)),
   ]);
   return {
     avisos: avisosDeInicio(avisos),

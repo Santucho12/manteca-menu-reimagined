@@ -21,10 +21,10 @@ const ventas = (valor: unknown) => `${valor} ${Number(valor) === 1 ? 'venta' : '
 export function SemanaContraSemana({ datos }: { datos: DiaDeLaSemana[] }) {
   return (
     <Panel
-      titulo="Últimos 7 días"
+      titulo="Esta semana vs la anterior"
       etiqueta={
-        <Etiqueta as="h2" id="ultimos-7-dias">
-          Últimos 7 días
+        <Etiqueta as="h2" id="esta-semana">
+          Esta semana vs la anterior
         </Etiqueta>
       }
     >
@@ -42,14 +42,14 @@ export function SemanaContraSemana({ datos }: { datos: DiaDeLaSemana[] }) {
             <Tooltip formatter={ventas} />
             <Legend />
             <Bar
-              name="Últimos 7 días"
+              name="Esta semana"
               dataKey="actual"
               fill={COLORES.actual}
               radius={4}
               isAnimationActive={false}
             />
             <Bar
-              name="7 días anteriores"
+              name="Semana anterior"
               dataKey="anterior"
               fill={COLORES.anterior}
               radius={4}

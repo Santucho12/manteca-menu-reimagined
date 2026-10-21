@@ -94,10 +94,12 @@ test('abajo de todo, las ventas de los ultimos 7 dias contra los 7 anteriores', 
   page,
 }) => {
   await page.goto('/admin');
-  const panel = page.getByRole('region', { name: 'Últimos 7 días' });
+  const panel = page.getByRole('region', { name: 'Esta semana vs la anterior' });
   await expect(panel.getByRole('figure', { name: 'Ventas por día' })).toBeVisible();
-  await expect(panel.getByText('Últimos 7 días', { exact: true }).first()).toBeVisible();
-  await expect(panel.getByText('7 días anteriores')).toBeVisible();
+  await expect(
+    panel.getByText('Esta semana vs la anterior', { exact: true }).first(),
+  ).toBeVisible();
+  await expect(panel.getByText('Semana anterior')).toBeVisible();
 });
 
 test('al pasar el mouse, la tarjeta se levanta y crece un poco', async ({ page }, info) => {
