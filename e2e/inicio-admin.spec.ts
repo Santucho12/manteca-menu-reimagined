@@ -90,6 +90,16 @@ test('el mes a mes arranca con 4 meses y se amplia a todo el año', async ({ pag
   expect(await barras.count()).toBeGreaterThan(12);
 });
 
+test('abajo de todo, las ventas de los ultimos 7 dias contra los 7 anteriores', async ({
+  page,
+}) => {
+  await page.goto('/admin');
+  const panel = page.getByRole('region', { name: 'Últimos 7 días' });
+  await expect(panel.getByRole('figure', { name: 'Ventas por día' })).toBeVisible();
+  await expect(panel.getByText('Últimos 7 días', { exact: true }).first()).toBeVisible();
+  await expect(panel.getByText('7 días anteriores')).toBeVisible();
+});
+
 test('guarda capturas del inicio', async ({ page }, info) => {
   await page.goto('/admin');
   await expect(grafico(page)).toBeVisible();
