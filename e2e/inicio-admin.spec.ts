@@ -47,7 +47,8 @@ test('ve el aviso de gastos sin clasificar y lo lleva a gastos', async ({ page }
 test('un monto de 8 cifras entra en su tarjeta, sin desbordar la pantalla', async ({ page }) => {
   await page.goto('/admin');
   const valores = page.getByRole('definition');
-  await expect(valores.filter({ hasText: '$29.999.997,00' }).first()).toBeVisible();
+  // El total del mes depende de lo que haya en la base: la venta sembrada se ve entre los mas vendidos.
+  await expect(page.getByRole('list', { name: 'Más vendidos' })).toContainText('$29.999.997,00');
   const desbordados = await valores.evaluateAll(
     (todos) => todos.filter((v) => v.scrollWidth > v.clientWidth).length,
   );
@@ -66,6 +67,15 @@ test('ve los numeros del mes y el producto que mas vendio', async ({ page }) => 
   const lista = page.getByRole('list', { name: 'Más vendidos' });
   await expect(lista.getByRole('listitem').first()).toContainText(producto.texto.split(' · ')[0]!);
   await expect(grafico(page)).toBeVisible();
+});
+
+test('el bloque de ventas del mes muestra el monto y cuantas ventas van', async ({ page }) => {
+  await page.goto('/admin');
+  const bloque = page.getByRole('region', { name: 'Ventas del mes' });
+  await expect(bloque).toContainText(/Del 1 a hoy · \d+ ventas?/);
+  await expect(bloque).toContainText(/\$[\d.]{9,},\d{2}/);
+  await expect(bloque).toContainText('Gastos');
+  await expect(bloque).toContainText('Resultado');
 });
 
 test('guarda capturas del inicio', async ({ page }, info) => {
