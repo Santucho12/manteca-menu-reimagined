@@ -143,6 +143,9 @@ Cambiar la barra de arriba del panel por una sidebar, y el encabezado de cada pa
 ### 36. Publicar el sistema en el dominio
 Publicar el sistema en `mantecabakeryar.com`: el menú nuevo, que sale de la base, en `/` y el panel en `/admin`. El proyecto de Vercel `manteca-menu-reimagined` ya está conectado a este repo y sigue sirviendo el deploy del 2 de julio; el deploy del merge del PR #19 falló. La base real ya tiene las 6 categorías y los 35 productos de la página de julio, con los mismos nombres, precios y descripciones, y las fotos están en `public/menu/`.
 
+### 43. El panel desde cero
+Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, sin tomar como referencia el diseño anterior ni Plan Reminder Pro (decisión de Santiago, 2026-10-21). Quedan la carta pública, el servidor (acciones, `src/lib`, base) y las pruebas de Playwright de funcionamiento: son la lista de lo que cada pantalla nueva tiene que volver a hacer. Se borran las pruebas que miraban el diseño viejo, la skill `estetica-panel` y los specs y planes de estética. La estética nueva se define con Santiago, con maquetas, antes de construir. Reemplaza los pedidos 38, 39, 40 y 42.
+
 ### 41. Playwright en otro puerto
 Que las pruebas de Playwright levanten su servidor en el puerto 3211, con su propia carpeta de compilación, para no tumbar el `npm run dev` del 3210 (pedido de Santiago, 2026-10-21).
 
@@ -167,11 +170,12 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 
 | # | Pedido | Qué falta |
 |---|---|---|
-| 42 | Colores y letra de Plan Reminder Pro en el panel | Todo |
-| 38 | Estética de Plan Reminder Pro en Inicio, Menú y Ventas | Todo |
+| 43 | El panel desde cero | Borrado el front del panel. Falta definir con Santiago la estética nueva y rehacer cada pantalla hasta que vuelvan a pasar sus pruebas de Playwright |
+| 42 | Colores y letra de Plan Reminder Pro en el panel | Reemplazado por el pedido 43: el panel se rehace desde cero |
+| 38 | Estética de Plan Reminder Pro en Inicio, Menú y Ventas | Reemplazado por el pedido 43: el panel se rehace desde cero |
 | 41 | Playwright en otro puerto | Todo |
-| 40 | Sidebar elegida y vuelta a la paleta de Manteca | Todo |
-| 39 | Rediseño de Inicio y de la sidebar | La paleta índigo y las tipografías Inter y Outfit se sacan en el pedido 40, por decisión de Santiago (2026-10-21); queda la organización de Inicio |
+| 40 | Sidebar elegida y vuelta a la paleta de Manteca | Reemplazado por el pedido 43: el panel se rehace desde cero |
+| 39 | Rediseño de Inicio y de la sidebar | Reemplazado por el pedido 43: el panel se rehace desde cero |
 | 37 | Ícono de la pestaña | Hecho con su prueba en `src/app/icon.svg`. Falta que `npm run verificar` y `npm run e2e` den verde enteros: en la primera corrida dos archivos de tests de base se cortaron por tiempo y la segunda se frenó por falta de memoria |
 | 36 | Publicar el sistema en el dominio | Cargar en Vercel las variables de la base real, volver a publicar, crear la cuenta del dueño en la base real y comprobar `/` y `/admin` en el dominio |
 | 30 | Ventas: la parte de Fudo | Construida la parte a mano (ver Completados). Falta, cuando estén las credenciales: traer las ventas de Fudo, vincular productos y medios, "Actualizar ahora" y lo esperado en los cierres. En Reportes: mostrar hasta cuándo están sincronizadas las ventas, y resolver los descuentos de Fudo para que "por producto" cierre con "por período". En Inicio: los avisos "Productos de Fudo sin vincular" y "Las ventas no se sincronizan desde hace más de un día", y la fecha de la última sincronización |
