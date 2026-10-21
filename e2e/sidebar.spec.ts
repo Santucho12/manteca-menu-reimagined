@@ -61,6 +61,12 @@ test.describe('con la sesion del admin', () => {
     await expect(page.locator('.escala-del-panel')).toHaveCSS('zoom', '0.85');
   });
 
+  test('en la computadora, debajo del logo dice Sistema de gestión', async ({ page }, info) => {
+    test.skip(info.project.name !== 'computadora', 'solo en la computadora');
+    await page.goto('/admin');
+    await expect(page.getByText('Sistema de gestión', { exact: true }).first()).toBeVisible();
+  });
+
   test('en la computadora, las secciones en tres grupos', async ({ page }, info) => {
     test.skip(info.project.name !== 'computadora', 'solo en la computadora');
     await page.goto('/admin');
