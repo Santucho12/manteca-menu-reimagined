@@ -76,9 +76,9 @@
 
   --font-title: var(--font-family-title);
   --font-sans: var(--font-family-sans);
-  /* Los titulos y las cifras grandes van en Outfit, como en plan-reminder-pro; Manic queda
-     para el nombre de la marca. */
-  --font-heading: var(--font-family-display);
+  /* shadcn usa font-heading en los titulos de sus componentes: van en la
+     tipografia de texto. Manic queda para los titulos de pantalla. */
+  --font-heading: var(--font-family-sans);
 
   --shadow-suave: var(--sombra-suave);
   --shadow-media: var(--sombra-media);
@@ -88,30 +88,29 @@
 :root {
   --radius: 0.75rem;
   --font-family-title: 'Manic', sans-serif;
-  --font-family-sans: var(--fuente-inter), 'Inter', sans-serif;
-  --font-family-display: var(--fuente-outfit), 'Outfit', sans-serif;
+  --font-family-sans: 'Neufile Grotesk', sans-serif;
 
-  --background: hsl(210 20% 98%);
-  --foreground: hsl(220 40% 12%);
-  --card: #ffffff;
-  --card-foreground: hsl(220 40% 12%);
+  --background: oklch(0.955 0.015 85);
+  --foreground: oklch(0.22 0.035 45);
+  --card: oklch(0.985 0.008 85);
+  --card-foreground: oklch(0.22 0.035 45);
   --popover: oklch(0.98 0.01 85);
   --popover-foreground: oklch(0.22 0.035 45);
   /* La marca son el crema del fondo y el dorado del nombre: los botones van en dorado, con la
      letra oscura (el blanco sobre el dorado no se lee). */
   --primary: #bfa042;
   --primary-foreground: oklch(0.22 0.035 45);
-  --secondary: hsl(210 20% 95%);
+  --secondary: oklch(0.935 0.018 85);
   --secondary-foreground: oklch(0.32 0.065 45);
   --muted: oklch(0.92 0.015 85);
-  --muted-foreground: hsl(220 20% 45%);
+  --muted-foreground: oklch(0.5 0.03 55);
   --accent: #bfa042;
   /* Marron oscuro y no blanco: el blanco sobre el dorado da 2,5 a 1 y no se lee. */
   --accent-foreground: oklch(0.22 0.035 45);
   /* Un poco mas oscuro que el rojo de shadcn: tiene que leerse sobre su propio fondo tenue. */
   --destructive: oklch(0.5 0.2 27);
   --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: hsl(220 20% 90%);
+  --border: oklch(0.88 0.02 85);
   /* El borde de un campo y el anillo de foco tienen que distinguirse del fondo (3 a 1). */
   --input: oklch(0.62 0.03 70);
   --ring: oklch(0.6 0.115 88);
@@ -227,22 +226,4 @@ html {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-/* La estetica moderna del panel (pedido 39). Va acotada al panel: el menu publico conserva la
-   marca de Manteca. */
-.panel-moderno {
-  --background: #f4f5fa;
-  --foreground: #0b0d14;
-  --card: #ffffff;
-  --card-foreground: #0b0d14;
-  --muted-foreground: #5b6275;
-  --border: #e4e6ef;
-  --secondary: #eceef6;
-  --secondary-foreground: #0b0d14;
-  --primary: #5b5bf0;
-  --primary-foreground: #ffffff;
-  --accent: #5b5bf0;
-  --accent-foreground: #ffffff;
-  --ring: #5b5bf0;
 }

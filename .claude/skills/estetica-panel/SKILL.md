@@ -26,21 +26,17 @@ son los de Manteca.
 ## Sidebar (computadora, desde `lg`)
 
 - `aside` fijo a la izquierda: `fixed left-0 top-0 h-full w-[260px] border-r bg-card flex-col`.
-- **Marca** (`p-8 pb-6`, `flex items-center gap-3`):
-  - cuadrado `w-10 h-10 rounded-xl bg-accent flex items-center justify-center shadow-lg shadow-accent/30` con el ícono `Croissant` en crema (`text-background`, tamaño 24);
-  - "Manteca" en dorado: `font-title text-accent text-2xl leading-none`;
-  - debajo, "Sistema de gestión" en `text-[8px] font-bold text-muted-foreground uppercase tracking-wider mt-1`.
-- **Navegación** (`flex-1 p-4 space-y-1 mt-4`, `aria-label="Panel"`). Cada enlace es
-  `flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-300`, con ícono de lucide de 20:
-  - activo: `text-foreground bg-accent/15 shadow-sm ring-1 ring-accent/40`, con el ícono dorado (`text-accent`) en `strokeWidth={2.5}`;
-  - inactivo: `text-muted-foreground hover:text-foreground hover:bg-secondary/50`, con el ícono en `strokeWidth={2}`.
-  - Plan Reminder Pro desliza el fondo del activo con framer-motion. Acá no se usa esa
-    librería: queda el mismo aspecto, sin el deslizamiento.
-- **Pie** (`p-4`): quién tiene la sesión y "Salir", con la misma forma de enlace inactivo e ícono `LogOut`.
+- **Marca** (`px-8 pt-8 pb-4`): el logo de Manteca en dorado (`public/menu/logo-oscuro.png`, el de la carta), 150 px de ancho, con `alt="Manteca"`. Sin cuadrado ni "Sistema de gestión" (Santiago, 2026-10-21, pedido 40).
+- **Navegación** (`aria-label="Panel"`, `px-4 py-2`): las secciones en tres grupos por momento del día, que arma `gruposDelPanel` de `src/lib/acceso/marco.ts`: "Día a día" (Inicio, Ventas, Caja), "Plata" (Gastos, Proveedores, Reportes) y "Ajustes" (Menú, Usuarios, Auditoría). El título de cada grupo, `text-[10px] font-bold tracking-[0.16em] uppercase text-muted-foreground`. Con pocas secciones (Caja) van juntas, sin título. Mi cuenta va aparte, al pie de la navegación, tras una línea.
+- Cada enlace es `relative flex items-center gap-3 px-4 py-3 rounded-2xl text-sm`, con ícono de lucide de 20:
+  - activo: una pestaña dorada pegada al borde izquierdo (`before:` de `w-1.5 h-6 rounded-r-full bg-accent`) y el texto `text-foreground font-bold`, sin fondo; ícono en `strokeWidth={2.5}`;
+  - inactivo: `text-muted-foreground font-semibold hover:bg-secondary hover:text-foreground`.
+- **Pendientes:** Caja (cierres con diferencia), Gastos (sin clasificar) y Usuarios (esperando rol) llevan su número en una píldora dorada (`bg-accent text-accent-foreground rounded-full text-xs font-bold`), con los mismos casos que los avisos de Inicio. En la barra de abajo del celular el número va sobre el ícono, así que el nombre del enlace queda "3 Gastos": las pruebas lo buscan con `^(\d+ ?)?Gastos`.
+- **Pie** (`px-4 pb-4`): quién tiene la sesión y "Salir", con la forma de enlace inactivo e ícono `LogOut`.
 
 ## Celular (por debajo de `lg`)
 
-- **Barra de arriba:** `fixed top-0 inset-x-0 h-14 z-50 bg-card/95 backdrop-blur border-b flex items-center justify-between px-4`, con la marca chica (cuadrado `w-8 h-8 rounded-lg`, ícono 18, "Manteca" en `text-lg`) y "Salir" como ícono (`h-9 w-9 rounded-xl text-muted-foreground`).
+- **Barra de arriba:** `fixed top-0 inset-x-0 h-14 z-50 bg-card/95 backdrop-blur border-b flex items-center justify-between px-4`, con el logo chico (104 px) y "Salir" como ícono (`h-9 w-9 rounded-xl text-muted-foreground`).
 - **Barra de abajo:** `fixed bottom-0 inset-x-0 z-50 bg-card/95 backdrop-blur border-t flex`. Cada botón es `flex-1 h-16 flex flex-col items-center justify-center gap-1 text-[9px] font-bold`, ícono de 20; activo con la letra `text-foreground` y el ícono dorado, inactivo `text-muted-foreground`.
 - Plan Reminder Pro tiene 5 secciones. Con más de 5 enlaces, abajo van Inicio, Ventas, Gastos y
   Caja, más "Más" (ícono `Ellipsis`), que abre la lista "Más secciones" con el resto, en la

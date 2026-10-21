@@ -2,12 +2,14 @@
 import { Etiqueta } from '@/components/panel/Piezas';
 import type { NumeroDelMes } from '@/lib/inicio/numeros';
 
-// Un color por dato, como en un tablero: indigo, coral, menta y ambar.
+// Un icono por dato; el color es el de la marca en todas (skill estetica-panel).
+const CUADRO = 'bg-accent/15 text-foreground';
+const BARRA = 'bg-accent';
 const TONOS = {
-  Ventas: { icono: ShoppingBag, cuadro: 'bg-indigo-50 text-indigo-600', barra: 'bg-indigo-500' },
-  Gastos: { icono: Receipt, cuadro: 'bg-rose-50 text-rose-600', barra: 'bg-rose-500' },
-  Balance: { icono: TrendingUp, cuadro: 'bg-emerald-50 text-emerald-600', barra: 'bg-emerald-500' },
-  'Ticket promedio': { icono: Ticket, cuadro: 'bg-amber-50 text-amber-600', barra: 'bg-amber-500' },
+  Ventas: { icono: ShoppingBag, cuadro: CUADRO, barra: BARRA },
+  Gastos: { icono: Receipt, cuadro: CUADRO, barra: BARRA },
+  Balance: { icono: TrendingUp, cuadro: CUADRO, barra: BARRA },
+  'Ticket promedio': { icono: Ticket, cuadro: CUADRO, barra: BARRA },
 };
 
 export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
@@ -18,7 +20,7 @@ export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
         return (
           <div
             key={item.etiqueta}
-            className="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white p-6 shadow-sm"
+            className="relative overflow-hidden rounded-3xl border bg-card border p-6 shadow-sm"
           >
             <span className={`absolute inset-x-6 top-0 h-1 rounded-b-full ${barra}`} />
             <div className="flex items-center justify-between gap-3">
@@ -27,7 +29,7 @@ export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
                 <Icono size={20} aria-hidden="true" />
               </span>
             </div>
-            <dd className="font-heading mt-4 text-xl font-bold tracking-tight whitespace-nowrap xl:text-2xl">
+            <dd className="font-heading mt-4 text-lg font-bold tracking-tight break-words xl:text-xl">
               {item.valor}
             </dd>
           </div>
