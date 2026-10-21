@@ -13,8 +13,22 @@ const TODAS = [
   'Auditoría',
   'Mi cuenta',
 ];
+// En la computadora van por momento del dia, con Mi cuenta al pie.
+const AGRUPADAS = [
+  'Inicio',
+  'Ventas',
+  'Caja',
+  'Gastos',
+  'Proveedores',
+  'Reportes',
+  'Menú',
+  'Usuarios',
+  'Auditoría',
+  'Mi cuenta',
+];
 const ABAJO = ['Inicio', 'Ventas', 'Gastos', 'Caja'];
-const enLista = (nombres: string[]) => nombres.map((n) => new RegExp(`^${n}`));
+// En el celular el numero de pendientes va antes del nombre ("3Gastos").
+const enLista = (nombres: string[]) => nombres.map((n) => new RegExp(`^(\\d+ ?)?${n}`));
 const panel = (page: Page) => page.getByRole('navigation', { name: 'Panel' });
 
 test.describe('con la sesion del admin', () => {
@@ -22,20 +36,29 @@ test.describe('con la sesion del admin', () => {
 
   test('la marca y el hero de Gastos, con la seccion marcada', async ({ page }) => {
     await page.goto('/admin/gastos/nuevo');
-    await expect(page.getByText('Manteca', { exact: true }).locator('visible=true')).toHaveCount(1);
-    const gastos = panel(page).getByRole('link', { name: /^Gastos/ });
+    await expect(page.getByRole('img', { name: 'Manteca' }).locator('visible=true')).toHaveCount(1);
+    const gastos = panel(page).getByRole('link', { name: /^(\d+ ?)?Gastos/ });
     await expect(gastos).toHaveAttribute('aria-current', 'page');
     await page.goto('/admin/gastos');
     await expect(page.getByRole('heading', { level: 1, name: 'Gastos' })).toBeVisible();
     await expect(page.getByText('Lo que se pagó, por categoría y proveedor.')).toBeVisible();
   });
 
-  test('en la computadora, la sidebar con todas las secciones', async ({ page }, info) => {
+  test('en la computadora, las secciones en tres grupos', async ({ page }, info) => {
     test.skip(info.project.name !== 'computadora', 'solo en la computadora');
     await page.goto('/admin');
-    await expect(page.getByText('Sistema de gestión')).toBeVisible();
-    await expect(panel(page).getByRole('link')).toHaveText(enLista(TODAS));
+    for (const grupo of ['Día a día', 'Plata', 'Ajustes']) {
+      await expect(panel(page).getByText(grupo, { exact: true })).toBeVisible();
+    }
+    await expect(panel(page).getByRole('link')).toHaveText(enLista(AGRUPADAS));
     await expect(page.getByRole('button', { name: 'Más' })).toHaveCount(0);
+  });
+
+  test('en la computadora, Usuarios dice cuantos esperan un rol', async ({ page }, info) => {
+    test.skip(info.project.name !== 'computadora', 'solo en la computadora');
+    // Las cuentas de prueba siempre dejan alguna pendiente: el invitado espera un rol.
+    await page.goto('/admin');
+    await expect(panel(page).getByRole('link', { name: /^Usuarios/ })).toContainText(/\d+/);
   });
 
   test('en el celular, cuatro abajo y el resto en Más', async ({ page }, info) => {
