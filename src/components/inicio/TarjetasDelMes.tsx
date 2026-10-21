@@ -7,27 +7,27 @@ import { textoDeVariacion } from '@/lib/reportes/comparacion';
 const TONOS = {
   Ventas: {
     icono: ShoppingBag,
-    tarjeta: 'border-green-300 bg-green-100',
-    cuadro: 'bg-white text-green-700',
-    punto: 'bg-green-600',
+    tarjeta: 'border-emerald-100 bg-white',
+    cuadro: 'border border-emerald-100 bg-emerald-50 text-emerald-600',
+    punto: 'bg-emerald-600',
   },
   Gastos: {
     icono: Receipt,
-    tarjeta: 'border-red-300 bg-red-100',
-    cuadro: 'bg-white text-red-700',
-    punto: 'bg-red-600',
+    tarjeta: 'border-rose-100 bg-white',
+    cuadro: 'border border-rose-100 bg-rose-50 text-rose-600',
+    punto: 'bg-rose-600',
   },
   Resultado: {
     icono: TrendingUp,
-    tarjeta: 'border-blue-300 bg-blue-100',
-    cuadro: 'bg-white text-blue-700',
+    tarjeta: 'border-blue-100 bg-white',
+    cuadro: 'border border-blue-100 bg-blue-50 text-blue-600',
     punto: 'bg-blue-600',
   },
   'Ticket promedio': {
     icono: Ticket,
-    tarjeta: 'border-border bg-neutral-100',
-    cuadro: 'bg-white text-neutral-700',
-    punto: 'bg-neutral-500',
+    tarjeta: 'border-slate-200 bg-white',
+    cuadro: 'border border-slate-200 bg-slate-100 text-slate-600',
+    punto: 'bg-slate-600',
   },
 };
 

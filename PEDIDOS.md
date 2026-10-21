@@ -146,7 +146,7 @@ Publicar el sistema en `mantecabakeryar.com`: el menú nuevo, que sale de la bas
 ### 38. Estética de Plan Reminder Pro en Inicio, Menú y Ventas
 Llevar al cuerpo de Inicio, Menú y Ventas la estética de FiestaCobra (tarjetas con ícono, bloque oscuro de "Ventas del mes", paneles con cabecera, tabla, filtros en tarjeta, acciones como íconos), con los colores y la tipografía de Manteca. Diseño en `docs/superpowers/specs/2026-10-19-estetica-de-pantallas-design.md`.
 
-**Excepción (Santiago, 2026-10-20):** Inicio lleva tarjetas blancas con letra negra, subtítulos grises y acentos verde, rojo y azul (no solo los colores de `globals.css`). El fondo de toda la app pasa a blanco y las tarjetas de Inicio llevan relleno verde, rojo y azul. Quedó sin hacer: aplicar lo mismo a Menú y Ventas.
+**Excepción (Santiago, 2026-10-20):** Inicio lleva tarjetas blancas con letra negra, subtítulos grises y acentos verde, rojo y azul (no solo los colores de `globals.css`). La paleta pasa a la de la referencia de Santiago (fondo `#f8fafc`, texto `#0f172a`, subtítulos `#64748b`, bordes `#e2e8f0`) en toda la app, y las tarjetas de Inicio llevan borde y ícono verde, rojo y azul sobre blanco, con el bloque en azul marino. Quedó sin hacer: aplicar lo mismo a Menú y Ventas.
 
 ### 37. Ícono de la pestaña
 La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como en la página de julio (decisión de Santiago, 2026-10-19).
