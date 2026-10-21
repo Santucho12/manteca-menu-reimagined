@@ -24,10 +24,8 @@ export function BloqueDelMes({ resultado, cantidad, className = '' }: Props) {
   return (
     <section
       aria-label="Ventas del mes"
-      className={`relative overflow-hidden rounded-[28px] bg-neutral-950 text-white p-7 shadow-xl shadow-black/30 md:p-9 ${className}`}
+      className={`relative overflow-hidden rounded-[28px] bg-accent text-white p-7 shadow-xl shadow-accent/30 md:p-9 ${className}`}
     >
-      <div className="absolute -top-24 -right-16 size-72 rounded-full bg-accent/20 blur-2xl" />
-      <div className="absolute -bottom-28 left-1/3 size-64 rounded-full bg-accent/10 blur-3xl" />
       <div className="relative flex flex-col gap-8">
         <div>
           <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold tracking-[0.2em] uppercase">
@@ -49,7 +47,7 @@ export function BloqueDelMes({ resultado, cantidad, className = '' }: Props) {
           </div>
           {porcion === null ? null : (
             <div className="h-2 overflow-hidden rounded-full bg-white/15">
-              <div className="h-full rounded-full bg-accent" style={{ width: `${porcion}%` }} />
+              <div className="h-full rounded-full bg-white" style={{ width: `${porcion}%` }} />
             </div>
           )}
           <p className="text-xs font-medium text-white/70">{textoDeLaPorcion(porcion)}</p>
