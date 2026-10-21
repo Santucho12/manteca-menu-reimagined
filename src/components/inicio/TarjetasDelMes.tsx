@@ -25,8 +25,8 @@ const TONOS = {
   },
   'Ticket promedio': {
     icono: Ticket,
-    tarjeta: 'border-slate-200 bg-white',
-    cuadro: 'border border-slate-200 bg-slate-100 text-slate-600',
+    tarjeta: 'border-slate-100 bg-white',
+    cuadro: 'border border-slate-100 bg-slate-50 text-slate-600',
     punto: 'bg-slate-600',
   },
 };
@@ -37,7 +37,10 @@ export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
       {items.map((item) => {
         const { icono: Icono, tarjeta, cuadro, punto } = TONOS[item.etiqueta as keyof typeof TONOS];
         return (
-          <div key={item.etiqueta} className={`rounded-3xl border p-6 ${tarjeta}`}>
+          <div
+            key={item.etiqueta}
+            className={`rounded-xl border p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] ${tarjeta}`}
+          >
             <div className="flex items-start justify-between gap-3">
               <Etiqueta as="dt">{item.etiqueta}</Etiqueta>
               <span className={`grid size-10 shrink-0 place-items-center rounded-xl ${cuadro}`}>
@@ -47,7 +50,7 @@ export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
             <dd className="mt-2 mb-4 text-lg font-bold whitespace-nowrap sm:text-xl lg:text-lg 2xl:text-2xl">
               {item.valor}
             </dd>
-            <dd className="text-muted-foreground flex items-center justify-between gap-2 border-t pt-3 text-[11px] font-bold uppercase">
+            <dd className="flex items-center justify-between gap-2 border-t border-slate-50 pt-3 text-[11px] text-slate-400 font-bold uppercase">
               {textoDeVariacion(item.variacion)}
               <span className={`size-1.5 shrink-0 rounded-full ${punto}`} />
             </dd>
