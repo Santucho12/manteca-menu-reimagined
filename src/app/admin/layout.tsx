@@ -4,16 +4,16 @@ import type { ReactNode } from 'react';
 import './panel.css';
 
 // Las letras de Plan Reminder Pro con sus mismos pesos: un 800 o un 900 se ven en 700, como alla.
-const PESOS: Array<'400' | '500' | '600' | '700'> = ['400', '500', '600', '700'];
+// next/font pide los valores escritos en cada llamada, no en una constante.
 const inter = Inter({
   subsets: ['latin'],
-  weight: PESOS,
+  weight: ['400', '500', '600', '700'],
   display: 'swap',
   variable: '--font-inter',
 });
 const outfit = Outfit({
   subsets: ['latin'],
-  weight: PESOS,
+  weight: ['400', '500', '600', '700'],
   display: 'swap',
   variable: '--font-outfit',
 });

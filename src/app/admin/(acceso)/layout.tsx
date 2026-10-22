@@ -1,0 +1,19 @@
+import type { ReactNode } from 'react';
+import { EntradaDelIngreso } from '@/components/panel/Entradas';
+import { Marca } from '@/components/panel/Marca';
+
+/** Ingreso, registro y cambio obligado: la pantalla de ingreso de Plan Reminder Pro. */
+export default function LayoutDeAcceso({ children }: { children: ReactNode }) {
+  return (
+    <main className="min-h-screen bg-background relative overflow-clip flex items-center justify-center p-4">
+      <EntradaDelIngreso className="w-full max-w-sm">
+        <div className="flex flex-col items-center mb-10 text-center animate-in-fade">
+          <Marca tamano="ingreso" />
+        </div>
+        <div className="bg-card/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-white/50 p-10">
+          {children}
+        </div>
+      </EntradaDelIngreso>
+    </main>
+  );
+}

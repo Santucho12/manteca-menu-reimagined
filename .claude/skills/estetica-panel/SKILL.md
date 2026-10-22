@@ -166,3 +166,7 @@ en componentes de hasta 80 líneas, con la lógica en `.ts` y nombres en españo
 | Usar los colores de Tailwind 4 o agregar familias nuevas | Rosas, ámbares y verdes más saturados que en PRP | Las siete familias de `panel.css` |
 | Un `p` donde PRP tiene un `h3` | El número sale en Inter | La etiqueta de PRP, o `font-display` |
 | Ajustar colores "para que pase el contraste" | Ya no es PRP | Exacto: es decisión de Santiago |
+| Dibujar una ventana o la hoja "Más" dentro de un elemento con `backdrop-blur` o `transform` (la barra de abajo, el contenido animado) | El `fixed` queda atado a ese elemento y no tapa la pantalla | `createPortal` a `<main>` |
+| Repetir `layoutId="activeNav"` fuera de la barra lateral (en "Más") | La pestaña verde salta entre los dos | Solo en la barra lateral |
+| Envolver el `motion.tr` dentro de `AnimatePresence mode="popLayout"` | La salida de la fila no anda | El `motion.tr` va como hijo directo |
+| Ponerle el nombre del registro a otro enlace de la fila (`aria-label="WhatsApp a …"`) | `getByRole('link', { name })` encuentra dos | Ese enlace se nombra solo por lo que hace |
