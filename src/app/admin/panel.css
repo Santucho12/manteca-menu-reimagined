@@ -1,0 +1,249 @@
+/*
+ * Estética del panel (/admin): la de Plan Reminder Pro, tal cual (Santiago, 2026-10-21).
+ * Se copia entera a src/app/admin/panel.css y la importa solo el layout raíz del panel:
+ * la carta pública tiene su propio CSS (src/app/globals.css) y no se toca.
+ *
+ * Sale de plan-reminder-pro (src/index.css y tailwind.config.ts, Tailwind 3), pasado a
+ * Tailwind 4 sin que cambie cómo se ve. Cada diferencia entre las dos versiones está
+ * corregida acá; las de clases sueltas están en la tabla de SKILL.md.
+ */
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'lenis/dist/lenis.css';
+
+/* Las recetas de la skill y los documentos no son código: que Tailwind no genere sus clases. */
+@source not '../../../.claude';
+@source not '../../../docs';
+
+/* PRP no activa el modo oscuro: dark: solo aplicaría dentro de .dark, que nunca está. */
+@custom-variant dark (&:is(.dark *));
+/* Tailwind 3 aplicaba hover: también al tocar en el celular; Tailwind 4 solo con mouse. */
+@custom-variant hover (&:hover);
+
+@theme {
+  /* Las variables --font-inter y --font-outfit las pone next/font en <html>. */
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-outfit), sans-serif;
+
+  /* Radios de PRP: lg es --radius (0.75rem) y md y sm le restan 2 y 4 px. xl, 2xl y 3xl
+     son los de Tailwind: se repiten por si otro CSS los pisa. */
+  --radius-sm: calc(0.75rem - 4px);
+  --radius-md: calc(0.75rem - 2px);
+  --radius-lg: 0.75rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+
+  /* Colores del tema (src/index.css de PRP). */
+  --color-background: hsl(210 20% 98%);
+  --color-foreground: hsl(220 40% 12%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(220 40% 12%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(220 40% 12%);
+  --color-primary: hsl(160 84% 39%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  --color-secondary: hsl(210 20% 95%);
+  --color-secondary-foreground: hsl(220 40% 12%);
+  --color-muted: hsl(210 20% 95%);
+  --color-muted-foreground: hsl(220 20% 45%);
+  --color-accent: hsl(160 84% 39%);
+  --color-accent-foreground: hsl(0 0% 100%);
+  --color-destructive: hsl(0 84% 60%);
+  --color-destructive-foreground: hsl(0 0% 100%);
+  --color-border: hsl(220 20% 90%);
+  --color-input: hsl(220 20% 90%);
+  --color-ring: hsl(160 84% 39%);
+  --color-status-paid: hsl(160 60% 94%);
+  --color-status-paid-text: hsl(160 84% 25%);
+  --color-status-pending: hsl(38 92% 94%);
+  --color-status-pending-text: hsl(38 92% 25%);
+  --color-status-overdue: hsl(0 84% 96%);
+  --color-status-overdue-text: hsl(0 84% 35%);
+
+  /* La paleta de Tailwind 3. Tailwind 4 trae otros valores (oklch, más saturados) para los
+     mismos nombres: sin esto el rosa, el ámbar y el verde se ven distintos. */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-200: #a7f3d0;
+  --color-emerald-300: #6ee7b7;
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-emerald-800: #065f46;
+  --color-emerald-900: #064e3b;
+  --color-emerald-950: #022c22;
+  --color-rose-50: #fff1f2;
+  --color-rose-100: #ffe4e6;
+  --color-rose-200: #fecdd3;
+  --color-rose-300: #fda4af;
+  --color-rose-400: #fb7185;
+  --color-rose-500: #f43f5e;
+  --color-rose-600: #e11d48;
+  --color-rose-700: #be123c;
+  --color-rose-800: #9f1239;
+  --color-rose-900: #881337;
+  --color-rose-950: #4c0519;
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-200: #fde68a;
+  --color-amber-300: #fcd34d;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+  --color-amber-800: #92400e;
+  --color-amber-900: #78350f;
+  --color-amber-950: #451a03;
+  --color-violet-50: #f5f3ff;
+  --color-violet-100: #ede9fe;
+  --color-violet-200: #ddd6fe;
+  --color-violet-300: #c4b5fd;
+  --color-violet-400: #a78bfa;
+  --color-violet-500: #8b5cf6;
+  --color-violet-600: #7c3aed;
+  --color-violet-700: #6d28d9;
+  --color-violet-800: #5b21b6;
+  --color-violet-900: #4c1d95;
+  --color-violet-950: #2e1065;
+  --color-blue-50: #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-200: #bfdbfe;
+  --color-blue-300: #93c5fd;
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+  --color-blue-800: #1e40af;
+  --color-blue-900: #1e3a8a;
+  --color-blue-950: #172554;
+  --color-sky-50: #f0f9ff;
+  --color-sky-100: #e0f2fe;
+  --color-sky-200: #bae6fd;
+  --color-sky-300: #7dd3fc;
+  --color-sky-400: #38bdf8;
+  --color-sky-500: #0ea5e9;
+  --color-sky-600: #0284c7;
+  --color-sky-700: #0369a1;
+  --color-sky-800: #075985;
+  --color-sky-900: #0c4a6e;
+  --color-sky-950: #082f49;
+
+  --animate-pulse-subtle: pulse-subtle 2s ease-in-out infinite;
+
+  @keyframes pulse-subtle {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  /* Como PRP: sin zoom por doble toque y sin que el celular agrande la letra solo (el zoom con
+     dos dedos sigue). Tailwind 4 apaga el resaltado al tocar; Tailwind 3 lo dejaba. */
+  html {
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: initial;
+  }
+
+  /* La letra base es de 14 px (html sigue en 16: los rem no cambian). */
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+  }
+
+  /* Todo h1–h4 va en Outfit, aunque la clase no lo diga: los números de las tarjetas son h3. */
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.03em;
+    font-weight: 600;
+  }
+
+  /* Lo que Tailwind 3 traía de fábrica y Tailwind 4 no. */
+  input::placeholder,
+  textarea::placeholder {
+    opacity: 1;
+    color: #9ca3af;
+  }
+
+  button,
+  [role='button'] {
+    cursor: pointer;
+  }
+
+  :disabled {
+    cursor: default;
+  }
+}
+
+@utility shadow-card {
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.03),
+    0 4px 12px -2px rgba(0, 0, 0, 0.06);
+}
+
+@utility shadow-premium {
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.05),
+    0 8px 10px -6px rgb(0 0 0 / 0.05);
+}
+
+@utility animate-in-fade {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@utility animate-in-slide {
+  animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
