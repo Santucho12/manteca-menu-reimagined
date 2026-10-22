@@ -17,7 +17,8 @@ export type ClaveDeAyuda =
   | 'caja'
   | 'control'
   | 'menu'
-  | 'aumento';
+  | 'aumento'
+  | 'reportes';
 
 export const AYUDAS: Record<ClaveDeAyuda, Ayuda> = {
   inicio: {
@@ -230,6 +231,28 @@ export const AYUDAS: Record<ClaveDeAyuda, Ayuda> = {
           'Elegí el alcance, el porcentaje y el redondeo, y tocá Ver cambios: no se cambia nada todavía.',
           'Revisá la tabla (también entran los productos ocultos) y recién ahí tocá Aplicar aumento.',
           'No hay deshacer: un error se corrige con otro aumento o editando el precio.',
+        ],
+      },
+    ],
+  },
+  reportes: {
+    titulo: 'Cómo funcionan los Reportes',
+    introduccion: 'Para entender por qué un mes fue mejor o peor, con los números que ya cargaste.',
+    temas: [
+      {
+        titulo: 'El período',
+        puntos: [
+          'Elegí las fechas o usá un atajo (esta semana, este mes, mes pasado).',
+          'Cada número se compara con el período de antes, o con el que elijas en Comparar.',
+          'Lo anulado y lo cancelado no cuenta.',
+        ],
+      },
+      {
+        titulo: 'Cada reporte',
+        puntos: [
+          'Ventas y gastos se ven por período, por producto o categoría.',
+          'Caja muestra los cierres de cada día y marca los días sin cierre.',
+          'Resultado es ventas menos gastos; sin gastos cargados no se calcula.',
         ],
       },
     ],

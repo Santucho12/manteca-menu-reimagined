@@ -40,7 +40,7 @@ export default defineConfig({
     port: PUERTO,
     // Nunca uno que ya estaba abierto: pudo arrancar con otras variables y otra base.
     reuseExistingServer: false,
-    env: { PUERTO_DEV: String(PUERTO), NEXT_DIST_DIR: '.next-e2e' },
+    env: { PUERTO_DEV: String(PUERTO), NEXT_DIST_DIR: '.next-e2e', E2E: '1' },
     timeout: 120_000,
   },
 });

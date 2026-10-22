@@ -95,14 +95,14 @@ export function FiltroDeFecha({ id, name, etiqueta, valor }: PropsDeCampo & { va
 }
 
 /** El boton de una barra que filtra sin buscador. */
-export function BotonDeFiltrar() {
+export function BotonDeFiltrar({ texto = 'Filtrar' }: { texto?: string }) {
   return (
     <button
       type="submit"
       className="h-11 md:h-14 px-5 rounded-xl md:rounded-2xl bg-primary text-white font-bold text-sm md:uppercase md:tracking-widest shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center justify-center gap-2 self-end"
     >
       <SlidersHorizontal size={16} aria-hidden="true" />
-      Filtrar
+      {texto}
     </button>
   );
 }

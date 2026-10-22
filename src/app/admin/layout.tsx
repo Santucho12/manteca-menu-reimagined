@@ -30,11 +30,16 @@ export const metadata: Metadata = {
 // cover: sin esto env(safe-area-inset-*) vale 0 y las barras del celular quedan bajo la muesca.
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover' };
 
+// El servidor de las pruebas esconde el aviso de problemas de Next (solo existe en desarrollo): su
+// boton, "Open issues overlay", figura como un boton mas y las pruebas que buscan "Ver" lo toman.
+const ESCONDER_AVISO_DE_NEXT = 'nextjs-portal { display: none !important; }';
+
 /** Layout raiz del panel: su CSS y sus letras no tocan la carta, que tiene el suyo. */
 export default function LayoutDelPanel({ children }: { children: ReactNode }) {
   return (
     <html lang="es-AR" className={`${inter.variable} ${outfit.variable}`}>
       <body>
+        {process.env.E2E === '1' ? <style>{ESCONDER_AVISO_DE_NEXT}</style> : null}
         <TooltipProvider>
           <ScrollSuave />
           {children}
