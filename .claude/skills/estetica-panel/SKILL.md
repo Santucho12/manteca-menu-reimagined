@@ -52,10 +52,10 @@ Decisiones de Santiago (2026-10-21):
    (`e2e/acceso.spec.ts`).
 2. **`panel.css`** copiado entero e importado solo desde ese layout.
 3. **Letras con `next/font/google`**, en `<html>` (si van en `<body>`, `--font-sans` no las ve):
-   `Inter` y `Outfit`, cada una con `subsets: ['latin']`, `weight: '400 700'`, `display: 'swap'`
-   y `variable: '--font-inter'` / `'--font-outfit'`. PRP carga solo de 400 a 700: por eso
-   `font-extrabold` y `font-black` se ven en 700. Con la fuente variable entera se verían más
-   gruesas. IBM Plex Mono no va: PRP la declara, pero `font-mono` la pisa y el código sale en la
+   `Inter` y `Outfit`, cada una con `subsets: ['latin']`, `weight: ['400', '500', '600', '700']`,
+   `display: 'swap'` y `variable: '--font-inter'` / `'--font-outfit'`. PRP carga solo esos
+   cuatro pesos: por eso `font-extrabold` y `font-black` se ven en 700. Con la fuente variable
+   entera se verían más gruesas (y un rango como `'400 700'` no lo acepta el tipo de `next/font`). IBM Plex Mono no va: PRP la declara, pero `font-mono` la pisa y el código sale en la
    mono del sistema.
 4. **En el layout**: `TooltipProvider`, el arranque de Lenis y la vuelta arriba al cambiar de ruta
    (`movimiento.md`). El `<Toaster />` va dentro de `<main>`.
@@ -162,7 +162,7 @@ en componentes de hasta 80 líneas, con la lógica en `.ts` y nombres en españo
 | Poner el logo de la carta en vez del cuadrado verde | Otra marca | La de la decisión de Santiago |
 | Instalar componentes con `npx shadcn add` | Otro estilo, y colores escritos en el CSS de la carta | `componentes-base.md`, a mano |
 | Poner el panel debajo del layout de la carta o pintar los colores en un `div` | Las listas y los avisos que van a `body` salen con los colores de la carta | Layout raíz propio con `panel.css` |
-| Cargar Inter y Outfit enteras, o ponerles la clase en `<body>` | Títulos más gruesos, o la letra del sistema | `weight: '400 700'` y la clase de `next/font` en `<html>` |
+| Cargar Inter y Outfit enteras, o ponerles la clase en `<body>` | Títulos más gruesos, o la letra del sistema | `weight: ['400', '500', '600', '700']` y la clase de `next/font` en `<html>` |
 | Usar los colores de Tailwind 4 o agregar familias nuevas | Rosas, ámbares y verdes más saturados que en PRP | Las siete familias de `panel.css` |
 | Un `p` donde PRP tiene un `h3` | El número sale en Inter | La etiqueta de PRP, o `font-display` |
 | Ajustar colores "para que pase el contraste" | Ya no es PRP | Exacto: es decisión de Santiago |
