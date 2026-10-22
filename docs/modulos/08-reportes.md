@@ -115,7 +115,7 @@ leer sus cierres y los gastos de su cierre.
   `agrupar` (día o mes, serie superpuesta), `ventas`, `gastos`, `resultado`, `caja`,
   `paginas` (de a 50), `lista` y `consultas` (con la sesión del usuario).
 - `src/components/reportes/`: encabezado común, totales, tablas y gráficos de Recharts sin
-  animación, con los colores de `globals.css`.
+  animación, con los colores del panel (skill `estetica-panel`).
 - Pantallas en `/admin/reportes` y sus siete rutas.
 - **Inicio va a usar lo mismo:** `ventasPorDia`, `gastosPorDia`, `totalesDeVentas`,
   `resultadoDelPeriodo` y `resultadoPorMes`, para que el mismo dato no dé distinto.

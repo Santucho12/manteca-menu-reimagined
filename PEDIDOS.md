@@ -144,7 +144,11 @@ Cambiar la barra de arriba del panel por una sidebar, y el encabezado de cada pa
 Publicar el sistema en `mantecabakeryar.com`: el menú nuevo, que sale de la base, en `/` y el panel en `/admin`. El proyecto de Vercel `manteca-menu-reimagined` ya está conectado a este repo y sigue sirviendo el deploy del 2 de julio; el deploy del merge del PR #19 falló. La base real ya tiene las 6 categorías y los 35 productos de la página de julio, con los mismos nombres, precios y descripciones, y las fotos están en `public/menu/`.
 
 ### 43. El panel desde cero
-Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, sin tomar como referencia el diseño anterior ni Plan Reminder Pro (decisión de Santiago, 2026-10-21). Quedan la carta pública, el servidor (acciones, `src/lib`, base) y las pruebas de Playwright de funcionamiento: son la lista de lo que cada pantalla nueva tiene que volver a hacer. Se borran las pruebas que miraban el diseño viejo, la skill `estetica-panel` y los specs y planes de estética. La estética nueva se define con Santiago, con maquetas, antes de construir. Reemplaza los pedidos 38, 39, 40 y 42.
+Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, sin tomar como referencia el diseño anterior (decisión de Santiago, 2026-10-21). Quedan la carta pública, el servidor (acciones, `src/lib`, base) y las pruebas de Playwright de funcionamiento: son la lista de lo que cada pantalla nueva tiene que volver a hacer. Se borran las pruebas que miraban el diseño viejo, la skill `estetica-panel` vieja y los specs y planes de estética. Reemplaza los pedidos 38, 39, 40 y 42.
+
+**Estética elegida (Santiago, 2026-10-21):** la de Plan Reminder Pro, tal cual: colores, letras, piezas y movimiento, con la marca de Manteca (cuadrado verde con la medialuna y "Manteca"). Suma `framer-motion` 12.36.0, `sonner` 1.7.4 y `lenis` 1.1.20, las versiones de Plan Reminder Pro. Está entera en la skill `estetica-panel` nueva.
+
+**Excepción (Santiago, 2026-10-21):** los colores del panel son los exactos de Plan Reminder Pro aunque no pasen el contraste AA que pide el pedido 21 (letra blanca sobre el verde, 2,6 a 1; el rojo de error, 3,6; el anillo de foco, 2,5; los grises chicos, 2,6). Las pruebas de contraste (`tests/contraste.test.ts`) siguen mirando solo la carta pública; no se extienden al panel. Queda a confirmar por Santiago si el panel también bloquea el zoom en el celular, como Plan Reminder Pro; mientras tanto, no lo bloquea.
 
 ### 41. Playwright en otro puerto
 Que las pruebas de Playwright levanten su servidor en el puerto 3211, con su propia carpeta de compilación, para no tumbar el `npm run dev` del 3210 (pedido de Santiago, 2026-10-21).
@@ -170,7 +174,7 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 
 | # | Pedido | Qué falta |
 |---|---|---|
-| 43 | El panel desde cero | Borrado el front del panel. Falta definir con Santiago la estética nueva y rehacer cada pantalla hasta que vuelvan a pasar sus pruebas de Playwright |
+| 43 | El panel desde cero | Borrado el front del panel y definida la estética (skill `estetica-panel`). Falta montar el panel con esa skill (layout raíz propio, `panel.css`, letras y librerías) y rehacer cada pantalla hasta que vuelvan a pasar sus pruebas de Playwright |
 | 42 | Colores y letra de Plan Reminder Pro en el panel | Reemplazado por el pedido 43: el panel se rehace desde cero |
 | 38 | Estética de Plan Reminder Pro en Inicio, Menú y Ventas | Reemplazado por el pedido 43: el panel se rehace desde cero |
 | 41 | Playwright en otro puerto | Todo |

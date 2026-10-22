@@ -67,8 +67,11 @@ Sobre lo que tocaste (`CLAUDE.md`, "Reglas de código"):
 
 ## 4. Estilos (si tocaste algo visual)
 
-- Lo nuevo usa los colores de `globals.css` y los componentes base del proyecto. No hay guía
-  de estilos que consultar ni actualizar (pedido 23).
+- En el panel (`/admin`), lo nuevo sigue la skill `estetica-panel`: sus colores (`panel.css`),
+  sus piezas y sus componentes base. Las capturas se comparan con las de su carpeta
+  `referencias/`, en los mismos tamaños.
+- En la carta pública, lo nuevo usa los colores de `globals.css`.
+- No hay guía de estilos que consultar ni actualizar (pedido 23).
 
 ## 5. Reglas de negocio sensibles
 
