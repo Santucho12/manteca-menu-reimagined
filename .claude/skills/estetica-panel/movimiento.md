@@ -142,7 +142,7 @@ export const viewport: Viewport = {
 celular no queden debajo de la muesca ni de la barra de inicio del iPhone.
 
 PRP, además, no deja hacer zoom en el celular. Eso impide agrandar la letra a quien lo necesita,
-así que **va solo si Santiago lo confirma**; mientras tanto el panel deja hacer zoom
+así que **no va** (Santiago, 2026-10-22): el panel deja hacer zoom
 (`touch-action: manipulation`, que ya está en `panel.css`, solo saca el zoom por doble toque). Si
 lo confirma, el `viewport` suma `maximumScale: 1` y `userScalable: false`, y un componente de
 cliente agrega, una vez, `document.addEventListener('gesturestart', (e) => e.preventDefault())`

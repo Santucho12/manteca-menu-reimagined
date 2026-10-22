@@ -148,7 +148,7 @@ Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, 
 
 **Estética elegida (Santiago, 2026-10-21):** la de Plan Reminder Pro, tal cual: colores, letras, piezas y movimiento, con la marca de Manteca (cuadrado verde con la medialuna y "Manteca"). Suma `framer-motion` 12.36.0, `sonner` 1.7.4 y `lenis` 1.1.20, las versiones de Plan Reminder Pro. Está entera en la skill `estetica-panel` nueva.
 
-**Excepción (Santiago, 2026-10-21):** los colores del panel son los exactos de Plan Reminder Pro aunque no pasen el contraste AA que pide el pedido 21 (letra blanca sobre el verde, 2,6 a 1; el rojo de error, 3,6; el anillo de foco, 2,5; los grises chicos, 2,6). Las pruebas de contraste (`tests/contraste.test.ts`) siguen mirando solo la carta pública; no se extienden al panel. Queda a confirmar por Santiago si el panel también bloquea el zoom en el celular, como Plan Reminder Pro; mientras tanto, no lo bloquea.
+**Excepción (Santiago, 2026-10-21):** los colores del panel son los exactos de Plan Reminder Pro aunque no pasen el contraste AA que pide el pedido 21 (letra blanca sobre el verde, 2,6 a 1; el rojo de error, 3,6; el anillo de foco, 2,5; los grises chicos, 2,6). Las pruebas de contraste (`tests/contraste.test.ts`) siguen mirando solo la carta pública; no se extienden al panel. El panel no bloquea el zoom en el celular, a diferencia de Plan Reminder Pro (Santiago, 2026-10-22).
 
 ### 41. Playwright en otro puerto
 Que las pruebas de Playwright levanten su servidor en el puerto 3211, con su propia carpeta de compilación, para no tumbar el `npm run dev` del 3210 (pedido de Santiago, 2026-10-21).

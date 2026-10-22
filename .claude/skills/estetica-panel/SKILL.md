@@ -27,8 +27,7 @@ Decisiones de Santiago (2026-10-21):
   `lenis` 1.1.20.
 - **Marca**: cuadrado verde con la medialuna de lucide (`Croissant`), "Manteca" en la letra de los
   títulos y "SISTEMA DE GESTIÓN" debajo.
-- **A confirmar con Santiago**: PRP bloquea el zoom en el celular (`movimiento.md`). Hasta que lo
-  confirme, no se bloquea.
+- **Zoom**: PRP bloquea el zoom en el celular; Manteca no (Santiago, 2026-10-22).
 
 ## Archivos
 
