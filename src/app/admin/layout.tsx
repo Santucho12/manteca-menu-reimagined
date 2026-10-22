@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Outfit } from 'next/font/google';
 import type { ReactNode } from 'react';
+import { ScrollSuave } from '@/components/panel/ScrollSuave';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import './panel.css';
 
 // Las letras de Plan Reminder Pro con sus mismos pesos: un 800 o un 900 se ven en 700, como alla.
@@ -32,7 +34,12 @@ export const viewport: Viewport = { width: 'device-width', initialScale: 1, view
 export default function LayoutDelPanel({ children }: { children: ReactNode }) {
   return (
     <html lang="es-AR" className={`${inter.variable} ${outfit.variable}`}>
-      <body>{children}</body>
+      <body>
+        <TooltipProvider>
+          <ScrollSuave />
+          {children}
+        </TooltipProvider>
+      </body>
     </html>
   );
 }

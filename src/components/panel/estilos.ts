@@ -23,4 +23,7 @@ export const TARJETA_DE_SECCION =
 export const TARJETA_DE_FORMULARIO =
   'bg-card rounded-[2rem] border border-border/50 shadow-xl p-5 md:p-8 space-y-5';
 
+export const LUGAR_DE_ABAJO =
+  'flex-1 min-w-0 h-16 flex flex-col items-center justify-center gap-1 text-[9px] font-bold transition-colors';
+
 export const CERRAR_VENTANA = 'p-2 rounded-full hover:bg-secondary transition-colors';
