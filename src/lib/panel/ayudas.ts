@@ -13,7 +13,9 @@ export type ClaveDeAyuda =
   | 'categorias'
   | 'recurrentes'
   | 'ventas'
-  | 'canales';
+  | 'canales'
+  | 'caja'
+  | 'control';
 
 export const AYUDAS: Record<ClaveDeAyuda, Ayuda> = {
   inicio: {
@@ -148,6 +150,48 @@ export const AYUDAS: Record<ClaveDeAyuda, Ayuda> = {
         puntos: [
           'Sumá, renombrá y desactivá canales. No se repite un nombre.',
           'Un canal desactivado no se ofrece al cargar una venta, pero conserva las que ya tiene.',
+        ],
+      },
+    ],
+  },
+  caja: {
+    titulo: 'Cómo funciona el cierre de caja',
+    introduccion: 'Al terminar el turno, contá lo que hay en la caja y cargalo acá.',
+    temas: [
+      {
+        titulo: 'Cómo se carga',
+        puntos: [
+          'Cargás lo que contaste: el efectivo y lo cobrado por cada medio. El sistema no te muestra lo esperado, para que el conteo sea a ciegas.',
+          'Sumá los retiros (con quién retiró) y los gastos que se pagaron con la plata de la caja.',
+          'Hay un cierre por día. Si te equivocaste, pedile al admin que lo anule.',
+        ],
+      },
+      {
+        titulo: 'Después de guardar',
+        puntos: [
+          'El resultado aparece cuando entran las ventas del día.',
+          'En Mis cierres ves los que cargaste vos.',
+        ],
+      },
+    ],
+  },
+  control: {
+    titulo: 'Cómo funciona el control de cierres',
+    introduccion: 'Acá revisás los cierres de cada día: quién los cargó y si cierran.',
+    temas: [
+      {
+        titulo: 'La lista',
+        puntos: [
+          'Filtrá por fechas, persona y estado. Los días sin cierre aparecen marcados y se pueden cargar.',
+          'Fondo distinto avisa que la caja arrancó con otro monto del que quedó el día anterior.',
+          'La tolerancia es la diferencia por medio de pago que se acepta como "cierra".',
+        ],
+      },
+      {
+        titulo: 'Revisar y anular',
+        puntos: [
+          'Marcá como revisado con un comentario cuando lo controlaste.',
+          'Un cierre no se borra: se anula con un motivo y sus gastos quedan anulados.',
         ],
       },
     ],

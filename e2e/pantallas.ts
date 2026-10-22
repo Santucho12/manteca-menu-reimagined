@@ -22,4 +22,8 @@ export const PANTALLAS_PARA_CALENTAR = [
   `/admin/ventas/${SIN_ID}`,
   '/admin/ventas/canales',
   `/admin/ventas/canales/${SIN_ID}`,
+  '/admin/caja',
+  '/admin/caja/mis-cierres',
+  '/admin/caja/control',
+  `/admin/caja/cierres/${SIN_ID}`,
 ];
