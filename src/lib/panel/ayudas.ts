@@ -18,7 +18,9 @@ export type ClaveDeAyuda =
   | 'control'
   | 'menu'
   | 'aumento'
-  | 'reportes';
+  | 'reportes'
+  | 'usuarios'
+  | 'auditoria';
 
 export const AYUDAS: Record<ClaveDeAyuda, Ayuda> = {
   inicio: {
@@ -253,6 +255,41 @@ export const AYUDAS: Record<ClaveDeAyuda, Ayuda> = {
           'Ventas y gastos se ven por período, por producto o categoría.',
           'Caja muestra los cierres de cada día y marca los días sin cierre.',
           'Resultado es ventas menos gastos; sin gastos cargados no se calcula.',
+        ],
+      },
+    ],
+  },
+  usuarios: {
+    titulo: 'Cómo funciona Usuarios',
+    introduccion: 'Quién entra al sistema y qué puede hacer. Solo un administrador asigna roles.',
+    temas: [
+      {
+        titulo: 'Las cuentas',
+        puntos: [
+          'Quien se registra queda esperando un rol. Con Dar rol de Caja entra a cargar su cierre.',
+          'Rechazar corta el acceso y no deja volver a registrarse con ese email.',
+          'Desactivar saca el acceso en el momento; Reactivar lo devuelve.',
+        ],
+      },
+      {
+        titulo: 'Contraseña y datos',
+        puntos: [
+          'Resetear muestra una contraseña temporal una sola vez: pasásela a la persona, que tiene que cambiarla al entrar.',
+          'Corregir datos cambia el nombre y el email. Sobre tu propia cuenta solo podés corregir los datos.',
+        ],
+      },
+    ],
+  },
+  auditoria: {
+    titulo: 'Cómo funciona la Auditoría',
+    introduccion: 'Todo lo que se cargó o se cambió en el sistema, quién lo hizo y cuándo.',
+    temas: [
+      {
+        titulo: 'Cómo se lee',
+        puntos: [
+          'Filtrá por fechas, persona, módulo y tipo de acción.',
+          'Ver el detalle muestra cada campo con su valor anterior y el nuevo, con nombres y pesos.',
+          'Lo que hace el sistema solo (como cargar un recurrente) figura como El sistema.',
         ],
       },
     ],

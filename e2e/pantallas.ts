@@ -41,4 +41,7 @@ export const PANTALLAS_PARA_CALENTAR = [
   '/admin/reportes/gastos-por-periodo',
   '/admin/reportes/caja',
   '/admin/reportes/resultado',
+  '/admin/usuarios',
+  '/admin/auditoria',
+  '/admin/auditoria/1',
 ];
