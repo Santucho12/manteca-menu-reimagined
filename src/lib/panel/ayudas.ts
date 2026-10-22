@@ -5,7 +5,8 @@ export type Ayuda = {
   temas: { titulo: string; puntos: string[] }[];
 };
 
-export type ClaveDeAyuda = 'inicio' | 'cuenta';
+export type ClaveDeAyuda =
+  'inicio' | 'cuenta' | 'proveedores' | 'gastos' | 'categorias' | 'recurrentes';
 
 export const AYUDAS: Record<ClaveDeAyuda, Ayuda> = {
   inicio: {
@@ -34,6 +35,78 @@ export const AYUDAS: Record<ClaveDeAyuda, Ayuda> = {
           'El mes a mes muestra ventas, gastos y balance: arranca con 4 meses y se amplía a todo el año.',
           'Más vendidos: los 5 productos que más plata dejaron en el mes.',
           'Abajo de todo, las ventas de los últimos 7 días contra los 7 anteriores.',
+        ],
+      },
+    ],
+  },
+  proveedores: {
+    titulo: 'Cómo funciona Proveedores',
+    introduccion: 'Acá tenés a quién le comprás, cómo contactarlo y cuánto le pagaste en el mes.',
+    temas: [
+      {
+        titulo: 'La lista',
+        puntos: [
+          'Escribí parte del nombre y apretá Buscar.',
+          'Pagado este mes suma los gastos cargados a cada proveedor en el mes, sin los anulados.',
+          'El botón verde abre el chat de WhatsApp. Si el proveedor no tiene teléfono, no aparece.',
+        ],
+      },
+      {
+        titulo: 'Desactivados',
+        puntos: [
+          'Un proveedor no se borra: se desactiva y conserva sus gastos.',
+          'Con Ver desactivados los ves, y desde su ficha lo podés reactivar.',
+        ],
+      },
+    ],
+  },
+  gastos: {
+    titulo: 'Cómo funciona Gastos',
+    introduccion:
+      'Todo lo que sale, para que el balance del mes sea real: lo que se pagó, por categoría y proveedor.',
+    temas: [
+      {
+        titulo: 'La lista',
+        puntos: [
+          'Va del más nuevo al más viejo. Filtrá por fechas, categoría y proveedor.',
+          'El total de arriba no cuenta lo anulado.',
+          'Los gastos sin clasificar vienen de un cierre de caja y esperan su categoría.',
+        ],
+      },
+      {
+        titulo: 'Cargar, editar y anular',
+        puntos: [
+          'Un gasto no se borra: se anula con un motivo, deja de contar y queda en el historial.',
+          'La compra de mercadería se carga como gasto, con su proveedor.',
+          'Los recurrentes se cargan solos el día que tocan, y quedan marcados como automáticos.',
+        ],
+      },
+    ],
+  },
+  categorias: {
+    titulo: 'Cómo funciona Categorías',
+    introduccion: 'Las categorías ordenan los gastos. Podés sumar, renombrar y desactivar.',
+    temas: [
+      {
+        titulo: 'Qué tenés que saber',
+        puntos: [
+          'Pedir proveedor obliga a elegir uno al cargar un gasto de esa categoría.',
+          'Una categoría desactivada no se ofrece más, pero conserva sus gastos.',
+          'Sin clasificar la usa el sistema para los gastos de un cierre: no se elige ni se desactiva.',
+        ],
+      },
+    ],
+  },
+  recurrentes: {
+    titulo: 'Cómo funciona Recurrentes',
+    introduccion: 'Un recurrente es una plantilla que carga un gasto solo, el día que toca.',
+    temas: [
+      {
+        titulo: 'Cómo se cargan',
+        puntos: [
+          'Elegí la frecuencia (mensual, bimestral o anual) y el primer vencimiento.',
+          'El gasto nace ya contado en el balance del mes y queda marcado como automático.',
+          'Si ese mes el monto fue otro, editá el gasto. Si no se pagó, anulalo.',
         ],
       },
     ],
