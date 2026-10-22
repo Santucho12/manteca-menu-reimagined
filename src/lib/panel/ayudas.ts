@@ -6,7 +6,14 @@ export type Ayuda = {
 };
 
 export type ClaveDeAyuda =
-  'inicio' | 'cuenta' | 'proveedores' | 'gastos' | 'categorias' | 'recurrentes';
+  | 'inicio'
+  | 'cuenta'
+  | 'proveedores'
+  | 'gastos'
+  | 'categorias'
+  | 'recurrentes'
+  | 'ventas'
+  | 'canales';
 
 export const AYUDAS: Record<ClaveDeAyuda, Ayuda> = {
   inicio: {
@@ -107,6 +114,40 @@ export const AYUDAS: Record<ClaveDeAyuda, Ayuda> = {
           'Elegí la frecuencia (mensual, bimestral o anual) y el primer vencimiento.',
           'El gasto nace ya contado en el balance del mes y queda marcado como automático.',
           'Si ese mes el monto fue otro, editá el gasto. Si no se pagó, anulalo.',
+        ],
+      },
+    ],
+  },
+  ventas: {
+    titulo: 'Cómo funciona Ventas',
+    introduccion: 'Las ventas del período, con su total: las de Fudo y las que cargás a mano.',
+    temas: [
+      {
+        titulo: 'La lista',
+        puntos: [
+          'Arranca en el mes de hoy. Filtrá por fechas, origen, medio de pago y estado.',
+          'El total de arriba no cuenta lo cancelado ni lo anulado.',
+          'Las ventas de Fudo entran solas: se corrigen en Fudo, no acá.',
+        ],
+      },
+      {
+        titulo: 'Cargar y anular',
+        puntos: [
+          'Cargá a mano lo que no pasa por Fudo: Cheaf, encargos, ventas a comercios.',
+          'Una venta a mano no se edita ni se borra: se anula con un motivo y queda en el historial.',
+        ],
+      },
+    ],
+  },
+  canales: {
+    titulo: 'Cómo funciona Canales',
+    introduccion: 'Por dónde entran las ventas que no pasan por Fudo.',
+    temas: [
+      {
+        titulo: 'Qué tenés que saber',
+        puntos: [
+          'Sumá, renombrá y desactivá canales. No se repite un nombre.',
+          'Un canal desactivado no se ofrece al cargar una venta, pero conserva las que ya tiene.',
         ],
       },
     ],

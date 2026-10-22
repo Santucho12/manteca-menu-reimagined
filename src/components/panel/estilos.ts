@@ -75,7 +75,7 @@ export const CAMPO_DE_FILTRO =
   'w-full min-w-0 sm:w-[180px] h-11 md:h-14 px-3 md:px-4 rounded-xl md:rounded-2xl bg-secondary/30 border-none text-xs md:text-sm font-semibold focus:ring-2 focus:ring-primary/20';
 
 export const BARRA_DE_FILTROS =
-  'flex flex-col xl:flex-row gap-3 md:gap-4 mb-6 md:mb-8 bg-card border border-border p-3 md:p-5 rounded-2xl md:rounded-3xl shadow-xs';
+  'flex flex-col xl:flex-row xl:flex-wrap gap-3 md:gap-4 mb-6 md:mb-8 bg-card border border-border p-3 md:p-5 rounded-2xl md:rounded-3xl shadow-xs';
 
 export const BOTON_DE_ENCABEZADO_NEUTRO =
   'flex-1 lg:flex-none px-4 md:px-6 h-11 md:h-12 rounded-2xl bg-card border border-border text-slate-900 font-bold text-sm md:uppercase md:tracking-widest whitespace-nowrap shadow-md hover:bg-slate-50 active:scale-95 transition-all flex items-center justify-center gap-2 md:gap-3';
