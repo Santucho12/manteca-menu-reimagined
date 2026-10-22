@@ -1,5 +1,5 @@
 import { numeroDePagina, unValor } from '../usuarios/presentacion';
-import type { FiltrosDeProveedores } from './consultas';
+import type { FilaDeProveedor, FiltrosDeProveedores } from './consultas';
 
 // La busqueda va tal cual: las comas y los puntos son parte de un nombre. La consulta escapa
 // los comodines.
@@ -26,4 +26,31 @@ export function enlaceDeProveedores({ busqueda, desactivados, pagina }: FiltrosD
   if (pagina > 1) parametros.set('pagina', String(pagina));
   const texto = parametros.toString();
   return texto ? `/admin/proveedores?${texto}` : '/admin/proveedores';
+}
+
+export type FilaConPagado = FilaDeProveedor & { pagadoCentavos: number };
+
+/** Cada proveedor con lo pagado en el mes; sin gastos en el mes, cero. */
+export function filasConPagado(
+  filas: FilaDeProveedor[],
+  pagado: Map<string, number>,
+): FilaConPagado[] {
+  return filas.map((fila) => ({ ...fila, pagadoCentavos: pagado.get(fila.id) ?? 0 }));
+}
+
+/** Que dice la lista vacia, segun por que esta vacia. */
+export function vacioDeProveedores({ busqueda, desactivados }: FiltrosDeProveedores) {
+  if (busqueda) {
+    return {
+      titulo: 'No se encontraron proveedores',
+      texto: 'No hay registros que coincidan con tu búsqueda.',
+    };
+  }
+  if (desactivados) {
+    return {
+      titulo: 'No hay proveedores desactivados',
+      texto: 'Los que desactives van a aparecer acá.',
+    };
+  }
+  return { titulo: 'Todavía no hay proveedores', texto: 'Cargá el primero con Nuevo proveedor.' };
 }

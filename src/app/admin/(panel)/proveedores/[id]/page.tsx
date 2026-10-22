@@ -1,0 +1,112 @@
+import { Pencil, Send } from 'lucide-react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { ENLACE_EN_TEXTO, FranjaDeAviso } from '@/components/panel/Avisos';
+import { CargadoPor } from '@/components/panel/CargadoPor';
+import { BOTON_DE_ENCABEZADO, BOTON_DE_ENCABEZADO_NEUTRO } from '@/components/panel/estilos';
+import { InsigniaDeEstado } from '@/components/panel/Insignias';
+import { Pantalla } from '@/components/panel/Pantalla';
+import { Dato, Datos, Seccion } from '@/components/panel/Seccion';
+import { exigirPagina } from '@/lib/acceso/servidor';
+import { diaEnArgentina } from '@/lib/fechas';
+import { recurrentesActivosDelProveedor } from '@/lib/gastos/proveedores';
+import { proveedorPorId, type Proveedor } from '@/lib/proveedores/consultas';
+import { telefonoParaMostrar, urlDeWhatsApp } from '@/lib/proveedores/telefono';
+import { BotonDeEstado } from '../BotonDeEstado';
+import { PagosDelProveedor } from './PagosDelProveedor';
+
+export const metadata: Metadata = { title: 'Proveedor' };
+
+function DatosDelProveedor({ proveedor }: { proveedor: Proveedor }) {
+  const telefono = proveedor.telefono ? telefonoParaMostrar(proveedor.telefono) : null;
+  return (
+    <Seccion forma="lista">
+      <Datos>
+        <Dato titulo="Teléfono" valor={telefono} />
+        <Dato titulo="Ubicación" valor={proveedor.ubicacion} />
+        <Dato titulo="Qué le comprás" valor={proveedor.que_compra} />
+        <Dato titulo="Observaciones" valor={proveedor.observaciones} />
+      </Datos>
+    </Seccion>
+  );
+}
+
+// Un recurrente sigue cargandose aunque su proveedor se desactive: se avisa antes.
+function AvisoDeRecurrentes({ cantidad }: { cantidad: number }) {
+  const texto =
+    cantidad === 1 ? '1 gasto recurrente activo' : `${cantidad} gastos recurrentes activos`;
+  return (
+    <FranjaDeAviso>
+      <p>
+        Tiene {texto}. Si lo desactivás, se siguen cargando: desactivalos en{' '}
+        <Link href="/admin/gastos/recurrentes" className={ENLACE_EN_TEXTO}>
+          Recurrentes
+        </Link>{' '}
+        si ya no le pagás.
+      </p>
+    </FranjaDeAviso>
+  );
+}
+
+function Acciones({ proveedor }: { proveedor: Proveedor }) {
+  return (
+    <>
+      {proveedor.telefono ? (
+        <a
+          href={urlDeWhatsApp(proveedor.telefono)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={BOTON_DE_ENCABEZADO}
+        >
+          <Send size={18} aria-hidden="true" /> WhatsApp
+        </a>
+      ) : null}
+      <Link
+        href={`/admin/proveedores/${proveedor.id}/editar`}
+        className={BOTON_DE_ENCABEZADO_NEUTRO}
+      >
+        <Pencil size={18} aria-hidden="true" /> Editar
+      </Link>
+    </>
+  );
+}
+
+export default async function FichaDeProveedor({ params }: { params: Promise<{ id: string }> }) {
+  const { cliente } = await exigirPagina('admin');
+  const { id } = await params;
+  const [proveedor, recurrentes] = await Promise.all([
+    proveedorPorId(cliente, id),
+    recurrentesActivosDelProveedor(cliente, id),
+  ]);
+  if (!proveedor) notFound();
+  return (
+    <Pantalla
+      titulo={proveedor.nombre}
+      subtitulo="Sus datos y lo que le pagaste."
+      acciones={<Acciones proveedor={proveedor} />}
+      ayuda="proveedores"
+    >
+      {proveedor.activo ? null : (
+        <div>
+          <InsigniaDeEstado tono="pizarra">Desactivado</InsigniaDeEstado>
+        </div>
+      )}
+      <CargadoPor cliente={cliente} tabla="proveedores" id={proveedor.id} />
+      <DatosDelProveedor proveedor={proveedor} />
+      <BotonDeEstado id={proveedor.id} activo={proveedor.activo} />
+      {proveedor.activo && recurrentes > 0 ? <AvisoDeRecurrentes cantidad={recurrentes} /> : null}
+      <PagosDelProveedor
+        cliente={cliente}
+        proveedorId={proveedor.id}
+        hoy={diaEnArgentina(new Date())}
+      />
+      <Link
+        href="/admin/proveedores"
+        className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
+      >
+        Volver a proveedores
+      </Link>
+    </Pantalla>
+  );
+}
