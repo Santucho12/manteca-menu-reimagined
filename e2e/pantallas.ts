@@ -26,4 +26,11 @@ export const PANTALLAS_PARA_CALENTAR = [
   '/admin/caja/mis-cierres',
   '/admin/caja/control',
   `/admin/caja/cierres/${SIN_ID}`,
+  '/admin/menu',
+  '/admin/menu/desactivados',
+  '/admin/menu/aumento',
+  '/admin/menu/categorias/nueva',
+  `/admin/menu/categorias/${SIN_ID}`,
+  '/admin/menu/productos/nuevo',
+  `/admin/menu/productos/${SIN_ID}`,
 ];

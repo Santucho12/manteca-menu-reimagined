@@ -79,3 +79,7 @@ export const BARRA_DE_FILTROS =
 
 export const BOTON_DE_ENCABEZADO_NEUTRO =
   'flex-1 lg:flex-none px-4 md:px-6 h-11 md:h-12 rounded-2xl bg-card border border-border text-slate-900 font-bold text-sm md:uppercase md:tracking-widest whitespace-nowrap shadow-md hover:bg-slate-50 active:scale-95 transition-all flex items-center justify-center gap-2 md:gap-3';
+
+/** Un icono de accion de una fila que no edita ni borra (subir, bajar, mostrar). */
+export const ICONO_DE_ACCION =
+  'p-1.5 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/10 transition-all duration-200 disabled:opacity-40';

@@ -3,6 +3,7 @@ import { Toaster } from '@/components/ui/sonner';
 import type { EnlaceDelMarco } from '@/lib/acceso/marco';
 import { BarraLateral } from './BarraLateral';
 import { BarrasDelCelular } from './BarrasDelCelular';
+import { Principal } from './Principal';
 
 type Props = { nombre: string; enlaces: EnlaceDelMarco[]; children: ReactNode };
 
@@ -15,10 +16,10 @@ export function MarcoDelPanel({ nombre, enlaces, children }: Props) {
     <div className="min-h-screen bg-background">
       <BarraLateral nombre={nombre} enlaces={enlaces} />
       <BarrasDelCelular nombre={nombre} enlaces={enlaces} />
-      <main className="lg:ml-[260px] px-4 md:px-8 pt-20 pb-28 lg:p-10 min-h-screen relative overflow-clip">
+      <Principal className="lg:ml-[260px] px-4 md:px-8 pt-20 pb-28 lg:p-10 min-h-screen relative overflow-clip">
         <Toaster />
         <div className="max-w-7xl mx-auto">{children}</div>
-      </main>
+      </Principal>
     </div>
   );
 }

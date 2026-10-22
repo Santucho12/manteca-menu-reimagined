@@ -13,6 +13,10 @@ export default defineConfig({
   // De a un navegador. Sin ventana: Santiago no quiere verla abrirse (pedido 32); con
   // E2E_A_LA_VISTA=1 se abre. El slowMo queda igual sin ventana: las pruebas cuentan con que
   // React termine de cargar antes de cada toque.
+  // Cada pantalla pide varias veces a Supabase y el servidor de desarrollo compila al abrirla:
+  // con los 5 s y los 30 s de fabrica, las pruebas fallan por lentas y no por rotas.
+  timeout: 120_000,
+  expect: { timeout: 30_000 },
   workers: 1,
   fullyParallel: false,
   reporter: 'list',

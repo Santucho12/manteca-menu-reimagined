@@ -15,7 +15,9 @@ export type ClaveDeAyuda =
   | 'ventas'
   | 'canales'
   | 'caja'
-  | 'control';
+  | 'control'
+  | 'menu'
+  | 'aumento';
 
 export const AYUDAS: Record<ClaveDeAyuda, Ayuda> = {
   inicio: {
@@ -192,6 +194,42 @@ export const AYUDAS: Record<ClaveDeAyuda, Ayuda> = {
         puntos: [
           'Marcá como revisado con un comentario cuando lo controlaste.',
           'Un cierre no se borra: se anula con un motivo y sus gastos quedan anulados.',
+        ],
+      },
+    ],
+  },
+  menu: {
+    titulo: 'Cómo funciona el Menú',
+    introduccion: 'Lo que ve el cliente en la carta: categorías, productos y precios.',
+    temas: [
+      {
+        titulo: 'Ordenar y mostrar',
+        puntos: [
+          'Las flechas suben y bajan categorías y productos.',
+          'Ocultar saca algo de la carta sin borrarlo. Un producto sin precio no se puede mostrar.',
+          'Una categoría nueva se crea oculta: mostrala cuando tenga productos.',
+        ],
+      },
+      {
+        titulo: 'Precios y desactivados',
+        puntos: [
+          'Cambiar un precio acá no lo cambia en Fudo: cambialo también allá.',
+          'Desactivar no borra: en Ver desactivados lo reactivás y vuelve oculto, para que lo revises.',
+          'Una categoría con productos no se desactiva hasta mover o desactivar sus productos.',
+        ],
+      },
+    ],
+  },
+  aumento: {
+    titulo: 'Cómo funciona el Aumento de precios',
+    introduccion: 'Sube o baja todos los precios de un alcance con un porcentaje.',
+    temas: [
+      {
+        titulo: 'Cómo se usa',
+        puntos: [
+          'Elegí el alcance, el porcentaje y el redondeo, y tocá Ver cambios: no se cambia nada todavía.',
+          'Revisá la tabla (también entran los productos ocultos) y recién ahí tocá Aplicar aumento.',
+          'No hay deshacer: un error se corrige con otro aumento o editando el precio.',
         ],
       },
     ],
