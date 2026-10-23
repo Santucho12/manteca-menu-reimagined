@@ -42,3 +42,21 @@ export function insigniaDeMas(mas: { insignia: number | null }[]): number | null
   const total = mas.reduce((suma, enlace) => suma + (enlace.insignia ?? 0), 0);
   return total > 0 ? total : null;
 }
+
+type ConGrupo = { clave: string; grupo?: string };
+
+/**
+ * La barra lateral: los enlaces en sus grupos (sin titulo si ninguno tiene grupo) y Mi cuenta
+ * aparte, que va fija abajo, fuera de todo.
+ */
+export function partirEnlaces<T extends ConGrupo>(enlaces: T[]) {
+  const cuenta = enlaces.find((e) => e.clave === 'cuenta') ?? null;
+  const grupos: { titulo: string | null; enlaces: T[] }[] = [];
+  for (const enlace of enlaces.filter((e) => e.clave !== 'cuenta')) {
+    const titulo = enlace.grupo ?? null;
+    const ultimo = grupos[grupos.length - 1];
+    if (ultimo && ultimo.titulo === titulo) ultimo.enlaces.push(enlace);
+    else grupos.push({ titulo, enlaces: [enlace] });
+  }
+  return { grupos, cuenta };
+}

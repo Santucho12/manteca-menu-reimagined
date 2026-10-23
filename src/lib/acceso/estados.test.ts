@@ -96,18 +96,31 @@ describe('requiereSesion', () => {
 });
 
 describe('enlacesDelPanel', () => {
-  it('el admin ve Inicio, Menú, Ventas, Proveedores, Gastos, Caja, Reportes, Usuarios, Auditoría y Mi cuenta', () => {
-    expect(enlacesDelPanel('admin').map((enlace) => enlace.texto)).toEqual([
+  it('el admin ve sus secciones agrupadas: Dia a dia, Plata y Ajustes, y Mi cuenta aparte', () => {
+    const enlaces = enlacesDelPanel('admin');
+    expect(enlaces.map((enlace) => enlace.texto)).toEqual([
       'Inicio',
-      'Menú',
       'Ventas',
-      'Proveedores',
-      'Gastos',
       'Caja',
+      'Gastos',
+      'Proveedores',
       'Reportes',
+      'Menú',
       'Usuarios',
       'Auditoría',
       'Mi cuenta',
+    ]);
+    expect(enlaces.map((enlace) => enlace.grupo)).toEqual([
+      'Día a día',
+      'Día a día',
+      'Día a día',
+      'Plata',
+      'Plata',
+      'Plata',
+      'Ajustes',
+      'Ajustes',
+      'Ajustes',
+      undefined,
     ]);
   });
 

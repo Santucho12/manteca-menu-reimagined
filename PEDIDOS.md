@@ -150,6 +150,9 @@ Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, 
 
 **Excepción (Santiago, 2026-10-21):** los colores del panel son los exactos de Plan Reminder Pro aunque no pasen el contraste AA que pide el pedido 21 (letra blanca sobre el verde, 2,6 a 1; el rojo de error, 3,6; el anillo de foco, 2,5; los grises chicos, 2,6). Las pruebas de contraste (`tests/contraste.test.ts`) siguen mirando solo la carta pública; no se extienden al panel. El panel no bloquea el zoom en el celular, a diferencia de Plan Reminder Pro (Santiago, 2026-10-22).
 
+### 44. Barra lateral en grupos y más chica
+La barra lateral del panel agrupa las secciones: Día a día (Inicio, Ventas, Caja), Plata (Gastos, Proveedores, Reportes) y Ajustes (Menú, Usuarios, Auditoría), con Mi cuenta fija abajo, fuera de los grupos. Todo a escala 0,9: ancho 234 px, íconos, letra y espacios (Santiago, 2026-10-23). Caja ve su lista sin grupos.
+
 ### 41. Playwright en otro puerto
 Que las pruebas de Playwright levanten su servidor en el puerto 3211, con su propia carpeta de compilación, para no tumbar el `npm run dev` del 3210 (pedido de Santiago, 2026-10-21).
 
@@ -174,6 +177,7 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 44 | Barra lateral en grupos y más chica | Hecha y probada con lint, tipos, tests de `acceso` y `sidebar` en computadora (2026-10-23). Falta el cierre completo (`npm run verificar` y `npm run e2e` en los dos tamaños) |
 | 43 | El panel desde cero | Hechas las pantallas (2026-10-22): ingreso, registro, Inicio, Mi cuenta, Proveedores, Gastos (con categorías y recurrentes), Ventas y canales, Caja (cargar, mis cierres, control, detalle), Menú (lista, categorías, productos, aumento y desactivados), Reportes, Usuarios y Auditoría, cada una con su ayuda y probada en computadora y celular. Falta el cierre: `npm run verificar` entero, `npm run e2e` entero y revisar las capturas contra `referencias/` |
 | 42 | Colores y letra de Plan Reminder Pro en el panel | Reemplazado por el pedido 43: el panel se rehace desde cero |
 | 38 | Estética de Plan Reminder Pro en Inicio, Menú y Ventas | Reemplazado por el pedido 43: el panel se rehace desde cero |
