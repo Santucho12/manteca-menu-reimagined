@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
-import { Button } from '@/components/ui/button';
+import { BOTON_SUAVE } from '@/components/panel/estilos';
+import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { fondoSugerido } from '@/lib/caja/consultas';
 import { diaEnArgentina } from '@/lib/fechas';
@@ -17,10 +17,10 @@ type Parametros = Promise<Record<string, string | string[] | undefined>>;
 function QuienCarga({ nombre }: { nombre: string }) {
   return (
     <form action="/admin/salir" method="post" className="flex flex-wrap items-center gap-3">
-      <p className="font-medium">Cargando como {nombre}.</p>
-      <Button type="submit" variant="outline" size="sm">
+      <p className="text-sm font-semibold">Cargando como {nombre}.</p>
+      <button type="submit" className={`${BOTON_SUAVE} h-10 px-4`}>
         ¿No sos vos? Cambiar de persona
-      </Button>
+      </button>
     </form>
   );
 }
@@ -46,12 +46,13 @@ export default async function CargarCierre({ searchParams }: { searchParams: Par
     gastos: [],
   };
   return (
-    <div className="space-y-6">
-      <TituloDePagina subtitulo="Contá lo que hay en la caja y cargalo al terminar el día.">
-        Cierre de caja
-      </TituloDePagina>
+    <Pantalla
+      titulo="Cierre de caja"
+      subtitulo="Contá lo que hay en la caja y cargalo al terminar el día."
+      ayuda="caja"
+    >
       <QuienCarga nombre={perfil.nombre} />
       <FormularioDeCierre inicial={inicial} />
-    </div>
+    </Pantalla>
   );
 }

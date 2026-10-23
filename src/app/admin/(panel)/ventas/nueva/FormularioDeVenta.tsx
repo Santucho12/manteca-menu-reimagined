@@ -7,9 +7,10 @@ import { AvisoDeError } from '@/components/formularios/AvisoDeError';
 import { Campo } from '@/components/formularios/Campo';
 import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
 import { CampoDeTextoLargo } from '@/components/formularios/CampoDeTextoLargo';
-import { Button } from '@/components/ui/button';
+import { PieDelFormulario } from '@/components/formularios/PieDelFormulario';
 import { nombreDeMedio } from '@/lib/caja/pantalla';
 import { MEDIOS } from '@/lib/caja/resultado';
+import { conValorInicial } from '@/lib/formularios/valorInicial';
 import { useGuardar } from '@/lib/gastos/useGuardar';
 import { formatearPesos } from '@/lib/plata';
 import { esquemaVenta, type DatosDeVenta } from '@/lib/ventas/esquemas';
@@ -32,7 +33,7 @@ const MEDIOS_PARA_ELEGIR = [
 // El total se recalcula con cada tecla, sin redibujar todo el formulario.
 function TotalDeLaVenta({ control }: { control: Control<DatosDeVenta> }) {
   const renglones = useWatch({ control, name: 'renglones' });
-  return <p className="text-lg font-semibold">Total: {formatearPesos(totalEscrito(renglones))}</p>;
+  return <p className="text-lg font-bold">Total: {formatearPesos(totalEscrito(renglones))}</p>;
 }
 
 export function FormularioDeVenta({ inicial, canales, opciones }: Props) {
@@ -45,34 +46,36 @@ export function FormularioDeVenta({ inicial, canales, opciones }: Props) {
     defaultValues: inicial,
   });
   const { errors } = formState;
+  const registro = conValorInicial(register, inicial);
   const elegirCanal = [
     { valor: '', texto: 'Elegí el canal' },
     ...canales.map((c) => ({ valor: c.id, texto: c.nombre })),
   ];
   return (
-    <form onSubmit={handleSubmit(guardado.enviar)} noValidate className="max-w-2xl space-y-4">
-      {guardado.mensaje ? <AvisoDeError mensaje={guardado.mensaje} /> : null}
-      <Campo
-        id="fecha"
-        etiqueta="Fecha"
-        type="date"
-        error={errors.fecha?.message}
-        {...register('fecha')}
-      />
-      <CampoDeSeleccion
-        id="canal"
-        etiqueta="Canal"
-        opciones={elegirCanal}
-        error={errors.canalId?.message}
-        {...register('canalId')}
-      />
-      <CampoDeSeleccion
-        id="medio"
-        etiqueta="Medio de pago"
-        opciones={MEDIOS_PARA_ELEGIR}
-        error={errors.medio?.message}
-        {...register('medio')}
-      />
+    <form onSubmit={handleSubmit(guardado.enviar)} noValidate className="space-y-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Campo
+          id="fecha"
+          etiqueta="Fecha"
+          type="date"
+          error={errors.fecha?.message}
+          {...registro('fecha')}
+        />
+        <CampoDeSeleccion
+          id="canal"
+          etiqueta="Canal"
+          opciones={elegirCanal}
+          error={errors.canalId?.message}
+          {...registro('canalId')}
+        />
+        <CampoDeSeleccion
+          id="medio"
+          etiqueta="Medio de pago"
+          opciones={MEDIOS_PARA_ELEGIR}
+          error={errors.medio?.message}
+          {...registro('medio')}
+        />
+      </div>
       <RenglonesDeVenta
         control={control}
         register={register}
@@ -85,11 +88,14 @@ export function FormularioDeVenta({ inicial, canales, opciones }: Props) {
         id="comentario"
         etiqueta="Comentario"
         error={errors.comentario?.message}
-        {...register('comentario')}
+        {...registro('comentario')}
       />
-      <Button type="submit" disabled={guardado.enviando} className="w-full sm:w-auto">
-        {guardado.enviando ? 'Guardando…' : 'Guardar venta'}
-      </Button>
+      {guardado.mensaje ? <AvisoDeError mensaje={guardado.mensaje} /> : null}
+      <PieDelFormulario
+        enviando={guardado.enviando}
+        texto="Guardar venta"
+        cancelar="/admin/ventas"
+      />
     </form>
   );
 }

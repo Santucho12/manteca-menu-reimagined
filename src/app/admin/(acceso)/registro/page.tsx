@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
+import { EnlaceDeAcceso, TituloDeAcceso } from '@/components/formularios/Acceso';
 import { soloSinSesion } from '@/lib/acceso/servidor';
 import { FormularioRegistro } from './FormularioRegistro';
 
@@ -11,14 +10,9 @@ export default async function PaginaRegistro() {
   await soloSinSesion();
   return (
     <>
-      <TituloDePagina>Crear una cuenta</TituloDePagina>
+      <TituloDeAcceso>Crear una cuenta</TituloDeAcceso>
       <FormularioRegistro />
-      <p className="text-muted-foreground text-sm">
-        ¿Ya tenés cuenta?{' '}
-        <Link href="/admin/ingresar" className="text-foreground underline underline-offset-4">
-          Ingresar
-        </Link>
-      </p>
+      <EnlaceDeAcceso pregunta="¿Ya tenés cuenta?" href="/admin/ingresar" texto="Ingresar" />
     </>
   );
 }

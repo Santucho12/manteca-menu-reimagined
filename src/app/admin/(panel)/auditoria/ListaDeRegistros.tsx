@@ -1,4 +1,8 @@
+import { ScrollText } from 'lucide-react';
 import Link from 'next/link';
+import { Chip } from '@/components/panel/Insignias';
+import { ListaDelPanel, type Columna } from '@/components/panel/ListaDelPanel';
+import { SinResultados } from '@/components/panel/SinResultados';
 import {
   datoDe,
   fechaYHora,
@@ -10,45 +14,77 @@ import {
   type RegistroDeAuditoria,
 } from '@/lib/auditoria/textos';
 
-type Props = { registros: RegistroDeAuditoria[]; nombres: Nombres };
+type Props = { registros: RegistroDeAuditoria[]; nombres: Nombres; total: number };
 
-function Fila({ registro, nombres }: { registro: RegistroDeAuditoria; nombres: Nombres }) {
+const ENLACE =
+  'text-xs font-semibold text-primary hover:underline underline-offset-4 whitespace-nowrap';
+
+// "Gastos · Gasto · nombre": un solo texto, para que se lea (y se busque) de corrido.
+function queEs(registro: RegistroDeAuditoria, nombres: Nombres): string {
   const { modulo, dato } = datoDe(registro.tabla);
-  const resumen = resumenDe(registro);
   const nombre = nombreDelDato(registro, nombres);
+  return `${modulo} · ${dato}${nombre ? ` · ${nombre}` : ''}`;
+}
+
+const Detalle = ({ registro }: { registro: RegistroDeAuditoria }) => (
+  <Link href={`/admin/auditoria/${registro.id}`} className={ENLACE}>
+    Ver el detalle
+  </Link>
+);
+
+const columnas = (nombres: Nombres): Columna<RegistroDeAuditoria>[] => [
+  {
+    titulo: 'Fecha',
+    celda: (r) => <span className="text-xs whitespace-nowrap">{fechaYHora(r.fecha)}</span>,
+  },
+  {
+    titulo: 'Qué',
+    celda: (r) => (
+      <div className="space-y-1 max-w-[320px]">
+        <p className="text-xs font-semibold">{queEs(r, nombres)}</p>
+        {resumenDe(r) ? <p className="text-xs text-muted-foreground">{resumenDe(r)}</p> : null}
+      </div>
+    ),
+  },
+  {
+    titulo: 'Persona',
+    desde: 'lg',
+    celda: (r) => <span className="text-xs">{personaDe(r.usuario_id, nombres)}</span>,
+  },
+  { titulo: 'Acción', celda: (r) => <Chip>{nombreDeAccion(r.accion)}</Chip> },
+  { titulo: 'Detalle', alinear: 'der', celda: (r) => <Detalle registro={r} /> },
+];
+
+function Tarjeta({ registro, nombres }: { registro: RegistroDeAuditoria; nombres: Nombres }) {
   return (
-    <li className="flex flex-wrap items-start justify-between gap-3 p-4">
-      <div className="min-w-0 space-y-1">
-        <p className="font-medium">
-          {modulo} · {dato}
-          {nombre ? ` · ${nombre}` : ''}
-        </p>
-        <p className="text-muted-foreground text-sm">
-          {fechaYHora(registro.fecha)} · {personaDe(registro.usuario_id, nombres)}
-        </p>
-        {resumen ? <p className="text-sm">{resumen}</p> : null}
+    <>
+      <div className="flex items-start justify-between gap-3">
+        <p className="min-w-0 text-sm font-bold break-words">{queEs(registro, nombres)}</p>
+        <Chip>{nombreDeAccion(registro.accion)}</Chip>
       </div>
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="text-sm">{nombreDeAccion(registro.accion)}</span>
-        <Link
-          href={`/admin/auditoria/${registro.id}`}
-          className="text-sm underline underline-offset-4"
-        >
-          Ver el detalle
-        </Link>
-      </div>
-    </li>
+      <p className="text-xs text-muted-foreground">
+        {fechaYHora(registro.fecha)} · {personaDe(registro.usuario_id, nombres)}
+      </p>
+      {resumenDe(registro) ? <p className="text-xs">{resumenDe(registro)}</p> : null}
+      <Detalle registro={registro} />
+    </>
   );
 }
 
-export function ListaDeRegistros({ registros, nombres }: Props) {
-  if (registros.length === 0)
-    return <p className="text-muted-foreground">No hay registros para mostrar.</p>;
+/** Los registros de auditoria en la tabla de Plan Reminder Pro (y tarjetas en el celular). */
+export function ListaDeRegistros({ registros, nombres, total }: Props) {
+  if (registros.length === 0) {
+    return <SinResultados titulo="Sin registros" texto="No hay registros para mostrar." />;
+  }
   return (
-    <ul aria-label="Registros" className="bg-card divide-y rounded-xl border">
-      {registros.map((registro) => (
-        <Fila key={registro.id} registro={registro} nombres={nombres} />
-      ))}
-    </ul>
+    <ListaDelPanel
+      etiqueta="Registros"
+      icono={ScrollText}
+      total={total}
+      filas={registros}
+      clave={(r) => String(r.id)}
+      columnas={columnas(nombres)}
+      tarjeta={(r) => <Tarjeta registro={r} nombres={nombres} />}
+    />
   );
 }

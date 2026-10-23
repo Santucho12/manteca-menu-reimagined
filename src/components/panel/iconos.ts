@@ -1,30 +1,30 @@
 import {
   BookOpen,
   ChartColumn,
-  ClipboardList,
+  History,
   LayoutDashboard,
+  ListChecks,
   Receipt,
-  ScrollText,
   ShoppingBag,
   Truck,
-  UserRound,
+  UserCog,
   Users,
   Wallet,
   type LucideIcon,
 } from 'lucide-react';
 import type { EnlaceDelPanel } from '@/lib/acceso/estados';
 
-/** El icono de cada seccion del panel, en la sidebar y en la barra de abajo del celular. */
-export const ICONOS: Record<EnlaceDelPanel['clave'], LucideIcon> = {
+// Plan Reminder Pro no tiene estas secciones: los eligio Claude (skill estetica-panel).
+export const ICONOS_DEL_PANEL: Record<EnlaceDelPanel['clave'], LucideIcon> = {
   inicio: LayoutDashboard,
   menu: BookOpen,
   ventas: ShoppingBag,
   proveedores: Truck,
   gastos: Receipt,
   caja: Wallet,
-  cierres: ClipboardList,
   reportes: ChartColumn,
+  cierres: ListChecks,
   usuarios: Users,
-  auditoria: ScrollText,
-  cuenta: UserRound,
+  auditoria: History,
+  cuenta: UserCog,
 };

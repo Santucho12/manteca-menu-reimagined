@@ -1,7 +1,9 @@
+import { Package } from 'lucide-react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { CargadoPor } from '@/components/panel/CargadoPor';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
+import { Pantalla } from '@/components/panel/Pantalla';
+import { Seccion } from '@/components/panel/Seccion';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { leerPanel } from '@/lib/menu/consultas';
 import { productoParaEditar } from '@/lib/menu/panel';
@@ -26,10 +28,15 @@ export default async function PaginaEditarProducto({
     compartidos,
   }));
   return (
-    <div className="space-y-6">
-      <TituloDePagina>Editar {inicial.nombre}</TituloDePagina>
+    <Pantalla
+      titulo={`Editar ${inicial.nombre}`}
+      subtitulo="Cambiá sus datos y sus precios."
+      ayuda="menu"
+    >
       <CargadoPor cliente={cliente} tabla="productos" id={id} />
-      <FormularioDeProducto inicial={inicial} opciones={opciones} />
-    </div>
+      <Seccion icono={<Package className="text-primary" size={24} />}>
+        <FormularioDeProducto inicial={inicial} opciones={opciones} />
+      </Seccion>
+    </Pantalla>
   );
 }

@@ -1,5 +1,7 @@
+import { ShoppingBag } from 'lucide-react';
 import type { Metadata } from 'next';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
+import { Pantalla } from '@/components/panel/Pantalla';
+import { Seccion } from '@/components/panel/Seccion';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import { canalesDeVenta, opcionesParaVender } from '@/lib/ventas/consultas';
@@ -25,16 +27,18 @@ export default async function NuevaVenta() {
     renglones: [],
   };
   return (
-    <div className="space-y-6">
-      <TituloDePagina>Cargar venta</TituloDePagina>
-      <p className="text-muted-foreground max-w-xl text-sm">
-        Para lo que no pasa por Fudo: Cheaf, encargos, ventas a comercios.
-      </p>
-      <FormularioDeVenta
-        inicial={inicial}
-        canales={canales.filter((canal) => canal.activo)}
-        opciones={opciones}
-      />
-    </div>
+    <Pantalla
+      titulo="Cargar venta"
+      subtitulo="Para lo que no pasa por Fudo: Cheaf, encargos, ventas a comercios."
+      ayuda="ventas"
+    >
+      <Seccion icono={<ShoppingBag className="text-primary" size={24} />}>
+        <FormularioDeVenta
+          inicial={inicial}
+          canales={canales.filter((canal) => canal.activo)}
+          opciones={opciones}
+        />
+      </Seccion>
+    </Pantalla>
   );
 }

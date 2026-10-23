@@ -1,4 +1,4 @@
-# Pedidos
+﻿# Pedidos
 
 Registro de los pedidos que cambian la aplicación del Sistema Manteca. Las reglas de cómo se mantiene
 este archivo están en `CLAUDE.md`.
@@ -140,10 +140,48 @@ Lo que salió de revisar cada módulo: el control de cierres marca el fondo inic
 ### 35. Sidebar y hero con la estética de Plan Reminder Pro
 Cambiar la barra de arriba del panel por una sidebar, y el encabezado de cada pantalla (el hero), con la misma estética que Plan Reminder Pro (Sistema CobrarWpp), conservando los colores y la tipografía de Manteca. Armar una skill con esa estética y aplicarla.
 
+### 36. Publicar el sistema en el dominio
+Publicar el sistema en `mantecabakeryar.com`: el menú nuevo, que sale de la base, en `/` y el panel en `/admin`. El proyecto de Vercel `manteca-menu-reimagined` ya está conectado a este repo y sigue sirviendo el deploy del 2 de julio; el deploy del merge del PR #19 falló. La base real ya tiene las 6 categorías y los 35 productos de la página de julio, con los mismos nombres, precios y descripciones, y las fotos están en `public/menu/`.
+
+### 43. El panel desde cero
+Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, sin tomar como referencia el diseño anterior (decisión de Santiago, 2026-10-21). Quedan la carta pública, el servidor (acciones, `src/lib`, base) y las pruebas de Playwright de funcionamiento: son la lista de lo que cada pantalla nueva tiene que volver a hacer. Se borran las pruebas que miraban el diseño viejo, la skill `estetica-panel` vieja y los specs y planes de estética. Reemplaza los pedidos 38, 39, 40 y 42.
+
+**Estética elegida (Santiago, 2026-10-21):** la de Plan Reminder Pro, tal cual: colores, letras, piezas y movimiento, con la marca de Manteca (cuadrado verde con la medialuna y "Manteca"). Suma `framer-motion` 12.36.0, `sonner` 1.7.4 y `lenis` 1.1.20, las versiones de Plan Reminder Pro. Está entera en la skill `estetica-panel` nueva.
+
+**Excepción (Santiago, 2026-10-21):** los colores del panel son los exactos de Plan Reminder Pro aunque no pasen el contraste AA que pide el pedido 21 (letra blanca sobre el verde, 2,6 a 1; el rojo de error, 3,6; el anillo de foco, 2,5; los grises chicos, 2,6). Las pruebas de contraste (`tests/contraste.test.ts`) siguen mirando solo la carta pública; no se extienden al panel. El panel no bloquea el zoom en el celular, a diferencia de Plan Reminder Pro (Santiago, 2026-10-22).
+
+### 41. Playwright en otro puerto
+Que las pruebas de Playwright levanten su servidor en el puerto 3211, con su propia carpeta de compilación, para no tumbar el `npm run dev` del 3210 (pedido de Santiago, 2026-10-21).
+
+### 40. Sidebar elegida y vuelta a la paleta de Manteca
+Santiago eligió el 2026-10-21, entre 20 propuestas, la sidebar con las secciones en tres grupos ("Día a día", "Plata", "Ajustes"), el número de pendientes en Caja, Gastos y Usuarios, la sección activa marcada con una pestaña dorada al costado, el logo de Manteca arriba y Mi cuenta al pie. Decidió también que todo el panel vuelva al crema, el dorado y el marrón con Neufile Grotesk: se saca la paleta índigo y las tipografías Inter y Outfit del pedido 39.
+
+### 39. Rediseño de Inicio y de la sidebar
+Rediseño completo, desde cero, de la estética de Inicio (admin) y de la sidebar, con colores y estilo moderno a criterio de Claude (pedido de Santiago, 2026-10-21): sidebar oscura flotante, Inicio en bloques tipo bento, acento índigo. Los colores valen solo dentro del panel, el menú público no cambia. Sin cambios en qué hace cada pantalla.
+
+### 42. Colores y letra de Plan Reminder Pro en el panel
+El panel (`/admin`) usa los colores exactos y las tipografías (Inter y Outfit) de plan-reminder-pro, aplicados solo dentro de `.escala-del-panel`: el menú público sigue con el crema, el dorado y la letra de Manteca. Excepción a "colores y tipografía de Manteca" (CLAUDE.md, skill `estetica-panel`) por decisión de Santiago (2026-10-21); deshace la vuelta a Manteca del pedido 40. Falta actualizar CLAUDE.md y la skill, y los colores fijos que quedaron en Inicio (rojo de Para atender, dorado en los textos).
+
+### 38. Estética de Plan Reminder Pro en Inicio, Menú y Ventas
+Llevar al cuerpo de Inicio, Menú y Ventas la estética de FiestaCobra (tarjetas con ícono, bloque oscuro de "Ventas del mes", paneles con cabecera, tabla, filtros en tarjeta, acciones como íconos), con los colores y la tipografía de Manteca. Diseño en `docs/superpowers/specs/2026-10-19-estetica-de-pantallas-design.md`.
+
+**Excepción (Santiago, 2026-10-20):** Inicio lleva tarjetas blancas con letra negra, subtítulos grises y acentos verde, rojo y azul (no solo los colores de `globals.css`). La paleta pasa a la de la referencia de Santiago (los tokens HSL de `plan-reminder-pro`: fondo `210 20% 98%`, texto `220 40% 12%`, subtítulos `220 20% 45%`, bordes `220 20% 90%`) en toda la app, y las tarjetas de Inicio llevan borde y ícono verde, rojo y azul sobre blanco, con el bloque en azul marino. Quedó sin hacer: aplicar lo mismo a Menú y Ventas.
+
+### 37. Ícono de la pestaña
+La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como en la página de julio (decisión de Santiago, 2026-10-19).
+
 ## Pendientes
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 43 | El panel desde cero | Hechas las pantallas (2026-10-22): ingreso, registro, Inicio, Mi cuenta, Proveedores, Gastos (con categorías y recurrentes), Ventas y canales, Caja (cargar, mis cierres, control, detalle), Menú (lista, categorías, productos, aumento y desactivados), Reportes, Usuarios y Auditoría, cada una con su ayuda y probada en computadora y celular. Falta el cierre: `npm run verificar` entero, `npm run e2e` entero y revisar las capturas contra `referencias/` |
+| 42 | Colores y letra de Plan Reminder Pro en el panel | Reemplazado por el pedido 43: el panel se rehace desde cero |
+| 38 | Estética de Plan Reminder Pro en Inicio, Menú y Ventas | Reemplazado por el pedido 43: el panel se rehace desde cero |
+| 41 | Playwright en otro puerto | Todo |
+| 40 | Sidebar elegida y vuelta a la paleta de Manteca | Reemplazado por el pedido 43: el panel se rehace desde cero |
+| 39 | Rediseño de Inicio y de la sidebar | Reemplazado por el pedido 43: el panel se rehace desde cero |
+| 37 | Ícono de la pestaña | Hecho con su prueba en `src/app/icon.svg`. Falta que `npm run verificar` y `npm run e2e` den verde enteros: en la primera corrida dos archivos de tests de base se cortaron por tiempo y la segunda se frenó por falta de memoria |
+| 36 | Publicar el sistema en el dominio | Cargar en Vercel las variables de la base real, volver a publicar, crear la cuenta del dueño en la base real y comprobar `/` y `/admin` en el dominio |
 | 30 | Ventas: la parte de Fudo | Construida la parte a mano (ver Completados). Falta, cuando estén las credenciales: traer las ventas de Fudo, vincular productos y medios, "Actualizar ahora" y lo esperado en los cierres. En Reportes: mostrar hasta cuándo están sincronizadas las ventas, y resolver los descuentos de Fudo para que "por producto" cierre con "por período". En Inicio: los avisos "Productos de Fudo sin vincular" y "Las ventas no se sincronizan desde hace más de un día", y la fecha de la última sincronización |
 | 21 | Arreglos de la revisión de la base técnica | Hecho y verificado (rama `fix/revision-base-tecnica`): montos sin precisión y URL sin cifrar se rechazan; protecciones de configuración (todo test corre en algún grupo, versión de Node, tipos de Supabase fuera de Prettier, clave secreta prohibida en componentes); la siembra repara cuentas y lee todas las páginas; un solo aviso con todas las variables que faltan; comprobación de tokens corregida; colores con contraste suficiente y anillo de foco entero. Los controles de 44 px, el campo con error y los títulos en Neufile Grotesk entraron con el pedido 22. Queda para el menú público: las tipografías en woff2. Las variantes de la guía ya no van: la guía se sacó en el pedido 23 |
 

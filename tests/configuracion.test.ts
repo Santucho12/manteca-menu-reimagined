@@ -87,6 +87,16 @@ describe('servidor de desarrollo', () => {
     const carga = lanzador.indexOf("loadEnvFile('.env.local')");
     expect(carga).toBeGreaterThan(-1);
     expect(carga).toBeLessThan(lanzador.indexOf('spawn('));
-    expect(lanzador).toContain("'--port', '3210'");
+    // El puerto sale de PUERTO_DEV: sin eso, el de siempre.
+    expect(lanzador).toContain("process.env.PUERTO_DEV ?? '3210'");
+  });
+
+  it('Playwright levanta su propio servidor, en otro puerto y otra carpeta de compilacion', () => {
+    // Next no deja dos `next dev` en la misma carpeta de compilacion: asi las pruebas no
+    // tumban el servidor de quien esta trabajando en el 3210.
+    const config = readFileSync('playwright.config.ts', 'utf8');
+    expect(config).toContain('const PUERTO = 3211');
+    expect(config).toContain("NEXT_DIST_DIR: '.next-e2e'");
+    expect(readFileSync('next.config.ts', 'utf8')).toContain('process.env.NEXT_DIST_DIR');
   });
 });

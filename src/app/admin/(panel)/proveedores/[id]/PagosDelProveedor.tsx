@@ -1,10 +1,12 @@
 import Link from 'next/link';
+import { ListaDeGastos } from '@/app/admin/(panel)/gastos/ListaDeGastos';
+import { MOSAICO } from '@/components/panel/estilos';
+import { Seccion } from '@/components/panel/Seccion';
 import { listarGastos } from '@/lib/gastos/consultas';
 import { enlaceDeGastos } from '@/lib/gastos/pantalla';
 import { totalesDelProveedor } from '@/lib/gastos/proveedores';
 import { formatearPesos } from '@/lib/plata';
 import type { Cliente } from '@/lib/supabase/cliente';
-import { ListaDeGastos } from '../../gastos/ListaDeGastos';
 
 type Props = { cliente: Cliente; proveedorId: string; hoy: string };
 
@@ -23,20 +25,24 @@ export async function PagosDelProveedor({ cliente, proveedorId, hoy }: Props) {
     listarGastos(cliente, filtros),
   ]);
   return (
-    <section aria-labelledby="pagos" className="space-y-3">
-      <h2 id="pagos" className="font-heading text-xl font-semibold">
-        Lo pagado
-      </h2>
-      <div className="flex flex-wrap gap-x-6 gap-y-1">
-        <p>Este mes: {formatearPesos(totales.mesCentavos)}</p>
-        <p>Este año: {formatearPesos(totales.anioCentavos)}</p>
+    <Seccion titulo="Lo pagado" forma="lista">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <p className={`${MOSAICO} text-sm font-semibold`}>
+          Este mes: {formatearPesos(totales.mesCentavos)}
+        </p>
+        <p className={`${MOSAICO} text-sm font-semibold`}>
+          Este año: {formatearPesos(totales.anioCentavos)}
+        </p>
       </div>
-      <ListaDeGastos filas={lista.filas} />
+      <ListaDeGastos filas={lista.filas} total={lista.total} />
       {lista.total > lista.filas.length ? (
-        <Link href={enlaceDeGastos(filtros, hoy)} className="text-sm underline underline-offset-4">
+        <Link
+          href={enlaceDeGastos(filtros, hoy)}
+          className="text-sm font-bold text-primary hover:underline underline-offset-4"
+        >
           Ver todos sus gastos del año
         </Link>
       ) : null}
-    </section>
+    </Seccion>
   );
 }

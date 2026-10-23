@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
+import { FranjaDeAviso } from '@/components/panel/Avisos';
+import { BOTON_DE_ENCABEZADO } from '@/components/panel/estilos';
+import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { nombresDe, registroPorId } from '@/lib/auditoria/consultas';
 import {
@@ -17,23 +19,23 @@ import {
 
 export const metadata: Metadata = { title: 'Registro de auditoría' };
 
+const TITULO = 'text-[10px] font-bold text-muted-foreground uppercase tracking-widest';
+
 // Cada campo con su valor anterior y el nuevo; en un alta, solo lo cargado.
 function Cambios({ cambios, conAntes }: { cambios: Cambio[]; conAntes: boolean }) {
   if (cambios.length === 0) return null;
   const columnas = conAntes ? 'sm:grid-cols-3' : 'sm:grid-cols-2';
   return (
-    <div className="bg-card rounded-xl border">
-      <div
-        className={`text-muted-foreground hidden gap-3 border-b p-4 text-sm sm:grid ${columnas}`}
-      >
-        <span>Campo</span>
-        {conAntes ? <span>Antes</span> : null}
-        <span>{conAntes ? 'Después' : 'Valor'}</span>
+    <div className="bg-card rounded-2xl shadow-card border border-border overflow-hidden">
+      <div className={`hidden gap-3 border-b border-border bg-muted/30 p-4 sm:grid ${columnas}`}>
+        <span className={TITULO}>Campo</span>
+        {conAntes ? <span className={TITULO}>Antes</span> : null}
+        <span className={TITULO}>{conAntes ? 'Después' : 'Valor'}</span>
       </div>
-      <ul aria-label="Cambios" className="divide-y">
+      <ul aria-label="Cambios" className="divide-y divide-border">
         {cambios.map((cambio) => (
-          <li key={cambio.campo} className={`grid gap-1 p-4 sm:gap-3 ${columnas}`}>
-            <span className="font-medium">{cambio.campo}</span>
+          <li key={cambio.campo} className={`grid gap-1 p-4 text-sm sm:gap-3 ${columnas}`}>
+            <span className="font-bold">{cambio.campo}</span>
             {conAntes ? <span className="text-muted-foreground">{cambio.antes}</span> : null}
             <span>{cambio.despues}</span>
           </li>
@@ -52,26 +54,30 @@ export default async function RegistroDeAuditoria({ params }: { params: Promise<
   const enlace = enlaceDe(registro);
   const nombre = nombreDelDato(registro, nombres);
   return (
-    <div className="space-y-6">
-      <TituloDePagina>
-        {nombreDeAccion(registro.accion)}: {dato}
-        {nombre ? ` · ${nombre}` : ''}
-      </TituloDePagina>
-      <p className="text-muted-foreground">
-        {modulo} · {fechaYHora(registro.fecha)} · {personaDe(registro.usuario_id, nombres)}
-      </p>
-      {registro.motivo ? <p className="font-medium">Motivo: {registro.motivo}</p> : null}
-      <Cambios cambios={cambiosDe(registro, nombres)} conAntes={registro.antes !== null} />
-      <div className="flex flex-wrap gap-4 text-sm">
-        {enlace ? (
-          <Link href={enlace} className="underline underline-offset-4">
+    <Pantalla
+      titulo={`${nombreDeAccion(registro.accion)}: ${dato}${nombre ? ` · ${nombre}` : ''}`}
+      subtitulo={`${modulo} · ${fechaYHora(registro.fecha)} · ${personaDe(registro.usuario_id, nombres)}`}
+      acciones={
+        enlace ? (
+          <Link href={enlace} className={BOTON_DE_ENCABEZADO}>
             Ver el dato
           </Link>
-        ) : null}
-        <Link href="/admin/auditoria" className="underline underline-offset-4">
-          Volver a la auditoría
-        </Link>
-      </div>
-    </div>
+        ) : undefined
+      }
+      ayuda="auditoria"
+    >
+      {registro.motivo ? (
+        <FranjaDeAviso>
+          <p>Motivo: {registro.motivo}</p>
+        </FranjaDeAviso>
+      ) : null}
+      <Cambios cambios={cambiosDe(registro, nombres)} conAntes={registro.antes !== null} />
+      <Link
+        href="/admin/auditoria"
+        className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
+      >
+        Volver a la auditoría
+      </Link>
+    </Pantalla>
   );
 }

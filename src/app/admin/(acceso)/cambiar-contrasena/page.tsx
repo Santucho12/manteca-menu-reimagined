@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
-import { Button } from '@/components/ui/button';
+import { TituloDeAcceso } from '@/components/formularios/Acceso';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { FormularioCambioObligado } from './FormularioCambioObligado';
 
@@ -11,15 +10,18 @@ export default async function PaginaCambioObligado() {
   const { perfil } = await exigirPagina('cambiar-contrasena');
   return (
     <>
-      <TituloDePagina>Cambiá tu contraseña</TituloDePagina>
-      <p className="text-muted-foreground">
+      <TituloDeAcceso>Cambiá tu contraseña</TituloDeAcceso>
+      <p className="-mt-4 mb-6 px-1 text-sm text-muted-foreground">
         {perfil.nombre}, entraste con una contraseña temporal. Elegí una nueva para seguir.
       </p>
       <FormularioCambioObligado />
-      <form action="/admin/salir" method="post">
-        <Button type="submit" variant="ghost">
+      <form action="/admin/salir" method="post" className="mt-3">
+        <button
+          type="submit"
+          className="w-full h-12 px-4 rounded-xl text-muted-foreground font-bold text-[10px] uppercase tracking-widest hover:bg-secondary"
+        >
           Salir
-        </Button>
+        </button>
       </form>
     </>
   );

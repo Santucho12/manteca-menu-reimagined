@@ -28,7 +28,7 @@ export function numerosDelMes(actual: DelPeriodo, anterior: DelPeriodo): NumeroD
     { etiqueta: 'Ventas', valor: formatearPesos(resultado.ventasCentavos), variacion: c.ventas },
     { etiqueta: 'Gastos', valor: formatearPesos(resultado.gastosCentavos), variacion: c.gastos },
     {
-      etiqueta: 'Resultado',
+      etiqueta: 'Balance',
       valor: final === null ? 'Sin calcular' : formatearPesos(final),
       variacion: c.resultado,
     },

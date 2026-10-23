@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { enlaceActivo, insigniaDeMas, repartirParaCelular } from './navegacion';
+import { activoEnMas, enlaceActivo, insigniaDeMas, repartirParaCelular } from './navegacion';
 
 const enlaces = [
   { clave: 'inicio', href: '/admin' },
@@ -46,6 +46,19 @@ describe('repartirParaCelular', () => {
   it('con 5 o menos, todos abajo', () => {
     const pocos = ['caja', 'cierres', 'cuenta'].map((clave) => ({ clave }));
     expect(repartirParaCelular(pocos)).toEqual({ abajo: pocos, mas: [] });
+  });
+});
+
+describe('activoEnMas', () => {
+  const mas = [{ clave: 'proveedores' }, { clave: 'usuarios' }];
+
+  it('marca Mas cuando la seccion activa quedo adentro', () => {
+    expect(activoEnMas(mas, 'usuarios')).toBe(true);
+  });
+
+  it('no lo marca si la activa esta abajo o no hay ninguna', () => {
+    expect(activoEnMas(mas, 'gastos')).toBe(false);
+    expect(activoEnMas(mas, null)).toBe(false);
   });
 });
 

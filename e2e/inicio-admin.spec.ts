@@ -47,7 +47,8 @@ test('ve el aviso de gastos sin clasificar y lo lleva a gastos', async ({ page }
 test('un monto de 8 cifras entra en su tarjeta, sin desbordar la pantalla', async ({ page }) => {
   await page.goto('/admin');
   const valores = page.getByRole('definition');
-  await expect(valores.filter({ hasText: '$29.999.997,00' }).first()).toBeVisible();
+  // El total del mes depende de lo que haya en la base: la venta sembrada se ve entre los mas vendidos.
+  await expect(page.getByRole('list', { name: 'Más vendidos' })).toContainText('$29.999.997,00');
   const desbordados = await valores.evaluateAll(
     (todos) => todos.filter((v) => v.scrollWidth > v.clientWidth).length,
   );
@@ -60,12 +61,45 @@ test('un monto de 8 cifras entra en su tarjeta, sin desbordar la pantalla', asyn
 
 test('ve los numeros del mes y el producto que mas vendio', async ({ page }) => {
   await page.goto('/admin');
-  for (const etiqueta of ['Ventas', 'Gastos', 'Resultado', 'Ticket promedio']) {
+  for (const etiqueta of ['Ventas', 'Gastos', 'Balance', 'Ticket promedio']) {
     await expect(page.getByRole('term').filter({ hasText: etiqueta })).toBeVisible();
   }
   const lista = page.getByRole('list', { name: 'Más vendidos' });
   await expect(lista.getByRole('listitem').first()).toContainText(producto.texto.split(' · ')[0]!);
   await expect(grafico(page)).toBeVisible();
+});
+
+test('el bloque de ventas del mes muestra el monto y cuantas ventas van', async ({ page }) => {
+  await page.goto('/admin');
+  const bloque = page.getByRole('region', { name: 'Ventas del mes' });
+  await expect(bloque).toContainText(/Del 1 a hoy · \d+ ventas?/);
+  await expect(bloque).toContainText(/\$[\d.]{9,},\d{2}/);
+  await expect(bloque).toContainText('Gastos');
+  await expect(bloque).toContainText('Balance');
+});
+
+test('el mes a mes arranca con 4 meses y se amplia a todo el año', async ({ page }) => {
+  await page.goto('/admin');
+  const barras = page.locator('[aria-label="Gráfico por mes"] .recharts-bar-rectangle');
+  await expect(barras).toHaveCount(12); // 4 meses x 3 series
+  await page.getByRole('button', { name: 'Ver todo el año' }).click();
+  await expect(page.getByRole('button', { name: 'Ver 4 meses' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  expect(await barras.count()).toBeGreaterThan(12);
+});
+
+test('abajo de todo, las ventas de los ultimos 7 dias contra los 7 anteriores', async ({
+  page,
+}) => {
+  await page.goto('/admin');
+  const panel = page.getByRole('region', { name: 'Esta semana vs la anterior' });
+  await expect(panel.getByRole('figure', { name: 'Ventas por día' })).toBeVisible();
+  await expect(
+    panel.getByText('Esta semana vs la anterior', { exact: true }).first(),
+  ).toBeVisible();
+  await expect(panel.getByText('Semana anterior')).toBeVisible();
 });
 
 test('guarda capturas del inicio', async ({ page }, info) => {

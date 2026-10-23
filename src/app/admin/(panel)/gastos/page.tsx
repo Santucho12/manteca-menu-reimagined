@@ -1,19 +1,25 @@
+import { Plus } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Campo } from '@/components/formularios/Campo';
-import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
-import { Button } from '@/components/ui/button';
+import { ENLACE_EN_TEXTO, FranjaDeAviso } from '@/components/panel/Avisos';
+import { BOTON_DE_ENCABEZADO, BOTON_DE_ENCABEZADO_NEUTRO } from '@/components/panel/estilos';
+import {
+  BarraDeFiltros,
+  BotonDeFiltrar,
+  FiltroDeFecha,
+  FiltroDeSeleccion,
+} from '@/components/panel/Filtros';
+import { Paginas } from '@/components/panel/Paginas';
+import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
-import { listarGastos, opcionesDeGasto, sinClasificar, type Opcion } from '@/lib/gastos/consultas';
+import { listarGastos, opcionesDeGasto, sinClasificar } from '@/lib/gastos/consultas';
 import { generarAlAbrir } from '@/lib/gastos/generacion';
 import {
   enlaceDeGastos,
   filtrosDeGastos,
-  type FiltrosDeGastos,
-  type ParametrosDeGastos,
   textoDeSinClasificar,
+  type ParametrosDeGastos,
 } from '@/lib/gastos/pantalla';
 import { formatearPesos } from '@/lib/plata';
 import { cantidadDePaginas } from '@/lib/usuarios/presentacion';
@@ -21,88 +27,24 @@ import { ListaDeGastos } from './ListaDeGastos';
 
 export const metadata: Metadata = { title: 'Gastos' };
 
-type PropsDeFiltros = { filtros: FiltrosDeGastos; categorias: Opcion[]; proveedores: Opcion[] };
-
-const todas = (lista: Opcion[], vacio: string) => [
+const todas = (lista: { id: string; nombre: string }[], vacio: string) => [
   { valor: '', texto: vacio },
   ...lista.map((item) => ({ valor: item.id, texto: item.nombre })),
 ];
 
-function Filtros({ filtros, categorias, proveedores }: PropsDeFiltros) {
-  return (
-    <form action="/admin/gastos" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5 lg:items-end">
-      <Campo id="desde" name="desde" type="date" etiqueta="Desde" defaultValue={filtros.desde} />
-      <Campo id="hasta" name="hasta" type="date" etiqueta="Hasta" defaultValue={filtros.hasta} />
-      <CampoDeSeleccion
-        id="categoria"
-        name="categoria"
-        etiqueta="Categoría"
-        opciones={todas(categorias, 'Todas')}
-        defaultValue={filtros.categoriaId ?? ''}
-      />
-      <CampoDeSeleccion
-        id="proveedor"
-        name="proveedor"
-        etiqueta="Proveedor"
-        opciones={todas(proveedores, 'Todos')}
-        defaultValue={filtros.proveedorId ?? ''}
-      />
-      <Button type="submit">Filtrar</Button>
-    </form>
-  );
-}
-
-function Paginas({
-  filtros,
-  total,
-  hoy,
-}: {
-  filtros: FiltrosDeGastos;
-  total: number;
-  hoy: string;
-}) {
-  const ultima = cantidadDePaginas(total);
-  if (ultima === 1) return null;
-  const a = (pagina: number) => enlaceDeGastos({ ...filtros, pagina }, hoy);
-  return (
-    <nav aria-label="Páginas" className="flex items-center gap-4 text-sm">
-      {filtros.pagina > 1 ? <Link href={a(filtros.pagina - 1)}>Anterior</Link> : null}
-      <span>
-        Página {filtros.pagina} de {ultima}
-      </span>
-      {filtros.pagina < ultima ? <Link href={a(filtros.pagina + 1)}>Siguiente</Link> : null}
-    </nav>
-  );
-}
-
-type Pendientes = { cantidad: number; categoriaId: string | null; hasta: string };
-
-// Los gastos que Caja pago con la caja esperan su categoria: el enlace los muestra todos.
-function SinClasificar({ cantidad, categoriaId, hasta }: Pendientes) {
-  if (cantidad === 0 || !categoriaId) return null;
-  const enlace = '/admin/gastos?desde=2000-01-01&hasta=' + hasta + '&categoria=' + categoriaId;
-  return (
-    <p>
-      <Link href={enlace} className="font-medium underline underline-offset-4">
-        {textoDeSinClasificar(cantidad)}
-      </Link>
-    </p>
-  );
-}
-
 function Accesos() {
   return (
-    <div className="flex flex-wrap gap-2">
-      <Button asChild>
-        <Link href="/admin/gastos/nuevo">Cargar gasto</Link>
-      </Button>
-      <Button asChild variant="outline">
-        <Link href="/admin/gastos/recurrentes">Recurrentes</Link>
-      </Button>
-      <Button asChild variant="outline">
-        <Link href="/admin/gastos/categorias">Categorías</Link>
-      </Button>
-    </div>
+    <>
+      <Link href="/admin/gastos/nuevo" className={BOTON_DE_ENCABEZADO}>
+        <Plus size={18} aria-hidden="true" /> Cargar gasto
+      </Link>
+      <Link href="/admin/gastos/recurrentes" className={BOTON_DE_ENCABEZADO_NEUTRO}>
+        Recurrentes
+      </Link>
+      <Link href="/admin/gastos/categorias" className={BOTON_DE_ENCABEZADO_NEUTRO}>
+        Categorías
+      </Link>
+    </>
   );
 }
 
@@ -121,15 +63,47 @@ export default async function PaginaDeGastos({
     opcionesDeGasto(cliente),
     sinClasificar(cliente),
   ]);
+  const enlaceSinClasificar = `/admin/gastos?desde=2000-01-01&hasta=${filtros.hasta}&categoria=${pendientes.categoriaId}`;
   return (
-    <div className="space-y-6">
-      <TituloDePagina subtitulo="Lo que se pagó, por categoría y proveedor.">Gastos</TituloDePagina>
-      <Accesos />
-      <SinClasificar {...pendientes} hasta={filtros.hasta} />
-      <Filtros filtros={filtros} {...opciones} />
-      <p className="text-lg font-semibold">Total: {formatearPesos(lista.totalCentavos)}</p>
-      <ListaDeGastos filas={lista.filas} />
-      <Paginas filtros={{ ...filtros, pagina: lista.pagina }} total={lista.total} hoy={hoy} />
-    </div>
+    <Pantalla
+      titulo="Gastos"
+      subtitulo="Lo que se pagó, por categoría y proveedor."
+      acciones={<Accesos />}
+      ayuda="gastos"
+    >
+      {pendientes.cantidad > 0 && pendientes.categoriaId ? (
+        <FranjaDeAviso>
+          <Link href={enlaceSinClasificar} className={ENLACE_EN_TEXTO}>
+            {textoDeSinClasificar(pendientes.cantidad)}
+          </Link>
+        </FranjaDeAviso>
+      ) : null}
+      <BarraDeFiltros accion="/admin/gastos">
+        <FiltroDeFecha id="desde" name="desde" etiqueta="Desde" valor={filtros.desde} />
+        <FiltroDeFecha id="hasta" name="hasta" etiqueta="Hasta" valor={filtros.hasta} />
+        <FiltroDeSeleccion
+          id="categoria"
+          name="categoria"
+          etiqueta="Categoría"
+          opciones={todas(opciones.categorias, 'Todas')}
+          valor={filtros.categoriaId ?? ''}
+        />
+        <FiltroDeSeleccion
+          id="proveedor"
+          name="proveedor"
+          etiqueta="Proveedor"
+          opciones={todas(opciones.proveedores, 'Todos')}
+          valor={filtros.proveedorId ?? ''}
+        />
+        <BotonDeFiltrar />
+      </BarraDeFiltros>
+      <p className="text-lg font-bold">Total: {formatearPesos(lista.totalCentavos)}</p>
+      <ListaDeGastos filas={lista.filas} total={lista.total} />
+      <Paginas
+        pagina={lista.pagina}
+        ultima={cantidadDePaginas(lista.total)}
+        enlaceA={(pagina) => enlaceDeGastos({ ...filtros, pagina }, hoy)}
+      />
+    </Pantalla>
   );
 }

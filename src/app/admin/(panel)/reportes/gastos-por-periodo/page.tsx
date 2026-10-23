@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import { EncabezadoDeReporte } from '@/components/reportes/EncabezadoDeReporte';
+import { PantallaDeReporte } from '@/components/reportes/PantallaDeReporte';
 import { GraficoDeLineas } from '@/components/reportes/GraficoDeLineas';
-import { Paginas } from '@/components/reportes/Paginas';
+import { PaginasDeReporte } from '@/components/reportes/PaginasDeReporte';
 import { SinDatos } from '@/components/reportes/SinDatos';
 import { TablaPorPeriodo } from '@/components/reportes/TablaPorPeriodo';
 import { Totales } from '@/components/reportes/Totales';
@@ -40,8 +40,7 @@ export default async function ReporteDeGastosPorPeriodo({
   );
   const anteriorTotal = anterior.length ? totalDeGastos(anterior) : null;
   return (
-    <div className="space-y-6">
-      <EncabezadoDeReporte titulo="Gastos por período" ruta={RUTA} periodos={periodos} hoy={hoy} />
+    <PantallaDeReporte titulo="Gastos por período" ruta={RUTA} periodos={periodos} hoy={hoy}>
       {actual.length === 0 ? (
         <SinDatos>No hay gastos en este período.</SinDatos>
       ) : (
@@ -57,7 +56,7 @@ export default async function ReporteDeGastosPorPeriodo({
           />
           <GraficoDeLineas datos={serie} />
           <TablaPorPeriodo filas={pagina.filas} escala={escala} />
-          <Paginas
+          <PaginasDeReporte
             ruta={RUTA}
             periodos={periodos}
             pagina={pagina.pagina}
@@ -65,6 +64,6 @@ export default async function ReporteDeGastosPorPeriodo({
           />
         </>
       )}
-    </div>
+    </PantallaDeReporte>
   );
 }

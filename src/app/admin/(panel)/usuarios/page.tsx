@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
+import { Paginas } from '@/components/panel/Paginas';
+import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { listarUsuarios } from '@/lib/usuarios/consultas';
 import { filtrosDeLaUrl, type ParametrosDeUrl } from '@/lib/usuarios/pantalla';
+import { cantidadDePaginas, enlaceDeUsuarios } from '@/lib/usuarios/presentacion';
 import { Filtros } from './Filtros';
 import { ListaDeUsuarios } from './ListaDeUsuarios';
-import { Paginacion } from './Paginacion';
 
 export const metadata: Metadata = { title: 'Usuarios' };
 
@@ -16,13 +17,18 @@ export default async function PaginaUsuarios({ searchParams }: Props) {
   const filtros = filtrosDeLaUrl(await searchParams);
   const { filas, total, pagina } = await listarUsuarios(cliente, filtros);
   return (
-    <div className="space-y-6">
-      <TituloDePagina subtitulo="Quién entra al sistema y qué puede hacer.">
-        Usuarios
-      </TituloDePagina>
+    <Pantalla
+      titulo="Usuarios"
+      subtitulo="Quién entra al sistema y qué puede hacer."
+      ayuda="usuarios"
+    >
       <Filtros filtros={filtros} />
       <ListaDeUsuarios filas={filas} yo={perfil.id} />
-      <Paginacion filtros={{ ...filtros, pagina }} total={total} />
-    </div>
+      <Paginas
+        pagina={pagina}
+        ultima={cantidadDePaginas(total)}
+        enlaceA={(numero) => enlaceDeUsuarios({ ...filtros, pagina: numero })}
+      />
+    </Pantalla>
   );
 }

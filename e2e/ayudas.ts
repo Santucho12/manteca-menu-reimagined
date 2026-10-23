@@ -33,7 +33,8 @@ export async function ingresarComo(page: Page, email: string, contrasena: string
   await page.getByRole('button', { name: 'Ingresar' }).click();
 }
 
-const deSeccion = (nombre: string) => ({ name: new RegExp(`^${nombre}`) });
+// En el celular el numero de pendientes va antes del nombre ("3Gastos").
+const deSeccion = (nombre: string) => ({ name: new RegExp(`^(\\d+ ?)?${nombre}`) });
 
 /**
  * El enlace de una seccion del panel. En el celular abajo van solo cuatro: si no esta, abre

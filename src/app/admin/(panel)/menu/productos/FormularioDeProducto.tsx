@@ -8,7 +8,8 @@ import { Campo } from '@/components/formularios/Campo';
 import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
 import { CampoDeTextoLargo } from '@/components/formularios/CampoDeTextoLargo';
 import { Casilla } from '@/components/formularios/Casilla';
-import { Button } from '@/components/ui/button';
+import { PieDelFormulario } from '@/components/formularios/PieDelFormulario';
+import { conValorInicial } from '@/lib/formularios/valorInicial';
 import { esquemaProducto, type DatosDeProducto } from '@/lib/menu/esquemas';
 import { useGuardado } from '@/lib/menu/useGuardado';
 import {
@@ -45,41 +46,44 @@ export function FormularioDeProducto({ inicial, opciones }: Props) {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = formulario;
+  const registro = conValorInicial(register, inicial);
   const categorias = [
     { valor: '', texto: 'Elegí una categoría' },
     ...opciones.map((o) => ({ valor: o.id, texto: o.nombre })),
   ];
   return (
     <FormProvider {...formulario}>
-      <form onSubmit={handleSubmit(guardado.enviar)} noValidate className="max-w-xl space-y-5">
-        {guardado.mensaje ? <AvisoDeError mensaje={guardado.mensaje} /> : null}
-        <CampoDeSeleccion
-          id="categoria"
-          etiqueta="Categoría"
-          opciones={categorias}
-          error={errors.categoriaId?.message}
-          {...register('categoriaId')}
-        />
-        <Campo
-          id="nombre"
-          etiqueta="Nombre"
-          error={errors.nombre?.message}
-          {...register('nombre')}
-        />
+      <form onSubmit={handleSubmit(guardado.enviar)} noValidate className="space-y-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <CampoDeSeleccion
+            id="categoria"
+            etiqueta="Categoría"
+            opciones={categorias}
+            error={errors.categoriaId?.message}
+            {...registro('categoriaId')}
+          />
+          <Campo
+            id="nombre"
+            etiqueta="Nombre"
+            error={errors.nombre?.message}
+            {...registro('nombre')}
+          />
+        </div>
         <CampoDeTextoLargo
           id="descripcion"
           etiqueta="Descripción"
           error={errors.descripcion?.message}
-          {...register('descripcion')}
+          {...registro('descripcion')}
         />
         <CampoDeSeleccion
           id="etiqueta"
           etiqueta="Etiqueta"
           opciones={ETIQUETAS}
-          {...register('etiqueta')}
+          {...registro('etiqueta')}
         />
         <CamposDelProducto opciones={opciones} />
-        <Casilla id="visible" etiqueta="Se muestra en el menú" {...register('visible')} />
+        <Casilla id="visible" etiqueta="Se muestra en el menú" {...registro('visible')} />
+        {guardado.mensaje ? <AvisoDeError mensaje={guardado.mensaje} /> : null}
         {guardado.pendiente ? (
           <ConfirmacionDeOcultar
             productos={guardado.pendiente}
@@ -88,9 +92,7 @@ export function FormularioDeProducto({ inicial, opciones }: Props) {
             alVolver={guardado.cancelar}
           />
         ) : (
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Guardando…' : 'Guardar'}
-          </Button>
+          <PieDelFormulario enviando={isSubmitting} cancelar="/admin/menu" />
         )}
       </form>
     </FormProvider>

@@ -1,6 +1,8 @@
+import { Tags } from 'lucide-react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
+import { Pantalla } from '@/components/panel/Pantalla';
+import { Seccion } from '@/components/panel/Seccion';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { leerPanel, localDeQuienPide } from '@/lib/menu/consultas';
 import { categoriaParaEditar } from '@/lib/menu/panel';
@@ -17,9 +19,14 @@ export default async function PaginaEditarCategoria({
   const inicial = categoriaParaEditar(await leerPanel(cliente), (await params).id);
   if (!inicial) notFound();
   return (
-    <div className="space-y-6">
-      <TituloDePagina>Editar {inicial.nombre}</TituloDePagina>
-      <FormularioDeCategoria inicial={inicial} localId={await localDeQuienPide(cliente)} />
-    </div>
+    <Pantalla
+      titulo={`Editar ${inicial.nombre}`}
+      subtitulo="Cambiá sus datos y sus presentaciones."
+      ayuda="menu"
+    >
+      <Seccion icono={<Tags className="text-primary" size={24} />}>
+        <FormularioDeCategoria inicial={inicial} localId={await localDeQuienPide(cliente)} />
+      </Seccion>
+    </Pantalla>
   );
 }

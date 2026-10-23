@@ -32,6 +32,11 @@ export function repartirParaCelular<T extends { clave: string }>(enlaces: T[]) {
   };
 }
 
+/** Si la pantalla en la que se esta quedo en "Mas": el boton se marca como su seccion. */
+export function activoEnMas(mas: { clave: string }[], activo: string | null): boolean {
+  return activo !== null && mas.some((enlace) => enlace.clave === activo);
+}
+
 /** Lo que avisan los enlaces que quedaron en "Mas": se ve sobre el boton aunque este cerrado. */
 export function insigniaDeMas(mas: { insignia: number | null }[]): number | null {
   const total = mas.reduce((suma, enlace) => suma + (enlace.insignia ?? 0), 0);

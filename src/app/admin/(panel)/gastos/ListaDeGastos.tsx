@@ -1,45 +1,108 @@
+import { Receipt } from 'lucide-react';
 import Link from 'next/link';
-import { Badge } from '@/components/ui/badge';
+import { Chip } from '@/components/panel/Insignias';
+import { ListaDelPanel, type Columna } from '@/components/panel/ListaDelPanel';
+import { SinResultados } from '@/components/panel/SinResultados';
 import type { FilaDeGasto } from '@/lib/gastos/consultas';
 import { fechaParaMostrar, nombreDeMedio } from '@/lib/gastos/pantalla';
 import { formatearPesos } from '@/lib/plata';
 
-function FilaDeLaLista({ gasto }: { gasto: FilaDeGasto }) {
-  const detalle = [gasto.proveedor, nombreDeMedio(gasto.medio_de_pago)].filter(Boolean).join(' · ');
+const ENLACE =
+  'text-xs font-semibold text-foreground hover:text-primary rounded focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors';
+
+const nombreDelGasto = (g: FilaDeGasto) =>
+  `${g.categoria}${g.descripcion ? ` — ${g.descripcion}` : ''}`;
+
+function Marcas({ gasto }: { gasto: FilaDeGasto }) {
   return (
-    <li className="flex flex-wrap items-start justify-between gap-3 p-4">
-      <div className="min-w-0 space-y-1">
-        <Link
-          href={`/admin/gastos/${gasto.id}`}
-          className="font-medium underline-offset-4 hover:underline"
-        >
-          {gasto.categoria}
-          {gasto.descripcion ? ` — ${gasto.descripcion}` : ''}
-        </Link>
-        <p className="text-muted-foreground text-sm">
-          {fechaParaMostrar(gasto.fecha)} · {detalle}
-        </p>
-      </div>
-      <div className="flex items-center gap-2">
-        {gasto.recurrente_id ? <Badge variant="secondary">Automático</Badge> : null}
-        {gasto.cierre_id ? <Badge variant="secondary">De caja</Badge> : null}
-        {gasto.anulado ? <Badge variant="outline">Anulado</Badge> : null}
-        <span className={gasto.anulado ? 'text-muted-foreground line-through' : 'font-medium'}>
-          {formatearPesos(gasto.monto_centavos)}
-        </span>
-      </div>
-    </li>
+    <span className="flex flex-wrap gap-1">
+      {gasto.recurrente_id ? <Chip>Automático</Chip> : null}
+      {gasto.cierre_id ? <Chip>De caja</Chip> : null}
+      {gasto.anulado ? <Chip>Anulado</Chip> : null}
+    </span>
   );
 }
 
-export function ListaDeGastos({ filas }: { filas: FilaDeGasto[] }) {
-  if (filas.length === 0)
-    return <p className="text-muted-foreground">No hay gastos para mostrar.</p>;
+const Monto = ({ gasto }: { gasto: FilaDeGasto }) => (
+  <span
+    className={`text-sm font-bold whitespace-nowrap ${gasto.anulado ? 'text-muted-foreground line-through' : 'text-foreground'}`}
+  >
+    {formatearPesos(gasto.monto_centavos)}
+  </span>
+);
+
+const COLUMNAS: Columna<FilaDeGasto>[] = [
+  {
+    titulo: 'Fecha',
+    celda: (g) => (
+      <span className="text-xs font-medium whitespace-nowrap">{fechaParaMostrar(g.fecha)}</span>
+    ),
+  },
+  {
+    titulo: 'Gasto',
+    celda: (g) => (
+      <div className="space-y-1 max-w-[260px]">
+        <Link href={`/admin/gastos/${g.id}`} className={`${ENLACE} line-clamp-2 break-words`}>
+          {nombreDelGasto(g)}
+        </Link>
+        <Marcas gasto={g} />
+      </div>
+    ),
+  },
+  {
+    titulo: 'Proveedor',
+    desde: 'lg',
+    celda: (g) => <span className="text-xs text-foreground/80">{g.proveedor ?? '—'}</span>,
+  },
+  {
+    titulo: 'Medio',
+    desde: 'lg',
+    celda: (g) => (
+      <span className="text-xs text-foreground/80">{nombreDeMedio(g.medio_de_pago)}</span>
+    ),
+  },
+  { titulo: 'Monto', alinear: 'der', celda: (g) => <Monto gasto={g} /> },
+];
+
+function Tarjeta({ gasto }: { gasto: FilaDeGasto }) {
+  const detalle = [gasto.proveedor, nombreDeMedio(gasto.medio_de_pago)].filter(Boolean).join(' · ');
   return (
-    <ul aria-label="Gastos" className="bg-card divide-y rounded-xl border">
-      {filas.map((gasto) => (
-        <FilaDeLaLista key={gasto.id} gasto={gasto} />
-      ))}
-    </ul>
+    <>
+      <div className="flex items-start justify-between gap-3">
+        <Link href={`/admin/gastos/${gasto.id}`} className="min-w-0 text-sm font-bold break-words">
+          {nombreDelGasto(gasto)}
+        </Link>
+        <Monto gasto={gasto} />
+      </div>
+      <p className="text-xs text-muted-foreground">
+        {fechaParaMostrar(gasto.fecha)} · {detalle}
+      </p>
+      <Marcas gasto={gasto} />
+    </>
+  );
+}
+
+type Props = { filas: FilaDeGasto[]; total?: number };
+
+/** Los gastos en la tabla de Plan Reminder Pro (y tarjetas en el celular). */
+export function ListaDeGastos({ filas, total }: Props) {
+  if (filas.length === 0) {
+    return (
+      <SinResultados
+        titulo="No hay gastos para mostrar"
+        texto="No hay registros que coincidan con tus filtros."
+      />
+    );
+  }
+  return (
+    <ListaDelPanel
+      etiqueta="Gastos"
+      icono={Receipt}
+      total={total ?? filas.length}
+      filas={filas}
+      clave={(g) => g.id}
+      columnas={COLUMNAS}
+      tarjeta={(g) => <Tarjeta gasto={g} />}
+    />
   );
 }

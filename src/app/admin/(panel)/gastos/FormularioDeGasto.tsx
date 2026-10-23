@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { AvisoDeError } from '@/components/formularios/AvisoDeError';
 import { Campo } from '@/components/formularios/Campo';
-import { Button } from '@/components/ui/button';
+import { PieDelFormulario } from '@/components/formularios/PieDelFormulario';
 import type { Opcion, OpcionDeCategoria } from '@/lib/gastos/consultas';
 import { esquemaGasto, type DatosDeGasto } from '@/lib/gastos/esquemas';
 import { useGuardar } from '@/lib/gastos/useGuardar';
 import { crearGastoDesdeElPanel, editarGastoDesdeElPanel } from './acciones';
+import { conValorInicial } from '@/lib/formularios/valorInicial';
 import { CamposDelGasto, type PropsDeCampos } from './CamposDelGasto';
 
 type Props = {
@@ -26,38 +27,39 @@ export function FormularioDeGasto({ inicial, id, categorias, proveedores, deCaja
     id ? editarGastoDesdeElPanel({ ...datos, id }) : crearGastoDesdeElPanel(datos);
   const guardado = useGuardar(guardar, () => router.push('/admin/gastos'));
   const {
-    register,
+    register: registrar,
     handleSubmit,
     formState: { errors },
   } = useForm<DatosDeGasto>({ resolver: zodResolver(esquemaGasto), defaultValues: inicial });
+  const registro = conValorInicial(registrar, inicial);
   return (
-    <form onSubmit={handleSubmit(guardado.enviar)} noValidate className="max-w-xl space-y-4">
+    <form onSubmit={handleSubmit(guardado.enviar)} noValidate className="space-y-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Campo
+          id="fecha"
+          etiqueta="Fecha"
+          type="date"
+          readOnly={deCaja}
+          error={errors.fecha?.message}
+          {...registro('fecha')}
+        />
+        <CamposDelGasto
+          registro={registro as unknown as PropsDeCampos['registro']}
+          errors={errors}
+          inicial={inicial}
+          categorias={categorias}
+          proveedores={proveedores}
+          deCaja={deCaja}
+        />
+        <Campo
+          id="comprobante"
+          etiqueta="Comprobante (opcional)"
+          error={errors.comprobante?.message}
+          {...registro('comprobante')}
+        />
+      </div>
       {guardado.mensaje ? <AvisoDeError mensaje={guardado.mensaje} /> : null}
-      <Campo
-        id="fecha"
-        etiqueta="Fecha"
-        type="date"
-        readOnly={deCaja}
-        error={errors.fecha?.message}
-        {...register('fecha')}
-      />
-      <CamposDelGasto
-        register={register as unknown as PropsDeCampos['register']}
-        errors={errors}
-        inicial={inicial}
-        categorias={categorias}
-        proveedores={proveedores}
-        deCaja={deCaja}
-      />
-      <Campo
-        id="comprobante"
-        etiqueta="Comprobante (opcional)"
-        error={errors.comprobante?.message}
-        {...register('comprobante')}
-      />
-      <Button type="submit" disabled={guardado.enviando}>
-        {guardado.enviando ? 'Guardando…' : 'Guardar'}
-      </Button>
+      <PieDelFormulario enviando={guardado.enviando} cancelar="/admin/gastos" />
     </form>
   );
 }

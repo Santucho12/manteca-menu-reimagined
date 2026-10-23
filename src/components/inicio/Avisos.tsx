@@ -1,3 +1,4 @@
+import { AlertTriangle, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import type { Aviso } from '@/lib/inicio/avisos';
 
@@ -5,18 +6,26 @@ import type { Aviso } from '@/lib/inicio/avisos';
 export function Avisos({ avisos }: { avisos: Aviso[] }) {
   if (avisos.length === 0) return null;
   return (
-    <section aria-labelledby="avisos" className="space-y-2">
-      <h2 id="avisos" className="font-heading text-xl font-semibold">
+    <section
+      aria-labelledby="avisos"
+      className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-amber-900 space-y-3"
+    >
+      <h2 id="avisos" className="flex items-center gap-2 text-sm font-bold">
+        <AlertTriangle size={18} aria-hidden="true" />
         Para atender
+        <span className="rounded-full bg-amber-600 px-2 py-0.5 text-xs font-bold text-white">
+          {avisos.length}
+        </span>
       </h2>
-      <ul className="bg-card divide-y rounded-xl border">
-        {avisos.map((a) => (
-          <li key={a.texto}>
+      <ul className="space-y-2">
+        {avisos.map((aviso) => (
+          <li key={aviso.texto}>
             <Link
-              href={a.enlace}
-              className="block p-4 font-medium underline-offset-4 hover:underline"
+              href={aviso.enlace}
+              className="flex items-center justify-between gap-3 rounded-xl bg-white/70 px-4 py-3 text-sm font-semibold hover:bg-white transition-colors"
             >
-              {a.texto}
+              {aviso.texto}
+              <ChevronRight size={16} aria-hidden="true" className="shrink-0" />
             </Link>
           </li>
         ))}

@@ -1,26 +1,37 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
-import { Badge } from '@/components/ui/badge';
+import { FranjaDeAviso } from '@/components/panel/Avisos';
+import { BotonDeAnular } from '@/components/panel/BotonDeAnular';
+import { InsigniaDeEstado } from '@/components/panel/Insignias';
+import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { cierrePorId, fondosAnteriores, type Cierre } from '@/lib/caja/consultas';
 import { nombreDeEstado } from '@/lib/caja/pantalla';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
-import { AccionesDelCierre } from './AccionesDelCierre';
+import { anularCierreDesdeElPanel } from '../../acciones';
+import { BotonDeRevisar } from './BotonDeRevisar';
 import { DetalleDelCierre } from './DetalleDelCierre';
 
 export const metadata: Metadata = { title: 'Cierre de caja' };
 
 function Marcas({ cierre }: { cierre: Cierre }) {
+  if (cierre.estado !== 'anulado' && !cierre.comentario_revision) return null;
   return (
-    <div className="space-y-1">
-      {cierre.estado === 'anulado' ? (
-        <p className="font-medium">Anulado: {cierre.motivo_anulacion}</p>
-      ) : null}
+    <FranjaDeAviso>
+      {cierre.estado === 'anulado' ? <p>Anulado: {cierre.motivo_anulacion}</p> : null}
       {cierre.comentario_revision ? (
         <p>Comentario de la revisión: {cierre.comentario_revision}</p>
       ) : null}
+    </FranjaDeAviso>
+  );
+}
+
+function AccionesDelCierre({ cierre }: { cierre: Cierre }) {
+  return (
+    <div className="flex flex-wrap items-start gap-3">
+      {cierre.estado === 'revisado' ? null : <BotonDeRevisar id={cierre.id} />}
+      <BotonDeAnular id={cierre.id} anular={anularCierreDesdeElPanel} titulo="Anular el cierre" />
     </div>
   );
 }
@@ -36,23 +47,25 @@ export default async function FichaDeCierre({ params }: { params: Promise<{ id: 
     ? ((await fondosAnteriores(cliente, [cierre.id])).get(cierre.id) ?? null)
     : null;
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-3">
-        <TituloDePagina>Cierre del {fechaParaMostrar(cierre.fecha)}</TituloDePagina>
-        <Badge variant="outline">{nombreDeEstado(cierre.estado)}</Badge>
+    <Pantalla
+      titulo={`Cierre del ${fechaParaMostrar(cierre.fecha)}`}
+      subtitulo={`Cargado por ${cierre.persona}`}
+      ayuda={esAdmin ? 'control' : 'caja'}
+    >
+      <div>
+        <InsigniaDeEstado tono={cierre.estado === 'anulado' ? 'pizarra' : 'esmeralda'}>
+          {nombreDeEstado(cierre.estado)}
+        </InsigniaDeEstado>
       </div>
-      <p className="text-muted-foreground">Cargado por {cierre.persona}</p>
       <Marcas cierre={cierre} />
       <DetalleDelCierre cierre={cierre} fondoAnterior={anterior} />
-      {esAdmin && cierre.estado !== 'anulado' ? (
-        <AccionesDelCierre id={cierre.id} revisado={cierre.estado === 'revisado'} />
-      ) : null}
+      {esAdmin && cierre.estado !== 'anulado' ? <AccionesDelCierre cierre={cierre} /> : null}
       <Link
         href={esAdmin ? '/admin/caja/control' : '/admin/caja/mis-cierres'}
-        className="inline-block py-2 text-sm underline underline-offset-4"
+        className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
       >
         {esAdmin ? 'Volver al control' : 'Volver a mis cierres'}
       </Link>
-    </div>
+    </Pantalla>
   );
 }

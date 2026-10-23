@@ -1,5 +1,7 @@
+import { Repeat } from 'lucide-react';
 import type { Metadata } from 'next';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
+import { Pantalla } from '@/components/panel/Pantalla';
+import { Seccion } from '@/components/panel/Seccion';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import { opcionesDeGasto } from '@/lib/gastos/consultas';
@@ -21,9 +23,10 @@ export default async function NuevoRecurrente() {
     primerVencimiento: diaEnArgentina(new Date()),
   };
   return (
-    <div className="space-y-6">
-      <TituloDePagina>Nuevo recurrente</TituloDePagina>
-      <FormularioDeRecurrente inicial={inicial} {...opciones} />
-    </div>
+    <Pantalla titulo="Nuevo recurrente" subtitulo="Un gasto que se carga solo." ayuda="recurrentes">
+      <Seccion icono={<Repeat className="text-primary" size={24} />}>
+        <FormularioDeRecurrente inicial={inicial} {...opciones} />
+      </Seccion>
+    </Pantalla>
   );
 }

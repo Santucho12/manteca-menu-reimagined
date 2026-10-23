@@ -1,5 +1,7 @@
+import { Package } from 'lucide-react';
 import type { Metadata } from 'next';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
+import { Pantalla } from '@/components/panel/Pantalla';
+import { Seccion } from '@/components/panel/Seccion';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { leerPanel } from '@/lib/menu/consultas';
 import { FormularioDeProducto } from '../FormularioDeProducto';
@@ -22,9 +24,14 @@ export default async function PaginaNuevoProducto() {
     ({ id, nombre, presentaciones, compartidos }) => ({ id, nombre, presentaciones, compartidos }),
   );
   return (
-    <div className="space-y-6">
-      <TituloDePagina>Nuevo producto</TituloDePagina>
-      <FormularioDeProducto inicial={VACIO} opciones={opciones} />
-    </div>
+    <Pantalla
+      titulo="Nuevo producto"
+      subtitulo="Elegí su categoría y cargale los precios."
+      ayuda="menu"
+    >
+      <Seccion icono={<Package className="text-primary" size={24} />}>
+        <FormularioDeProducto inicial={VACIO} opciones={opciones} />
+      </Seccion>
+    </Pantalla>
   );
 }

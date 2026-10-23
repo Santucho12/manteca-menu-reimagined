@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import type { ProductoDelReporte } from '../reportes/ventas';
-import { masVendidos, mesEnCurso, textoDePresentaciones, ultimosDoceMeses } from './meses';
+import {
+  masVendidos,
+  mesEnCurso,
+  mesesVisibles,
+  textoDePresentaciones,
+  ultimosDoceMeses,
+} from './meses';
 
 const producto = (clave: string, montoCentavos: number): ProductoDelReporte => ({
   clave,
@@ -38,4 +44,13 @@ describe('meses del inicio', () => {
     };
     expect(textoDePresentaciones(medialuna)).toBe('3 Unidad · 1,5 Docena');
   });
+});
+
+describe('mesesVisibles', () => {
+  const doce = Array.from({ length: 12 }, (_, i) => i + 1);
+  it('sin ampliar muestra los ultimos 4 meses', () =>
+    expect(mesesVisibles(doce, false)).toEqual([9, 10, 11, 12]));
+  it('ampliado muestra todo el año', () => expect(mesesVisibles(doce, true)).toEqual(doce));
+  it('con menos de 4 meses muestra los que hay', () =>
+    expect(mesesVisibles([1, 2], false)).toEqual([1, 2]));
 });

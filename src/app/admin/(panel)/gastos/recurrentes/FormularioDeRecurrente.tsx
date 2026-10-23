@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { AvisoDeError } from '@/components/formularios/AvisoDeError';
 import { Campo } from '@/components/formularios/Campo';
 import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
-import { Button } from '@/components/ui/button';
+import { PieDelFormulario } from '@/components/formularios/PieDelFormulario';
 import type { Opcion, OpcionDeCategoria } from '@/lib/gastos/consultas';
 import { esquemaRecurrente, type DatosDeRecurrente } from '@/lib/gastos/esquemas';
 import { opcionesDeFrecuencia } from '@/lib/gastos/pantalla';
@@ -15,6 +15,7 @@ import {
   crearRecurrenteDesdeElPanel,
   editarRecurrenteDesdeElPanel,
 } from '../acciones-de-configuracion';
+import { conValorInicial } from '@/lib/formularios/valorInicial';
 import { CamposDelGasto, type PropsDeCampos } from '../CamposDelGasto';
 
 type Props = {
@@ -30,40 +31,41 @@ export function FormularioDeRecurrente({ inicial, id, categorias, proveedores }:
     id ? editarRecurrenteDesdeElPanel({ ...datos, id }) : crearRecurrenteDesdeElPanel(datos);
   const guardado = useGuardar(guardar, () => router.push('/admin/gastos/recurrentes'));
   const {
-    register,
+    register: registrar,
     handleSubmit,
     formState: { errors },
   } = useForm<DatosDeRecurrente>({
     resolver: zodResolver(esquemaRecurrente),
     defaultValues: inicial,
   });
+  const registro = conValorInicial(registrar, inicial);
   return (
-    <form onSubmit={handleSubmit(guardado.enviar)} noValidate className="max-w-xl space-y-4">
+    <form onSubmit={handleSubmit(guardado.enviar)} noValidate className="space-y-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <CamposDelGasto
+          registro={registro as unknown as PropsDeCampos['registro']}
+          errors={errors}
+          inicial={inicial}
+          categorias={categorias}
+          proveedores={proveedores}
+        />
+        <CampoDeSeleccion
+          id="frecuencia"
+          etiqueta="Cada cuánto"
+          opciones={opcionesDeFrecuencia()}
+          error={errors.frecuencia?.message}
+          {...registro('frecuencia')}
+        />
+        <Campo
+          id="primer-vencimiento"
+          etiqueta="Primer vencimiento"
+          type="date"
+          error={errors.primerVencimiento?.message}
+          {...registro('primerVencimiento')}
+        />
+      </div>
       {guardado.mensaje ? <AvisoDeError mensaje={guardado.mensaje} /> : null}
-      <CamposDelGasto
-        register={register as unknown as PropsDeCampos['register']}
-        errors={errors}
-        inicial={inicial}
-        categorias={categorias}
-        proveedores={proveedores}
-      />
-      <CampoDeSeleccion
-        id="frecuencia"
-        etiqueta="Cada cuánto"
-        opciones={opcionesDeFrecuencia()}
-        error={errors.frecuencia?.message}
-        {...register('frecuencia')}
-      />
-      <Campo
-        id="primer-vencimiento"
-        etiqueta="Primer vencimiento"
-        type="date"
-        error={errors.primerVencimiento?.message}
-        {...register('primerVencimiento')}
-      />
-      <Button type="submit" disabled={guardado.enviando}>
-        {guardado.enviando ? 'Guardando…' : 'Guardar'}
-      </Button>
+      <PieDelFormulario enviando={guardado.enviando} cancelar="/admin/gastos/recurrentes" />
     </form>
   );
 }

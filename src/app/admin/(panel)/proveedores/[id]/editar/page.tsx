@@ -1,6 +1,8 @@
+import { Truck } from 'lucide-react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
+import { Pantalla } from '@/components/panel/Pantalla';
+import { Seccion } from '@/components/panel/Seccion';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { proveedorPorId } from '@/lib/proveedores/consultas';
 import { datosParaEditar } from '@/lib/proveedores/esquemas';
@@ -13,9 +15,14 @@ export default async function EditarProveedor({ params }: { params: Promise<{ id
   const proveedor = await proveedorPorId(cliente, (await params).id);
   if (!proveedor) notFound();
   return (
-    <div className="space-y-6">
-      <TituloDePagina>Editar {proveedor.nombre}</TituloDePagina>
-      <FormularioDeProveedor inicial={datosParaEditar(proveedor)} id={proveedor.id} />
-    </div>
+    <Pantalla
+      titulo={`Editar ${proveedor.nombre}`}
+      subtitulo="Corregí los datos del proveedor."
+      ayuda="proveedores"
+    >
+      <Seccion icono={<Truck className="text-primary" size={24} />}>
+        <FormularioDeProveedor inicial={datosParaEditar(proveedor)} id={proveedor.id} />
+      </Seccion>
+    </Pantalla>
   );
 }

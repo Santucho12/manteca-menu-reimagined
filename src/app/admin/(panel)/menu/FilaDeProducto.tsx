@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { Chip } from '@/components/panel/Insignias';
 import type { ProductoDelPanel } from '@/lib/menu/panel';
 import { textoDePrecios } from '@/lib/menu/pantalla';
 import { TEXTOS_DE_ETIQUETA } from '@/lib/menu/publico';
@@ -12,15 +12,17 @@ export function FilaDeProducto({
   categoria: string;
 }) {
   return (
-    <li className="space-y-2 border-t py-3 first:border-t-0">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="font-medium">{producto.nombre}</span>
-        {producto.etiqueta ? (
-          <Badge variant="secondary">{TEXTOS_DE_ETIQUETA[producto.etiqueta]}</Badge>
-        ) : null}
-        {producto.visible ? null : <Badge variant="outline">Oculto</Badge>}
+    <li className="flex flex-wrap items-center justify-between gap-3 py-3">
+      <div className="min-w-0 space-y-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm font-bold">{producto.nombre}</span>
+          {producto.etiqueta ? <Chip>{TEXTOS_DE_ETIQUETA[producto.etiqueta]}</Chip> : null}
+          {producto.visible ? null : <Chip>Oculto</Chip>}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {textoDePrecios(producto.precios, categoria)}
+        </p>
       </div>
-      <p className="text-muted-foreground text-sm">{textoDePrecios(producto.precios, categoria)}</p>
       <BotonesDeElemento
         tipo="producto"
         id={producto.id}

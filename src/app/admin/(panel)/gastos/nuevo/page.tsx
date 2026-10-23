@@ -1,5 +1,7 @@
+import { Receipt } from 'lucide-react';
 import type { Metadata } from 'next';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
+import { Pantalla } from '@/components/panel/Pantalla';
+import { Seccion } from '@/components/panel/Seccion';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import { opcionesDeGasto } from '@/lib/gastos/consultas';
@@ -24,9 +26,10 @@ export default async function NuevoGasto() {
     clave: crypto.randomUUID(),
   };
   return (
-    <div className="space-y-6">
-      <TituloDePagina>Cargar gasto</TituloDePagina>
-      <FormularioDeGasto inicial={inicial} {...opciones} />
-    </div>
+    <Pantalla titulo="Cargar gasto" subtitulo="Anotá lo que pagaste." ayuda="gastos">
+      <Seccion icono={<Receipt className="text-primary" size={24} />}>
+        <FormularioDeGasto inicial={inicial} {...opciones} />
+      </Seccion>
+    </Pantalla>
   );
 }

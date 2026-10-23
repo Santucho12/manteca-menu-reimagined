@@ -1,17 +1,10 @@
 import type { Metadata } from 'next';
-import { EncabezadoDeReporte } from '@/components/reportes/EncabezadoDeReporte';
+import { PaginasDeReporte } from '@/components/reportes/PaginasDeReporte';
+import { Chip } from '@/components/panel/Insignias';
 import { GraficoDeBarras } from '@/components/reportes/GraficoDeBarras';
-import { Paginas } from '@/components/reportes/Paginas';
+import { PantallaDeReporte } from '@/components/reportes/PantallaDeReporte';
 import { SinDatos } from '@/components/reportes/SinDatos';
-import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Celda, TablaDeDatos } from '@/components/reportes/TablaDeDatos';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { primerDiaConCierre } from '@/lib/caja/consultas';
 import { diaEnArgentina } from '@/lib/fechas';
@@ -32,71 +25,61 @@ import { periodosDelReporte, type ParametrosDeReporte } from '@/lib/reportes/per
 export const metadata: Metadata = { title: 'Caja' };
 const RUTA = '/admin/reportes/caja';
 
+const TITULOS_DE_DIA = [
+  { texto: 'Día' },
+  { texto: 'Empleado' },
+  { texto: 'Declarado', der: true },
+  { texto: 'Diferencia', der: true },
+];
+
 function FilaDelDia({ fila }: { fila: FilaDeCaja }) {
   const { cierre } = fila;
   return (
-    <TableRow>
-      <TableCell>{fechaParaMostrar(fila.fecha)}</TableCell>
-      <TableCell className="whitespace-normal">
-        {cierre ? cierre.persona : <Badge variant="outline">Sin cierre</Badge>}
-      </TableCell>
-      <TableCell className="text-right">
-        {cierre ? formatearPesos(cierre.declaradoCentavos) : ''}
-      </TableCell>
-      <TableCell className="text-right whitespace-normal">
-        {cierre ? textoDeDiferencia(cierre.diferenciaCentavos) : ''}
-      </TableCell>
-    </TableRow>
+    <tr>
+      <Celda>
+        <span className="font-medium whitespace-nowrap">{fechaParaMostrar(fila.fecha)}</span>
+      </Celda>
+      <Celda>{cierre ? cierre.persona : <Chip>Sin cierre</Chip>}</Celda>
+      <Celda der>{cierre ? formatearPesos(cierre.declaradoCentavos) : ''}</Celda>
+      <Celda der>{cierre ? textoDeDiferencia(cierre.diferenciaCentavos) : ''}</Celda>
+    </tr>
   );
 }
 
 function CierresPorDia({ filas }: { filas: FilaDeCaja[] }) {
   return (
-    <Table aria-label="Cierres por día">
-      <TableHeader>
-        <TableRow>
-          <TableHead>Día</TableHead>
-          <TableHead>Empleado</TableHead>
-          <TableHead className="text-right">Declarado</TableHead>
-          <TableHead className="text-right whitespace-normal">Diferencia</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {filas.map((fila) => (
-          <FilaDelDia key={fila.fecha} fila={fila} />
-        ))}
-      </TableBody>
-    </Table>
+    <TablaDeDatos etiqueta="Cierres por día" titulos={TITULOS_DE_DIA}>
+      {filas.map((fila) => (
+        <FilaDelDia key={fila.fecha} fila={fila} />
+      ))}
+    </TablaDeDatos>
   );
 }
 
+const TITULOS_DE_EMPLEADO = [
+  { texto: 'Empleado' },
+  { texto: 'Cierres', der: true },
+  { texto: 'Diferencia', der: true },
+];
+
 function PorEmpleado({ resumen }: { resumen: ResumenDeEmpleado[] }) {
   return (
-    <Table aria-label="Por empleado">
-      <TableHeader>
-        <TableRow>
-          <TableHead>Empleado</TableHead>
-          <TableHead className="text-right">Cierres</TableHead>
-          <TableHead className="text-right">Diferencia</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {resumen.map((r) => (
-          <TableRow key={r.persona}>
-            <TableCell>{r.persona}</TableCell>
-            <TableCell className="text-right">{r.cierres}</TableCell>
-            <TableCell className="text-right">{textoDeDiferencia(r.diferenciaCentavos)}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <TablaDeDatos etiqueta="Por empleado" titulos={TITULOS_DE_EMPLEADO}>
+      {resumen.map((r) => (
+        <tr key={r.persona}>
+          <Celda>{r.persona}</Celda>
+          <Celda der>{r.cierres}</Celda>
+          <Celda der>{textoDeDiferencia(r.diferenciaCentavos)}</Celda>
+        </tr>
+      ))}
+    </TablaDeDatos>
   );
 }
 
 function Diferencias({ datos }: { datos: ReturnType<typeof diferenciasDelGrafico> }) {
   if (datos.length === 0) {
     return (
-      <p className="text-muted-foreground text-sm">
+      <p className="text-xs text-muted-foreground">
         Todavía no hay diferencias: los cierres esperan las ventas de Fudo.
       </p>
     );
@@ -119,30 +102,29 @@ export default async function ReporteDeCaja({
   const filas = filasDeCaja(cierres, periodos.actual, primero, hoy);
   const pagina = paginaDe(filas, periodos.pagina);
   return (
-    <div className="space-y-6">
-      <EncabezadoDeReporte
-        titulo="Caja"
-        ruta={RUTA}
-        periodos={periodos}
-        hoy={hoy}
-        conComparacion={false}
-      />
+    <PantallaDeReporte
+      titulo="Caja"
+      ruta={RUTA}
+      periodos={periodos}
+      hoy={hoy}
+      conComparacion={false}
+    >
       {filas.length === 0 ? (
         <SinDatos>No hay cierres en este período.</SinDatos>
       ) : (
         <>
           <Diferencias datos={diferenciasDelGrafico(cierres)} />
           <CierresPorDia filas={pagina.filas} />
-          <Paginas
+          <PaginasDeReporte
             ruta={RUTA}
             periodos={periodos}
             pagina={pagina.pagina}
             paginas={pagina.paginas}
           />
-          <h2 className="font-heading text-xl font-semibold">Por empleado</h2>
+          <h2 className="text-xl font-bold tracking-tight text-slate-800">Por empleado</h2>
           <PorEmpleado resumen={resumenPorEmpleado(cierres)} />
         </>
       )}
-    </div>
+    </PantallaDeReporte>
   );
 }

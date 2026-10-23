@@ -16,15 +16,17 @@ beforeAll(async () => {
 
 afterAll(() => borrarVentas([delLocal.id, deOtroLocal.id]));
 
-async function idsQueVe(rol: RolDePrueba, tabla: (typeof TABLAS)[number]) {
-  const { data, error } = await (await clienteComo(rol)).from(tabla).select('id');
+// Con `solo` se piden esos ids: la lista entera topea en 1000 filas y la base de pruebas tiene mas.
+async function idsQueVe(rol: RolDePrueba, tabla: (typeof TABLAS)[number], solo?: string[]) {
+  const consulta = (await clienteComo(rol)).from(tabla).select('id');
+  const { data, error } = await (solo ? consulta.in('id', solo) : consulta);
   expect(error).toBeNull();
   return (data ?? []).map((fila) => fila.id);
 }
 
 describe('RLS de ventas: lectura', () => {
   it('el admin ve las ventas y los canales de su local, no los de otro', async () => {
-    const ids = await idsQueVe('admin', 'ventas');
+    const ids = await idsQueVe('admin', 'ventas', [delLocal.id, deOtroLocal.id]);
     expect(ids).toContain(delLocal.id);
     expect(ids).not.toContain(deOtroLocal.id);
     expect((await idsQueVe('admin', 'canales_de_venta')).length).toBeGreaterThanOrEqual(4);

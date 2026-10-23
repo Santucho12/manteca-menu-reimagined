@@ -1,20 +1,55 @@
 'use client';
 
+import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import { Campo } from '@/components/formularios/Campo';
-import { Button } from '@/components/ui/button';
+import { BOTON_SUAVE, ETIQUETA, ICONO_BORRAR, ICONO_DE_ACCION } from '@/components/panel/estilos';
 import type { DatosDeCategoria } from '@/lib/menu/esquemas';
+
+function Mover({
+  i,
+  total,
+  mover,
+}: {
+  i: number;
+  total: number;
+  mover: (a: number, b: number) => void;
+}) {
+  return (
+    <>
+      <button
+        type="button"
+        aria-label={`Subir la presentación ${i + 1}`}
+        disabled={i === 0}
+        onClick={() => mover(i, i - 1)}
+        className={ICONO_DE_ACCION}
+      >
+        <ArrowUp size={16} aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        aria-label={`Bajar la presentación ${i + 1}`}
+        disabled={i === total - 1}
+        onClick={() => mover(i, i + 1)}
+        className={ICONO_DE_ACCION}
+      >
+        <ArrowDown size={16} aria-hidden="true" />
+      </button>
+    </>
+  );
+}
 
 export function EditorDePresentaciones() {
   const { control, register, formState } = useFormContext<DatosDeCategoria>();
   const { fields, append, remove, move } = useFieldArray({ control, name: 'presentaciones' });
   const compartido = useWatch({ control, name: 'precioCompartido' });
   const errores = formState.errors.presentaciones;
+  const general = errores?.root?.message ?? errores?.message;
   return (
-    <fieldset className="space-y-3">
-      <legend className="text-sm font-medium">Presentaciones</legend>
+    <fieldset className="space-y-4">
+      <legend className={`${ETIQUETA} mb-3`}>Presentaciones</legend>
       {fields.map((campo, i) => (
-        <div key={campo.id} className="space-y-2 rounded-lg border p-3">
+        <div key={campo.id} className="space-y-3 rounded-xl bg-secondary/40 p-3">
           <Campo
             id={`presentacion-${i}`}
             etiqueta={`Nombre de la presentación ${i + 1}`}
@@ -30,51 +65,29 @@ export function EditorDePresentaciones() {
               {...register(`presentaciones.${i}.compartido`)}
             />
           ) : null}
-          <div className="flex flex-wrap gap-2">
-            <Button
+          <div className="flex items-center gap-1">
+            <Mover i={i} total={fields.length} mover={move} />
+            <button
               type="button"
-              variant="outline"
-              size="sm"
-              aria-label={`Subir la presentación ${i + 1}`}
-              disabled={i === 0}
-              onClick={() => move(i, i - 1)}
-            >
-              ↑
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              aria-label={`Bajar la presentación ${i + 1}`}
-              disabled={i === fields.length - 1}
-              onClick={() => move(i, i + 1)}
-            >
-              ↓
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
               aria-label={`Quitar la presentación ${i + 1}`}
               disabled={fields.length === 1}
               onClick={() => remove(i)}
+              className={ICONO_BORRAR}
             >
-              Quitar
-            </Button>
+              <Trash2 size={16} aria-hidden="true" />
+            </button>
           </div>
         </div>
       ))}
-      {(errores?.root?.message ?? errores?.message) ? (
-        <p className="text-destructive text-sm">{errores?.root?.message ?? errores?.message}</p>
-      ) : null}
-      <Button
+      {general ? <p className="text-xs text-rose-600 font-medium">{general}</p> : null}
+      <button
         type="button"
-        variant="outline"
         onClick={() => append({ id: '', nombre: '', compartido: '', compartidoOriginal: '' })}
         disabled={fields.length >= 6}
+        className={BOTON_SUAVE}
       >
-        Agregar presentación
-      </Button>
+        <Plus size={14} aria-hidden="true" /> Agregar presentación
+      </button>
     </fieldset>
   );
 }

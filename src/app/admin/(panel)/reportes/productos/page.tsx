@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import { EncabezadoDeReporte } from '@/components/reportes/EncabezadoDeReporte';
+import { PantallaDeReporte } from '@/components/reportes/PantallaDeReporte';
 import { GraficoDeBarras } from '@/components/reportes/GraficoDeBarras';
-import { Paginas } from '@/components/reportes/Paginas';
+import { PaginasDeReporte } from '@/components/reportes/PaginasDeReporte';
 import { SinDatos } from '@/components/reportes/SinDatos';
 import { TablaComparada } from '@/components/reportes/TablaComparada';
 import { Totales } from '@/components/reportes/Totales';
@@ -59,8 +59,7 @@ export default async function ReporteDeProductos({
   );
   const pagina = paginaDe(comparadas, periodos.pagina);
   return (
-    <div className="space-y-6">
-      <EncabezadoDeReporte titulo="Ventas por producto" ruta={RUTA} periodos={periodos} hoy={hoy} />
+    <PantallaDeReporte titulo="Ventas por producto" ruta={RUTA} periodos={periodos} hoy={hoy}>
       {actual.length === 0 ? (
         <SinDatos>No hay ventas en este período.</SinDatos>
       ) : (
@@ -84,7 +83,7 @@ export default async function ReporteDeProductos({
               variacion,
             }))}
           />
-          <Paginas
+          <PaginasDeReporte
             ruta={RUTA}
             periodos={periodos}
             pagina={pagina.pagina}
@@ -92,6 +91,6 @@ export default async function ReporteDeProductos({
           />
         </>
       )}
-    </div>
+    </PantallaDeReporte>
   );
 }

@@ -1,42 +1,49 @@
+import { Receipt } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { ENLACE_EN_TEXTO, FranjaDeAviso } from '@/components/panel/Avisos';
+import { BotonDeAnular } from '@/components/panel/BotonDeAnular';
 import { CargadoPor } from '@/components/panel/CargadoPor';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
+import { Pantalla } from '@/components/panel/Pantalla';
+import { Dato, Datos, Seccion } from '@/components/panel/Seccion';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { gastoPorId, opcionesDeGasto, type Gasto } from '@/lib/gastos/consultas';
 import { datosDeGastoParaEditar } from '@/lib/gastos/esquemas';
 import { fechaParaMostrar, nombreDeMedio } from '@/lib/gastos/pantalla';
 import { formatearPesos } from '@/lib/plata';
-import { BotonDeAnular } from '../BotonDeAnular';
+import { anularGastoDesdeElPanel } from '../acciones';
 import { FormularioDeGasto } from '../FormularioDeGasto';
 
 export const metadata: Metadata = { title: 'Gasto' };
 
 function GastoAnulado({ gasto }: { gasto: Gasto }) {
   return (
-    <div className="bg-card max-w-xl space-y-2 rounded-xl border p-4">
-      <p className="font-medium">Anulado: {gasto.motivo_anulacion}</p>
-      <p className="text-muted-foreground text-sm">
-        {fechaParaMostrar(gasto.fecha)} · {formatearPesos(gasto.monto_centavos)} ·{' '}
-        {nombreDeMedio(gasto.medio_de_pago)}
-      </p>
-      {gasto.descripcion ? <p className="text-sm">{gasto.descripcion}</p> : null}
-    </div>
+    <Seccion forma="lista">
+      <p className="font-bold">Anulado: {gasto.motivo_anulacion}</p>
+      <Datos>
+        <Dato titulo="Fecha" valor={fechaParaMostrar(gasto.fecha)} />
+        <Dato titulo="Monto" valor={formatearPesos(gasto.monto_centavos)} />
+        <Dato titulo="Medio de pago" valor={nombreDeMedio(gasto.medio_de_pago)} />
+        <Dato titulo="Descripción" valor={gasto.descripcion} />
+      </Datos>
+    </Seccion>
   );
 }
 
 // La plata de este gasto la declaro Caja: aca solo se clasifica.
 function DeCaja({ cierreId }: { cierreId: string }) {
   return (
-    <p className="max-w-xl text-sm">
-      Salió de un cierre de caja. Elegí la categoría y, si hace falta, el proveedor. El monto y la
-      fecha se corrigen anulando{' '}
-      <Link href={`/admin/caja/cierres/${cierreId}`} className="underline underline-offset-4">
-        el cierre
-      </Link>
-      .
-    </p>
+    <FranjaDeAviso>
+      <p>
+        Salió de un cierre de caja. Elegí la categoría y, si hace falta, el proveedor. El monto y la
+        fecha se corrigen anulando{' '}
+        <Link href={`/admin/caja/cierres/${cierreId}`} className={ENLACE_EN_TEXTO}>
+          el cierre
+        </Link>
+        .
+      </p>
+    </FranjaDeAviso>
   );
 }
 
@@ -50,26 +57,36 @@ export default async function FichaDeGasto({ params }: { params: Promise<{ id: s
   const seOfrece = opciones.categorias.some((categoria) => categoria.id === datos.categoriaId);
   const inicial = { ...datos, categoriaId: seOfrece ? datos.categoriaId : '' };
   return (
-    <div className="space-y-6">
-      <TituloDePagina>Gasto</TituloDePagina>
+    <Pantalla titulo="Gasto" subtitulo="Corregilo o anulalo con un motivo." ayuda="gastos">
       <CargadoPor cliente={cliente} tabla="gastos" id={gasto.id} />
       {gasto.anulado ? (
         <GastoAnulado gasto={gasto} />
       ) : (
         <>
           {gasto.cierre_id ? <DeCaja cierreId={gasto.cierre_id} /> : null}
-          <FormularioDeGasto
-            inicial={inicial}
-            id={gasto.id}
-            deCaja={gasto.cierre_id !== null}
-            {...opciones}
-          />
-          {gasto.cierre_id ? null : <BotonDeAnular id={gasto.id} />}
+          <Seccion icono={<Receipt className="text-primary" size={24} />}>
+            <FormularioDeGasto
+              inicial={inicial}
+              id={gasto.id}
+              deCaja={gasto.cierre_id !== null}
+              {...opciones}
+            />
+          </Seccion>
+          {gasto.cierre_id ? null : (
+            <BotonDeAnular
+              id={gasto.id}
+              anular={anularGastoDesdeElPanel}
+              titulo="Anular el gasto"
+            />
+          )}
         </>
       )}
-      <Link href="/admin/gastos" className="inline-block py-2 text-sm underline underline-offset-4">
+      <Link
+        href="/admin/gastos"
+        className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
+      >
         Volver a gastos
       </Link>
-    </div>
+    </Pantalla>
   );
 }

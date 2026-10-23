@@ -1,11 +1,12 @@
 'use client';
 
-import type { FieldErrors, UseFormRegister } from 'react-hook-form';
+import type { FieldErrors } from 'react-hook-form';
 import { Campo } from '@/components/formularios/Campo';
 import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
 import type { Opcion, OpcionDeCategoria } from '@/lib/gastos/consultas';
 import type { DatosDeGasto } from '@/lib/gastos/esquemas';
 import { opcionesDeMedio, opcionesParaElegir } from '@/lib/gastos/pantalla';
+import type { Registro } from '@/lib/formularios/valorInicial';
 
 // Los campos que comparten un gasto y un recurrente: categoria, monto, descripcion,
 // proveedor y medio de pago.
@@ -15,7 +16,7 @@ type Campos = Pick<
 >;
 
 export type PropsDeCampos = {
-  register: UseFormRegister<Campos>;
+  registro: Registro<Campos>;
   errors: FieldErrors<Campos>;
   inicial: Campos;
   categorias: OpcionDeCategoria[];
@@ -25,7 +26,7 @@ export type PropsDeCampos = {
 };
 
 export function CamposDelGasto({
-  register,
+  registro,
   errors,
   inicial,
   categorias,
@@ -39,7 +40,7 @@ export function CamposDelGasto({
         etiqueta="Categoría"
         opciones={opcionesParaElegir(categorias, inicial.categoriaId, 'Elegí una categoría')}
         error={errors.categoriaId?.message}
-        {...register('categoriaId')}
+        {...registro('categoriaId')}
       />
       <Campo
         id="monto"
@@ -47,20 +48,20 @@ export function CamposDelGasto({
         inputMode="decimal"
         readOnly={deCaja}
         error={errors.monto?.message}
-        {...register('monto')}
+        {...registro('monto')}
       />
       <Campo
         id="descripcion"
         etiqueta="Descripción"
         error={errors.descripcion?.message}
-        {...register('descripcion')}
+        {...registro('descripcion')}
       />
       <CampoDeSeleccion
         id="proveedor"
         etiqueta="Proveedor"
         opciones={opcionesParaElegir(proveedores, inicial.proveedorId, 'Sin proveedor')}
         error={errors.proveedorId?.message}
-        {...register('proveedorId')}
+        {...registro('proveedorId')}
       />
       <CampoDeSeleccion
         id="medio-de-pago"
@@ -70,7 +71,7 @@ export function CamposDelGasto({
           ...opcionesDeMedio(inicial.medioDePago),
         ]}
         error={errors.medioDePago?.message}
-        {...register('medioDePago')}
+        {...registro('medioDePago')}
       />
     </>
   );

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { EnlaceDeAcceso, TituloDeAcceso } from '@/components/formularios/Acceso';
 import { AvisoDeError } from '@/components/formularios/AvisoDeError';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
 import { soloSinSesion } from '@/lib/acceso/servidor';
 import { MENSAJES } from '@/lib/usuarios/errores';
 import { unValor } from '@/lib/usuarios/presentacion';
@@ -16,15 +15,16 @@ export default async function PaginaIngresar({ searchParams }: Props) {
   const desactivada = unValor((await searchParams).motivo) === 'desactivada';
   return (
     <>
-      <TituloDePagina>Ingresar</TituloDePagina>
-      {desactivada ? <AvisoDeError mensaje={MENSAJES.desactivada} /> : null}
+      <TituloDeAcceso>Ingresar</TituloDeAcceso>
+      {desactivada ? (
+        <AvisoDeError mensaje={MENSAJES.desactivada} variante="caja" className="mb-4" />
+      ) : null}
       <FormularioIngreso />
-      <p className="text-muted-foreground text-sm">
-        ¿No tenés cuenta?{' '}
-        <Link href="/admin/registro" className="text-foreground underline underline-offset-4">
-          Crear una cuenta
-        </Link>
-      </p>
+      <EnlaceDeAcceso
+        pregunta="¿No tenés cuenta?"
+        href="/admin/registro"
+        texto="Crear una cuenta"
+      />
     </>
   );
 }

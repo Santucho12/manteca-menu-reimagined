@@ -1,5 +1,6 @@
 node_modules/
 .next/
+.next-e2e/
 out/
 next-env.d.ts
 *.tsbuildinfo
@@ -17,3 +18,4 @@ e2e/capturas/
 
 # Sesiones de prueba que guarda Playwright: tienen tokens.
 e2e/.sesiones/
+.vercel

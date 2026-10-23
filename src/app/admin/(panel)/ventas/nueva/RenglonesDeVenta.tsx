@@ -1,5 +1,6 @@
 'use client';
 
+import { Plus, Trash2 } from 'lucide-react';
 import {
   useFieldArray,
   type Control,
@@ -9,7 +10,7 @@ import {
 } from 'react-hook-form';
 import { Campo } from '@/components/formularios/Campo';
 import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
-import { Button } from '@/components/ui/button';
+import { BOTON_PELIGRO, BOTON_SUAVE, ETIQUETA } from '@/components/panel/estilos';
 import { montoParaEditar } from '@/lib/gastos/plata';
 import type { DatosDeVenta } from '@/lib/ventas/esquemas';
 import type { OpcionDeVenta } from '@/lib/ventas/opciones';
@@ -31,10 +32,13 @@ export function RenglonesDeVenta({ control, register, setValue, errors, opciones
     if (opcion) setValue(`renglones.${i}.precio`, montoParaEditar(opcion.precioCentavos));
   };
   return (
-    <fieldset className="space-y-3 rounded-lg border p-4">
-      <legend className="px-1 font-medium">Productos</legend>
+    <fieldset className="space-y-4">
+      <legend className={`${ETIQUETA} mb-3`}>Productos</legend>
       {fields.map((renglon, i) => (
-        <div key={renglon.id} className="grid gap-3 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end">
+        <div
+          key={renglon.id}
+          className="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr_auto] gap-3 sm:items-end rounded-xl bg-secondary/40 p-3"
+        >
           <CampoDeSeleccion
             id={`producto-${i}`}
             etiqueta={`Producto ${i + 1}`}
@@ -56,21 +60,21 @@ export function RenglonesDeVenta({ control, register, setValue, errors, opciones
             error={errors.renglones?.[i]?.precio?.message}
             {...register(`renglones.${i}.precio`)}
           />
-          <Button type="button" variant="outline" onClick={() => remove(i)}>
-            Quitar
-          </Button>
+          <button type="button" onClick={() => remove(i)} className={BOTON_PELIGRO}>
+            <Trash2 size={16} aria-hidden="true" /> Quitar
+          </button>
         </div>
       ))}
       {errors.renglones?.message ? (
-        <p className="text-destructive text-sm">{errors.renglones.message}</p>
+        <p className="text-xs text-rose-600 font-medium">{errors.renglones.message}</p>
       ) : null}
-      <Button
+      <button
         type="button"
-        variant="outline"
         onClick={() => append({ opcion: '', cantidad: '1', precio: '' })}
+        className={BOTON_SUAVE}
       >
-        Sumar producto
-      </Button>
+        <Plus size={14} aria-hidden="true" /> Sumar producto
+      </button>
     </fieldset>
   );
 }

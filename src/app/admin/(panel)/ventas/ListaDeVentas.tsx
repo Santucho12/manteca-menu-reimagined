@@ -1,43 +1,88 @@
+import { Receipt } from 'lucide-react';
 import Link from 'next/link';
-import { Badge } from '@/components/ui/badge';
+import { Chip } from '@/components/panel/Insignias';
+import { ListaDelPanel, type Columna } from '@/components/panel/ListaDelPanel';
+import { SinResultados } from '@/components/panel/SinResultados';
 import { nombreDeMedio } from '@/lib/caja/pantalla';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import { formatearPesos } from '@/lib/plata';
 import type { FilaDeVenta } from '@/lib/ventas/consultas';
 import { estadoDeVenta, nombreDeOrigen } from '@/lib/ventas/pantalla';
 
-function Fila({ venta }: { venta: FilaDeVenta }) {
-  const detalle = [nombreDeOrigen(venta.origen), venta.canal, ...venta.medios.map(nombreDeMedio)];
-  const noCuenta = venta.anulado || venta.estado !== 'cerrada';
+const ENLACE =
+  'text-xs font-semibold text-foreground hover:text-primary rounded focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors';
+
+const noCuenta = (v: FilaDeVenta) => v.anulado || v.estado !== 'cerrada';
+const detalleDe = (v: FilaDeVenta) =>
+  [nombreDeOrigen(v.origen), v.canal, ...v.medios.map(nombreDeMedio)].filter(Boolean).join(' · ');
+
+const Total = ({ venta }: { venta: FilaDeVenta }) => (
+  <span
+    className={`text-sm font-bold whitespace-nowrap ${noCuenta(venta) ? 'text-muted-foreground line-through' : 'text-foreground'}`}
+  >
+    {formatearPesos(venta.total_centavos)}
+  </span>
+);
+
+const Estado = ({ venta }: { venta: FilaDeVenta }) =>
+  noCuenta(venta) ? <Chip>{estadoDeVenta(venta)}</Chip> : null;
+
+const COLUMNAS: Columna<FilaDeVenta>[] = [
+  {
+    titulo: 'Fecha',
+    celda: (v) => (
+      <Link href={`/admin/ventas/${v.id}`} className={`${ENLACE} whitespace-nowrap`}>
+        {fechaParaMostrar(v.fecha)}
+      </Link>
+    ),
+  },
+  { titulo: 'Origen', celda: (v) => <span className="text-xs">{nombreDeOrigen(v.origen)}</span> },
+  { titulo: 'Canal', desde: 'lg', celda: (v) => <span className="text-xs">{v.canal ?? '—'}</span> },
+  {
+    titulo: 'Medio',
+    desde: 'lg',
+    celda: (v) => <span className="text-xs">{v.medios.map(nombreDeMedio).join(' · ') || '—'}</span>,
+  },
+  { titulo: 'Estado', celda: (v) => <Estado venta={v} /> },
+  { titulo: 'Total', alinear: 'der', celda: (v) => <Total venta={v} /> },
+];
+
+function Tarjeta({ venta }: { venta: FilaDeVenta }) {
   return (
-    <li className="flex flex-wrap items-start justify-between gap-3 p-4">
-      <div className="min-w-0 space-y-1">
-        <Link
-          href={`/admin/ventas/${venta.id}`}
-          className="font-medium underline-offset-4 hover:underline"
-        >
+    <>
+      <div className="flex items-start justify-between gap-3">
+        <Link href={`/admin/ventas/${venta.id}`} className="text-sm font-bold">
           {fechaParaMostrar(venta.fecha)}
         </Link>
-        <p className="text-muted-foreground text-sm">{detalle.filter(Boolean).join(' · ')}</p>
+        <Total venta={venta} />
       </div>
-      <div className="flex items-center gap-2">
-        {noCuenta ? <Badge variant="outline">{estadoDeVenta(venta)}</Badge> : null}
-        <span className={noCuenta ? 'text-muted-foreground line-through' : 'font-medium'}>
-          {formatearPesos(venta.total_centavos)}
-        </span>
-      </div>
-    </li>
+      <p className="text-xs text-muted-foreground">{detalleDe(venta)}</p>
+      <Estado venta={venta} />
+    </>
   );
 }
 
-export function ListaDeVentas({ filas }: { filas: FilaDeVenta[] }) {
-  if (filas.length === 0)
-    return <p className="text-muted-foreground">No hay ventas para mostrar.</p>;
+type Props = { filas: FilaDeVenta[]; total: number };
+
+/** Las ventas en la tabla de Plan Reminder Pro (y tarjetas en el celular). */
+export function ListaDeVentas({ filas, total }: Props) {
+  if (filas.length === 0) {
+    return (
+      <SinResultados
+        titulo="No hay ventas para mostrar"
+        texto="No hay registros que coincidan con tus filtros."
+      />
+    );
+  }
   return (
-    <ul aria-label="Ventas" className="bg-card divide-y rounded-xl border">
-      {filas.map((venta) => (
-        <Fila key={venta.id} venta={venta} />
-      ))}
-    </ul>
+    <ListaDelPanel
+      etiqueta="Ventas"
+      icono={Receipt}
+      total={total}
+      filas={filas}
+      clave={(v) => v.id}
+      columnas={COLUMNAS}
+      tarjeta={(v) => <Tarjeta venta={v} />}
+    />
   );
 }

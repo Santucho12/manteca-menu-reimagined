@@ -13,6 +13,10 @@ export const ultimosDoceMeses = (hoy: string): Periodo => ({
   hasta: hoy,
 });
 
+/** El grafico arranca con los ultimos 4 meses; ampliado, muestra todo el año. */
+export const mesesVisibles = <T>(meses: T[], ampliado: boolean): T[] =>
+  ampliado ? meses : meses.slice(-4);
+
 /** Los 5 que mas plata dejaron; lo no vinculado no es un producto y no entra. */
 export const masVendidos = (productos: ProductoDelReporte[]) =>
   productos.filter((p) => p.clave !== SIN_VINCULAR).slice(0, 5);

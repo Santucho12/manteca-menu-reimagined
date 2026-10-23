@@ -14,7 +14,8 @@ import {
   type Pagina,
   type PerfilDeAcceso,
 } from './estados';
-import { enlacesDelMarco, type EnlaceDelMarco } from './marco';
+import { cierresConDiferencia, gastosSinClasificar } from '../inicio/consultas';
+import { enlacesDelMarco, type EnlaceDelMarco, type PendientesDelMarco } from './marco';
 
 export type PaginaConSesion = Exclude<Pagina, 'publica'>;
 export type Acceso = { cliente: Cliente; perfil: PerfilDeAcceso; estado: EstadoDeAcceso };
@@ -73,6 +74,18 @@ export async function datosDelMarco({ cliente, perfil, estado }: Acceso): Promis
   nombre: string;
   enlaces: EnlaceDelMarco[];
 }> {
-  const pendientes = estado === 'admin' ? await pendientesActuales(cliente) : 0;
+  const pendientes = estado === 'admin' ? await pendientesDelAdmin(cliente) : SIN_PENDIENTES;
   return { nombre: perfil.nombre, enlaces: enlacesDelMarco(estado, pendientes) };
+}
+
+const SIN_PENDIENTES: PendientesDelMarco = { usuarios: 0, caja: 0, gastos: 0 };
+
+// Los mismos casos que los avisos de Inicio, para que la sidebar y el Inicio digan lo mismo.
+async function pendientesDelAdmin(cliente: Cliente): Promise<PendientesDelMarco> {
+  const [usuarios, caja, gastos] = await Promise.all([
+    pendientesActuales(cliente),
+    cierresConDiferencia(cliente),
+    gastosSinClasificar(cliente),
+  ]);
+  return { usuarios, caja: caja.cantidad, gastos: gastos.cantidad };
 }

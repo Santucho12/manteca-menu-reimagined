@@ -180,11 +180,11 @@ El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
 
 - No hay página de guía de estilos: Santiago la sacó el 2026-10-07 (pedido 23). No se
   consulta ni se mantiene.
-- Las pantallas usan los colores y tipografías de `src/app/globals.css` y los componentes
-  base de `src/components/ui/` y `src/components/formularios/`, para que se vean iguales
-  entre sí.
-- La sidebar, las barras del celular y el hero siguen la skill `estetica-panel`: la estética de
-  Plan Reminder Pro con los colores y la tipografía de Manteca (Santiago, 2026-10-12).
+- El panel (`/admin`) se rehace desde cero (pedido 43), sin tomar como referencia el diseño
+  anterior, con la estética de Plan Reminder Pro tal cual: colores, letras, piezas y movimiento
+  (Santiago, 2026-10-21). Está entera en la skill `estetica-panel`. Sus colores son los exactos
+  aunque no pasen el contraste AA: es una excepción de Santiago, anotada en `PEDIDOS.md`.
+- La carta pública (`/`) usa los colores y las tipografías de Manteca de `src/app/globals.css`.
 
 ## Stack
 
@@ -192,7 +192,7 @@ El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
 |---|---|
 | Aplicación | Next.js 16 (App Router) + React 19 + TypeScript estricto, un solo proyecto con el panel y el menú público |
 | Datos, login y archivos | Supabase: Postgres, Auth, RLS y Storage, en dos proyectos (pruebas y real) |
-| Interfaz | Tailwind 4 + shadcn/ui; gráficos con Recharts |
+| Interfaz | Tailwind 4 + shadcn/ui; gráficos con Recharts. En el panel, además, framer-motion, sonner y lenis (skill `estetica-panel`) |
 | Formularios y validación | React Hook Form + Zod, con el mismo esquema en el formulario y en el servidor |
 | Tests | Vitest (lógica y base de pruebas) + Playwright (navegador) |
 | Calidad | ESLint + Prettier |
@@ -225,10 +225,12 @@ La aplicación usa el puerto 3210 y no el 3000, que suele estar ocupado por otro
 Playwright corre sin ventana: Santiago no quiere verla abrirse (2026-10-11, pedido 32). Con
 `E2E_A_LA_VISTA=1` se abre la ventana, para mirarlo. Con o sin ventana va con `slowMo` de 300 ms,
 porque las pruebas cuentan con que React termine de cargar antes de cada toque. Va un
-navegador a la vez (`workers: 1`). Levanta su propio servidor con `npm run dev` y no reutiliza
-uno que ya estaba abierto, que pudo arrancar con otras variables y otra base: si el puerto
-3210 está ocupado, se cierra ese servidor antes de correr las pruebas. El servidor de
-Playwright para Claude (`.mcp.json`) también abre la ventana a la vista.
+navegador a la vez (`workers: 1`). Levanta su propio servidor con `npm run dev`, en el puerto
+3211 y con su propia carpeta de compilación (`.next-e2e`), y no reutiliza uno que ya estaba
+abierto, que pudo arrancar con otras variables y otra base. Así no toca el servidor del 3210,
+que es el de quien trabaja: no se lo cierra para correr las pruebas (Santiago, 2026-10-21,
+pedido 41). Si el 3211 está ocupado, se cierra ese. El servidor de Playwright para Claude
+(`.mcp.json`) también abre la ventana a la vista.
 
 ## Git
 
@@ -266,7 +268,7 @@ Están en `.claude/skills/` y se usan dentro del flujo de superpowers.
 | `endpoint-staff` | Al escribir o revisar código de servidor que lee o escribe datos |
 | `pre-finish` | Al terminar cualquier cambio de código, antes de decir que está hecho |
 | `verificacion-funcional` | Para revisar a fondo un módulo ya hecho; detecta y no arregla |
-| `estetica-panel` | Al tocar la sidebar, las barras del celular o el encabezado (hero) de una pantalla del panel |
+| `estetica-panel` | Al construir, cambiar o revisar cualquier pantalla o estilo del panel (`/admin`) |
 
 Las reglas viven en este archivo; las skills las repiten donde las aplican. Al cambiar una,
 se busca en todas (`pre-finish`, paso 7).
@@ -280,11 +282,12 @@ sobre el texto que un plugin inyecte al empezar la sesión.
   Supabase Auth, aunque `vercel:auth` recomiende Clerk. La base es Supabase, creada en la
   cuenta que defina Santiago; no se provisiona por el Marketplace de Vercel salvo que
   Santiago lo decida.
-- **Diseño:** mandan los colores y componentes del proyecto. `design-taste-frontend` y
-  `minimalist-ui` no se usan: imponen su propia paleta, tipografía e íconos. `impeccable`,
-  solo si Santiago lo pide. Para pulir: `emil-design-eng`, `accessibility` y `vercel:shadcn`;
-  para gráficos, `dataviz` con la paleta del proyecto.
-  `estetica-dg-vmax` y `autoelevadores-style` son de otras marcas.
+- **Diseño:** mandan los colores y componentes del proyecto. En el panel manda la skill
+  `estetica-panel`: ninguna otra skill cambia sus colores, letras ni piezas, y sus componentes
+  base no se instalan con el CLI de shadcn. `design-taste-frontend` y `minimalist-ui` no se
+  usan: imponen su propia paleta, tipografía e íconos. `impeccable`, solo si Santiago lo pide.
+  Para pulir: `emil-design-eng`, `accessibility` y `vercel:shadcn`; para gráficos, `dataviz`
+  con la paleta del proyecto. `estetica-dg-vmax` y `autoelevadores-style` son de otras marcas.
 - **Cierre:** si algo está hecho lo decide `pre-finish`. `vercel:verification` sirve para
   diagnosticar por qué algo no anda, no para cerrar un pedido.
 - **Navegador:** las pruebas usan Playwright. `claude-in-chrome`, solo si Santiago lo pide:

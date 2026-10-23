@@ -1,5 +1,5 @@
 import { diasConCierre, primerDiaConCierre } from '../caja/consultas';
-import { datosDelResultado, ventasPorProducto } from '../reportes/consultas';
+import { datosDelResultado, ventasPorDia, ventasPorProducto } from '../reportes/consultas';
 import { periodoAnterior, sumarDias } from '../reportes/periodos';
 import { resultadoPorMes } from '../reportes/resultado';
 import { productosDelReporte } from '../reportes/ventas';
@@ -7,6 +7,7 @@ import type { Cliente } from '../supabase/cliente';
 import { contarPendientes } from '../usuarios/consultas';
 import { avisosDeInicio, type ConFecha, type DatosDeAvisos } from './avisos';
 import { masVendidos, mesEnCurso, ultimosDoceMeses } from './meses';
+import { semanaContraSemana, rangoDeSemanas } from './semana';
 
 type Respuesta = {
   data: { fecha: string }[] | null;
@@ -20,7 +21,7 @@ function conFecha(r: Respuesta): ConFecha {
 }
 
 // Un cierre anulado o revisado ya no esta en con_diferencia: el estado alcanza.
-async function cierresConDiferencia(cliente: Cliente): Promise<ConFecha> {
+export async function cierresConDiferencia(cliente: Cliente): Promise<ConFecha> {
   return conFecha(
     await cliente
       .from('cierres_de_caja')
@@ -41,7 +42,9 @@ async function idDeSinClasificar(cliente: Cliente): Promise<string | null> {
   return respuesta.data?.id ?? null;
 }
 
-async function gastosSinClasificar(cliente: Cliente): Promise<DatosDeAvisos['sinClasificar']> {
+export async function gastosSinClasificar(
+  cliente: Cliente,
+): Promise<DatosDeAvisos['sinClasificar']> {
   const categoriaId = await idDeSinClasificar(cliente);
   if (!categoriaId) return { cantidad: 0, desde: null, categoriaId };
   const gastos = await cliente
@@ -77,12 +80,13 @@ export async function datosDeAvisos(cliente: Cliente, hoy: string): Promise<Dato
 /** Todo lo de Inicio, con el mismo calculo que Reportes. */
 export async function datosDelInicio(cliente: Cliente, hoy: string) {
   const mes = mesEnCurso(hoy);
-  const [avisos, actual, anterior, anio, productos] = await Promise.all([
+  const [avisos, actual, anterior, anio, productos, dias] = await Promise.all([
     datosDeAvisos(cliente, hoy),
     datosDelResultado(cliente, mes),
     datosDelResultado(cliente, periodoAnterior(mes)),
     datosDelResultado(cliente, ultimosDoceMeses(hoy)),
     ventasPorProducto(cliente, mes),
+    ventasPorDia(cliente, rangoDeSemanas(hoy)),
   ]);
   return {
     avisos: avisosDeInicio(avisos),
@@ -90,5 +94,6 @@ export async function datosDelInicio(cliente: Cliente, hoy: string) {
     anterior,
     meses: resultadoPorMes(anio.ventas, anio.gastos),
     masVendidos: masVendidos(productosDelReporte(productos)),
+    semana: semanaContraSemana(dias, hoy),
   };
 }

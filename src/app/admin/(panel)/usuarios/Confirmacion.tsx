@@ -1,4 +1,5 @@
-import { Button } from '@/components/ui/button';
+import { AlertTriangle } from 'lucide-react';
+import { BOTON_CANCELAR, BOTON_PELIGRO, BOTON_PRINCIPAL } from '@/components/panel/estilos';
 import { CONFIRMAR, preguntaDe, type AccionConConfirmacion } from '@/lib/usuarios/pantalla';
 
 type Props = {
@@ -9,17 +10,27 @@ type Props = {
   alCancelar: () => void;
 };
 
+/** La pregunta antes de una accion que no se deshace sola, dentro de la misma tarjeta. */
 export function Confirmacion({ accion, nombre, enviando, alConfirmar, alCancelar }: Props) {
+  const peligrosa = CONFIRMAR[accion].variante === 'destructive';
   return (
-    <div className="space-y-3 rounded-lg border p-3">
-      <p className="text-sm">{preguntaDe(accion, nombre)}</p>
-      <div className="flex flex-wrap gap-2">
-        <Button variant={CONFIRMAR[accion].variante} disabled={enviando} onClick={alConfirmar}>
-          {CONFIRMAR[accion].texto}
-        </Button>
-        <Button variant="outline" disabled={enviando} onClick={alCancelar}>
+    <div className="space-y-4 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-amber-900">
+      <div className="flex items-start gap-3">
+        <AlertTriangle size={18} className="shrink-0 mt-0.5" aria-hidden="true" />
+        <p className="text-sm font-semibold">{preguntaDe(accion, nombre)}</p>
+      </div>
+      <div className="flex flex-col-reverse sm:flex-row gap-3">
+        <button type="button" disabled={enviando} onClick={alCancelar} className={BOTON_CANCELAR}>
           Cancelar
-        </Button>
+        </button>
+        <button
+          type="button"
+          disabled={enviando}
+          onClick={alConfirmar}
+          className={`${peligrosa ? `${BOTON_PELIGRO} h-12` : BOTON_PRINCIPAL} justify-center`}
+        >
+          {CONFIRMAR[accion].texto}
+        </button>
       </div>
     </div>
   );

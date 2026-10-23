@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { EncabezadoDeReporte } from '@/components/reportes/EncabezadoDeReporte';
+import { PantallaDeReporte } from '@/components/reportes/PantallaDeReporte';
 import { GraficoPorMes } from '@/components/reportes/GraficoPorMes';
 import { SinDatos } from '@/components/reportes/SinDatos';
 import { TablaComparada } from '@/components/reportes/TablaComparada';
@@ -68,8 +68,7 @@ export default async function ReporteDeResultado({
   ]);
   const otro = anterior.vacio ? null : anterior.resultado;
   return (
-    <div className="space-y-6">
-      <EncabezadoDeReporte titulo="Resultado" ruta={RUTA} periodos={periodos} hoy={hoy} />
+    <PantallaDeReporte titulo="Resultado" ruta={RUTA} periodos={periodos} hoy={hoy}>
       {actual.vacio ? (
         <SinDatos>No hay ventas ni gastos en este período.</SinDatos>
       ) : (
@@ -84,6 +83,6 @@ export default async function ReporteDeResultado({
           ) : null}
         </>
       )}
-    </div>
+    </PantallaDeReporte>
   );
 }

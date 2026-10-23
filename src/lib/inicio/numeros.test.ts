@@ -39,7 +39,7 @@ describe('numerosDelMes', () => {
         variacion: { diferenciaCentavos: 50000, porcentaje: 100 },
       },
       {
-        etiqueta: 'Resultado',
+        etiqueta: 'Balance',
         valor: '$3.000,00',
         variacion: { diferenciaCentavos: 150000, porcentaje: 100 },
       },

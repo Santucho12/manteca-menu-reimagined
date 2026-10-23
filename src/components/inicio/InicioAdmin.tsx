@@ -1,50 +1,43 @@
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
-import { GraficoPorMes } from '@/components/reportes/GraficoPorMes';
-import { Totales } from '@/components/reportes/Totales';
+import { BotonDeAyuda } from '@/components/panel/Ayuda';
+import { EncabezadoDePantalla } from '@/components/panel/EncabezadoDePantalla';
+import { EntradaDePantalla } from '@/components/panel/Entradas';
 import type { datosDelInicio } from '@/lib/inicio/consultas';
 import { numerosDelMes } from '@/lib/inicio/numeros';
+import { AYUDAS } from '@/lib/panel/ayudas';
+import { totalesDeVentas } from '@/lib/reportes/ventas';
 import { Avisos } from './Avisos';
+import { BloqueDelMes } from './BloqueDelMes';
 import { MasVendidos } from './MasVendidos';
+import { MesAMes } from './MesAMes';
+import { SemanaContraSemana } from './SemanaContraSemana';
+import { TarjetasDelMes } from './TarjetasDelMes';
 
 type DatosDelInicio = Awaited<ReturnType<typeof datosDelInicio>>;
 
-function Bloque({
-  id,
-  titulo,
-  children,
-}: {
-  id: string;
-  titulo: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section aria-labelledby={id} className="space-y-2">
-      <h2 id={id} className="font-heading text-xl font-semibold">
-        {titulo}
-      </h2>
-      {children}
-    </section>
-  );
-}
-
-/** Lo que requiere accion, los numeros del mes, el mes a mes y los mas vendidos. */
+/** El tablero del admin: avisos, numeros del mes, bloque de ventas, mes a mes, mas vendidos y semana. */
 export function InicioAdmin({ datos }: { datos: DatosDelInicio }) {
+  const cantidad = totalesDeVentas(datos.actual.ventas).ventas;
   return (
-    <div className="space-y-8">
-      <TituloDePagina subtitulo="Cómo viene el mes y lo que hay para atender.">
-        Inicio
-      </TituloDePagina>
-      <Avisos avisos={datos.avisos} />
-      <Bloque id="este-mes" titulo="Este mes">
-        <p className="text-muted-foreground text-sm">
-          Del 1 a hoy, contra los mismos días del mes anterior.
-        </p>
-        <Totales items={numerosDelMes(datos.actual, datos.anterior)} grilla="cuatro" />
-      </Bloque>
-      <Bloque id="mes-a-mes" titulo="Mes a mes">
-        <GraficoPorMes datos={datos.meses} />
-      </Bloque>
-      <MasVendidos productos={datos.masVendidos} />
-    </div>
+    <>
+      <EncabezadoDePantalla
+        titulo="Inicio"
+        subtitulo="Cómo viene el mes y qué hay que atender."
+        ayuda={<BotonDeAyuda ayuda={AYUDAS.inicio} />}
+      />
+      <EntradaDePantalla className="space-y-8">
+        <Avisos avisos={datos.avisos} />
+        <section aria-label="Este mes">
+          <TarjetasDelMes items={numerosDelMes(datos.actual, datos.anterior)} />
+        </section>
+        <BloqueDelMes resultado={datos.actual.resultado} cantidad={cantidad} />
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          <div className="xl:col-span-2">
+            <MesAMes datos={datos.meses} />
+          </div>
+          <MasVendidos productos={datos.masVendidos} />
+        </div>
+        <SemanaContraSemana datos={datos.semana} />
+      </EntradaDePantalla>
+    </>
   );
 }

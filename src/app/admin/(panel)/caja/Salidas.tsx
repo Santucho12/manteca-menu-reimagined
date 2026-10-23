@@ -1,5 +1,6 @@
 'use client';
 
+import { Plus, Trash2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import {
   useFieldArray,
@@ -8,7 +9,7 @@ import {
   type UseFormRegister,
 } from 'react-hook-form';
 import { Campo } from '@/components/formularios/Campo';
-import { Button } from '@/components/ui/button';
+import { BOTON_PELIGRO, BOTON_SUAVE, ETIQUETA } from '@/components/panel/estilos';
 import type { DatosDeCierre } from '@/lib/caja/esquemas';
 
 type Props = {
@@ -16,6 +17,9 @@ type Props = {
   register: UseFormRegister<DatosDeCierre>;
   errors: FieldErrors<DatosDeCierre>;
 };
+
+const FILA =
+  'grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 sm:items-end rounded-xl bg-secondary/40 p-3';
 
 function Grupo({
   titulo,
@@ -27,11 +31,27 @@ function Grupo({
   children: ReactNode;
 }) {
   return (
-    <fieldset className="space-y-3 rounded-lg border p-4">
-      <legend className="px-1 font-medium">{titulo}</legend>
-      <p className="text-muted-foreground text-sm">{ayuda}</p>
+    <fieldset className="space-y-4">
+      <legend className={`${ETIQUETA} mb-1`}>{titulo}</legend>
+      <p className="text-xs text-muted-foreground">{ayuda}</p>
       {children}
     </fieldset>
+  );
+}
+
+function Quitar({ alTocar }: { alTocar: () => void }) {
+  return (
+    <button type="button" onClick={alTocar} className={BOTON_PELIGRO}>
+      <Trash2 size={16} aria-hidden="true" /> Quitar
+    </button>
+  );
+}
+
+function Sumar({ alTocar, children }: { alTocar: () => void; children: ReactNode }) {
+  return (
+    <button type="button" onClick={alTocar} className={BOTON_SUAVE}>
+      <Plus size={14} aria-hidden="true" /> {children}
+    </button>
   );
 }
 
@@ -41,7 +61,7 @@ export function Retiros({ control, register, errors }: Props) {
   return (
     <Grupo titulo="Retiros" ayuda="Efectivo que se sacó de la caja durante el día.">
       {fields.map((retiro, i) => (
-        <div key={retiro.id} className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+        <div key={retiro.id} className={FILA}>
           <Campo
             id={`retiro-monto-${i}`}
             etiqueta={`Monto del retiro ${i + 1}`}
@@ -55,14 +75,10 @@ export function Retiros({ control, register, errors }: Props) {
             error={errors.retiros?.[i]?.quien?.message}
             {...register(`retiros.${i}.quien`)}
           />
-          <Button type="button" variant="outline" onClick={() => remove(i)}>
-            Quitar
-          </Button>
+          <Quitar alTocar={() => remove(i)} />
         </div>
       ))}
-      <Button type="button" variant="outline" onClick={() => append({ monto: '', quien: '' })}>
-        Sumar retiro
-      </Button>
+      <Sumar alTocar={() => append({ monto: '', quien: '' })}>Sumar retiro</Sumar>
     </Grupo>
   );
 }
@@ -73,7 +89,7 @@ export function GastosDeCaja({ control, register, errors }: Props) {
   return (
     <Grupo titulo="Gastos pagados con la caja" ayuda="Lo que se pagó con efectivo de la caja.">
       {fields.map((gasto, i) => (
-        <div key={gasto.id} className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+        <div key={gasto.id} className={FILA}>
           <Campo
             id={`gasto-monto-${i}`}
             etiqueta={`Monto del gasto ${i + 1}`}
@@ -87,18 +103,10 @@ export function GastosDeCaja({ control, register, errors }: Props) {
             error={errors.gastos?.[i]?.descripcion?.message}
             {...register(`gastos.${i}.descripcion`)}
           />
-          <Button type="button" variant="outline" onClick={() => remove(i)}>
-            Quitar
-          </Button>
+          <Quitar alTocar={() => remove(i)} />
         </div>
       ))}
-      <Button
-        type="button"
-        variant="outline"
-        onClick={() => append({ monto: '', descripcion: '' })}
-      >
-        Sumar gasto
-      </Button>
+      <Sumar alTocar={() => append({ monto: '', descripcion: '' })}>Sumar gasto</Sumar>
     </Grupo>
   );
 }

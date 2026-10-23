@@ -1,5 +1,7 @@
+import { Tags } from 'lucide-react';
 import type { Metadata } from 'next';
-import { TituloDePagina } from '@/components/panel/TituloDePagina';
+import { Pantalla } from '@/components/panel/Pantalla';
+import { Seccion } from '@/components/panel/Seccion';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { localDeQuienPide } from '@/lib/menu/consultas';
 import { FormularioDeCategoria } from '../FormularioDeCategoria';
@@ -19,12 +21,14 @@ const VACIA = {
 export default async function PaginaNuevaCategoria() {
   const { cliente } = await exigirPagina('admin');
   return (
-    <div className="space-y-6">
-      <TituloDePagina>Nueva categoría</TituloDePagina>
-      <p className="text-muted-foreground text-sm">
-        Se crea oculta: mostrala desde el menú cuando tenga productos.
-      </p>
-      <FormularioDeCategoria inicial={VACIA} localId={await localDeQuienPide(cliente)} />
-    </div>
+    <Pantalla
+      titulo="Nueva categoría"
+      subtitulo="Se crea oculta: mostrala desde el menú cuando tenga productos."
+      ayuda="menu"
+    >
+      <Seccion icono={<Tags className="text-primary" size={24} />}>
+        <FormularioDeCategoria inicial={VACIA} localId={await localDeQuienPide(cliente)} />
+      </Seccion>
+    </Pantalla>
   );
 }
