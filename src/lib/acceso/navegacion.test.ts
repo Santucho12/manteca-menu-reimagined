@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { activoEnMas, enlaceActivo, insigniaDeMas, repartirParaCelular } from './navegacion';
+import {
+  activoEnMas,
+  enlaceActivo,
+  insigniaDeMas,
+  partirEnlaces,
+  repartirParaCelular,
+} from './navegacion';
 
 const enlaces = [
   { clave: 'inicio', href: '/admin' },
@@ -67,5 +73,33 @@ describe('insigniaDeMas', () => {
     expect(insigniaDeMas([{ insignia: 3 }, { insignia: null }, { insignia: 2 }])).toBe(5);
     expect(insigniaDeMas([{ insignia: null }])).toBeNull();
     expect(insigniaDeMas([])).toBeNull();
+  });
+});
+
+describe('partirEnlaces', () => {
+  const e = (clave: string, grupo?: string) => ({ clave, grupo });
+
+  it('arma los grupos en orden y deja Mi cuenta aparte', () => {
+    const partido = partirEnlaces([
+      e('inicio', 'A'),
+      e('ventas', 'A'),
+      e('gastos', 'B'),
+      e('cuenta'),
+    ]);
+    expect(partido.grupos.map((g) => [g.titulo, g.enlaces.map((x) => x.clave)])).toEqual([
+      ['A', ['inicio', 'ventas']],
+      ['B', ['gastos']],
+    ]);
+    expect(partido.cuenta?.clave).toBe('cuenta');
+  });
+
+  it('sin grupos hay una sola lista sin titulo', () => {
+    const partido = partirEnlaces([e('caja'), e('cierres'), e('cuenta')]);
+    expect(partido.grupos).toEqual([{ titulo: null, enlaces: [e('caja'), e('cierres')] }]);
+    expect(partido.cuenta?.clave).toBe('cuenta');
+  });
+
+  it('sin enlaces no hay grupos ni cuenta', () => {
+    expect(partirEnlaces([])).toEqual({ grupos: [], cuenta: null });
   });
 });

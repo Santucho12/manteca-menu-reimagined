@@ -6,10 +6,10 @@ import { cn } from '@/lib/utils';
 const TAMANOS = {
   lateral: {
     caja: 'flex items-center gap-3',
-    cuadrado: 'w-10 h-10 rounded-xl shadow-lg shadow-primary/30',
-    icono: 24,
-    nombre: 'text-2xl',
-    lema: 'text-[8px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap mt-1',
+    cuadrado: 'w-9 h-9 rounded-xl shadow-lg shadow-primary/30',
+    icono: 22,
+    nombre: 'text-xl',
+    lema: 'text-[7px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap mt-1',
   },
   barra: {
     caja: 'flex items-center gap-2',

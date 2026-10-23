@@ -32,6 +32,8 @@ export type EnlaceDelPanel = {
     | 'cuenta';
   href: string;
   texto: string;
+  /** El titulo del grupo de la barra lateral; Mi cuenta no lleva: va aparte, abajo. */
+  grupo?: 'Día a día' | 'Plata' | 'Ajustes';
 };
 
 const INGRESAR = '/admin/ingresar';
@@ -54,15 +56,15 @@ const ENLACES: Record<'caja' | 'admin', EnlaceDelPanel[]> = {
     { clave: 'cuenta', href: '/admin/cuenta', texto: 'Mi cuenta' },
   ],
   admin: [
-    { clave: 'inicio', href: '/admin', texto: 'Inicio' },
-    { clave: 'menu', href: '/admin/menu', texto: 'Menú' },
-    { clave: 'ventas', href: '/admin/ventas', texto: 'Ventas' },
-    { clave: 'proveedores', href: '/admin/proveedores', texto: 'Proveedores' },
-    { clave: 'gastos', href: '/admin/gastos', texto: 'Gastos' },
-    { clave: 'caja', href: '/admin/caja/control', texto: 'Caja' },
-    { clave: 'reportes', href: '/admin/reportes', texto: 'Reportes' },
-    { clave: 'usuarios', href: '/admin/usuarios', texto: 'Usuarios' },
-    { clave: 'auditoria', href: '/admin/auditoria', texto: 'Auditoría' },
+    { clave: 'inicio', href: '/admin', texto: 'Inicio', grupo: 'Día a día' },
+    { clave: 'ventas', href: '/admin/ventas', texto: 'Ventas', grupo: 'Día a día' },
+    { clave: 'caja', href: '/admin/caja/control', texto: 'Caja', grupo: 'Día a día' },
+    { clave: 'gastos', href: '/admin/gastos', texto: 'Gastos', grupo: 'Plata' },
+    { clave: 'proveedores', href: '/admin/proveedores', texto: 'Proveedores', grupo: 'Plata' },
+    { clave: 'reportes', href: '/admin/reportes', texto: 'Reportes', grupo: 'Plata' },
+    { clave: 'menu', href: '/admin/menu', texto: 'Menú', grupo: 'Ajustes' },
+    { clave: 'usuarios', href: '/admin/usuarios', texto: 'Usuarios', grupo: 'Ajustes' },
+    { clave: 'auditoria', href: '/admin/auditoria', texto: 'Auditoría', grupo: 'Ajustes' },
     { clave: 'cuenta', href: '/admin/cuenta', texto: 'Mi cuenta' },
   ],
 };
