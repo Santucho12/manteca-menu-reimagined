@@ -174,7 +174,7 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 
 | # | Pedido | Qué falta |
 |---|---|---|
-| 43 | El panel desde cero | Hecha la Fase 0 (2026-10-22): layout propio, marco, ingreso, registro, cambio obligado, inicio de caja e invitado, ayuda y Mi cuenta; `acceso`, `registro`, `cuenta` y `ayuda` en verde. Falta el resto de las pantallas (Fases 1 a 9 del plan) |
+| 43 | El panel desde cero | Hechas las pantallas (2026-10-22): ingreso, registro, Inicio, Mi cuenta, Proveedores, Gastos (con categorías y recurrentes), Ventas y canales, Caja (cargar, mis cierres, control, detalle), Menú (lista, categorías, productos, aumento y desactivados), Reportes, Usuarios y Auditoría, cada una con su ayuda y probada en computadora y celular. Falta el cierre: `npm run verificar` entero, `npm run e2e` entero y revisar las capturas contra `referencias/` |
 | 42 | Colores y letra de Plan Reminder Pro en el panel | Reemplazado por el pedido 43: el panel se rehace desde cero |
 | 38 | Estética de Plan Reminder Pro en Inicio, Menú y Ventas | Reemplazado por el pedido 43: el panel se rehace desde cero |
 | 41 | Playwright en otro puerto | Todo |

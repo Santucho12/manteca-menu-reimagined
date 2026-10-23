@@ -15,4 +15,25 @@ describe('ayudas', () => {
     expect(AYUDAS.inicio.titulo).toBe('Cómo funciona Inicio');
     expect(AYUDAS.cuenta.titulo).toBe('Cómo funciona Mi cuenta');
   });
+
+  it('cada pantalla del panel tiene su ayuda', () => {
+    const claves = [
+      'inicio',
+      'cuenta',
+      'proveedores',
+      'gastos',
+      'categorias',
+      'recurrentes',
+      'ventas',
+      'canales',
+      'caja',
+      'control',
+      'menu',
+      'aumento',
+      'reportes',
+      'usuarios',
+      'auditoria',
+    ];
+    expect(Object.keys(AYUDAS).sort()).toEqual([...claves].sort());
+  });
 });
