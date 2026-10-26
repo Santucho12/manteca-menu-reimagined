@@ -182,9 +182,9 @@ El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
   consulta ni se mantiene.
 - El panel (`/admin`) se rehace desde cero (pedido 43), sin tomar como referencia el diseño
   anterior, con la estética de Plan Reminder Pro: letras, piezas y movimiento (Santiago,
-  2026-10-21). Está entera en la skill `estetica-panel`. Los colores son los de Manteca Bakery:
-  el dorado `#bfa042` como acento sobre crema, con letra marrón oscuro sobre el dorado (Santiago,
-  2026-10-25, pedido 45).
+  2026-10-21). Está entera en la skill `estetica-panel`. Los colores son los de PRP con el azul
+  marino `#1e3a8a` en lugar de su verde de marca, con letra blanca encima (Santiago, 2026-10-25,
+  pedido 45).
 - La carta pública (`/`) usa los colores y las tipografías de Manteca de `src/app/globals.css`.
 
 ## Stack

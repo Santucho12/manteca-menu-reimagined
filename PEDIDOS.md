@@ -153,8 +153,8 @@ Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, 
 ### 46. Actualizar Next.js por seguridad
 Next.js 16.4.0 tiene una vulnerabilidad publicada y `next dev` se frenaba al arrancar para avisarlo. Pasa a 16.4.3, con `eslint-config-next` igual, fijadas exactas (Santiago, 2026-10-25, en la rama del pedido 45).
 
-### 45. El panel con la paleta de Manteca
-El panel (`/admin`) deja el verde de Plan Reminder Pro y toma la paleta de Manteca Bakery: el dorado `#bfa042` como acento (botones principales, sección activa, foco, marca y gráficos) sobre un fondo crema claro, con letra marrón oscuro sobre el dorado para que se lea. Se mantienen las letras, las piezas y el movimiento de Plan Reminder Pro. El verde `emerald` queda solo para lo que confirma plata o exporta (Santiago, 2026-10-25).
+### 45. El panel en azul marino
+El panel (`/admin`) deja el verde de marca de Plan Reminder Pro y pasa a un azul marino corporativo, `#1e3a8a`, con letra blanca (botones principales, sección activa, foco, marca y la serie de ventas en los gráficos; resultado pasa a ámbar). Los fondos de cada pantalla quedan como antes, y se mantienen las letras, las piezas y el movimiento de Plan Reminder Pro. El verde `emerald` queda solo para lo que confirma plata o exporta. Primero se probó el dorado de Manteca Bakery sobre crema; Santiago pidió volver a los fondos de antes y después cambiar al azul (2026-10-25).
 
 ### 44. Barra lateral en grupos y más chica
 La barra lateral del panel agrupa las secciones: Día a día (Inicio, Ventas, Caja), Plata (Gastos, Proveedores, Reportes) y Ajustes (Menú, Usuarios, Auditoría), con Mi cuenta fija abajo, fuera de los grupos. Todo a escala 0,9: ancho 234 px, íconos, letra y espacios (Santiago, 2026-10-23). Caja ve su lista sin grupos.
@@ -184,7 +184,7 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 | # | Pedido | Qué falta |
 |---|---|---|
 | 46 | Actualizar Next.js por seguridad | Hecho: tipos, lint y build en verde y `next dev` arranca sin el aviso. Falta el cierre completo, junto con el 45 |
-| 45 | El panel con la paleta de Manteca | Hechos los colores, con su prueba en `e2e/sidebar.spec.ts`; tipos y lint en verde. Falta el cierre completo (`npm run verificar` y `npm run e2e` en los dos tamaños) |
+| 45 | El panel en azul marino | Hechos los colores, con su prueba en `e2e/sidebar.spec.ts`; tipos y lint en verde. Falta el cierre completo (`npm run verificar` y `npm run e2e` en los dos tamaños) |
 | 44 | Barra lateral en grupos y más chica | Hecha y probada con lint, tipos, tests de `acceso` y `sidebar` en computadora (2026-10-23). Falta el cierre completo (`npm run verificar` y `npm run e2e` en los dos tamaños) |
 | 43 | El panel desde cero | Hechas las pantallas (2026-10-22): ingreso, registro, Inicio, Mi cuenta, Proveedores, Gastos (con categorías y recurrentes), Ventas y canales, Caja (cargar, mis cierres, control, detalle), Menú (lista, categorías, productos, aumento y desactivados), Reportes, Usuarios y Auditoría, cada una con su ayuda y probada en computadora y celular. Falta el cierre: `npm run verificar` entero, `npm run e2e` entero y revisar las capturas contra `referencias/` |
 | 42 | Colores y letra de Plan Reminder Pro en el panel | Reemplazado por el pedido 43: el panel se rehace desde cero |
