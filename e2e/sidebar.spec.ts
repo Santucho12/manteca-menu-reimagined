@@ -18,7 +18,7 @@ test.describe('con la sesion del admin', () => {
     await expect(page.getByText('Lo que se pagó, por categoría y proveedor.')).toBeVisible();
   });
 
-  test('el panel usa el dorado de Manteca sobre crema', async ({ page }) => {
+  test('el panel usa el azul marino, con el fondo de antes', async ({ page }) => {
     await page.goto('/admin');
     const tema = await page.evaluate(() => {
       const raiz = getComputedStyle(document.documentElement);
@@ -28,14 +28,9 @@ test.describe('con la sesion del admin', () => {
         fondo: raiz.getPropertyValue('--color-background').trim(),
       };
     });
-    expect(tema).toEqual({
-      principal: '#bfa042',
-      letraSobrePrincipal: '#2b1d14',
-      fondo: '#f8f4ec',
-    });
-    // La letra dorada va más oscura que el fondo dorado, para leerse sobre blanco.
+    expect(tema).toEqual({ principal: '#1e3a8a', letraSobrePrincipal: '#fff', fondo: '#f9fafb' });
     const inicio = panel(page).getByRole('link', { name: /^Inicio/ });
-    await expect(inicio).toHaveCSS('color', 'rgb(138, 115, 48)');
+    await expect(inicio).toHaveCSS('color', 'rgb(30, 58, 138)');
   });
 
   test('en la computadora, Usuarios dice cuantos esperan un rol', async ({ page }, info) => {
