@@ -34,26 +34,28 @@
   --radius-2xl: 1rem;
   --radius-3xl: 1.5rem;
 
-  /* Colores del tema (src/index.css de PRP). */
-  --color-background: hsl(210 20% 98%);
-  --color-foreground: hsl(220 40% 12%);
+  /* Colores del tema: los de Manteca Bakery, el dorado del logo sobre crema (Santiago,
+     2026-10-25, pedido 45). La letra sobre el dorado es marrón oscuro y no blanca: el blanco
+     da 2,5 a 1 y no se lee. */
+  --color-background: #f8f4ec;
+  --color-foreground: #2b1d14;
   --color-card: hsl(0 0% 100%);
-  --color-card-foreground: hsl(220 40% 12%);
+  --color-card-foreground: #2b1d14;
   --color-popover: hsl(0 0% 100%);
-  --color-popover-foreground: hsl(220 40% 12%);
-  --color-primary: hsl(160 84% 39%);
-  --color-primary-foreground: hsl(0 0% 100%);
-  --color-secondary: hsl(210 20% 95%);
-  --color-secondary-foreground: hsl(220 40% 12%);
-  --color-muted: hsl(210 20% 95%);
-  --color-muted-foreground: hsl(220 20% 45%);
-  --color-accent: hsl(160 84% 39%);
-  --color-accent-foreground: hsl(0 0% 100%);
+  --color-popover-foreground: #2b1d14;
+  --color-primary: #bfa042;
+  --color-primary-foreground: #2b1d14;
+  --color-secondary: #f1ebdd;
+  --color-secondary-foreground: #2b1d14;
+  --color-muted: #f1ebdd;
+  --color-muted-foreground: #74644f;
+  --color-accent: #bfa042;
+  --color-accent-foreground: #2b1d14;
   --color-destructive: hsl(0 84% 60%);
   --color-destructive-foreground: hsl(0 0% 100%);
-  --color-border: hsl(220 20% 90%);
-  --color-input: hsl(220 20% 90%);
-  --color-ring: hsl(160 84% 39%);
+  --color-border: #e8dfcc;
+  --color-input: #e8dfcc;
+  --color-ring: #bfa042;
   --color-status-paid: hsl(160 60% 94%);
   --color-status-paid-text: hsl(160 84% 25%);
   --color-status-pending: hsl(38 92% 94%);
@@ -245,5 +247,13 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* La letra y los íconos dorados van en un dorado más oscuro que el fondo de los botones: el del
+   logo sobre blanco da 2,5 a 1 y no se lee; este da 4,6 (pedido 45). */
+@layer utilities {
+  .text-primary {
+    color: #8a7330;
   }
 }
