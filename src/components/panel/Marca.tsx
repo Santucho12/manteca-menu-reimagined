@@ -33,7 +33,7 @@ export function Marca({ tamano }: { tamano: keyof typeof TAMANOS }) {
   return (
     <div role="img" aria-label="Manteca" className={caja}>
       <div className={cn('bg-primary flex items-center justify-center', cuadrado)}>
-        <Croissant className="text-white" size={icono} strokeWidth={2.5} />
+        <Croissant className="text-primary-foreground" size={icono} strokeWidth={2.5} />
       </div>
       <div>
         <p className={cn('font-display font-extrabold tracking-tight leading-none', nombre)}>

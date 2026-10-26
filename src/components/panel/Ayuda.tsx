@@ -74,7 +74,7 @@ function VentanaDeAyuda({ ayuda, abierta, cerrar }: PropsDeLaVentana) {
               <button
                 type="button"
                 onClick={cerrar}
-                className="w-full h-12 rounded-xl bg-primary text-white font-bold text-[10px] uppercase tracking-widest"
+                className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold text-[10px] uppercase tracking-widest"
               >
                 Entendido
               </button>

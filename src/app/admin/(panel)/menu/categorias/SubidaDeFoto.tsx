@@ -34,7 +34,7 @@ export function SubidaDeFoto({ localId }: { localId: string }) {
         accept="image/jpeg,image/png,image/webp"
         disabled={subiendo}
         onChange={(e) => elegir(e.target.files?.[0])}
-        className="block w-full min-h-11 text-sm rounded-xl bg-secondary/30 p-2 file:mr-3 file:rounded-lg file:border-none file:bg-primary file:px-3 file:py-2 file:text-xs file:font-bold file:text-white"
+        className="block w-full min-h-11 text-sm rounded-xl bg-secondary/30 p-2 file:mr-3 file:rounded-lg file:border-none file:bg-primary file:px-3 file:py-2 file:text-xs file:font-bold file:text-primary-foreground"
       />
       {subiendo ? <p className="text-xs text-muted-foreground">Subiendo la foto…</p> : null}
       {mensaje ? <AvisoDeError mensaje={mensaje} /> : null}
