@@ -16,7 +16,7 @@ import type { ResultadoDelMes } from '@/lib/reportes/resultado';
 
 // Una serie por color, de la paleta de Plan Reminder Pro: ventas en el verde de la marca, gastos
 // en rosa y balance en azul.
-const COLORES = { ventas: '#bfa042', gastos: '#f43f5e', resultado: '#3b82f6' };
+const COLORES = { ventas: '#1e3a8a', gastos: '#f43f5e', resultado: '#f59e0b' };
 const EJE = { stroke: '#94a3b8', fontSize: 10, fontWeight: 700 };
 
 const pesos = (valor: unknown) => formatearPesos(Math.round(Number(valor)));

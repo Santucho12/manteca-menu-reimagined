@@ -33,7 +33,7 @@ export function GraficoDeLineas({ datos }: { datos: PuntoSuperpuesto[] }) {
           <Line
             name="Período"
             dataKey="actual"
-            stroke="#bfa042"
+            stroke="#1e3a8a"
             strokeWidth={3}
             dot={false}
             isAnimationActive={false}

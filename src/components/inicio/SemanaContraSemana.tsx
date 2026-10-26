@@ -13,7 +13,7 @@ import {
 import type { DiaDeLaSemana } from '@/lib/inicio/semana';
 
 // Los colores de Plan Reminder Pro: la semana actual en el verde de la marca y la anterior en gris.
-const COLORES = { actual: '#bfa042', anterior: '#94a3b8' };
+const COLORES = { actual: '#1e3a8a', anterior: '#94a3b8' };
 const EJE = { stroke: '#94a3b8', fontSize: 10, fontWeight: 700 };
 const ventas = (valor: unknown) => `${valor} ${Number(valor) === 1 ? 'venta' : 'ventas'}`;
 
