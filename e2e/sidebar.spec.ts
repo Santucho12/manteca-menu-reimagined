@@ -18,6 +18,26 @@ test.describe('con la sesion del admin', () => {
     await expect(page.getByText('Lo que se pagó, por categoría y proveedor.')).toBeVisible();
   });
 
+  test('el panel usa el dorado de Manteca sobre crema', async ({ page }) => {
+    await page.goto('/admin');
+    const tema = await page.evaluate(() => {
+      const raiz = getComputedStyle(document.documentElement);
+      return {
+        principal: raiz.getPropertyValue('--color-primary').trim(),
+        letraSobrePrincipal: raiz.getPropertyValue('--color-primary-foreground').trim(),
+        fondo: raiz.getPropertyValue('--color-background').trim(),
+      };
+    });
+    expect(tema).toEqual({
+      principal: '#bfa042',
+      letraSobrePrincipal: '#2b1d14',
+      fondo: '#f8f4ec',
+    });
+    // La letra dorada va más oscura que el fondo dorado, para leerse sobre blanco.
+    const inicio = panel(page).getByRole('link', { name: /^Inicio/ });
+    await expect(inicio).toHaveCSS('color', 'rgb(138, 115, 48)');
+  });
+
   test('en la computadora, Usuarios dice cuantos esperan un rol', async ({ page }, info) => {
     test.skip(info.project.name !== 'computadora', 'solo en la computadora');
     // Las cuentas de prueba siempre dejan alguna pendiente: el invitado espera un rol.
