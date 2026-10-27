@@ -28,7 +28,8 @@ export function Filtros({ filtros }: { filtros: FiltrosDeLista }) {
               aria-current={activo ? 'page' : undefined}
               className={cn(
                 ATAJO,
-                activo && 'bg-primary text-white hover:bg-primary hover:text-white',
+                activo &&
+                  'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground',
               )}
             >
               {opcion.texto}

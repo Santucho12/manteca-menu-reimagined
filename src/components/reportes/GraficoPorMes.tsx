@@ -14,18 +14,24 @@ import { formatearPesos } from '@/lib/plata';
 import { etiquetaDe } from '@/lib/reportes/agrupar';
 import type { ResultadoDelMes } from '@/lib/reportes/resultado';
 
-// Una serie por color, de la paleta de Plan Reminder Pro: ventas en el verde de la marca, gastos
-// en rosa y balance en azul.
+// Los mismos colores que las tarjetas de Inicio: ventas en verde, gastos en rojo y resultado
+// (el balance) en azul (Santiago, 2026-10-26).
 const COLORES = { ventas: '#10b981', gastos: '#f43f5e', resultado: '#3b82f6' };
 const EJE = { stroke: '#94a3b8', fontSize: 10, fontWeight: 700 };
 
 const pesos = (valor: unknown) => formatearPesos(Math.round(Number(valor)));
 
 /** Ventas, gastos y resultado de cada mes; un mes sin gastos no tiene barra de resultado. */
-export function GraficoPorMes({ datos }: { datos: ResultadoDelMes[] }) {
+export function GraficoPorMes({
+  datos,
+  alto = 'h-72',
+}: {
+  datos: ResultadoDelMes[];
+  alto?: string;
+}) {
   const meses = datos.map((d) => ({ ...d, etiqueta: etiquetaDe(d.mes, 'mes') }));
   return (
-    <figure aria-label="Gráfico por mes" className="h-72">
+    <figure aria-label="Gráfico por mes" className={alto}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={meses} margin={{ left: 8, right: 8 }} barGap={6} barCategoryGap="28%">
           <CartesianGrid stroke="#e2e8f0" vertical={false} />

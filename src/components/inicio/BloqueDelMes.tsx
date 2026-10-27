@@ -24,10 +24,10 @@ export function BloqueDelMes({ resultado, cantidad }: Props) {
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="relative overflow-hidden rounded-2xl bg-[#0F172A] border border-slate-800 shadow-2xl p-5 md:p-8"
+      className="relative overflow-hidden rounded-2xl bg-[#0F172A] border border-slate-800 shadow-2xl p-4 md:px-6 md:py-4"
     >
-      <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-        <div className="space-y-4 min-w-0">
+      <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="space-y-2 min-w-0">
           <div className="flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
               <TrendingUp size={16} aria-hidden="true" />
@@ -38,12 +38,12 @@ export function BloqueDelMes({ resultado, cantidad }: Props) {
           </div>
           <div className="space-y-1">
             <p className="text-slate-500 text-sm font-medium">{textoDeVentasDelMes(cantidad)}</p>
-            <p className="text-4xl md:text-6xl font-extrabold tracking-tighter text-white font-display break-words">
+            <p className="text-3xl md:text-5xl font-extrabold tracking-tighter text-white font-display break-words">
               {formatearPesos(resultado.ventasCentavos)}
             </p>
           </div>
         </div>
-        <div className="w-full md:w-80 space-y-4 p-5 rounded-xl bg-slate-900/50 border border-slate-800/50 backdrop-blur-xs">
+        <div className="w-full md:w-80 space-y-3 p-4 rounded-xl bg-slate-900/50 border border-slate-800/50 backdrop-blur-xs">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className={ETIQUETA}>Gastos</p>

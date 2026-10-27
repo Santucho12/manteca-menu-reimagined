@@ -33,6 +33,50 @@ test.afterAll(async () => {
 const grafico = (page: import('@playwright/test').Page) =>
   page.getByRole('figure', { name: 'Gráfico por mes' }).locator('svg').first();
 
+const colorDeLaSerie = (page: import('@playwright/test').Page, figura: string, serie: string) =>
+  page
+    .getByRole('figure', { name: figura })
+    .locator('.recharts-legend-item')
+    .filter({ hasText: serie })
+    .locator('path')
+    .first();
+
+test('los avisos van en rosa, como el ícono de Gastos', async ({ page }) => {
+  await page.goto('/admin');
+  const avisos = page.getByRole('region', { name: /Para atender/ });
+  await expect(avisos).toHaveCSS('background-color', 'rgb(255, 241, 242)');
+});
+
+test('los gráficos van en azul, verde y rojo', async ({ page }) => {
+  await page.goto('/admin');
+  const esperados = [
+    ['Gráfico por mes', 'Ventas', '#10b981'],
+    ['Gráfico por mes', 'Resultado', '#3b82f6'],
+    ['Gráfico por mes', 'Gastos', '#f43f5e'],
+    ['Ventas por día', 'Esta semana', '#3b82f6'],
+    ['Ventas por día', 'Semana anterior', '#f43f5e'],
+  ] as const;
+  for (const [figura, serie, color] of esperados) {
+    await expect(colorDeLaSerie(page, figura, serie)).toHaveAttribute('fill', color);
+  }
+});
+
+test('la tarjeta de Balance va en azul', async ({ page }) => {
+  await page.goto('/admin');
+  const tarjeta = page.getByRole('term').filter({ hasText: 'Balance' }).locator('xpath=../..');
+  await expect(tarjeta.locator('svg').first()).toHaveCSS('color', 'rgb(37, 99, 235)');
+});
+
+test('los tres más vendidos llevan medalla de oro, plata y bronce', async ({ page }) => {
+  await page.goto('/admin');
+  const filas = page.getByRole('list', { name: 'Más vendidos' }).getByRole('listitem');
+  const medallas = ['Medalla de oro', 'Medalla de plata', 'Medalla de bronce'];
+  for (const [posicion, medalla] of medallas.entries()) {
+    await expect(filas.nth(posicion).getByRole('img', { name: medalla })).toBeVisible();
+  }
+  await expect(filas.nth(3).getByRole('img', { name: /Medalla/ })).toHaveCount(0);
+});
+
 test('ve el aviso de gastos sin clasificar y lo lleva a gastos', async ({ page }) => {
   await page.goto('/admin');
   const aviso = page.getByRole('link', { name: /gastos? sin clasificar/ });

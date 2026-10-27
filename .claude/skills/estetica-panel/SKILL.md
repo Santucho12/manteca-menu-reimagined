@@ -18,14 +18,20 @@ PRP es la app "FiestaCobra", en
 React 18, Tailwind 3). Esta skill ya trae todo pasado a Manteca: el código de PRP se consulta
 solo para algo que acá no esté. No se entra a su base real: tiene datos de sus clientes.
 
+**Azul marino en vez del verde de PRP (Santiago, 2026-10-25, pedido 45).** El verde de marca
+(`primary`, `accent`, `ring`) pasa a ser `#1e3a8a`, con letra blanca encima; fondos, bordes y
+grises siguen siendo los de PRP. En los gráficos, ventas va en `#1e3a8a` y resultado en ámbar
+(`#f59e0b`), para no confundirse. Donde esta skill o `piezas.md` digan "verde" de la marca, se
+lee "azul marino"; `emerald` sigue con su significado (confirma plata o exporta).
+
 Decisiones de Santiago (2026-10-21):
 
-- **Colores exactos**, aunque no pasen el contraste AA (letra blanca sobre el verde, 2,6 a 1; el
-  rojo de error, 3,6; el anillo de foco, 2,5; los grises chicos, 2,6). Es una excepción anotada en
-  `PEDIDOS.md` (pedido 43): `tests/contraste.test.ts` mira solo la carta y no se extiende al panel.
+- **Los rojos y grises de PRP**, aunque no pasen el contraste AA (el rojo de error, 3,6; los grises
+  chicos, 2,6). El azul marino sí lo pasa. Es una excepción anotada en `PEDIDOS.md` (pedido 43): `tests/contraste.test.ts`
+  mira solo la carta y no se extiende al panel.
 - **Las tres librerías de PRP, con su versión exacta**: `framer-motion` 12.36.0, `sonner` 1.7.4 y
   `lenis` 1.1.20.
-- **Marca**: cuadrado verde con la medialuna de lucide (`Croissant`), "Manteca" en la letra de los
+- **Marca**: cuadrado azul marino (antes verde) con la medialuna de lucide (`Croissant`), "Manteca" en la letra de los
   títulos y "SISTEMA DE GESTIÓN" debajo.
 - **Zoom**: PRP bloquea el zoom en el celular; Manteca no (Santiago, 2026-10-22).
 
@@ -123,7 +129,7 @@ Y lo que cambia por ser Next y no una sola página:
 - **Colores**: los del tema (`primary`, `secondary`, `muted`, `border`…) y solo estas familias de
   la paleta: `slate`, `emerald`, `rose`, `amber`, `violet`, `blue` y `sky`. Más `#25D366` para
   WhatsApp y `#0F172A` para el bloque oscuro. Ninguno más.
-- **Qué color dice qué**: verde (`primary`) la marca, lo activo y la acción principal;
+- **Qué color dice qué**: azul marino (`primary`) la marca, lo activo y la acción principal;
   `emerald-600` lo que confirma plata o exporta; `rose` lo urgente y lo que se borra o anula;
   `amber` lo que viene y las advertencias; `slate` lo vencido, neutro o apagado; `violet` lo
   secundario (grupos, seguimiento); `blue` solo en el hover de editar.
@@ -144,7 +150,7 @@ en componentes de hasta 80 líneas, con la lógica en `.ts` y nombres en españo
   el verde, los radios, las sombras, los espacios y las mayúsculas de las etiquetas.
 - En la consola del navegador: `getComputedStyle(document.querySelector('h1')).fontFamily`
   empieza con la Outfit de next/font; el `body` mide `14px`; un botón principal tiene fondo
-  `rgb(16, 183, 127)`.
+  `rgb(30, 58, 138)` y letra blanca.
 - Una pieza que no está en las capturas se compara contra su archivo de PRP, citado en
   `piezas.md`.
 
@@ -164,7 +170,8 @@ en componentes de hasta 80 líneas, con la lógica en `.ts` y nombres en españo
 | Cargar Inter y Outfit enteras, o ponerles la clase en `<body>` | Títulos más gruesos, o la letra del sistema | `weight: ['400', '500', '600', '700']` y la clase de `next/font` en `<html>` |
 | Usar los colores de Tailwind 4 o agregar familias nuevas | Rosas, ámbares y verdes más saturados que en PRP | Las siete familias de `panel.css` |
 | Un `p` donde PRP tiene un `h3` | El número sale en Inter | La etiqueta de PRP, o `font-display` |
-| Ajustar colores "para que pase el contraste" | Ya no es PRP | Exacto: es decisión de Santiago |
+| Ajustar los rojos o grises "para que pase el contraste" | Ya no es PRP | Exacto: es decisión de Santiago |
+| `bg-primary text-white` (receta de PRP) | Si cambia la letra del tema, ese botón no la sigue | `bg-primary text-primary-foreground` |
 | Dibujar una ventana o la hoja "Más" dentro de un elemento con `backdrop-blur` o `transform` (la barra de abajo, el contenido animado) | El `fixed` queda atado a ese elemento y no tapa la pantalla | `createPortal` a `<main>` |
 | Repetir `layoutId="activeNav"` fuera de la barra lateral (en "Más") | La pestaña verde salta entre los dos | Solo en la barra lateral |
 | Envolver el `motion.tr` dentro de `AnimatePresence mode="popLayout"` | La salida de la fila no anda | El `motion.tr` va como hijo directo |

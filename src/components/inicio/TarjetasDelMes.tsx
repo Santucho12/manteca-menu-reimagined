@@ -21,9 +21,9 @@ const TONOS: Record<string, { icono: LucideIcon; borde: string; cuadro: string; 
   },
   Balance: {
     icono: TrendingUp,
-    borde: 'border-amber-100',
-    cuadro: 'bg-amber-50 text-amber-600',
-    punto: 'bg-amber-600',
+    borde: 'border-blue-100',
+    cuadro: 'bg-blue-50 text-blue-600',
+    punto: 'bg-blue-600',
   },
   'Ticket promedio': {
     icono: Ticket,
@@ -54,7 +54,7 @@ export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
           <motion.div
             key={item.etiqueta}
             variants={TARJETA}
-            className={`relative overflow-hidden rounded-xl border ${borde} bg-white p-4 md:p-6 flex flex-col shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300`}
+            className={`relative overflow-hidden rounded-xl border ${borde} bg-white p-3 md:px-5 md:py-3.5 flex flex-col shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300`}
           >
             <div className="flex justify-between items-start gap-2 relative z-10">
               <div className="space-y-1 min-w-0">
@@ -69,8 +69,8 @@ export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
                 <Icono size={18} aria-hidden="true" />
               </div>
             </div>
-            <div className="mt-auto pt-4">
-              <div className="pt-3 md:pt-4 border-t border-slate-50 flex items-center justify-between gap-2">
+            <div className="mt-auto pt-2">
+              <div className="pt-2 border-t border-slate-50 flex items-center justify-between gap-2">
                 <span className="text-[9px] font-bold text-slate-400 uppercase leading-snug">
                   {textoDeVariacion(item.variacion)}
                 </span>

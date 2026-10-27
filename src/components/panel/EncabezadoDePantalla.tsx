@@ -10,16 +10,16 @@ type Props = { titulo: string; subtitulo?: string; acciones?: ReactNode; ayuda?:
 export function EncabezadoDePantalla({ titulo, subtitulo, acciones, ayuda }: Props) {
   const textos = (
     <div>
-      <h1 className="text-2xl md:text-4xl font-display font-extrabold tracking-tight">{titulo}</h1>
+      <h1 className="text-2xl md:text-[2rem] font-display font-extrabold tracking-tight">
+        {titulo}
+      </h1>
       {subtitulo ? (
-        <p className="text-sm md:text-base text-muted-foreground font-medium mt-1 md:mt-2">
-          {subtitulo}
-        </p>
+        <p className="text-sm md:text-[15px] text-muted-foreground font-medium mt-1">{subtitulo}</p>
       ) : null}
     </div>
   );
   return (
-    <header className="mb-6 md:mb-10 flex items-start gap-3">
+    <header className="mb-5 md:mb-7 flex items-start gap-3">
       <EntradaDelTitulo className="flex-1 min-w-0">
         {acciones ? (
           <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">

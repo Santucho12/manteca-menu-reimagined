@@ -6,16 +6,16 @@ export const CAMPO =
   'w-full h-12 rounded-xl bg-secondary/30 border-none px-4 text-sm font-semibold focus:ring-2 focus:ring-primary/20 transition-all';
 
 export const BOTON_PRINCIPAL =
-  'h-12 px-6 rounded-xl bg-primary text-white font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-60';
+  'h-12 px-6 rounded-xl bg-primary text-primary-foreground font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-60';
 
 export const BOTON_PRINCIPAL_AL_PIE =
-  'flex-[2] h-12 rounded-xl bg-primary text-white font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-2';
+  'flex-[2] h-12 rounded-xl bg-primary text-primary-foreground font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-2';
 
 export const BOTON_CANCELAR =
   'flex-1 h-12 rounded-xl bg-secondary text-foreground font-bold text-[10px] uppercase tracking-widest hover:bg-secondary/80 transition-all flex items-center justify-center';
 
 export const BOTON_DE_ENCABEZADO =
-  'flex-1 lg:flex-none px-4 md:px-6 h-11 md:h-12 rounded-2xl bg-primary text-white font-bold text-sm md:uppercase md:tracking-widest whitespace-nowrap shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-2 md:gap-3';
+  'flex-1 lg:flex-none px-4 md:px-6 h-11 md:h-12 rounded-2xl bg-primary text-primary-foreground font-bold text-sm md:uppercase md:tracking-widest whitespace-nowrap shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-2 md:gap-3';
 
 export const BOTON_DE_ENCABEZADO_SECUNDARIO =
   'flex-1 lg:flex-none px-4 md:px-6 h-11 md:h-12 rounded-2xl bg-emerald-600 text-white font-bold text-sm md:uppercase md:tracking-widest whitespace-nowrap shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/30 active:scale-95 transition-all flex items-center justify-center gap-2 md:gap-3';
@@ -33,7 +33,7 @@ export const BOTON_REACTIVAR =
   'h-10 px-4 rounded-xl border border-emerald-200 text-emerald-700 font-bold text-[10px] uppercase tracking-widest hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50';
 
 export const BOTON_DE_FILA =
-  'inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-[11px] font-bold uppercase tracking-wider whitespace-nowrap bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary/90 hover:shadow-primary/30 active:scale-95 transition-all duration-200';
+  'inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-[11px] font-bold uppercase tracking-wider whitespace-nowrap bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 hover:shadow-primary/30 active:scale-95 transition-all duration-200';
 
 export const BOTON_DE_FILA_SUAVE =
   'inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 text-[11px] font-bold hover:bg-emerald-100 hover:border-emerald-300 active:scale-95 transition-all whitespace-nowrap';

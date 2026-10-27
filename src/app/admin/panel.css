@@ -34,26 +34,28 @@
   --radius-2xl: 1rem;
   --radius-3xl: 1.5rem;
 
-  /* Colores del tema (src/index.css de PRP). */
+  /* Colores del tema (src/index.css de PRP), con el dorado del logo de Manteca Bakery en lugar
+     del verde de marca (Santiago, 2026-10-25, pedido 45). Sobre el dorado, la letra es marrón
+     oscuro y no blanca: el blanco da 2,5 a 1 y no se lee. */
   --color-background: hsl(210 20% 98%);
   --color-foreground: hsl(220 40% 12%);
   --color-card: hsl(0 0% 100%);
   --color-card-foreground: hsl(220 40% 12%);
   --color-popover: hsl(0 0% 100%);
   --color-popover-foreground: hsl(220 40% 12%);
-  --color-primary: hsl(160 84% 39%);
-  --color-primary-foreground: hsl(0 0% 100%);
+  --color-primary: #bfa042;
+  --color-primary-foreground: #2b1d14;
   --color-secondary: hsl(210 20% 95%);
   --color-secondary-foreground: hsl(220 40% 12%);
   --color-muted: hsl(210 20% 95%);
   --color-muted-foreground: hsl(220 20% 45%);
-  --color-accent: hsl(160 84% 39%);
-  --color-accent-foreground: hsl(0 0% 100%);
+  --color-accent: #bfa042;
+  --color-accent-foreground: #2b1d14;
   --color-destructive: hsl(0 84% 60%);
   --color-destructive-foreground: hsl(0 0% 100%);
   --color-border: hsl(220 20% 90%);
   --color-input: hsl(220 20% 90%);
-  --color-ring: hsl(160 84% 39%);
+  --color-ring: #bfa042;
   --color-status-paid: hsl(160 60% 94%);
   --color-status-paid-text: hsl(160 84% 25%);
   --color-status-pending: hsl(38 92% 94%);
@@ -166,6 +168,8 @@
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     -webkit-tap-highlight-color: initial;
+    /* Todo el panel un 5 % más chico, también lo que va en px (Santiago, 2026-10-26). */
+    zoom: 0.95;
   }
 
   /* La letra base es de 14 px (html sigue en 16: los rem no cambian). */
@@ -245,5 +249,13 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* La letra y los íconos dorados van en un dorado más oscuro que el fondo de los botones: el del
+   logo sobre blanco da 2,5 a 1 y no se lee; este da 4,6 (pedido 45). */
+@layer utilities {
+  .text-primary {
+    color: #8a7330;
   }
 }

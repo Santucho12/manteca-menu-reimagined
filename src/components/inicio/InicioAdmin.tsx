@@ -24,8 +24,7 @@ export function InicioAdmin({ datos }: { datos: DatosDelInicio }) {
         subtitulo="Cómo viene el mes y qué hay que atender."
         ayuda={<BotonDeAyuda ayuda={AYUDAS.inicio} />}
       />
-      <EntradaDePantalla className="space-y-8">
-        <Avisos avisos={datos.avisos} />
+      <EntradaDePantalla className="space-y-4">
         <section aria-label="Este mes">
           <TarjetasDelMes items={numerosDelMes(datos.actual, datos.anterior)} />
         </section>
@@ -34,9 +33,14 @@ export function InicioAdmin({ datos }: { datos: DatosDelInicio }) {
           <div className="xl:col-span-2">
             <MesAMes datos={datos.meses} />
           </div>
+          <Avisos avisos={datos.avisos} />
+        </div>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          <div className="xl:col-span-2">
+            <SemanaContraSemana datos={datos.semana} />
+          </div>
           <MasVendidos productos={datos.masVendidos} />
         </div>
-        <SemanaContraSemana datos={datos.semana} />
       </EntradaDePantalla>
     </>
   );

@@ -2,6 +2,12 @@ import { textoDePresentaciones } from '@/lib/inicio/meses';
 import { formatearPesos } from '@/lib/plata';
 import type { ProductoDelReporte } from '@/lib/reportes/ventas';
 
+const MEDALLAS = [
+  { icono: '🥇', nombre: 'Medalla de oro' },
+  { icono: '🥈', nombre: 'Medalla de plata' },
+  { icono: '🥉', nombre: 'Medalla de bronce' },
+];
+
 /** Los 5 productos que mas plata dejaron en el mes: un panel chico de Plan Reminder Pro. */
 export function MasVendidos({ productos }: { productos: ProductoDelReporte[] }) {
   return (
@@ -21,8 +27,13 @@ export function MasVendidos({ productos }: { productos: ProductoDelReporte[] }) 
         </p>
       ) : (
         <ol aria-label="Más vendidos" className="divide-y divide-border">
-          {productos.map((producto) => (
+          {productos.map((producto, posicion) => (
             <li key={producto.clave} className="py-2 flex items-center gap-3">
+              {MEDALLAS[posicion] ? (
+                <span role="img" aria-label={MEDALLAS[posicion].nombre} className="text-lg">
+                  {MEDALLAS[posicion].icono}
+                </span>
+              ) : null}
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold truncate">{producto.nombre}</p>
                 <p className="text-[10px] text-muted-foreground truncate">
