@@ -25,17 +25,17 @@ export function BarraLateral({ nombre, enlaces }: Props) {
   const { grupos, cuenta } = partirEnlaces(enlaces);
   return (
     <aside className="fixed left-0 top-0 h-full w-[234px] border-r border-border bg-card hidden lg:flex flex-col z-50">
-      <div className="p-6 pb-4">
+      <div className="px-6 pt-7 pb-5">
         <Marca tamano="lateral" />
       </div>
       {enlaces.length > 0 ? (
         <motion.nav aria-label="Panel" className="flex-1 min-h-0 flex flex-col px-3.5 pb-2">
           {/* overflow-y-auto (extension): en una pantalla baja los grupos se desplazan solos. */}
-          <div className="flex-1 min-h-0 overflow-y-auto space-y-3 pt-1">
+          <div className="flex-1 min-h-0 overflow-y-auto space-y-5 pt-2">
             {grupos.map((grupo) => (
               <div key={grupo.titulo ?? 'secciones'} className="space-y-1">
                 {grupo.titulo ? (
-                  <p className="px-3.5 pb-1 text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">
+                  <p className="px-3.5 pb-0.5 text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">
                     {grupo.titulo}
                   </p>
                 ) : null}
@@ -46,7 +46,7 @@ export function BarraLateral({ nombre, enlaces }: Props) {
             ))}
           </div>
           {cuenta ? (
-            <div className="pt-2 mt-2 border-t border-border">
+            <div className="pt-1.5 mt-1.5 border-t border-border">
               <Enlace enlace={cuenta} activo={activo} />
             </div>
           ) : null}

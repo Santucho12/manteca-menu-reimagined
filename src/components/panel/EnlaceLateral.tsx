@@ -35,7 +35,7 @@ export function EnlaceLateral({
       aria-current={activo ? 'page' : undefined}
       className={cn(
         'relative group w-full flex items-center font-semibold transition-all duration-300 rounded-2xl',
-        compacto ? 'gap-2.5 px-3.5 py-2.5 text-[13px]' : 'gap-3 px-4 py-3.5 text-sm',
+        compacto ? 'gap-2.5 px-3.5 py-2.5 text-[13px] rounded-xl' : 'gap-3 px-4 py-3.5 text-sm',
         activo
           ? 'text-primary shadow-xs ring-1 ring-primary/20'
           : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50',

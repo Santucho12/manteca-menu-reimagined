@@ -8,12 +8,12 @@ export function Avisos({ avisos }: { avisos: Aviso[] }) {
   return (
     <section
       aria-labelledby="avisos"
-      className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-amber-900 space-y-3"
+      className="h-full rounded-2xl border border-rose-200 bg-rose-50 p-4 text-rose-900 space-y-2"
     >
       <h2 id="avisos" className="flex items-center gap-2 text-sm font-bold">
-        <AlertTriangle size={18} aria-hidden="true" />
+        <AlertTriangle size={18} aria-hidden="true" className="text-rose-600" />
         Para atender
-        <span className="rounded-full bg-amber-600 px-2 py-0.5 text-xs font-bold text-white">
+        <span className="rounded-full bg-rose-600 px-2 py-0.5 text-xs font-bold text-white">
           {avisos.length}
         </span>
       </h2>
@@ -22,7 +22,7 @@ export function Avisos({ avisos }: { avisos: Aviso[] }) {
           <li key={aviso.texto}>
             <Link
               href={aviso.enlace}
-              className="flex items-center justify-between gap-3 rounded-xl bg-white/70 px-4 py-3 text-sm font-semibold hover:bg-white transition-colors"
+              className="flex items-center justify-between gap-3 rounded-xl bg-white/70 px-4 py-2.5 text-sm font-semibold hover:bg-white transition-colors"
             >
               {aviso.texto}
               <ChevronRight size={16} aria-hidden="true" className="shrink-0" />

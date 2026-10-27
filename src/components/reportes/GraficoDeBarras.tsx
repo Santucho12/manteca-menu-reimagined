@@ -24,7 +24,7 @@ export function GraficoDeBarras({ datos }: { datos: { nombre: string; montoCenta
           <Bar
             name="Monto"
             dataKey="montoCentavos"
-            fill="#1e3a8a"
+            fill="#bfa042"
             radius={[0, 6, 6, 0]}
             isAnimationActive={false}
           />
