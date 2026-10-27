@@ -1,5 +1,7 @@
+import { EnlaceASeccion } from '@/components/panel/EnlaceASeccion';
 import { textoDePresentaciones } from '@/lib/inicio/meses';
 import { formatearPesos } from '@/lib/plata';
+import { EncabezadoDeTarjeta } from './EncabezadoDeTarjeta';
 import type { ProductoDelReporte } from '@/lib/reportes/ventas';
 
 const MEDALLAS = [
@@ -13,38 +15,56 @@ export function MasVendidos({ productos }: { productos: ProductoDelReporte[] }) 
   return (
     <section
       aria-labelledby="mas-vendidos"
-      className="rounded-2xl border border-border bg-card p-5 md:p-6"
+      className="h-full flex flex-col rounded-2xl border border-border bg-card p-6 md:p-8"
     >
-      <h2
+      <EncabezadoDeTarjeta
+        titulo="Más vendidos"
+        descripcion="Por lo que dejaron en el mes, no por unidades."
         id="mas-vendidos"
-        className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4 font-sans"
       >
-        Más vendidos
-      </h2>
+        <EnlaceASeccion clave="costos" seccion="Costos" href="/admin/costos" texto="Ver costos" />
+      </EncabezadoDeTarjeta>
       {productos.length === 0 ? (
         <p className="text-sm text-muted-foreground leading-relaxed">
           Todavía no hay ventas este mes.
         </p>
       ) : (
-        <ol aria-label="Más vendidos" className="divide-y divide-border">
+        <ol aria-label="Más vendidos" className="flex-1 flex flex-col divide-y divide-border">
           {productos.map((producto, posicion) => (
-            <li key={producto.clave} className="py-2 flex items-center gap-3">
-              {MEDALLAS[posicion] ? (
-                <span role="img" aria-label={MEDALLAS[posicion].nombre} className="text-lg">
-                  {MEDALLAS[posicion].icono}
-                </span>
-              ) : null}
+            <li key={producto.clave} className="flex-1 py-3 flex items-center gap-3">
+              <Puesto posicion={posicion} />
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold truncate">{producto.nombre}</p>
-                <p className="text-[10px] text-muted-foreground truncate">
+                <p className="text-sm font-semibold truncate">{producto.nombre}</p>
+                <p className="text-[11px] text-muted-foreground truncate">
                   {textoDePresentaciones(producto)}
                 </p>
               </div>
-              <span className="text-xs font-bold">{formatearPesos(producto.montoCentavos)}</span>
+              <span className="shrink-0 text-sm font-bold tabular-nums">
+                {formatearPesos(producto.montoCentavos)}
+              </span>
             </li>
           ))}
         </ol>
       )}
     </section>
+  );
+}
+
+/** Todos los puestos ocupan lo mismo, para que los nombres queden alineados. */
+function Puesto({ posicion }: { posicion: number }) {
+  const medalla = MEDALLAS[posicion];
+  if (medalla) {
+    return (
+      <span role="img" aria-label={medalla.nombre} className="w-8 shrink-0 text-center text-xl">
+        {medalla.icono}
+      </span>
+    );
+  }
+  return (
+    <span className="w-8 shrink-0 flex justify-center">
+      <span className="h-6 w-6 rounded-full bg-secondary text-[11px] font-bold text-muted-foreground flex items-center justify-center">
+        {posicion + 1}
+      </span>
+    </span>
   );
 }

@@ -13,7 +13,7 @@ export function BotonDeAcceso({ enviando, children }: { enviando: boolean; child
     <button
       type="submit"
       disabled={enviando}
-      className="w-full h-14 rounded-2xl bg-primary text-primary-foreground font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+      className="w-full h-14 rounded-2xl bg-primary text-primary-foreground font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-primary/20 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-primary/30 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50"
     >
       {enviando ? <Loader2 size={16} className="animate-spin" aria-hidden /> : null}
       {children}

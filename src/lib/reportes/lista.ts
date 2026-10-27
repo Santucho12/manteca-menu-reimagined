@@ -32,7 +32,7 @@ export const REPORTES = [
   },
   {
     ruta: '/admin/reportes/resultado',
-    titulo: 'Resultado',
+    titulo: 'Balance',
     pregunta: 'Ventas menos gastos, con los gastos abiertos por categoría.',
   },
 ] as const;

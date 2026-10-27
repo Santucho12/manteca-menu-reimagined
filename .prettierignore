@@ -1,6 +1,7 @@
 # Generado
 .next/
 .next-e2e/
+.next-local/
 out/
 node_modules/
 package-lock.json

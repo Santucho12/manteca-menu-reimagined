@@ -49,32 +49,36 @@ export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
       className="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4"
     >
       {items.map((item) => {
-        const { icono: Icono, borde, cuadro, punto } = TONOS[item.etiqueta]!;
+        const { icono: Icono } = TONOS[item.etiqueta]!;
         return (
           <motion.div
             key={item.etiqueta}
             variants={TARJETA}
-            className={`relative overflow-hidden rounded-xl border ${borde} bg-white p-3 md:px-5 md:py-3.5 flex flex-col shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300`}
+            className="relative overflow-hidden rounded-2xl border border-border bg-card p-3 md:px-6 md:pt-7 md:pb-6 flex flex-col shadow-[0_2px_10px_-4px_rgba(43,29,20,0.08)] hover:shadow-xl transition-all duration-300"
           >
+            <span
+              aria-hidden="true"
+              className="absolute top-0 left-6 right-6 h-1 rounded-b-full bg-primary"
+            />
             <div className="flex justify-between items-start gap-2 relative z-10">
               <div className="space-y-1 min-w-0">
-                <dt className="text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                <dt className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">
                   {item.etiqueta}
                 </dt>
-                <dd className="text-sm md:text-lg xl:text-base 2xl:text-xl font-bold tracking-tight text-slate-900 break-all">
+                <dd className="text-sm md:text-lg xl:text-base 2xl:text-xl font-bold tracking-tight text-foreground break-all">
                   {item.valor}
                 </dd>
               </div>
-              <div className={`shrink-0 rounded-lg p-1.5 md:p-2 border ${borde} ${cuadro}`}>
+              <div className="shrink-0 rounded-xl p-1.5 md:p-2 bg-secondary text-foreground">
                 <Icono size={18} aria-hidden="true" />
               </div>
             </div>
-            <div className="mt-auto pt-2">
-              <div className="pt-2 border-t border-slate-50 flex items-center justify-between gap-2">
-                <span className="text-[9px] font-bold text-slate-400 uppercase leading-snug">
+            <div className="mt-auto pt-6">
+              <div className="pt-4 border-t border-border/60 flex items-center justify-between gap-2">
+                <span className="text-xs font-bold text-muted-foreground uppercase leading-snug">
                   {textoDeVariacion(item.variacion)}
                 </span>
-                <div className={`h-1.5 w-1.5 shrink-0 rounded-full ${punto}`} />
+                <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               </div>
             </div>
           </motion.div>

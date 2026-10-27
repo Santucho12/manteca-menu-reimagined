@@ -5,7 +5,7 @@ import { Info, X } from 'lucide-react';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { Ayuda } from '@/lib/panel/ayudas';
-import { useCerrarConEscape, useDestinoEnMain } from '@/lib/panel/ventanas';
+import { useBloquearElFondo, useCerrarConEscape, useDestinoEnMain } from '@/lib/panel/ventanas';
 import { CERRAR_VENTANA } from './estilos';
 
 /** El boton ⓘ del final del encabezado (ModuleHelp.tsx de Plan Reminder Pro). */
@@ -36,6 +36,7 @@ type PropsDeLaVentana = { ayuda: Ayuda; abierta: boolean; cerrar: () => void };
 /** Se cierra con Escape, con la X, con "Entendido" y tocando afuera. */
 function VentanaDeAyuda({ ayuda, abierta, cerrar }: PropsDeLaVentana) {
   useCerrarConEscape(abierta, cerrar);
+  useBloquearElFondo(abierta);
   return (
     <AnimatePresence>
       {abierta ? (
@@ -74,7 +75,7 @@ function VentanaDeAyuda({ ayuda, abierta, cerrar }: PropsDeLaVentana) {
               <button
                 type="button"
                 onClick={cerrar}
-                className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold text-[10px] uppercase tracking-widest"
+                className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-primary/30 active:translate-y-0 active:scale-95 transition-all duration-200"
               >
                 Entendido
               </button>

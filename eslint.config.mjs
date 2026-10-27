@@ -41,6 +41,7 @@ export default defineConfig([
   globalIgnores([
     '.next/**',
     '.next-e2e/**',
+    '.next-local/**',
     'out/**',
     '.vercel/**',
     '.superpowers/**',

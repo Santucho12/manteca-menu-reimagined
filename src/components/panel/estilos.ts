@@ -6,46 +6,46 @@ export const CAMPO =
   'w-full h-12 rounded-xl bg-secondary/30 border-none px-4 text-sm font-semibold focus:ring-2 focus:ring-primary/20 transition-all';
 
 export const BOTON_PRINCIPAL =
-  'h-12 px-6 rounded-xl bg-primary text-primary-foreground font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-60';
+  'h-12 px-6 rounded-xl bg-primary text-primary-foreground font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-primary/30 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center gap-2 disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-lg';
 
 export const BOTON_PRINCIPAL_AL_PIE =
-  'flex-[2] h-12 rounded-xl bg-primary text-primary-foreground font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-2';
+  'flex-[2] h-12 rounded-xl bg-primary text-primary-foreground font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-primary/30 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2';
 
 export const BOTON_CANCELAR =
-  'flex-1 h-12 rounded-xl bg-secondary text-foreground font-bold text-[10px] uppercase tracking-widest hover:bg-secondary/80 transition-all flex items-center justify-center';
+  'flex-1 h-12 rounded-xl bg-secondary text-foreground font-bold text-[10px] uppercase tracking-widest border border-transparent hover:border-border hover:bg-white hover:shadow-md active:scale-95 transition-all duration-200 flex items-center justify-center';
 
 export const BOTON_DE_ENCABEZADO =
-  'flex-1 lg:flex-none px-4 md:px-6 h-11 md:h-12 rounded-2xl bg-primary text-primary-foreground font-bold text-sm md:uppercase md:tracking-widest whitespace-nowrap shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-2 md:gap-3';
+  'flex-1 lg:flex-none px-4 md:px-6 h-11 md:h-12 rounded-2xl bg-primary text-primary-foreground font-bold text-sm md:uppercase md:tracking-widest whitespace-nowrap shadow-lg shadow-primary/20 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-primary/30 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 md:gap-3';
 
 export const BOTON_DE_ENCABEZADO_SECUNDARIO =
-  'flex-1 lg:flex-none px-4 md:px-6 h-11 md:h-12 rounded-2xl bg-emerald-600 text-white font-bold text-sm md:uppercase md:tracking-widest whitespace-nowrap shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/30 active:scale-95 transition-all flex items-center justify-center gap-2 md:gap-3';
+  'flex-1 lg:flex-none px-4 md:px-6 h-11 md:h-12 rounded-2xl bg-emerald-600 text-white font-bold text-sm md:uppercase md:tracking-widest whitespace-nowrap shadow-lg shadow-emerald-600/20 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-emerald-600/30 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 md:gap-3';
 
 export const BOTON_ESMERALDA =
-  'h-12 px-6 rounded-xl bg-emerald-600 text-white font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-600/20 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-60';
+  'h-12 px-6 rounded-xl bg-emerald-600 text-white font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-600/20 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-emerald-600/30 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60';
 
 export const BOTON_SUAVE =
-  'h-12 px-6 rounded-xl bg-secondary text-foreground font-bold text-[10px] uppercase tracking-widest hover:bg-secondary/80 transition-all flex items-center justify-center gap-2 disabled:opacity-60';
+  'h-12 px-6 rounded-xl bg-secondary text-foreground font-bold text-[10px] uppercase tracking-widest border border-transparent hover:border-border hover:bg-white hover:shadow-md active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60';
 
 export const BOTON_PELIGRO =
-  'h-10 px-4 rounded-xl border border-rose-200 text-rose-700 font-bold text-[10px] uppercase tracking-widest hover:bg-rose-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50';
+  'h-10 px-4 rounded-xl border border-rose-200 text-rose-700 font-bold text-[10px] uppercase tracking-widest hover:bg-rose-50 hover:border-rose-300 hover:shadow-md hover:shadow-rose-200/60 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50';
 
 export const BOTON_REACTIVAR =
-  'h-10 px-4 rounded-xl border border-emerald-200 text-emerald-700 font-bold text-[10px] uppercase tracking-widest hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50';
+  'h-10 px-4 rounded-xl border border-emerald-200 text-emerald-700 font-bold text-[10px] uppercase tracking-widest hover:bg-emerald-50 hover:border-emerald-300 hover:shadow-md hover:shadow-emerald-200/60 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50';
 
 export const BOTON_DE_FILA =
-  'inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-[11px] font-bold uppercase tracking-wider whitespace-nowrap bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 hover:shadow-primary/30 active:scale-95 transition-all duration-200';
+  'inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-[11px] font-bold uppercase tracking-wider whitespace-nowrap bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-primary/30 active:translate-y-0 active:scale-95 transition-all duration-200';
 
 export const BOTON_DE_FILA_SUAVE =
   'inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 text-[11px] font-bold hover:bg-emerald-100 hover:border-emerald-300 active:scale-95 transition-all whitespace-nowrap';
 
 export const ICONO_EDITAR =
-  'p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200';
+  'p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 hover:scale-110 active:scale-95 transition-all duration-200';
 
 export const ICONO_BORRAR =
-  'p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all duration-200';
+  'p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:scale-110 active:scale-95 transition-all duration-200';
 
 export const ATAJO =
-  'inline-flex items-center gap-1 h-9 px-3 rounded-xl text-xs font-bold bg-secondary/60 text-slate-600 hover:bg-primary/10 hover:text-primary transition-colors whitespace-nowrap';
+  'inline-flex items-center gap-1 h-9 px-3 rounded-xl text-xs font-bold bg-secondary/60 text-slate-600 hover:bg-primary/10 hover:text-primary hover:-translate-y-0.5 hover:shadow-sm active:scale-95 transition-all duration-200 whitespace-nowrap';
 
 export const TARJETA_DE_SECCION =
   'bg-card rounded-[2rem] border border-border/60 shadow-xl p-5 md:p-8 space-y-6';
@@ -78,8 +78,18 @@ export const BARRA_DE_FILTROS =
   'flex flex-col xl:flex-row xl:flex-wrap gap-3 md:gap-4 mb-6 md:mb-8 bg-card border border-border p-3 md:p-5 rounded-2xl md:rounded-3xl shadow-xs';
 
 export const BOTON_DE_ENCABEZADO_NEUTRO =
-  'flex-1 lg:flex-none px-4 md:px-6 h-11 md:h-12 rounded-2xl bg-card border border-border text-slate-900 font-bold text-sm md:uppercase md:tracking-widest whitespace-nowrap shadow-md hover:bg-slate-50 active:scale-95 transition-all flex items-center justify-center gap-2 md:gap-3';
+  'flex-1 lg:flex-none px-4 md:px-6 h-11 md:h-12 rounded-2xl bg-card border border-border text-slate-900 font-bold text-sm md:uppercase md:tracking-widest whitespace-nowrap shadow-md hover:bg-white hover:border-primary/40 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 md:gap-3';
 
 /** Un icono de accion de una fila que no edita ni borra (subir, bajar, mostrar). */
 export const ICONO_DE_ACCION =
   'p-1.5 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/10 transition-all duration-200 disabled:opacity-40';
+
+/** El botón de las tarjetas de Inicio (Ver reportes, Ver gastos, Ver todo el año): una sola pieza. */
+export const BOTON_DE_TARJETA =
+  'group inline-flex h-10 shrink-0 items-center gap-2.5 whitespace-nowrap rounded-full border border-border bg-white pl-4 pr-1.5 text-xs font-bold text-foreground shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#d8cdb6] hover:shadow-xl active:translate-y-0';
+
+export const CIRCULO_DE_BOTON =
+  'flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-muted-foreground transition-all duration-200 group-hover:scale-110 group-hover:bg-[#e6dcc8] group-hover:text-foreground';
+
+export const FLECHA_DE_BOTON =
+  'transition-transform duration-200 group-hover:translate-x-px group-hover:-translate-y-px';

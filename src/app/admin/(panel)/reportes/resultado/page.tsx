@@ -16,7 +16,7 @@ import {
   type ResultadoDelPeriodo,
 } from '@/lib/reportes/resultado';
 
-export const metadata: Metadata = { title: 'Resultado' };
+export const metadata: Metadata = { title: 'Balance' };
 const RUTA = '/admin/reportes/resultado';
 
 type Props = { actual: ResultadoDelPeriodo; anterior: ResultadoDelPeriodo | null };
@@ -30,7 +30,7 @@ function TotalesDelResultado({ actual, anterior }: Props) {
         { etiqueta: 'Ventas', valor: formatearPesos(actual.ventasCentavos), variacion: c.ventas },
         { etiqueta: 'Gastos', valor: formatearPesos(actual.gastosCentavos), variacion: c.gastos },
         {
-          etiqueta: 'Resultado',
+          etiqueta: 'Balance',
           valor: resultado === null ? 'Sin calcular' : formatearPesos(resultado),
           variacion: c.resultado,
         },
@@ -68,14 +68,14 @@ export default async function ReporteDeResultado({
   ]);
   const otro = anterior.vacio ? null : anterior.resultado;
   return (
-    <PantallaDeReporte titulo="Resultado" ruta={RUTA} periodos={periodos} hoy={hoy}>
+    <PantallaDeReporte titulo="Balance" ruta={RUTA} periodos={periodos} hoy={hoy}>
       {actual.vacio ? (
         <SinDatos>No hay ventas ni gastos en este período.</SinDatos>
       ) : (
         <>
           <TotalesDelResultado actual={actual.resultado} anterior={otro} />
           {actual.resultado.resultadoCentavos === null ? (
-            <SinDatos>Sin gastos cargados: el resultado no se calcula.</SinDatos>
+            <SinDatos>Sin gastos cargados: el balance no se calcula.</SinDatos>
           ) : null}
           <GraficoPorMes datos={resultadoPorMes(actual.ventas, actual.gastos)} />
           {actual.gastos.length ? (

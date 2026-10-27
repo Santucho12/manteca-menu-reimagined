@@ -18,7 +18,7 @@ test.describe('con la sesion del admin', () => {
     await expect(page.getByText('Lo que se pagó, por categoría y proveedor.')).toBeVisible();
   });
 
-  test('el panel usa el dorado de Manteca, con el fondo de antes', async ({ page }) => {
+  test('el panel usa el dorado de Manteca sobre crema', async ({ page }) => {
     await page.goto('/admin');
     const tema = await page.evaluate(() => {
       const raiz = getComputedStyle(document.documentElement);
@@ -31,11 +31,37 @@ test.describe('con la sesion del admin', () => {
     expect(tema).toEqual({
       principal: '#bfa042',
       letraSobrePrincipal: '#2b1d14',
-      fondo: '#f9fafb',
+      fondo: '#f4efe5',
     });
-    // La letra dorada va más oscura que el fondo dorado, para leerse sobre blanco.
+    // La sección activa va en marrón oscuro, con la rayita dorada al costado.
     const inicio = panel(page).getByRole('link', { name: /^Inicio/ });
-    await expect(inicio).toHaveCSS('color', 'rgb(138, 115, 48)');
+    await expect(inicio).toHaveCSS('color', 'rgb(43, 29, 20)');
+  });
+
+  test('Proveedores, Costos, Reportes, Auditoría y Mi cuenta avisan Próximamente', async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name !== 'computadora', 'solo en la computadora');
+    await page.goto('/admin');
+    for (const nombre of [/^Proveedores/, /^Costos/, /^Reportes/, /^Auditoría/, /^Mi cuenta/]) {
+      await panel(page).getByRole('link', { name: nombre }).click();
+      await expect(page.getByText('Próximamente').first()).toBeVisible();
+      // El cartel es blanco, con sombra, grande y en el medio de la pantalla.
+      const cartel = page.getByRole('status').filter({ hasText: 'Próximamente' });
+      await expect(cartel).toBeVisible();
+      await expect(cartel).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+      await expect(cartel).not.toHaveCSS('box-shadow', 'none');
+      const caja = (await cartel.boundingBox())!;
+      const ventana = page.viewportSize()!;
+      expect(caja.width).toBeGreaterThan(400);
+      expect(Math.abs(caja.x + caja.width / 2 - ventana.width / 2)).toBeLessThan(10);
+      expect(Math.abs(caja.y + caja.height / 2 - ventana.height / 2)).toBeLessThan(10);
+      await expect(page).toHaveURL(/\/admin$/);
+    }
+    await panel(page)
+      .getByRole('link', { name: /^Ventas/ })
+      .click();
+    await expect(page).toHaveURL(/\/admin\/ventas/);
   });
 
   test('en la computadora, Usuarios dice cuantos esperan un rol', async ({ page }, info) => {

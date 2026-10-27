@@ -38,6 +38,15 @@ describe('avisosDeInicio', () => {
     ]);
   });
 
+  it('avisa los pagos que vencen esta semana, al final', () => {
+    const avisos = avisosDeInicio({ ...NADA, vencenEstaSemana: 2 });
+    expect(avisos).toEqual([
+      { texto: 'Esta semana vencen 2 pagos.', enlace: '/admin/gastos/recurrentes' },
+    ]);
+    const uno = avisosDeInicio({ ...NADA, vencenEstaSemana: 1 });
+    expect(uno.map((a) => a.texto)).toEqual(['Esta semana vence 1 pago.']);
+  });
+
   it('en singular cuando es uno', () => {
     const avisos = avisosDeInicio({
       ...NADA,

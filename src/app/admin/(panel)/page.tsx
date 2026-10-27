@@ -11,7 +11,8 @@ export const metadata: Metadata = { title: 'Inicio' };
 export default async function PaginaInicio() {
   const { cliente, perfil, estado } = await exigirPagina('panel');
   if (estado === 'admin') {
-    return <InicioAdmin datos={await datosDelInicio(cliente, diaEnArgentina(new Date()))} />;
+    const hoy = diaEnArgentina(new Date());
+    return <InicioAdmin datos={await datosDelInicio(cliente, hoy)} hoy={hoy} />;
   }
   if (estado === 'caja') return <InicioCaja nombre={perfil.nombre} />;
   return <EsperaDeAcceso />;

@@ -19,7 +19,7 @@ export function EncabezadoDePantalla({ titulo, subtitulo, acciones, ayuda }: Pro
     </div>
   );
   return (
-    <header className="mb-5 md:mb-7 flex items-start gap-3">
+    <header className="mb-7 md:mb-11 flex items-start gap-3">
       <EntradaDelTitulo className="flex-1 min-w-0">
         {acciones ? (
           <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">

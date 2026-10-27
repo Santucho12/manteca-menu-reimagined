@@ -8,7 +8,7 @@ import {
   sembrarCierreConSalidas,
 } from '../cierres-de-prueba';
 import { clienteSecretoDePruebas } from '../clientes';
-import { borrarGastos, sembrarGasto } from '../gastos-de-prueba';
+import { borrarGastos, sembrarGasto, sembrarRecurrente } from '../gastos-de-prueba';
 import { sembrarVentaConRenglones } from '../reportes-de-prueba';
 import { clienteComo } from '../sesiones';
 import { borrarVentas, productoParaVender } from '../ventas-de-prueba';
@@ -85,6 +85,44 @@ describe('datos del inicio', () => {
       expect(datos.meses.at(-1)?.mes).toBe('2017-06');
     } finally {
       await borrarVentas([venta], { categoriasDelMenu: [producto.categoriaId] });
+    }
+  });
+
+  it('trae las ventas de ayer y su cierre con diferencia', async () => {
+    const fecha = diaLibre();
+    const producto = await productoParaVender();
+    const venta = await sembrarVentaConRenglones({
+      fecha,
+      renglones: [{ producto, cantidad: 1, precioCentavos: 80000 }],
+    });
+    const cierre = await sembrarCierre({ fecha });
+    cierres.push(cierre.id);
+    await marcar(cierre.id, { estado: 'con_diferencia' });
+    try {
+      const { ayer } = await datosDelInicio(await clienteComo('admin'), diaSiguiente(fecha));
+      expect(ayer).toMatchObject({ dia: fecha, ventas: 1, montoCentavos: 80000 });
+      expect(ayer.cierre.estado).toBe('con_diferencia');
+    } finally {
+      await borrarVentas([venta], { categoriasDelMenu: [producto.categoriaId] });
+    }
+  });
+
+  it('si ayer no hubo ventas, no avisa que falta el cierre', async () => {
+    const fecha = diaLibre();
+    cierres.push((await sembrarCierre({ fecha })).id);
+    const datos = await datosDelInicio(await clienteComo('admin'), diaSiguiente(fecha, 2));
+    expect(datos.ayer.ventas).toBe(0);
+    expect(datos.avisos.some((a) => a.texto.startsWith('Ayer no se cargó'))).toBe(false);
+  });
+
+  it('trae los recurrentes que vencen en los proximos 7 dias', async () => {
+    const recurrente = await sembrarRecurrente({ primerVencimiento: '2099-03-12' });
+    try {
+      const datos = await datosDelInicio(await clienteComo('admin'), '2099-03-10');
+      const item = datos.vencimientos.items.find((v) => v.id === recurrente.id);
+      expect(item).toMatchObject({ fecha: '2099-03-12', montoCentavos: 50000000 });
+    } finally {
+      await borrarGastos({ recurrentes: [recurrente.id] });
     }
   });
 });

@@ -23,6 +23,7 @@ export type EnlaceDelPanel = {
     | 'menu'
     | 'ventas'
     | 'proveedores'
+    | 'costos'
     | 'gastos'
     | 'caja'
     | 'reportes'
@@ -61,6 +62,8 @@ const ENLACES: Record<'caja' | 'admin', EnlaceDelPanel[]> = {
     { clave: 'caja', href: '/admin/caja/control', texto: 'Caja', grupo: 'Día a día' },
     { clave: 'gastos', href: '/admin/gastos', texto: 'Gastos', grupo: 'Plata' },
     { clave: 'proveedores', href: '/admin/proveedores', texto: 'Proveedores', grupo: 'Plata' },
+    // Segunda fase: por ahora la navegación solo avisa "Próximamente" (src/lib/acceso/proximamente.ts).
+    { clave: 'costos', href: '/admin/costos', texto: 'Costos', grupo: 'Plata' },
     { clave: 'reportes', href: '/admin/reportes', texto: 'Reportes', grupo: 'Plata' },
     { clave: 'menu', href: '/admin/menu', texto: 'Menú', grupo: 'Ajustes' },
     { clave: 'usuarios', href: '/admin/usuarios', texto: 'Usuarios', grupo: 'Ajustes' },

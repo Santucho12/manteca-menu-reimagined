@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { EnlaceDelMarco } from '@/lib/acceso/marco';
 import { activoEnMas, insigniaDeMas } from '@/lib/acceso/navegacion';
-import { useCerrarConEscape, useDestinoEnMain } from '@/lib/panel/ventanas';
+import { useBloquearElFondo, useCerrarConEscape, useDestinoEnMain } from '@/lib/panel/ventanas';
 import { cn } from '@/lib/utils';
 import { EnlaceLateral } from './EnlaceLateral';
 import { CERRAR_VENTANA, LUGAR_DE_ABAJO } from './estilos';
@@ -51,6 +51,7 @@ type PropsDeLaHoja = Props & { abierta: boolean; cerrar: () => void };
 
 function HojaDeMas({ enlaces, activo, abierta, cerrar }: PropsDeLaHoja) {
   useCerrarConEscape(abierta, cerrar);
+  useBloquearElFondo(abierta);
   return (
     <AnimatePresence>
       {abierta ? (

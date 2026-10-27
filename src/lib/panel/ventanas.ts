@@ -1,4 +1,14 @@
 import { useEffect, useSyncExternalStore } from 'react';
+import { bloquearScrollDeLaPagina } from './scrollSuave';
+
+/** Mientras la ventana está abierta, el scroll de la página queda quieto. */
+export function useBloquearElFondo(abierta: boolean): void {
+  useEffect(() => {
+    if (!abierta) return;
+    bloquearScrollDeLaPagina(true);
+    return () => bloquearScrollDeLaPagina(false);
+  }, [abierta]);
+}
 
 /** Escape cierra la ventana abierta, como en Plan Reminder Pro. */
 export function useCerrarConEscape(abierta: boolean, cerrar: () => void): void {

@@ -1,5 +1,6 @@
 import {
   BookOpen,
+  Calculator,
   ChartColumn,
   History,
   LayoutDashboard,
@@ -20,6 +21,7 @@ export const ICONOS_DEL_PANEL: Record<EnlaceDelPanel['clave'], LucideIcon> = {
   menu: BookOpen,
   ventas: ShoppingBag,
   proveedores: Truck,
+  costos: Calculator,
   gastos: Receipt,
   caja: Wallet,
   reportes: ChartColumn,
