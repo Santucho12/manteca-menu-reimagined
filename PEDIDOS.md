@@ -150,6 +150,23 @@ Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, 
 
 **Excepción (Santiago, 2026-10-21):** los colores del panel son los exactos de Plan Reminder Pro aunque no pasen el contraste AA que pide el pedido 21 (letra blanca sobre el verde, 2,6 a 1; el rojo de error, 3,6; el anillo de foco, 2,5; los grises chicos, 2,6). Las pruebas de contraste (`tests/contraste.test.ts`) siguen mirando solo la carta pública; no se extienden al panel. El panel no bloquea el zoom en el celular, a diferencia de Plan Reminder Pro (Santiago, 2026-10-22).
 
+**Excepción (Santiago, 2026-10-27):** los pedidos 47 a 51 entraron a `main` sin `npm run verificar` ni `npm run e2e` completos; solo lint, tipos y los 540 tests puros en verde. Del 50 entraron los cálculos y la consulta, pero no la pantalla: otra sesión sacó `Ayer.tsx`, `Vencimientos.tsx` y sus pruebas de Playwright. Falta el cierre completo de los cinco.
+
+### 51. `npm run local`: la aplicación armada entera, sin compilar al navegar
+En local, `next dev` compila cada sección la primera vez que se entra y se siente lento. `npm run local` arma todo con `next build` en `.next-local` y lo sirve con `next start` en el 3210, contra la base de pruebas: navega como en producción, pero no recarga solo (Santiago, 2026-10-27).
+
+### 50. Inicio: ayer en una línea y vencimientos de la semana
+Arriba de todo, una franja con lo de ayer: ventas, tickets, ticket promedio y el cierre (cargado, con diferencia de $X, que lleva al control de ese día, o sin cargar). Si ayer no hubo ventas dice "Ayer no hubo ventas" y no sale el aviso de cierre faltante. Una tarjeta con los gastos recurrentes activos que vencen en los próximos 7 días, contando hoy, con su total; si no hay, no aparece (Santiago, 2026-10-27). Se hace en la rama `feat/panel-crema`, junto con el 47 y el 48, por decisión de Santiago: tocan los mismos archivos de Inicio.
+
+### 49. Inicio: el mes en curso marcado y "Más vendidos" por plata
+En el gráfico mes a mes, el mes de hoy se marca "en curso" y sus barras van más claras: va del 1 a hoy y no se tiene que leer como una caída. "Más vendidos" aclara en la tarjeta que se ordena por lo que dejó cada producto, no por unidades (Santiago, 2026-10-27).
+
+### 48. Proveedores, Reportes, Auditoría y Mi cuenta: "Próximamente"
+En la barra lateral y en el menú "Más" del celular, esas cuatro secciones no dejan entrar: al tocarlas aparece un aviso "Próximamente" y la pantalla no cambia (Santiago, 2026-10-27). Solo bloquea el toque en la navegación; entrar escribiendo la dirección sigue funcionando.
+
+### 47. Inicio: gastos por categoría en torta, y variación con color
+En Inicio, un gráfico de torta con los gastos del mes por categoría (las cinco mayores, el resto en "Otras"), a la par de "Esta semana vs la anterior". Y la variación de cada tarjeta de números va en verde si mejora y en rojo si empeora, con una flecha (en Gastos, bajar es mejorar) (Santiago, 2026-10-27).
+
 ### 46. Actualizar Next.js por seguridad
 Next.js 16.4.0 tiene una vulnerabilidad publicada y `next dev` se frenaba al arrancar para avisarlo. Pasa a 16.4.3, con `eslint-config-next` igual, fijadas exactas (Santiago, 2026-10-25, en la rama del pedido 45).
 
@@ -183,6 +200,11 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 51 | `npm run local`: la aplicación armada entera | Probado el 2026-10-27 en el 3212 (el 3210 estaba con `npm run dev`): arma y sirve, `/` en 1,1 s y el ingreso en 0,18 s. Falta que Santiago lo use con sesión y confirme que las secciones van rápido; entra al repo con el commit de la rama |
+| 50 | Inicio: ayer en una línea y vencimientos de la semana | Hecho con TDD: tests puros (`ayer`, `vencimientos`), de base (`inicio.base.test.ts`) y sus dos pruebas de Playwright en computadora, en verde; lint de lo tocado y tipos limpios (2026-10-27). Falta el cierre completo (`npm run verificar` y `npm run e2e` en los dos tamaños), junto con el 47 y el 48 |
+| 49 | Inicio: el mes en curso marcado y "Más vendidos" por plata | Todo |
+| 48 | Proveedores, Reportes, Auditoría y Mi cuenta: "Próximamente" | Todo |
+| 47 | Inicio: gastos por categoría en torta, y variación con color | Hechos y probados los dos cálculos (`gastosEnTorta` y `estadoDeVariacion`). Falta la parte de pantalla de los dos, con sus pruebas de Playwright, y el cierre completo |
 | 46 | Actualizar Next.js por seguridad | Hecho: tipos, lint y build en verde y `next dev` arranca sin el aviso. Falta el cierre completo, junto con el 45 |
 | 45 | El panel con la paleta de Manteca | Hechos el dorado (se deshizo el azul marino), los colores de Inicio (avisos en rosa, gráficos y Balance), las medallas, el nuevo orden de Inicio, el logo de Manteca, la barra lateral y los títulos más compactos y el panel al 95 %. **Excepción (Santiago, 2026-10-26):** entró a `main` sin `npm run verificar` ni `npm run e2e`; solo lint, tipos y tests puros en verde. Las pruebas nuevas de `e2e/sidebar.spec.ts` y `e2e/inicio-admin.spec.ts` se vieron fallar antes del cambio, pero no pasar después. `CLAUDE.md` y `estetica-panel` todavía dicen "azul marino". Falta el cierre completo |
 | 44 | Barra lateral en grupos y más chica | Hecha y probada con lint, tipos, tests de `acceso` y `sidebar` en computadora (2026-10-23). Falta el cierre completo (`npm run verificar` y `npm run e2e` en los dos tamaños) |

@@ -38,8 +38,11 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
       {
         titulo: 'Los números del mes',
         puntos: [
-          'Ventas, gastos, balance y ticket promedio del mes en curso.',
-          'Cada uno se compara con los mismos días del mes anterior: el día 12 compara del 1 al 12 de este mes contra del 1 al 12 del anterior.',
+          'Ventas: todo lo vendido del 1 del mes hasta hoy.',
+          'Gastos: todo lo pagado del 1 del mes hasta hoy, sea mercadería, alquiler, servicios, impuestos u otros.',
+          'Balance: lo que queda, las ventas menos los gastos. Si todavía no hay gastos cargados, no se puede calcular.',
+          'Ticket promedio: cuánto deja una venta en promedio, el total vendido dividido la cantidad de ventas del mes.',
+          'El número chico de cada tarjeta es el cambio contra los mismos días del mes anterior: el día 12 compara del 1 al 12 de este mes contra del 1 al 12 del anterior.',
           'Lo cancelado y lo anulado no cuentan.',
         ],
       },
@@ -47,8 +50,9 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'Gráficos y más vendidos',
         puntos: [
           'El mes a mes muestra ventas, gastos y balance: arranca con 4 meses y se amplía a todo el año.',
-          'Más vendidos: los 5 productos que más plata dejaron en el mes.',
-          'Abajo de todo, las ventas de los últimos 7 días contra los 7 anteriores.',
+          'Esta semana vs la anterior es un acumulado: suma las ventas día a día, desde hoy y los 6 días anteriores, y las compara con los 7 días de antes. El título dice si vas arriba o abajo.',
+          'Los gastos por categoría van en una torta: las 5 categorías que más pesan, y el resto junto en Otras.',
+          'Más vendidos: los 5 productos que más plata dejaron en el mes, con medallas de oro, plata y bronce para los tres primeros.',
         ],
       },
     ],

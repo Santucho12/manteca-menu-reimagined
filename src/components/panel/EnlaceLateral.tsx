@@ -3,7 +3,9 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import type { EnlaceDelMarco } from '@/lib/acceso/marco';
+import { esProximamente } from '@/lib/acceso/proximamente';
 import { cn } from '@/lib/utils';
+import { avisarProximamente } from './avisarProximamente';
 import { ICONOS_DEL_PANEL } from './iconos';
 import { Insignia } from './Insignia';
 
@@ -17,7 +19,7 @@ type Props = {
   alTocar?: () => void;
 };
 
-const FONDO = 'absolute inset-0 bg-primary/10 rounded-2xl z-0';
+const FONDO = 'absolute -left-3.5 top-1.5 bottom-1.5 w-1 rounded-r-full bg-primary z-0';
 
 /** El enlace de seccion de Plan Reminder Pro (alla es un boton; aca, Link con aria-current). */
 export function EnlaceLateral({
@@ -31,13 +33,19 @@ export function EnlaceLateral({
   return (
     <Link
       href={enlace.href}
-      onClick={alTocar}
+      onClick={(evento) => {
+        if (esProximamente(enlace.clave)) {
+          evento.preventDefault();
+          avisarProximamente(enlace.texto);
+        }
+        alTocar?.();
+      }}
       aria-current={activo ? 'page' : undefined}
       className={cn(
         'relative group w-full flex items-center font-semibold transition-all duration-300 rounded-2xl',
-        compacto ? 'gap-2.5 px-3.5 py-2.5 text-[13px] rounded-xl' : 'gap-3 px-4 py-3.5 text-sm',
+        compacto ? 'gap-2.5 px-3.5 py-2 text-[13px] rounded-xl' : 'gap-3 px-4 py-3.5 text-sm',
         activo
-          ? 'text-primary shadow-xs ring-1 ring-primary/20'
+          ? 'text-foreground font-bold bg-secondary/70'
           : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50',
       )}
     >

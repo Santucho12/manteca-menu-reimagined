@@ -130,6 +130,17 @@ Construido el 2026-10-12 (pedido 33). Diseño en `docs/superpowers/specs/2026-10
 - `src/components/inicio/`: `InicioAdmin`, `Avisos`, `MasVendidos`; reusa `Totales` y
   `GraficoPorMes` de Reportes.
 
+### Ayer y vencimientos (pedido 50, 2026-10-27)
+
+- **Ayer**: franja arriba de todo con ventas, tickets, ticket promedio y el cierre (cargado,
+  sin cargar o con diferencia, que lleva al control de ese día). Un cierre anulado no cuenta.
+  Si ayer no hubo ventas, dice "Ayer no hubo ventas" y no sale el aviso "Ayer no se cargó el
+  cierre": un día sin ventas es un día que el local no abrió.
+- **Vencen esta semana**: los recurrentes activos cuyo próximo vencimiento cae de hoy a 6
+  días, con el mismo cálculo que la lista de Recurrentes, y su total. Sin ninguno, no aparece.
+- Código: `src/lib/inicio/ayer.ts` y `vencimientos.ts` (puros); `Ayer.tsx` y
+  `Vencimientos.tsx`.
+
 ### Pruebas
 
 - Puros: `src/lib/inicio/*.test.ts`.

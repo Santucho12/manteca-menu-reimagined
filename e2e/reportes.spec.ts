@@ -25,7 +25,7 @@ const TITULOS = [
   'Gastos por categoría',
   'Gastos por período',
   'Caja',
-  'Resultado',
+  'Balance',
 ];
 const nombreDe = (producto: { texto: string }) => producto.texto.split(' · ')[0]!;
 const total = (page: Page, texto: string) =>
@@ -103,7 +103,7 @@ test('resultado: ventas menos gastos', async ({ page }) => {
 
 test('resultado: sin gastos cargados no lo calcula', async ({ page }) => {
   await page.goto('/admin/reportes/resultado?desde=2018-03-01&hasta=2018-03-31');
-  await expect(page.getByText('Sin gastos cargados: el resultado no se calcula.')).toBeVisible();
+  await expect(page.getByText('Sin gastos cargados: el balance no se calcula.')).toBeVisible();
 });
 
 test('caja: cada cierre esperando ventas, el dia sin cierre y el resumen por empleado', async ({

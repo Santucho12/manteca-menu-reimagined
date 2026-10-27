@@ -6,6 +6,8 @@ export type DatosDeAvisos = {
   ayerSinCierre: string | null;
   pendientes: number;
   sinClasificar: ConFecha & { categoriaId: string | null };
+  // Sale de los recurrentes, que Inicio lee aparte de los avisos.
+  vencenEstaSemana?: number;
 };
 export type Aviso = { texto: string; enlace: string };
 
@@ -47,6 +49,12 @@ function deGastos({ cantidad, desde, categoriaId }: DatosDeAvisos['sinClasificar
   ];
 }
 
+function deVencimientos(n = 0): Aviso[] {
+  if (n === 0) return [];
+  const texto = n === 1 ? 'Esta semana vence 1 pago.' : `Esta semana vencen ${n} pagos.`;
+  return [{ texto, enlace: '/admin/gastos/recurrentes' }];
+}
+
 /** Lo que requiere accion, en orden; cada aviso lleva a donde se resuelve. */
 export function avisosDeInicio(datos: DatosDeAvisos): Aviso[] {
   return [
@@ -54,5 +62,6 @@ export function avisosDeInicio(datos: DatosDeAvisos): Aviso[] {
     ...deAyer(datos.ayerSinCierre),
     ...dePendientes(datos.pendientes),
     ...deGastos(datos.sinClasificar),
+    ...deVencimientos(datos.vencenEstaSemana),
   ];
 }

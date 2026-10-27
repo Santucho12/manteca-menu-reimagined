@@ -4,10 +4,10 @@ import { cn } from '@/lib/utils';
 // El logo de Manteca en dorado sobre blanco (Santiago, 2026-10-26).
 const TAMANOS = {
   lateral: {
-    caja: 'flex flex-col items-start gap-1.5',
-    recuadro: 'py-1',
-    logo: 'w-[140px]',
-    lema: 'text-[8px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap',
+    caja: 'flex flex-col items-center gap-1.5',
+    recuadro: '',
+    logo: 'w-[124px]',
+    lema: 'text-[8px] font-bold text-muted-foreground/80 uppercase tracking-[0.18em] whitespace-nowrap',
   },
   barra: {
     caja: 'flex items-center',
@@ -28,7 +28,7 @@ export function Marca({ tamano }: { tamano: keyof typeof TAMANOS }) {
   const { caja, recuadro, logo, lema } = TAMANOS[tamano];
   return (
     <div role="img" aria-label="Manteca" className={caja}>
-      <div className={cn('bg-white', recuadro)}>
+      <div className={recuadro}>
         <Image
           src="/menu/logo-oscuro.png"
           alt=""

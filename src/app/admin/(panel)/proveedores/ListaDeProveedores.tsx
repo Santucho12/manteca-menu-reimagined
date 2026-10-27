@@ -136,7 +136,7 @@ function Tarjeta({ fila }: { fila: FilaConPagado }) {
             href={urlDeWhatsApp(fila.telefono)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 inline-flex items-center justify-center gap-1.5 h-11 px-2 rounded-xl text-sm font-bold bg-primary text-primary-foreground active:scale-95 transition-all"
+            className="flex-1 inline-flex items-center justify-center gap-1.5 h-11 px-2 rounded-xl text-sm font-bold bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-primary/30 active:translate-y-0 active:scale-95 transition-all duration-200"
           >
             <Send size={15} aria-hidden="true" /> WhatsApp
           </a>

@@ -29,7 +29,7 @@ export function GraficoDeLineas({ datos }: { datos: PuntoSuperpuesto[] }) {
           <XAxis dataKey="etiqueta" {...EJE} tickLine={false} />
           <YAxis tickFormatter={pesos} width={90} {...EJE} tickLine={false} axisLine={false} />
           <Tooltip formatter={pesos} />
-          <Legend />
+          <Legend iconType="circle" />
           <Line
             name="Período"
             dataKey="actual"

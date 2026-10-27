@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { ProductoDelReporte } from '../reportes/ventas';
 import {
   masVendidos,
+  mesDeHoy,
   mesEnCurso,
   mesesVisibles,
   textoDePresentaciones,
@@ -13,6 +14,13 @@ const producto = (clave: string, montoCentavos: number): ProductoDelReporte => (
   nombre: clave,
   montoCentavos,
   presentaciones: [],
+});
+
+describe('mesDeHoy', () => {
+  it('es el año y el mes de hoy: el que el gráfico marca en curso', () => {
+    expect(mesDeHoy('2026-10-27')).toBe('2026-10');
+    expect(mesDeHoy('2027-01-01')).toBe('2027-01');
+  });
 });
 
 describe('meses del inicio', () => {

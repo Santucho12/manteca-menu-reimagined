@@ -213,6 +213,7 @@ El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
 | Comando | Qué hace |
 |---|---|
 | `npm run dev` | Levanta la aplicación en local, contra la base de pruebas, en `http://localhost:3210`: carga `.env.local` antes que cualquier otro archivo de entorno |
+| `npm run local` | Arma la aplicación entera (`next build` en `.next-local`) y la sirve en `http://localhost:3210` contra la base de pruebas: navega sin compilar cada sección, pero no recarga sola tras un cambio. Va en lugar de `npm run dev`, no a la vez (`PUERTO_LOCAL` cambia el puerto) |
 | `npm test` | Todos los tests de Vitest |
 | `npm run verificar` | Lint, tipos, todos los tests y build, en ese orden; se corta en el primer error |
 | `npm run e2e` | Las pruebas de Playwright, sin abrir ventana (con `E2E_A_LA_VISTA=1`, a la vista) |

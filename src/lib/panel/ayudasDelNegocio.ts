@@ -51,7 +51,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
       {
         titulo: 'Después de guardar',
         puntos: [
-          'El resultado aparece cuando entran las ventas del día.',
+          'El balance aparece cuando entran las ventas del día.',
           'En Mis cierres ves los que cargaste vos.',
         ],
       },
@@ -131,7 +131,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         puntos: [
           'Ventas y gastos se ven por período, por producto o categoría.',
           'Caja muestra los cierres de cada día y marca los días sin cierre.',
-          'Resultado es ventas menos gastos; sin gastos cargados no se calcula.',
+          'Balance es ventas menos gastos; sin gastos cargados no se calcula.',
         ],
       },
     ],

@@ -16,6 +16,25 @@ describe('ayudas', () => {
     expect(AYUDAS.cuenta.titulo).toBe('Cómo funciona Mi cuenta');
   });
 
+  it('la ayuda de Inicio cuenta todo lo que se ve en la pantalla', () => {
+    const texto = AYUDAS.inicio.temas.flatMap((t) => [t.titulo, ...t.puntos]).join(' ');
+    for (const parte of [
+      'Ventas:',
+      'Gastos:',
+      'Balance:',
+      'Ticket promedio:',
+      'las ventas menos los gastos',
+      'dividido',
+      'hoy y los 6 días anteriores',
+      'acumulado',
+      'torta',
+      'medallas',
+      'Otras',
+    ]) {
+      expect(texto).toContain(parte);
+    }
+  });
+
   it('cada pantalla del panel tiene su ayuda', () => {
     const claves = [
       'inicio',

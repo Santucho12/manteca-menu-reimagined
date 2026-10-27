@@ -34,6 +34,15 @@ export function arrancarScrollSuave(): void {
   });
 }
 
+/** Con una ventana abierta la página de atrás no se mueve: ni con la rueda ni al pasarse del final. */
+export function bloquearScrollDeLaPagina(bloquear: boolean): void {
+  if (typeof document === 'undefined') return;
+  document.documentElement.style.overflow = bloquear ? 'hidden' : '';
+  if (!lenis) return;
+  if (bloquear) lenis.stop();
+  else lenis.start();
+}
+
 /** Vuelve arriba de todo al instante, al cambiar de pantalla. */
 export function volverArriba(): void {
   if (lenis) lenis.scrollTo(0, { immediate: true, force: true });

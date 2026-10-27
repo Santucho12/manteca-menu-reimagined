@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "node scripts/dev.mjs",
+    "local": "node scripts/local.mjs",
     "build": "next build",
     "lint": "eslint . && prettier --check .",
     "tipos": "tsc --noEmit",

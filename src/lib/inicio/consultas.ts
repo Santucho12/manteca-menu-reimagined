@@ -1,4 +1,8 @@
-import { diasConCierre, primerDiaConCierre } from '../caja/consultas';
+import { diasConCierre, listarCierres, primerDiaConCierre } from '../caja/consultas';
+import { listarRecurrentes } from '../gastos/consultas';
+import type { VentaDelDia } from '../reportes/ventas';
+import { resumenDeAyer, sinAvisoSiAyerNoHuboVentas } from './ayer';
+import { vencimientosDeLaSemana } from './vencimientos';
 import { datosDelResultado, ventasPorDia, ventasPorProducto } from '../reportes/consultas';
 import { periodoAnterior, sumarDias } from '../reportes/periodos';
 import { resultadoPorMes } from '../reportes/resultado';
@@ -77,6 +81,33 @@ export async function datosDeAvisos(cliente: Cliente, hoy: string): Promise<Dato
   return { conDiferencia, ayerSinCierre: ayer, pendientes, sinClasificar };
 }
 
+async function cierresDeAyer(cliente: Cliente, hoy: string) {
+  const ayer = sumarDias(hoy, -1);
+  const filtros = { desde: ayer, hasta: ayer, personaId: null, estado: null, pagina: 1 };
+  return (await listarCierres(cliente, filtros)).filas;
+}
+
+/** Ayer, lo que vence en la semana y los avisos, que dependen de si ayer hubo ventas. */
+async function ayerYVencimientos(
+  cliente: Cliente,
+  hoy: string,
+  dias: VentaDelDia[],
+  avisos: DatosDeAvisos,
+) {
+  const [cierres, recurrentes] = await Promise.all([
+    cierresDeAyer(cliente, hoy),
+    listarRecurrentes(cliente),
+  ]);
+  const ayer = resumenDeAyer(dias, cierres, hoy);
+  const vencimientos = vencimientosDeLaSemana(recurrentes, hoy);
+  const datos = { ...avisos, vencenEstaSemana: vencimientos.items.length };
+  return {
+    ayer,
+    vencimientos,
+    avisos: avisosDeInicio(sinAvisoSiAyerNoHuboVentas(datos, ayer.ventas)),
+  };
+}
+
 /** Todo lo de Inicio, con el mismo calculo que Reportes. */
 export async function datosDelInicio(cliente: Cliente, hoy: string) {
   const mes = mesEnCurso(hoy);
@@ -89,7 +120,7 @@ export async function datosDelInicio(cliente: Cliente, hoy: string) {
     ventasPorDia(cliente, rangoDeSemanas(hoy)),
   ]);
   return {
-    avisos: avisosDeInicio(avisos),
+    ...(await ayerYVencimientos(cliente, hoy, dias, avisos)),
     actual,
     anterior,
     meses: resultadoPorMes(anio.ventas, anio.gastos),

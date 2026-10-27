@@ -1,57 +1,129 @@
 'use client';
 
 import {
-  Bar,
-  BarChart,
+  Area,
   CartesianGrid,
+  ComposedChart,
   Legend,
+  Line,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from 'recharts';
+import { EnlaceASeccion } from '@/components/panel/EnlaceASeccion';
+import type { EstadoDeVariacion } from '@/lib/inicio/estadoDeVariacion';
+import { EncabezadoDeTarjeta } from './EncabezadoDeTarjeta';
 import type { DiaDeLaSemana } from '@/lib/inicio/semana';
+import {
+  acumularSemana,
+  resumenDeLaSemana,
+  type PuntoAcumulado,
+} from '@/lib/inicio/semanaAcumulada';
 
-// La semana actual en azul y la anterior en rojo (Santiago, 2026-10-25).
+// La semana actual en azul y la anterior en rojo, punteada (Santiago, 2026-10-25).
 const COLORES = { actual: '#3b82f6', anterior: '#f43f5e' };
 const EJE = { stroke: '#94a3b8', fontSize: 10, fontWeight: 700 };
+const CHIP: Record<EstadoDeVariacion, string> = {
+  mejora: 'bg-emerald-100 text-emerald-800',
+  empeora: 'bg-rose-100 text-rose-800',
+  igual: 'bg-secondary text-foreground',
+  'sin-datos': 'bg-secondary text-foreground',
+};
 const ventas = (valor: unknown) => `${valor} ${Number(valor) === 1 ? 'venta' : 'ventas'}`;
 
-/** La cantidad de ventas de cada uno de los ultimos 7 dias, contra el mismo dia de la semana anterior. */
+type PuntoDelFinal = { cx?: number; cy?: number; index?: number };
+
+/** Las ventas de la semana sumadas dia a dia, contra la semana anterior: si vas adelantado o atrasado. */
 export function SemanaContraSemana({ datos }: { datos: DiaDeLaSemana[] }) {
+  const resumen = resumenDeLaSemana(datos);
   return (
     <section
       aria-label="Esta semana vs la anterior"
-      className="h-full rounded-2xl border border-border bg-card p-5 md:p-6"
+      className="h-full rounded-2xl border border-border bg-card p-6 md:p-8"
     >
-      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">
-        Esta semana vs la anterior
-      </p>
-      <figure aria-label="Ventas por día" className="h-60">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={datos} margin={{ left: 0, right: 8 }} barGap={3} barCategoryGap="20%">
-            <CartesianGrid stroke="#e2e8f0" vertical={false} />
-            <XAxis dataKey="etiqueta" {...EJE} tickLine={false} />
-            <YAxis allowDecimals={false} width={36} {...EJE} tickLine={false} axisLine={false} />
-            <Tooltip formatter={ventas} />
-            <Legend />
-            <Bar
-              name="Esta semana"
-              dataKey="actual"
-              fill={COLORES.actual}
-              radius={[6, 6, 0, 0]}
-              isAnimationActive={false}
-            />
-            <Bar
-              name="Semana anterior"
-              dataKey="anterior"
-              fill={COLORES.anterior}
-              radius={[6, 6, 0, 0]}
-              isAnimationActive={false}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </figure>
+      <EncabezadoDeTarjeta
+        titulo="Esta semana vs la anterior"
+        descripcion="Las ventas sumadas día a día, contra la semana pasada."
+      >
+        <EnlaceASeccion
+          clave="reportes"
+          seccion="Reportes"
+          href="/admin/reportes/ventas"
+          texto="Ver reportes"
+        />
+      </EncabezadoDeTarjeta>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h3 className={`rounded-full px-3 py-1.5 text-xs font-bold ${CHIP[resumen.estado]}`}>
+          {resumen.titulo}
+        </h3>
+        <span className={`rounded-full px-3 py-1.5 text-xs font-bold ${CHIP[resumen.estado]}`}>
+          {resumen.chip}
+        </span>
+      </div>
+      <GraficoAcumulado puntos={acumularSemana(datos)} />
     </section>
+  );
+}
+
+function GraficoAcumulado({ puntos }: { puntos: PuntoAcumulado[] }) {
+  const puntoFinal = ({ cx, cy, index }: PuntoDelFinal) =>
+    index === puntos.length - 1 ? (
+      <circle
+        key="final"
+        cx={cx}
+        cy={cy}
+        r={6}
+        fill={COLORES.actual}
+        stroke="#fbf9f3"
+        strokeWidth={3}
+      />
+    ) : (
+      <g key={`punto-${index}`} />
+    );
+  return (
+    <figure aria-label="Ventas por día" className="h-52">
+      <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart data={puntos} margin={{ left: 0, right: 8, top: 8 }}>
+          <defs>
+            <linearGradient id="semanaActual" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor={COLORES.actual} stopOpacity={0.25} />
+              <stop offset="1" stopColor={COLORES.actual} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid stroke="#e2e8f0" vertical={false} />
+          <XAxis dataKey="etiqueta" {...EJE} tickLine={false} />
+          <YAxis allowDecimals={false} width={36} {...EJE} tickLine={false} axisLine={false} />
+          <Tooltip formatter={ventas} />
+          <Legend iconType="circle" />
+          <Area
+            dataKey="actual"
+            legendType="none"
+            fill="url(#semanaActual)"
+            stroke="none"
+            isAnimationActive={false}
+            tooltipType="none"
+          />
+          <Line
+            name="Esta semana"
+            dataKey="actual"
+            stroke={COLORES.actual}
+            strokeWidth={3.5}
+            dot={puntoFinal}
+            activeDot={{ r: 5 }}
+            isAnimationActive={false}
+          />
+          <Line
+            name="Semana anterior"
+            dataKey="anterior"
+            stroke={COLORES.anterior}
+            strokeWidth={2.5}
+            strokeDasharray="6 6"
+            dot={false}
+            isAnimationActive={false}
+          />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </figure>
   );
 }

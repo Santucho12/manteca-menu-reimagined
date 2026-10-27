@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { useCerrarConEscape, useDestinoEnMain } from '@/lib/panel/ventanas';
+import { useBloquearElFondo, useCerrarConEscape, useDestinoEnMain } from '@/lib/panel/ventanas';
 import { CERRAR_VENTANA } from './estilos';
 
 type Props = {
@@ -31,6 +31,7 @@ export function Ventana({
 }: Props) {
   const destino = useDestinoEnMain();
   useCerrarConEscape(abierta, cerrar);
+  useBloquearElFondo(abierta);
   const ventana = (
     <AnimatePresence>
       {abierta ? (

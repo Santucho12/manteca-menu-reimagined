@@ -7,6 +7,9 @@ const primeroDelMes = (fecha: string) => `${fecha.slice(0, 8)}01`;
 
 export const mesEnCurso = (hoy: string): Periodo => ({ desde: primeroDelMes(hoy), hasta: hoy });
 
+/** El año y el mes de hoy: el gráfico lo marca "en curso", porque todavía no terminó. */
+export const mesDeHoy = (hoy: string) => hoy.slice(0, 7);
+
 /** El grafico mes a mes: este mes y los 11 anteriores. */
 export const ultimosDoceMeses = (hoy: string): Periodo => ({
   desde: sumarMeses(primeroDelMes(hoy), -11),
