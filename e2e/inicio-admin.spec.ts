@@ -209,10 +209,11 @@ test('ve el aviso de gastos sin clasificar y lo lleva a gastos', async ({ page }
   const aviso = page.getByRole('link', { name: /gastos? sin clasificar/ });
   await expect(aviso).toBeVisible();
   await aviso.click();
-  await expect(page).toHaveURL(/\/admin\/gastos\?categoria=.+&desde=/);
-  // El enlace lleva la fecha mas vieja: el gasto sembrado se ve aunque sea de otro mes.
-  await expect(page.getByText('15/06/2000').first()).toBeVisible();
-  await expect(page.getByText('Hielo').first()).toBeVisible();
+  await expect(page).toHaveURL(/\/admin\/gastos$/);
+  // Para clasificar muestra los de cualquier mes: el gasto sembrado se ve aunque sea viejo.
+  const paraClasificar = page.getByRole('list', { name: 'Para clasificar' });
+  await expect(paraClasificar.getByText('15/06/2000').first()).toBeVisible();
+  await expect(paraClasificar.getByText('Hielo').first()).toBeVisible();
 });
 
 test('un monto de 8 cifras entra en su tarjeta, sin desbordar la pantalla', async ({ page }) => {

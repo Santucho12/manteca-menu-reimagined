@@ -29,7 +29,7 @@ export async function PagosDelProveedor({ cliente, proveedorId, hoy }: Props) {
           Este año: {formatearPesos(totales.anioCentavos)}
         </p>
       </div>
-      <ListaDeGastos filas={lista.filas} total={lista.total} />
+      <ListaDeGastos filas={lista.filas} vacio="Todavía no se le pagó nada este año." />
     </Seccion>
   );
 }

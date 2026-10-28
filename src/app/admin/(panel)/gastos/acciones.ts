@@ -2,8 +2,13 @@
 
 import { ejecutarAccion } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
-import { anularGasto, cargarGasto, editarGasto } from '@/lib/gastos/escritura';
-import { esquemaAnulacion, esquemaCarga, esquemaDeGastoEditado } from '@/lib/gastos/esquemas';
+import { anularGasto, cargarGasto, clasificarGasto, editarGasto } from '@/lib/gastos/escritura';
+import {
+  esquemaAnulacion,
+  esquemaCarga,
+  esquemaClasificacion,
+  esquemaDeGastoEditado,
+} from '@/lib/gastos/esquemas';
 
 // Hoy lo decide el servidor, en Argentina: un gasto suelto no puede tener fecha futura.
 const hoy = () => diaEnArgentina(new Date());
@@ -19,6 +24,12 @@ export async function editarGastoDesdeElPanel(datos: unknown) {
     const { id, ...cambios } = gasto;
     return editarGasto(cliente, id, cambios);
   });
+}
+
+export async function clasificarGastoDesdeElPanel(datos: unknown) {
+  return ejecutarAccion('admin', esquemaClasificacion, datos, ({ cliente }, clasificacion) =>
+    clasificarGasto(cliente, clasificacion),
+  );
 }
 
 export async function anularGastoDesdeElPanel(datos: unknown) {

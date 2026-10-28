@@ -133,7 +133,7 @@ test('muestra lo pagado en el mes en la lista y los gastos y totales en la ficha
   await expect(page.getByRole('list', { name: 'Gastos' }).getByRole('listitem')).toHaveCount(2);
 });
 
-test('avisa si tiene gastos recurrentes activos', async ({ page }) => {
+test('avisa si tiene gastos fijos activos', async ({ page }) => {
   const proveedor = await sembrarProveedor({ nombre: nuevoNombre() });
   const recurrente = await sembrarRecurrente({
     categoria: 'Mercadería',
@@ -142,7 +142,11 @@ test('avisa si tiene gastos recurrentes activos', async ({ page }) => {
   });
   recurrentes.push(recurrente.id);
   await page.goto(`/admin/proveedores/${proveedor.id}`);
-  await expect(page.getByText(/Tiene 1 gasto recurrente activo/)).toBeVisible();
+  await expect(page.getByText(/Tiene 1 gasto fijo activo/)).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Gastos' }).last()).toHaveAttribute(
+    'href',
+    '/admin/gastos',
+  );
 });
 
 test('guarda capturas de la lista y la ficha', async ({ page }, info) => {

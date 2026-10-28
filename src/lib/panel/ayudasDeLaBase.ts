@@ -10,8 +10,7 @@ export type ClaveDeAyuda =
   | 'cuenta'
   | 'proveedores'
   | 'gastos'
-  | 'categorias'
-  | 'recurrentes'
+  | 'fijos'
   | 'ventas'
   | 'canales'
   | 'caja'
@@ -31,13 +30,15 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
       {
         titulo: 'Lo que requiere acción',
         puntos: [
-          'Aparece solo si hay algo pendiente: cierres con diferencia, gastos sin clasificar o personas que esperan un rol.',
+          'Aparece solo si hay algo pendiente: cierres con diferencia, ayer sin cierre de caja, personas que esperan un rol, gastos sin clasificar y pagos que vencen en la semana.',
           'Cada aviso te lleva a la pantalla donde se resuelve, y desaparece solo cuando lo resolvés.',
+          'El aviso de ayer sin cierre no sale si ayer no hubo ventas: ese día el local no abrió.',
         ],
       },
       {
         titulo: 'Los números del mes',
         puntos: [
+          'El bloque oscuro muestra lo vendido en el mes, con los gastos y el balance debajo. La barra de avance dice qué parte de las ventas queda como balance.',
           'Ventas: todo lo vendido del 1 del mes hasta hoy.',
           'Gastos: todo lo pagado del 1 del mes hasta hoy, sea mercadería, alquiler, servicios, impuestos u otros.',
           'Balance: lo que queda, las ventas menos los gastos. Si todavía no hay gastos cargados, no se puede calcular.',
@@ -59,20 +60,39 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
   },
   proveedores: {
     titulo: 'Cómo funciona Proveedores',
-    introduccion: 'Acá tenés a quién le comprás, cómo contactarlo y cuánto le pagaste en el mes.',
+    introduccion:
+      'Acá tenés a quién le comprás, cómo contactarlo y cuánto le pagaste. Lo pagado sale de los gastos que le cargaste a cada uno.',
     temas: [
       {
         titulo: 'La lista',
         puntos: [
-          'Escribí parte del nombre y apretá Buscar.',
-          'Pagado este mes suma los gastos cargados a cada proveedor en el mes, sin los anulados.',
-          'El botón verde abre el chat de WhatsApp. Si el proveedor no tiene teléfono, no aparece.',
+          'Muestra el nombre, qué le comprás, el teléfono y lo pagado en el mes. Va de a 25 por página.',
+          'En Buscar por nombre escribí parte del nombre y apretá Buscar.',
+          'Pagado este mes suma los gastos cargados a ese proveedor del 1 del mes hasta hoy, sin los anulados.',
+          'El botón verde abre el chat de WhatsApp con el proveedor: no arma ningún pedido. Si no tiene teléfono, no aparece.',
+        ],
+      },
+      {
+        titulo: 'La ficha',
+        puntos: [
+          'Tiene sus datos de contacto, el total pagado en el mes y del año, y los gastos del año, del más nuevo al más viejo.',
+          'Los totales no cuentan los gastos anulados. Un proveedor sin gastos muestra los totales en cero.',
+          'Cargado por dice quién lo dio de alta y cuándo.',
+        ],
+      },
+      {
+        titulo: 'Cargar y editar',
+        puntos: [
+          'Solo el nombre es obligatorio. El alias, el CBU o el CUIT van en Observaciones.',
+          'El teléfono escribilo con la característica (por ejemplo 11 2345 6789): se guarda solo con el 549 adelante, que es lo que pide WhatsApp. Con el 15 y sin característica no se acepta.',
+          'Si ya hay uno con el mismo nombre, el sistema te avisa y te deja seguir.',
         ],
       },
       {
         titulo: 'Desactivados',
         puntos: [
-          'Un proveedor no se borra: se desactiva y conserva sus gastos.',
+          'Un proveedor no se borra: se desactiva y conserva sus gastos. Desactivado, no se ofrece al cargar un gasto nuevo.',
+          'Si tiene gastos fijos activos, te avisa: esos gastos fijos se siguen cargando hasta que los pauses aparte, en Gastos.',
           'Con Ver desactivados los ves, y desde su ficha lo podés reactivar.',
         ],
       },
@@ -81,50 +101,74 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
   gastos: {
     titulo: 'Cómo funciona Gastos',
     introduccion:
-      'Todo lo que sale, para que el balance del mes sea real: lo que se pagó, por categoría y proveedor.',
+      'Todo lo que sale, para que el balance del mes sea real: lo que pagaste y lo que viene, en una sola pantalla.',
     temas: [
       {
-        titulo: 'La lista',
+        titulo: 'Pagados',
         puntos: [
-          'Va del más nuevo al más viejo. Filtrá por fechas, categoría y proveedor.',
-          'El total de arriba no cuenta lo anulado.',
-          'Los gastos sin clasificar vienen de un cierre de caja y esperan su categoría.',
+          'Los gastos del mes, del más nuevo al más viejo, de a 25 por página. Cambiá de mes con las flechas: no se pasa a un mes que no llegó.',
+          'Filtrá por Fijos, De caja y categoría: la lista se actualiza sola. El total suma lo filtrado, sin lo anulado.',
+          'Fijo marca un gasto que cargó solo un gasto fijo, con cada cuánto se repite: revisalo por si el monto cambió. De caja marca uno que vino de un cierre.',
         ],
       },
       {
-        titulo: 'Cargar, editar y anular',
+        titulo: 'Próximos pagos',
         puntos: [
-          'Un gasto no se borra: se anula con un motivo, deja de contar y queda en el historial.',
-          'La compra de mercadería se carga como gasto, con su proveedor.',
-          'Los recurrentes se cargan solos el día que tocan, y quedan marcados como automáticos.',
+          'Cada gasto fijo con su próximo pago, del más cercano al más lejano. Lo de hoy ya está en Pagados.',
+          'Falta pagar este mes suma lo que vence de mañana a fin de mes. Los pausados quedan abajo.',
+        ],
+      },
+      {
+        titulo: 'Para clasificar',
+        puntos: [
+          'Los gastos que anota Caja en su cierre llegan sin categoría, de cualquier mes. Elegile una ahí mismo y tocá Listo.',
+          'Cuentan en el balance desde que llegan. A un gasto De caja no se le cambia el monto, la fecha ni el medio de pago, porque cambiaría la caja: se anula su cierre.',
+        ],
+      },
+      {
+        titulo: 'Cargar un gasto',
+        puntos: [
+          'La fecha viene con hoy; tocá Ayer o elegí otra en el calendario. Define a qué mes cuenta.',
+          'En ¿Se repite? elegí todos los meses, cada dos meses o una vez por año, y es un gasto fijo: se carga solo cada vez que toca, y la frase de abajo dice qué va a pasar.',
+          'Un gasto que no se repite no puede tener fecha futura.',
+          'El proveedor aparece solo en las categorías que lo piden, y ahí es obligatorio. El monto va con coma para los centavos: 12.345,50.',
+          'Efectivo de la caja no se ofrece: lo que se paga con la caja se anota en el cierre del día.',
+        ],
+      },
+      {
+        titulo: 'Categorías',
+        puntos: [
+          'El botón Categorías abre la lista: sumá, renombrá, desactivá o reactivá. Pide proveedor hace que esa categoría pida elegir uno.',
+          'Sin clasificar la usa el sistema para los gastos de la caja: no se elige a mano ni se desactiva.',
+        ],
+      },
+      {
+        titulo: 'Corregir',
+        puntos: [
+          'Abrí un gasto para corregirlo o anularlo con un motivo: deja de contar en los totales y queda en la lista. En la Auditoría queda el valor anterior y el nuevo.',
         ],
       },
     ],
   },
-  categorias: {
-    titulo: 'Cómo funciona Categorías',
-    introduccion: 'Las categorías ordenan los gastos. Podés sumar, renombrar y desactivar.',
+  fijos: {
+    titulo: 'Cómo funciona un gasto fijo',
+    introduccion:
+      'Un gasto fijo se carga solo cada vez que toca: el alquiler, un servicio, un sueldo.',
     temas: [
       {
-        titulo: 'Qué tenés que saber',
+        titulo: 'Cómo se carga',
         puntos: [
-          'Pedir proveedor obliga a elegir uno al cargar un gasto de esa categoría.',
-          'Una categoría desactivada no se ofrece más, pero conserva sus gastos.',
-          'Sin clasificar la usa el sistema para los gastos de un cierre: no se elige ni se desactiva.',
+          'El día que toca, el sistema lo carga ya contado en el balance del mes, a las 3 de la mañana y también al abrir Gastos. Si un día no corrió, carga lo atrasado con la fecha que correspondía.',
+          'Si el día no existe en ese mes (el 31 en abril), se carga el último día del mes. Nunca se carga dos veces el mismo pago.',
         ],
       },
-    ],
-  },
-  recurrentes: {
-    titulo: 'Cómo funciona Recurrentes',
-    introduccion: 'Un recurrente es una plantilla que carga un gasto solo, el día que toca.',
-    temas: [
       {
-        titulo: 'Cómo se cargan',
+        titulo: 'Corregir',
         puntos: [
-          'Elegí la frecuencia (mensual, bimestral o anual) y el primer vencimiento.',
-          'El gasto nace ya contado en el balance del mes y queda marcado como automático.',
-          'Si ese mes el monto fue otro, editá el gasto. Si no se pagó, anulalo.',
+          'Cambiar el monto vale para los próximos: lo que ya se cargó queda. Si un mes fue otro monto, corregí ese gasto en Pagados.',
+          'Si cambiás el próximo pago o cada cuánto, vale desde el próximo pago: no se vuelven a cargar meses pasados.',
+          'Pausado, deja de cargarse. Al reactivarlo, se carga desde ese día: lo que venció mientras estuvo pausado no aparece.',
+          'Ya se cargaron muestra los últimos seis pagos que cargó.',
         ],
       },
     ],
@@ -137,6 +181,7 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'Tus datos',
         puntos: [
           'Tu nombre, tu email y tu rol se ven acá pero no se cambian: los corrige un administrador.',
+          'El email es tu nombre de usuario para entrar.',
         ],
       },
       {
@@ -144,6 +189,13 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         puntos: [
           'Escribí la actual y después la nueva, de 6 caracteres como mínimo.',
           'Con el ojo ves lo que escribiste antes de guardar.',
+          'Si te olvidaste la contraseña, pedile a un administrador que te dé una temporal: la cambiás apenas entrás.',
+        ],
+      },
+      {
+        titulo: 'La sesión',
+        puntos: [
+          'La sesión no vence: queda abierta hasta que tocás Salir. En una computadora compartida, salí al terminar.',
         ],
       },
     ],

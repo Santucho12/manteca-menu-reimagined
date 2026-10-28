@@ -156,7 +156,7 @@ const BUSQUEDAS: Busqueda[] = [
       .in('id', ids);
     return (data ?? []).map((fila) => ({
       id: fila.id,
-      texto: fila.descripcion ?? 'Gasto recurrente',
+      texto: fila.descripcion ?? 'Gasto fijo',
     }));
   },
 ];

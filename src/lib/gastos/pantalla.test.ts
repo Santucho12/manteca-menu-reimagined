@@ -8,7 +8,6 @@ import {
   opcionesDeFrecuencia,
   opcionesDeMedio,
   opcionesParaElegir,
-  textoDeSinClasificar,
 } from './pantalla';
 
 const HOY = '2026-10-08';
@@ -103,12 +102,5 @@ describe('opcionesDeMedio y opcionesDeFrecuencia', () => {
 
   it('con el efectivo de la caja en un gasto que ya lo tenia', () => {
     expect(opcionesDeMedio('efectivo_caja').map((o) => o.valor)).toContain('efectivo_caja');
-  });
-});
-
-describe('textoDeSinClasificar', () => {
-  it('en singular y en plural', () => {
-    expect(textoDeSinClasificar(1)).toBe('Hay 1 gasto de caja sin clasificar');
-    expect(textoDeSinClasificar(3)).toBe('Hay 3 gastos de caja sin clasificar');
   });
 });

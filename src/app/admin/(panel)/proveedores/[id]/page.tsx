@@ -32,18 +32,17 @@ function DatosDelProveedor({ proveedor }: { proveedor: Proveedor }) {
   );
 }
 
-// Un recurrente sigue cargandose aunque su proveedor se desactive: se avisa antes.
+// Un gasto fijo sigue cargandose aunque su proveedor se desactive: se avisa antes.
 function AvisoDeRecurrentes({ cantidad }: { cantidad: number }) {
-  const texto =
-    cantidad === 1 ? '1 gasto recurrente activo' : `${cantidad} gastos recurrentes activos`;
+  const texto = cantidad === 1 ? '1 gasto fijo activo' : `${cantidad} gastos fijos activos`;
   return (
     <FranjaDeAviso>
       <p>
-        Tiene {texto}. Si lo desactivás, se siguen cargando: desactivalos en{' '}
-        <Link href="/admin/gastos/recurrentes" className={ENLACE_EN_TEXTO}>
-          Recurrentes
-        </Link>{' '}
-        si ya no le pagás.
+        Tiene {texto}. Si lo desactivás, se siguen cargando: pausalos desde Próximos pagos, en{' '}
+        <Link href="/admin/gastos" className={ENLACE_EN_TEXTO}>
+          Gastos
+        </Link>
+        , si ya no le pagás.
       </p>
     </FranjaDeAviso>
   );

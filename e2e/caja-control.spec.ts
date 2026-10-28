@@ -4,6 +4,7 @@ import {
   borrarCierres,
   diaLibre,
   diaSiguiente,
+  gastosDelCierre,
   idsDeCierresDe,
   restaurarTolerancia,
   sembrarCierre,
@@ -26,6 +27,8 @@ function dia(): string {
 }
 
 const delDia = (fecha: string) => `desde=${fecha}&hasta=${fecha}`;
+// Gastos se mira por mes.
+const delMes = (fecha: string) => `mes=${fecha.slice(0, 7)}`;
 
 function fila(page: Page, lista: string, texto: string) {
   return page.getByRole('list', { name: lista }).getByRole('listitem').filter({ hasText: texto });
@@ -47,25 +50,32 @@ test('ve el cierre de caja en el control y lo marca como revisado', async ({ pag
   await expect(page.getByText('Lo vi con el ticket')).toBeVisible();
 });
 
-test('el gasto de caja llega a Gastos sin clasificar y solo se clasifica', async ({ page }) => {
+test('el gasto de caja llega a Para clasificar y se clasifica ahí mismo', async ({ page }) => {
   const fecha = dia();
   await sembrarCierreConSalidas(fecha);
   await page.goto('/admin/gastos');
-  await page.getByRole('link', { name: /gastos? de caja sin clasificar/ }).click();
-  await expect(page).toHaveURL(/categoria=/);
-  await page.goto(`/admin/gastos?${delDia(fecha)}`);
-  const gasto = fila(page, 'Gastos', 'Hielo');
-  await expect(gasto).toContainText('Sin clasificar');
-  await expect(gasto).toContainText('De caja');
-  await gasto.getByRole('link').click();
+  const hielo = fila(page, 'Para clasificar', fechaParaMostrar(fecha)).filter({ hasText: 'Hielo' });
+  await hielo.getByLabel('Categoría').selectOption({ label: 'Mercadería' });
+  await expect(hielo.getByLabel('Proveedor')).toBeVisible();
+  await hielo.getByLabel('Categoría').selectOption({ label: 'Mantenimiento' });
+  await expect(hielo.getByLabel('Proveedor')).toHaveCount(0);
+  await hielo.getByRole('button', { name: 'Listo' }).click();
+  await expect(hielo).toHaveCount(0);
+  await page.goto(`/admin/gastos?${delMes(fecha)}`);
+  const gasto = fila(page, 'Gastos', 'Hielo').filter({ hasText: 'Mantenimiento' });
+  await expect(gasto.first()).toContainText('De caja');
+});
+
+test('un gasto de caja se abre con monto y fecha fijos, y sin anular', async ({ page }) => {
+  const fecha = dia();
+  const cierre = await sembrarCierreConSalidas(fecha);
+  const [hielo] = await gastosDelCierre(cierre);
+  await page.goto(`/admin/gastos/${hielo!.id}`);
   await expect(page.getByText(/Salió de un cierre de caja/)).toBeVisible();
   await expect(page.getByLabel('Monto')).toHaveAttribute('readonly', '');
+  await expect(page.getByLabel('Fecha')).toBeDisabled();
   await expect(page.getByLabel('Categoría')).toHaveValue('');
   await expect(page.getByRole('button', { name: 'Anular' })).toHaveCount(0);
-  await page.getByLabel('Categoría').selectOption({ label: 'Mantenimiento' });
-  await page.getByRole('button', { name: 'Guardar' }).click();
-  await page.goto(`/admin/gastos?${delDia(fecha)}`);
-  await expect(fila(page, 'Gastos', 'Hielo')).toContainText('Mantenimiento');
 });
 
 test('anula el cierre con motivo y su gasto queda anulado', async ({ page }) => {
@@ -77,8 +87,8 @@ test('anula el cierre con motivo y su gasto queda anulado', async ({ page }) => 
   await page.getByRole('button', { name: 'Confirmar anulación' }).click();
   await expect(page.getByText('Anulado: Mal contado')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Marcar como revisado' })).toHaveCount(0);
-  await page.goto(`/admin/gastos?${delDia(fecha)}`);
-  await expect(fila(page, 'Gastos', 'Hielo')).toContainText('Anulado');
+  await page.goto(`/admin/gastos?${delMes(fecha)}&tipo=caja`);
+  await expect(fila(page, 'Gastos', 'Hielo').filter({ hasText: 'Anulado' }).first()).toBeVisible();
 });
 
 test('marca los dias sin cierre y filtra por estado', async ({ page }) => {
@@ -92,19 +102,28 @@ test('marca los dias sin cierre y filtra por estado', async ({ page }) => {
     page.getByText(`Sin cierre: ${fechaParaMostrar(diaSiguiente(fecha))}`),
   ).toBeVisible();
   await page.getByLabel('Estado').selectOption({ label: 'Anulado' });
-  await page.getByRole('button', { name: 'Filtrar' }).click();
   await expect(page).toHaveURL(/estado=anulado/);
   await expect(page.getByText('No hay cierres para mostrar.')).toBeVisible();
+});
+
+test('toda la fila del cierre abre su detalle', async ({ page }) => {
+  const fecha = dia();
+  const id = await sembrarCierreConSalidas(fecha);
+  await page.goto(`/admin/caja/control?${delDia(fecha)}`);
+  await fila(page, 'Cierres', fechaParaMostrar(fecha)).click({ position: { x: 300, y: 20 } });
+  await expect(page).toHaveURL(new RegExp(`/admin/caja/cierres/${id}`));
 });
 
 test('cambia la tolerancia', async ({ page }) => {
   try {
     await page.goto('/admin/caja/control');
-    await page.getByLabel('Tolerancia').fill('750');
+    await page.getByRole('button', { name: 'Configurar tolerancia' }).click();
+    await page.getByLabel('Tolerancia', { exact: true }).fill('750');
     await page.getByRole('button', { name: 'Guardar tolerancia' }).click();
     await expect(page.getByText('Tolerancia guardada.')).toBeVisible();
     await page.reload();
-    await expect(page.getByLabel('Tolerancia')).toHaveValue('750');
+    await page.getByRole('button', { name: 'Configurar tolerancia' }).click();
+    await expect(page.getByLabel('Tolerancia', { exact: true })).toHaveValue('750');
   } finally {
     await restaurarTolerancia();
   }

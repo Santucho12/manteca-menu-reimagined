@@ -22,7 +22,7 @@ llega acá como un gasto sin clasificar.
 | Categoría | Obligatoria |
 | Monto | Obligatorio, mayor que cero |
 | Descripción | Opcional |
-| Proveedor | Obligatorio en Mercadería; opcional en el resto |
+| Proveedor | Solo en las categorías que lo piden (Mercadería arranca pidiéndolo), y ahí es obligatorio |
 | Medio de pago | Efectivo de la caja, transferencia, tarjeta u otro |
 | Número de comprobante | Texto, opcional. No se adjuntan fotos |
 
@@ -37,36 +37,49 @@ gasto (`docs/producto.md`).
 Existe además **Sin clasificar**, que usa el sistema para los gastos que vienen de un
 cierre. No se puede elegir a mano ni desactivar.
 
-## Gastos recurrentes
+## Gastos fijos
 
-Un recurrente es una plantilla: categoría, monto, descripción, proveedor, medio de pago,
-frecuencia y día.
+Un gasto fijo (en la base, `gastos_recurrentes`) se carga solo cada vez que toca: categoría,
+monto, descripción, proveedor, medio de pago, frecuencia y día. Hasta el 2026-10-27 se llamaban
+"recurrentes" (Santiago no los entendía con ese nombre, pedido 58).
 
 - Frecuencia: mensual, bimestral o anual.
-- El día que toca, el sistema crea el gasto solo, con el monto de la plantilla.
+- Se cargan desde "Cargar gasto", eligiendo cada cuánto se repite.
+- El día que toca, el sistema crea el gasto solo, con el monto del fijo.
 - **El gasto nace ya contado** en el resultado del mes, sin esperar confirmación.
-- En la lista queda marcado como "generado automáticamente", para que se lo pueda revisar.
+- En la lista queda marcado "Fijo · Todos los meses", para que se lo pueda revisar.
 - Si ese mes el monto fue otro, el admin lo edita. Si no se pagó, lo anula.
 
-## Pantallas
+## Pantallas (pedido 58, 2026-10-27)
 
 ### Gastos (`/admin/gastos`)
 
-- Lista del más nuevo al más viejo, con fecha, categoría, descripción, proveedor, medio de
-  pago y monto.
-- Filtros por fechas, categoría y proveedor. La lista está paginada.
-- Total de lo filtrado, sin contar lo anulado.
-- Arriba, los gastos **sin clasificar** que esperan categoría.
-- Acciones: cargar, editar y anular.
+Una sola pantalla con todo a la vista:
 
-### Recurrentes
+- **Para clasificar**, arriba, solo si hay: los gastos de caja sin categoría, de cualquier
+  mes. Se les elige la categoría (y el proveedor, si la categoría lo pide) ahí mismo.
+- **Pagados**: los gastos del mes, con flechas para cambiar de mes (no se pasa del de hoy),
+  pastillas Todos, Fijos y De caja, y la categoría, que se aplica sola. Total de lo filtrado sin
+  lo anulado, paginado de a 25. Cada fila: fecha, nombre, categoría, proveedor si tiene, medio,
+  marcas (Fijo, De caja, Anulado) y monto.
+- **Próximos pagos**: cada fijo activo con su próximo pago, del más cercano al más lejano, y
+  lo que falta pagar este mes. Los pausados, aparte.
+- **Categorías**, en una ventana: sumar, renombrar, desactivar y reactivar, con "Pide
+  proveedor".
 
-- Lista de las plantillas con su frecuencia, su día y su próximo vencimiento.
-- Acciones: crear, editar, desactivar y reactivar.
+En la computadora, Pagados a la izquierda y Próximos a la derecha; en el celular, Próximos
+arriba.
 
-### Categorías
+### Cargar gasto y Gasto
 
-- Lista de categorías, con las acciones sumar, renombrar, desactivar y reactivar.
+Un solo formulario: fecha con calendario propio y atajos Hoy y Ayer, "¿Se repite?", categoría,
+proveedor (si la categoría lo pide), monto, descripción, medio y comprobante (si no se repite).
+Un gasto que no se repite no puede tener fecha futura.
+
+### Gasto fijo (`/admin/gastos/fijos/[id]`)
+
+Editar, "Próximo pago" con el calendario, pausar y reactivar, y los últimos seis pagos que
+cargó.
 
 ## Reglas
 
@@ -76,16 +89,20 @@ frecuencia y día.
 3. A un gasto que vino de un cierre no se le puede cambiar el monto ni el medio de pago:
    cambiaría la caja. Sí la categoría, el proveedor y la descripción.
 4. Un gasto sin clasificar cuenta en el resultado desde que se crea.
-5. Un recurrente no se genera dos veces para el mismo período.
-6. Un recurrente desactivado deja de generar. Los gastos que ya generó quedan.
-7. Editar una plantilla cambia los gastos futuros, no los ya generados.
+5. Un fijo no se genera dos veces para el mismo período.
+6. Un fijo pausado deja de generar. Los gastos que ya generó quedan.
+7. Editar un fijo cambia los gastos futuros, no los ya generados. Si cambian el próximo pago o
+   la frecuencia, cuenta desde el próximo pago, que tiene que ser después de hoy (`PG208`): no
+   se vuelven a cargar meses pasados.
 8. Si el día elegido no existe en un mes (el 31 en abril), se genera el último día del mes.
 9. Una categoría desactivada no aparece para cargar gastos nuevos y conserva los que tiene.
 10. El efectivo de la caja sale por el cierre del día: un gasto a mano o un recurrente no se
     carga con ese medio, porque nunca llegaría a la caja y la dejaría con un faltante. Un gasto
     que ya lo tenía se edita sin cambiárselo (Santiago, 2026-10-12).
-11. La misma carga de un gasto mandada dos veces (un toque repetido, un reintento) no lo
-    duplica: cada formulario lleva su clave.
+11. La misma carga de un gasto o de un fijo mandada dos veces (un toque repetido, un reintento)
+    no lo duplica: cada formulario lleva su clave.
+12. El proveedor se pide solo en las categorías que lo piden. Un gasto viejo que ya tenía uno lo
+    conserva mientras no le cambien la categoría (pedido 58).
 
 ## Casos de borde
 
@@ -126,7 +143,9 @@ frecuencia y día.
 | Tema | Decisión |
 |---|---|
 | Categorías | Lista inicial que el admin puede cambiar |
-| Proveedor | Obligatorio en Mercadería, opcional en el resto |
+| Proveedor | Solo en las categorías que lo piden (Santiago, 2026-10-27) |
+| Nombre de los recurrentes | Gastos fijos (Santiago, 2026-10-27) |
+| Pantalla | Una sola: Para clasificar, Pagados por mes y Próximos pagos; categorías en una ventana (Santiago, 2026-10-27) |
 | Comprobante | Solo el número; sin adjuntos |
 | Cómo nacen los recurrentes | Ya contados, sin confirmación |
 | Frecuencia | Mensual, bimestral y anual |
@@ -158,5 +177,10 @@ Construido el 2026-10-08 (pedido 27). El detalle está en
   y `/admin/gastos/categorias`.
 
 Con el módulo de Cierres (pedido 28) llegan los gastos pagados con la caja: entran en "Sin
-clasificar", marcados "De caja", y la regla 3 quedó en la base (`PC305` y `PC306`). Arriba
-de la lista se avisa cuántos esperan categoría, con el enlace para verlos.
+clasificar", marcados "De caja", y la regla 3 quedó en la base (`PC305` y `PC306`).
+
+Pedido 58 (2026-10-27): la pantalla se rehízo (diseño en
+`docs/superpowers/specs/2026-10-27-gastos-desde-cero-design.md`). En la base,
+`gastos_recurrentes.clave`, `PG208` en `reglas_de_recurrentes()` y `gastos_total` con `el_tipo`
+(migración `20261027210000_gastos_fijos`). Se fueron `/admin/gastos/recurrentes` y
+`/admin/gastos/categorias`; llegó `/admin/gastos/fijos/[id]`.
