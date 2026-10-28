@@ -23,6 +23,12 @@ async function abrirLaCuenta(page: Page, email: string): Promise<Locator> {
   return fila;
 }
 
+// Resetear y corregir viven detrás de los tres puntitos de la tarjeta.
+async function abrirElMenu(page: Page, fila: Locator, opcion: string) {
+  await fila.getByRole('button', { name: 'Más acciones' }).click();
+  await page.getByRole('menuitem', { name: opcion }).click();
+}
+
 test('quien espera recibe el rol de Caja y entra al recargar', async ({ page, browser }) => {
   const cuenta = await crearCuentaTemporal();
   const persona = await abrirSinSesion(browser);
@@ -30,8 +36,9 @@ test('quien espera recibe el rol de Caja y entra al recargar', async ({ page, br
     await ingresarComo(persona, cuenta.email, cuenta.contrasena);
     await expect(persona.getByRole('main').getByText(ESPERA)).toBeVisible();
     const fila = await abrirLaCuenta(page, cuenta.email);
-    await expect(fila.getByText('Pendiente', { exact: true })).toBeVisible();
-    await fila.getByRole('button', { name: 'Dar rol de Caja' }).click();
+    await expect(fila.getByRole('combobox', { name: 'Rol' })).toHaveText('Pendiente');
+    await fila.getByRole('combobox', { name: 'Rol' }).click();
+    await page.getByRole('option', { name: 'Caja' }).click();
     await expect(fila.getByText('Activa', { exact: true })).toBeVisible();
     await persona.reload();
     await expect(
@@ -39,6 +46,18 @@ test('quien espera recibe el rol de Caja y entra al recargar', async ({ page, br
     ).toBeVisible();
   } finally {
     await persona.context().close();
+    await borrarCuentaTemporal(cuenta.id);
+  }
+});
+
+test('una cuenta con rol puede volver a pendiente', async ({ page }) => {
+  const cuenta = await crearCuentaTemporal({ rol: 'caja' });
+  try {
+    const fila = await abrirLaCuenta(page, cuenta.email);
+    await fila.getByRole('combobox', { name: 'Rol' }).click();
+    await page.getByRole('option', { name: 'Pendiente' }).click();
+    await expect(fila.getByRole('combobox', { name: 'Rol' })).toHaveText('Pendiente');
+  } finally {
     await borrarCuentaTemporal(cuenta.id);
   }
 });
@@ -64,13 +83,12 @@ test('el filtro Esperando rol y la busqueda encuentran a quien espera', async ({
   const cuenta = await crearCuentaTemporal();
   try {
     await page.goto('/admin/usuarios');
-    await page
-      .getByRole('navigation', { name: 'Estado' })
-      .getByRole('link', { name: 'Esperando rol' })
-      .click();
+    await page.getByRole('combobox', { name: 'Estado' }).click();
+    await page.getByRole('option', { name: 'Esperando rol' }).click();
     await expect(page).toHaveURL(/estado=pendientes/);
+    await expect(page.getByRole('button', { name: 'Buscar' })).toHaveCount(0);
     await page.getByLabel('Buscar por nombre o email').fill(cuenta.email);
-    await page.getByRole('button', { name: 'Buscar' }).click();
+    await expect(page).toHaveURL(/q=temporal/);
     await expect(page.getByRole('list', { name: 'Cuentas' }).getByRole('listitem')).toHaveCount(1);
     await expect(tarjeta(page, cuenta.email)).toBeVisible();
     await expect(await enlaceDeSeccion(page, 'Usuarios')).toContainText(/\d+/);
@@ -89,7 +107,9 @@ test('desactivar pide confirmacion y la persona pierde el acceso en el momento',
     await ingresarComo(persona, cuenta.email, cuenta.contrasena);
     await expect(persona).toHaveURL(/\/admin$/);
     const fila = await abrirLaCuenta(page, cuenta.email);
-    await fila.getByRole('button', { name: 'Desactivar' }).click();
+    const activa = fila.getByRole('switch', { name: 'Cuenta activa' });
+    await expect(activa).toBeChecked();
+    await activa.click();
     await expect(
       fila.getByText('¿Desactivar a Cuenta temporal? Pierde el acceso en el momento.'),
     ).toBeVisible();
@@ -97,7 +117,8 @@ test('desactivar pide confirmacion y la persona pierde el acceso en el momento',
     await expect(fila.getByText('Desactivada', { exact: true })).toBeVisible();
     await persona.reload();
     await expect(aviso(persona)).toHaveText(DESACTIVADA);
-    await fila.getByRole('button', { name: 'Reactivar' }).click();
+    await expect(activa).not.toBeChecked();
+    await activa.click();
     await expect(fila.getByText('Activa', { exact: true })).toBeVisible();
     await ingresarComo(persona, cuenta.email, cuenta.contrasena);
     await expect(persona).toHaveURL(/\/admin$/);
@@ -115,7 +136,7 @@ test('resetear muestra la contraseña temporal una sola vez y obliga a cambiarla
   const persona = await abrirSinSesion(browser);
   try {
     const fila = await abrirLaCuenta(page, cuenta.email);
-    await fila.getByRole('button', { name: 'Resetear contraseña' }).click();
+    await abrirElMenu(page, fila, 'Resetear contraseña');
     await fila.getByRole('button', { name: 'Sí, resetear' }).click();
     await expect(
       fila.getByText(
@@ -143,7 +164,7 @@ test('el admin corrige el nombre y el email de una cuenta', async ({ page }) => 
   const nuevo = `corregido.${randomUUID()}@manteca.test`;
   try {
     const fila = await abrirLaCuenta(page, cuenta.email);
-    await fila.getByRole('button', { name: 'Corregir datos' }).click();
+    await abrirElMenu(page, fila, 'Corregir datos');
     await fila.getByLabel('Nombre', { exact: true }).fill('Nombre corregido');
     await fila.getByLabel('Email', { exact: true }).fill(nuevo);
     await fila.getByRole('button', { name: 'Guardar' }).click();
@@ -158,7 +179,8 @@ test('el admin corrige el nombre y el email de una cuenta', async ({ page }) => 
 
 test('sobre su propia cuenta el admin solo corrige los datos', async ({ page }) => {
   const fila = await abrirLaCuenta(page, emailDePrueba('admin'));
-  await expect(fila.getByRole('button')).toHaveText(['Corregir datos']);
+  await fila.getByRole('button', { name: 'Más acciones' }).click();
+  await expect(page.getByRole('menuitem')).toHaveText(['Corregir datos']);
 });
 
 test('guarda una captura de Usuarios', async ({ page }, info) => {

@@ -50,12 +50,14 @@ describe('esquemas de usuarios', () => {
     ]);
   });
 
-  it.each(['caja', 'admin'])('asignar rol acepta %s', (rol) => {
+  it.each(['caja', 'admin', 'invitado'])('asignar rol acepta %s', (rol) => {
     expect(mensajes(esquemaAsignarRol, { id: ID, rol })).toEqual([]);
   });
 
-  it.each(['encargado', 'invitado'])('asignar rol rechaza %s', (rol) => {
-    expect(mensajes(esquemaAsignarRol, { id: ID, rol })).toEqual(['Elegí Caja o Admin.']);
+  it.each(['encargado'])('asignar rol rechaza %s', (rol) => {
+    expect(mensajes(esquemaAsignarRol, { id: ID, rol })).toEqual([
+      'Elegí Pendiente, Caja o Admin.',
+    ]);
   });
 
   it('rechaza un id que no es de una cuenta', () => {

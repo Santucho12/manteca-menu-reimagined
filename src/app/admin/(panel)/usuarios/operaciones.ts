@@ -9,6 +9,7 @@ type Operacion = (id: string) => Promise<Resultado<{ temporal?: string } | undef
 export const OPERACIONES: Record<Operable, Operacion> = {
   darCaja: (id) => darRol({ id, rol: 'caja' }),
   darAdmin: (id) => darRol({ id, rol: 'admin' }),
+  darPendiente: (id) => darRol({ id, rol: 'invitado' }),
   rechazar: (id) => desactivarCuenta({ id }),
   desactivar: (id) => desactivarCuenta({ id }),
   reactivar: (id) => reactivarCuenta({ id }),

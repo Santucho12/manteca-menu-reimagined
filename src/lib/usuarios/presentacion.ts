@@ -2,7 +2,14 @@ import type { PerfilDeAcceso, Rol } from '../acceso/estados';
 
 export type EstadoDeCuenta = 'Pendiente' | 'Activa' | 'Desactivada' | 'Rechazada';
 export type AccionDeUsuario =
-  'darCaja' | 'darAdmin' | 'rechazar' | 'desactivar' | 'reactivar' | 'resetear' | 'corregir';
+  | 'darCaja'
+  | 'darAdmin'
+  | 'darPendiente'
+  | 'rechazar'
+  | 'desactivar'
+  | 'reactivar'
+  | 'resetear'
+  | 'corregir';
 export type FiltroDeEstado = 'todos' | 'pendientes' | 'activos' | 'desactivados';
 export type FiltrosDeLista = { busqueda: string | null; estado: FiltroDeEstado; pagina: number };
 export type FilaDeUsuario = Pick<PerfilDeAcceso, 'id' | 'nombre' | 'email' | 'rol' | 'activo'>;
@@ -19,6 +26,7 @@ export const OPCIONES_DE_ESTADO: { valor: FiltroDeEstado; texto: string }[] = [
 export const ETIQUETAS_DE_ACCION: Record<AccionDeUsuario, string> = {
   darCaja: 'Dar rol de Caja',
   darAdmin: 'Dar rol de Admin',
+  darPendiente: 'Volver a pendiente',
   rechazar: 'Rechazar',
   desactivar: 'Desactivar',
   reactivar: 'Reactivar',
@@ -35,9 +43,9 @@ const NOMBRES_DE_ROL: Record<Rol, string> = {
 
 const CAMBIOS_DE_ROL: Record<Rol, AccionDeUsuario[]> = {
   invitado: ['darCaja', 'darAdmin'],
-  caja: ['darAdmin'],
-  encargado: ['darCaja', 'darAdmin'],
-  admin: ['darCaja'],
+  caja: ['darAdmin', 'darPendiente'],
+  encargado: ['darCaja', 'darAdmin', 'darPendiente'],
+  admin: ['darCaja', 'darPendiente'],
 };
 
 type Cuenta = Pick<PerfilDeAcceso, 'id' | 'rol' | 'activo'>;
@@ -58,6 +66,19 @@ export function accionesDisponibles(cuenta: Cuenta, yo: string): AccionDeUsuario
   if (!cuenta.activo) return ['reactivar'];
   if (cuenta.rol === 'invitado') return [...CAMBIOS_DE_ROL.invitado, 'rechazar'];
   return [...CAMBIOS_DE_ROL[cuenta.rol], 'desactivar', 'resetear', 'corregir'];
+}
+
+const DE_ROL: AccionDeUsuario[] = ['darCaja', 'darAdmin', 'darPendiente'];
+const DE_INTERRUPTOR: AccionDeUsuario[] = ['desactivar', 'reactivar'];
+
+/** Cada accion en su control: el rol, en un desplegable; activar o desactivar, en un interruptor. */
+export function repartirAcciones(acciones: AccionDeUsuario[]) {
+  const interruptor = acciones.find((a) => DE_INTERRUPTOR.includes(a));
+  return {
+    roles: acciones.filter((a) => DE_ROL.includes(a)),
+    interruptor: (interruptor ?? null) as 'desactivar' | 'reactivar' | null,
+    botones: acciones.filter((a) => !DE_ROL.includes(a) && !DE_INTERRUPTOR.includes(a)),
+  };
 }
 
 /** El texto de busqueda sin lo que rompe un filtro de PostgREST. Vacio, null. */
