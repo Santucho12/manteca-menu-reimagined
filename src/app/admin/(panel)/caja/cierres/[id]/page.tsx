@@ -3,7 +3,8 @@ import { Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { FranjaDeAviso } from '@/components/panel/Avisos';
-import { BOTON_SUAVE } from '@/components/panel/estilos';
+import { ACCESO_SECUNDARIO, ICONO_DE_ACCESO_SUAVE } from '@/components/panel/estilos';
+import { EnlaceDeVolver } from '@/components/panel/EnlaceDeVolver';
 import { BotonDeAnular } from '@/components/panel/BotonDeAnular';
 import { InsigniaDeEstado } from '@/components/panel/Insignias';
 import { Pantalla } from '@/components/panel/Pantalla';
@@ -28,8 +29,11 @@ function Marcas({ cierre }: { cierre: Cierre }) {
 function AccionesDelCierre({ cierre, esAdmin }: { cierre: Cierre; esAdmin: boolean }) {
   return (
     <div className="flex flex-wrap items-start gap-3">
-      <Link href={`/admin/caja/cierres/${cierre.id}/editar`} className={BOTON_SUAVE}>
-        <Pencil size={16} aria-hidden="true" /> Editar cierre
+      <Link href={`/admin/caja/cierres/${cierre.id}/editar`} className={ACCESO_SECUNDARIO}>
+        <span className={ICONO_DE_ACCESO_SUAVE}>
+          <Pencil size={15} aria-hidden="true" />
+        </span>
+        Editar cierre
       </Link>
       {esAdmin ? (
         <BotonDeAnular id={cierre.id} anular={anularCierreDesdeElPanel} titulo="Anular el cierre" />
@@ -62,12 +66,9 @@ export default async function FichaDeCierre({ params }: { params: Promise<{ id: 
       <Marcas cierre={cierre} />
       <DetalleDelCierre cierre={cierre} fondoAnterior={anterior} />
       {cierre.anulado ? null : <AccionesDelCierre cierre={cierre} esAdmin={esAdmin} />}
-      <Link
-        href={esAdmin ? '/admin/caja/control' : '/admin/caja/mis-cierres'}
-        className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
-      >
+      <EnlaceDeVolver href={esAdmin ? '/admin/caja/control' : '/admin/caja/mis-cierres'}>
         {esAdmin ? 'Volver al control' : 'Volver a mis cierres'}
-      </Link>
+      </EnlaceDeVolver>
     </Pantalla>
   );
 }

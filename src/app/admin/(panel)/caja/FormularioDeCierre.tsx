@@ -8,6 +8,7 @@ import { AvisoDeError } from '@/components/formularios/AvisoDeError';
 import { Campo } from '@/components/formularios/Campo';
 import { CampoDeTextoLargo } from '@/components/formularios/CampoDeTextoLargo';
 import { PieDelFormulario } from '@/components/formularios/PieDelFormulario';
+import { FranjaDeAviso } from '@/components/panel/Avisos';
 import { Seccion } from '@/components/panel/Seccion';
 import { esquemaCierre, type DatosDeCierre } from '@/lib/caja/esquemas';
 import { conValorInicial, type Registro } from '@/lib/formularios/valorInicial';
@@ -49,10 +50,10 @@ function Montos({ registro, errors }: PropsDeMontos) {
   );
 }
 
-type Props = { inicial: DatosDeCierre; id?: string };
+type Props = { inicial: DatosDeCierre; id?: string; avisoDelFondo?: string | null };
 
 /** Cargar un cierre nuevo o, con el id, editar uno existente; al terminar abre su resultado. */
-export function FormularioDeCierre({ inicial, id }: Props) {
+export function FormularioDeCierre({ inicial, id, avisoDelFondo }: Props) {
   const router = useRouter();
   const verDetalle = (cierre: string) => router.push(`/admin/caja/cierres/${cierre}`);
   const guardar = (datos: DatosDeCierre) =>
@@ -77,6 +78,11 @@ export function FormularioDeCierre({ inicial, id }: Props) {
           error={errors.fecha?.message}
           {...registro('fecha')}
         />
+        {avisoDelFondo ? (
+          <FranjaDeAviso>
+            <p>{avisoDelFondo}</p>
+          </FranjaDeAviso>
+        ) : null}
         <Montos registro={registro} errors={errors} />
         <Retiros control={control} register={register} errors={errors} />
         <GastosDeCaja control={control} register={register} errors={errors} />

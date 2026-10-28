@@ -2,6 +2,7 @@ import { FranjaDeAviso } from '@/components/panel/Avisos';
 import { Dato, Datos, Seccion } from '@/components/panel/Seccion';
 import type { Cierre } from '@/lib/caja/consultas';
 import { diferenciaDeFondo, textoDeFondo } from '@/lib/caja/fondo';
+import { avisoDeQueda } from '@/lib/caja/queda';
 import { nombreDeMedio, textoDeDiferencia } from '@/lib/caja/pantalla';
 import { formatearPesos } from '@/lib/plata';
 
@@ -50,12 +51,20 @@ function Salidas({ cierre }: { cierre: Cierre }) {
 
 function Efectivo({ cierre, anterior }: { cierre: Cierre; anterior: number | null }) {
   const fondo = diferenciaDeFondo(cierre.fondoInicialCentavos, anterior);
+  const contado = cierre.medios.find((m) => m.medio === 'efectivo')?.declaradoCentavos ?? 0;
+  const aviso = avisoDeQueda(contado, cierre.quedaEnCajaCentavos);
   return (
     <Seccion titulo="Efectivo de la caja" forma="lista">
       <Datos>
         <Dato titulo="Fondo inicial" valor={formatearPesos(cierre.fondoInicialCentavos)} />
+        <Dato titulo="Efectivo contado" valor={formatearPesos(contado)} />
         <Dato titulo="Queda en la caja" valor={formatearPesos(cierre.quedaEnCajaCentavos)} />
       </Datos>
+      {aviso ? (
+        <FranjaDeAviso>
+          <p>{aviso}</p>
+        </FranjaDeAviso>
+      ) : null}
       {fondo ? (
         <FranjaDeAviso>
           <p>{textoDeFondo(fondo)}</p>
@@ -72,6 +81,11 @@ export function DetalleDelCierre({ cierre, fondoAnterior }: Props) {
   return (
     <>
       <Seccion titulo="Por medio de pago" forma="lista">
+        <p className="pb-2 text-xs text-muted-foreground">
+          Esperado = fondo inicial + ventas del día − retiros − gastos pagados con la caja (el
+          efectivo); en los demás medios, lo vendido con ese medio. Se declara el efectivo total que
+          hay en el cajón, fondo incluido.
+        </p>
         <Medios cierre={cierre} />
       </Seccion>
       <Efectivo cierre={cierre} anterior={fondoAnterior} />

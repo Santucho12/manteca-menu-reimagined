@@ -1337,8 +1337,12 @@ export type Database = {
           ventas_transferencia_centavos: number
         }[]
       }
-      cierres_editar: { Args: { datos: Json; el_id: string }; Returns: undefined }
+      cierres_editar: {
+        Args: { datos: Json; el_id: string }
+        Returns: undefined
+      }
       cierres_exigir_quien_carga: { Args: never; Returns: undefined }
+      cierres_fecha_del_fondo: { Args: { la_fecha: string }; Returns: string }
       cierres_fondo_sugerido: { Args: { la_fecha: string }; Returns: number }
       cierres_fondos_anteriores: {
         Args: { ids: string[] }
@@ -1354,6 +1358,14 @@ export type Database = {
       }
       es_admin_activo: { Args: never; Returns: boolean }
       es_caja_activa: { Args: never; Returns: boolean }
+      es_vencimiento_del_fijo: {
+        Args: {
+          el_dia: string
+          la_frecuencia: Database["public"]["Enums"]["frecuencia_de_gasto"]
+          primero: string
+        }
+        Returns: boolean
+      }
       gastos_exigir_medio: {
         Args: { anterior: string; nuevo: string }
         Returns: undefined

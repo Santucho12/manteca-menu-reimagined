@@ -104,6 +104,12 @@ export const ACCESO_VERDE =
 export const ICONO_DE_ACCESO_SOBRE_VERDE =
   'flex h-7 w-7 items-center justify-center rounded-full bg-white/20 transition-transform duration-200 group-hover:scale-110';
 
+export const ACCESO_DE_PELIGRO =
+  'group inline-flex h-11 items-center justify-center gap-2.5 whitespace-nowrap rounded-full bg-rose-600 pl-3 pr-5 text-sm font-bold text-white shadow-md shadow-rose-600/25 transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg active:translate-y-0 active:scale-[0.98] disabled:opacity-50';
+
+export const ICONO_DE_ACCESO_PELIGRO =
+  'flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white transition-transform duration-200 group-hover:scale-110';
+
 export const ICONO_DE_ACCESO =
   'flex h-7 w-7 items-center justify-center rounded-full bg-black/10 transition-transform duration-200 group-hover:scale-110';
 

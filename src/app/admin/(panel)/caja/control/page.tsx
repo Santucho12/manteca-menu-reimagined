@@ -1,7 +1,4 @@
-import { Plus } from 'lucide-react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { BOTON_DE_ENCABEZADO } from '@/components/panel/estilos';
 import { Paginas } from '@/components/panel/Paginas';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPagina } from '@/lib/acceso/servidor';
@@ -23,6 +20,7 @@ import {
 import { diaEnArgentina } from '@/lib/fechas';
 import { montoParaEditar } from '@/lib/gastos/plata';
 import { cantidadDePaginas } from '@/lib/usuarios/presentacion';
+import { AccesoACargarCierre } from '../AccesoACargarCierre';
 import { ListaDeCierres } from '../ListaDeCierres';
 import { DiasSinCierre, FiltrosDelControl } from './FiltrosDelControl';
 import { ToleranciaEnTuerca } from './ToleranciaEnTuerca';
@@ -55,10 +53,8 @@ const verPendientes = (f: FiltrosDeControl) =>
 
 const Acciones = ({ tolerancia }: { tolerancia: string }) => (
   <>
+    <AccesoACargarCierre />
     <ToleranciaEnTuerca inicial={tolerancia} />
-    <Link href="/admin/caja" className={BOTON_DE_ENCABEZADO}>
-      <Plus size={18} aria-hidden="true" /> Cargar cierre
-    </Link>
   </>
 );
 
