@@ -21,7 +21,7 @@ type Props = {
 };
 
 const FLECHA =
-  'size-9 inline-flex items-center justify-center rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 active:scale-95 transition-all';
+  'size-9 inline-flex items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary active:scale-95 transition-all';
 const TIPOS: { tipo: TipoDeGasto | null; texto: string }[] = [
   { tipo: null, texto: 'Todos' },
   { tipo: 'fijos', texto: 'Fijos' },
@@ -63,7 +63,7 @@ function Tipos({ filtros, hoy }: Pick<Props, 'filtros' | 'hoy'>) {
           className={cn(
             'px-4 h-9 inline-flex items-center rounded-xl text-sm font-bold transition-all',
             filtros.tipo === tipo
-              ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+              ? 'bg-primary text-primary-foreground'
               : 'text-muted-foreground hover:text-foreground',
           )}
         >

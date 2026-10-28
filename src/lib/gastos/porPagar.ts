@@ -28,6 +28,8 @@ export type ItemPorPagar = {
   vencimiento: string;
   nombre: string;
   detalle: string;
+  /** Cada cuanto se repite, si es de un fijo. */
+  frecuencia: Frecuencia | null;
   fecha: string;
   montoCentavos: number;
   medio: MedioDePago | null;
@@ -46,6 +48,7 @@ function deLoCargado(pendiente: Pendiente): ItemPorPagar {
     vencimiento: pendiente.vencimiento,
     nombre: nombreDelGasto(pendiente),
     detalle: detalleDe(pendiente),
+    frecuencia: pendiente.frecuencia,
     fecha: pendiente.vencimiento,
     montoCentavos: pendiente.monto_centavos,
     medio: pendiente.medio_de_pago,
@@ -60,6 +63,7 @@ function deUnFijo(proximo: ProximoPago): ItemPorPagar {
     vencimiento: proximo.fecha,
     nombre: proximo.nombre,
     detalle: nombreDeFrecuencia(proximo.frecuencia),
+    frecuencia: proximo.frecuencia,
     fecha: proximo.fecha,
     montoCentavos: proximo.montoCentavos,
     medio: proximo.medio,

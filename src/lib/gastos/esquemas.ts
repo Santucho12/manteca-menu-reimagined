@@ -3,14 +3,21 @@ import { proximoPago } from './fijos';
 import { centavosDeMonto, montoParaEditar } from './plata';
 import { esFechaValida, type Frecuencia } from './vencimientos';
 
-export const MEDIOS_DE_PAGO = ['efectivo_caja', 'transferencia', 'tarjeta', 'otro'] as const;
+export const MEDIOS_DE_PAGO = [
+  'efectivo_caja',
+  'efectivo',
+  'transferencia',
+  'tarjeta',
+  'cheque',
+  'otro',
+] as const;
 export const FRECUENCIAS = ['mensual', 'bimestral', 'anual'] as const;
 /** "¿Se repite?" del formulario de carga: no, o cada cuánto. */
 export const REPETICIONES = ['no', ...FRECUENCIAS] as const;
 /** "¿Ya lo pagaste?" del formulario de carga, para lo que no se repite. */
 export const YA_PAGADO = ['si', 'no'] as const;
 // Lo que se paga a mano no sale del efectivo de la caja: eso lo carga el cierre del día.
-const MEDIOS_A_MANO = ['transferencia', 'tarjeta', 'otro'] as const;
+const MEDIOS_A_MANO = ['efectivo', 'transferencia', 'tarjeta', 'cheque', 'otro'] as const;
 
 const NO_FUTURO = 'La fecha de un gasto pagado no puede ser futura.';
 const NO_FUTURO_AL_CARGAR =

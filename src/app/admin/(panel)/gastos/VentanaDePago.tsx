@@ -17,6 +17,7 @@ import { opcionesDeMedio } from '@/lib/gastos/pantalla';
 import { pagoInicial, type ItemPorPagar } from '@/lib/gastos/porPagar';
 import { useGuardar } from '@/lib/gastos/useGuardar';
 import { sumarDias } from '@/lib/reportes/periodos';
+import { cn } from '@/lib/utils';
 import { pagarDesdeElPanel } from './acciones';
 
 type Props = { item: ItemPorPagar; hoy: string };
@@ -92,7 +93,11 @@ export function BotonDePago({ item, hoy }: Props) {
   const [abierta, setAbierta] = useState(false);
   return (
     <>
-      <button type="button" onClick={() => setAbierta(true)} className={BOTON_DE_FILA_SUAVE}>
+      <button
+        type="button"
+        onClick={() => setAbierta(true)}
+        className={cn(BOTON_DE_FILA_SUAVE, 'h-7 px-2 text-[10px]')}
+      >
         <Check size={13} aria-hidden="true" />
         Pagado
       </button>

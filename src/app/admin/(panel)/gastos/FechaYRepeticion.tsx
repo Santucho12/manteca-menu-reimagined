@@ -17,6 +17,12 @@ type Props = {
 };
 
 // Lo pagado mira para atrás; lo por pagar, para adelante.
+/** Lo que se carga dice si es cuando vence o cuando se pagó; al editar queda "Fecha". */
+function etiquetaDeLaFecha(nuevo: boolean, porPagar: boolean) {
+  if (!nuevo) return 'Fecha';
+  return porPagar ? 'Fecha en que vence' : 'Fecha de pago';
+}
+
 function atajosDe(hoy: string, porPagar: boolean, deCaja: boolean) {
   if (deCaja) return [];
   const otro = porPagar
@@ -42,7 +48,7 @@ export function FechaYRepeticion({ control, errors, hoy, nuevo, deCaja }: Props)
           render={({ field }) => (
             <CampoDeFecha
               id="fecha"
-              etiqueta={porPagar ? 'Vence el' : 'Fecha'}
+              etiqueta={etiquetaDeLaFecha(nuevo, porPagar)}
               valor={field.value}
               alCambiar={field.onChange}
               hasta={seRepite === 'no' && !porPagar ? hoy : undefined}

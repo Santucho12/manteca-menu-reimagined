@@ -4,7 +4,9 @@ import { PanelDeLista } from '@/components/panel/PanelDeLista';
 import type { FilaDeRecurrente } from '@/lib/gastos/consultas';
 import { nombreDelGasto } from '@/lib/gastos/filas';
 import { faltaPagarEsteMes, proximosPagos } from '@/lib/gastos/fijos';
-import { itemsPorPagar, type Pendiente } from '@/lib/gastos/porPagar';
+import { nombreDelMes } from '@/lib/gastos/meses';
+import { agruparPorMes, type GrupoDeMes } from '@/lib/gastos/porMes';
+import { itemsPorPagar, type ItemPorPagar, type Pendiente } from '@/lib/gastos/porPagar';
 import { formatearPesos } from '@/lib/plata';
 import { FilaPorPagar } from './FilaPorPagar';
 
@@ -38,6 +40,24 @@ type Props = {
   hoy: string;
 };
 
+// Cada mes abre con su nombre y lo que suma: se nota cuando lo que viene pasa al mes siguiente.
+function Mes({ grupo, hoy }: { grupo: GrupoDeMes<ItemPorPagar>; hoy: string }) {
+  return (
+    <>
+      <li
+        role="presentation"
+        className="flex items-baseline justify-between gap-3 bg-secondary/50 px-4 md:px-5 py-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+      >
+        <span>{nombreDelMes(grupo.mes)}</span>
+        <span className="tabular-nums">{formatearPesos(grupo.totalCentavos)}</span>
+      </li>
+      {grupo.items.map((item) => (
+        <FilaPorPagar key={item.clave} item={item} hoy={hoy} />
+      ))}
+    </>
+  );
+}
+
 /** Lo por pagar y el próximo pago de cada fijo activo, del más cercano al más lejano. */
 export function ProximosPagos({ recurrentes, porPagar, tomados, hoy }: Props) {
   const items = itemsPorPagar(porPagar, proximosPagos(recurrentes, hoy, tomados));
@@ -51,8 +71,8 @@ export function ProximosPagos({ recurrentes, porPagar, tomados, hoy }: Props) {
         </p>
       ) : (
         <ul aria-label="Próximos pagos" className="divide-y divide-border">
-          {items.map((item) => (
-            <FilaPorPagar key={item.clave} item={item} hoy={hoy} />
+          {agruparPorMes(items).map((grupo) => (
+            <Mes key={grupo.mes} grupo={grupo} hoy={hoy} />
           ))}
         </ul>
       )}

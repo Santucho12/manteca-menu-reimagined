@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { detalleDelGasto, fechaCorta, marcasDelGasto, nombreDelGasto } from './filas';
+import {
+  detalleDelGasto,
+  fechaCorta,
+  marcasDelGasto,
+  nombreDelGasto,
+  tonoDeLaMarca,
+} from './filas';
 
 const base = {
   descripcion: null,
@@ -40,5 +46,14 @@ describe('fechaCorta', () => {
   it('el día sin cero y el mes en tres letras', () => {
     expect(fechaCorta('2026-11-05')).toEqual({ dia: '5', mes: 'nov' });
     expect(fechaCorta('2026-01-22')).toEqual({ dia: '22', mes: 'ene' });
+  });
+});
+
+describe('tonoDeLaMarca', () => {
+  it('cada frecuencia de un fijo tiene su color; lo demas, el violeta de siempre', () => {
+    expect(tonoDeLaMarca('Fijo · Todos los meses')).toBe('violeta');
+    expect(tonoDeLaMarca('Fijo · Cada dos meses')).toBe('celeste');
+    expect(tonoDeLaMarca('Fijo · Una vez por año')).toBe('ambar');
+    expect(tonoDeLaMarca('De caja')).toBe('violeta');
   });
 });

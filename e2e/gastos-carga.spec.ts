@@ -68,15 +68,12 @@ test('carga un gasto con Ayer', async ({ page }) => {
   ]);
 });
 
-test('¿Se repite? dice qué va a pasar y esconde el comprobante', async ({ page }) => {
+test('¿Se repite? dice qué va a pasar, y ya no pide comprobante', async ({ page }) => {
   await page.goto('/admin/gastos/nuevo');
-  await expect(page.getByLabel('Comprobante (opcional)')).toBeVisible();
+  await expect(page.getByLabel('Comprobante')).toHaveCount(0);
   await page.getByRole('radio', { name: 'Todos los meses' }).check();
   const dia = Number(HOY.slice(8));
   await expect(page.getByText(`Vence hoy y después todos los meses, el día ${dia}.`)).toBeVisible();
-  await expect(page.getByLabel('Comprobante (opcional)')).toHaveCount(0);
-  await page.getByRole('radio', { name: 'No' }).check();
-  await expect(page.getByLabel('Comprobante (opcional)')).toBeVisible();
 });
 
 test('el proveedor aparece solo con una categoría que lo pide', async ({ page }) => {

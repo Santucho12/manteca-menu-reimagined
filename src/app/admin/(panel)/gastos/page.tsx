@@ -15,10 +15,12 @@ import {
 } from '@/lib/gastos/consultas';
 import { generarAlAbrir } from '@/lib/gastos/generacion';
 import { pagosPendientes, vencimientosTomados } from '@/lib/gastos/pagos';
+import { resumenPorCategoria } from '@/lib/gastos/resumenPorCategoria';
 import { filtrosDeGastos, type ParametrosDeGastos } from '@/lib/gastos/pantalla';
 import { Pagados } from './Pagados';
 import { ParaClasificar } from './ParaClasificar';
 import { ProximosPagos } from './ProximosPagos';
+import { TarjetasDeCategoria } from './TarjetasDeCategoria';
 import { VentanaDeCategorias } from './VentanaDeCategorias';
 
 export const metadata: Metadata = { title: 'Gastos' };
@@ -44,7 +46,7 @@ export default async function PaginaDeGastos({
   // Lo vencido aparece al abrir, sin esperar al proceso de la madrugada.
   await generarAlAbrir(estado, hoy);
   const filtros = filtrosDeGastos(await searchParams, hoy);
-  const [lista, opciones, recurrentes, pendientes, categorias, porPagar, tomados] =
+  const [lista, opciones, recurrentes, pendientes, categorias, porPagar, tomados, resumen] =
     await Promise.all([
       listarGastos(cliente, filtros),
       opcionesDeGasto(cliente),
@@ -53,6 +55,7 @@ export default async function PaginaDeGastos({
       listarCategorias(cliente),
       pagosPendientes(cliente),
       vencimientosTomados(cliente, hoy),
+      resumenPorCategoria(cliente, filtros),
     ]);
   return (
     <Pantalla
@@ -63,7 +66,8 @@ export default async function PaginaDeGastos({
     >
       <ParaClasificar gastos={pendientes.gastos} {...opciones} />
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 md:gap-8 items-start">
-        <div className="xl:col-span-2 order-2 xl:order-1">
+        <div className="xl:col-span-2 order-2 xl:order-1 space-y-5">
+          <TarjetasDeCategoria resumen={resumen} filtros={filtros} hoy={hoy} />
           <Pagados lista={lista} filtros={filtros} hoy={hoy} categorias={opciones.categorias} />
         </div>
         <div className="order-1 xl:order-2">

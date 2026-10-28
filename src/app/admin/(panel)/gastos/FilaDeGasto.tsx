@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Chip } from '@/components/panel/Insignias';
 import type { FilaDeGasto as Gasto } from '@/lib/gastos/consultas';
-import { detalleDelGasto, marcasDelGasto, nombreDelGasto } from '@/lib/gastos/filas';
+import { detalleDelGasto, marcasDelGasto, nombreDelGasto, tonoDeLaMarca } from '@/lib/gastos/filas';
 import { formatearPesos } from '@/lib/plata';
 import { cn } from '@/lib/utils';
 import { BaldosaDeFecha } from './BaldosaDeFecha';
@@ -23,7 +23,9 @@ export function FilaDeGasto({ gasto }: { gasto: Gasto }) {
         {marcas.length > 0 ? (
           <span className="flex flex-wrap gap-1">
             {marcas.map((marca) => (
-              <Chip key={marca}>{marca}</Chip>
+              <Chip key={marca} tono={tonoDeLaMarca(marca)}>
+                {marca}
+              </Chip>
             ))}
           </span>
         ) : null}

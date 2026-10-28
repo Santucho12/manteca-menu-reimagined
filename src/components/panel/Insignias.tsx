@@ -36,10 +36,27 @@ export function InsigniaDeEstado({ tono, icono, children }: Props) {
   );
 }
 
-/** El chip violeta bajo un nombre (seguimiento, "Automatico", "De caja"). */
-export function Chip({ children }: { children: ReactNode }) {
+const TONOS_DE_CHIP = {
+  violeta: 'bg-violet-100 text-violet-700',
+  celeste: 'bg-sky-100 text-sky-700',
+  ambar: 'bg-amber-100 text-amber-700',
+} as const;
+
+/** El chip bajo un nombre (seguimiento, "Automatico", "De caja"): violeta, o el tono que se pida. */
+export function Chip({
+  children,
+  tono = 'violeta',
+}: {
+  children: ReactNode;
+  tono?: keyof typeof TONOS_DE_CHIP;
+}) {
   return (
-    <span className="inline-block px-2 py-0.5 rounded-md bg-violet-100 text-violet-700 text-[9px] font-bold uppercase tracking-wider">
+    <span
+      className={cn(
+        'inline-block px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider',
+        TONOS_DE_CHIP[tono],
+      )}
+    >
       {children}
     </span>
   );

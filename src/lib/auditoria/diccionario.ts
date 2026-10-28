@@ -120,6 +120,7 @@ export const VALORES: Record<string, string> = {
   efectivo_caja: 'Efectivo de la caja',
   transferencia: 'Transferencia',
   tarjeta: 'Tarjeta',
+  cheque: 'Cheque',
   otro: 'Otro',
   mensual: 'Todos los meses',
   bimestral: 'Cada dos meses',

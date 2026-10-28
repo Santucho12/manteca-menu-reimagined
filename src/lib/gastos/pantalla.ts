@@ -19,8 +19,10 @@ export type ParametrosDeGastos = Record<string, string | string[] | undefined>;
 
 const MEDIOS: Record<MedioDePago, string> = {
   efectivo_caja: 'Efectivo de la caja',
+  efectivo: 'Efectivo',
   transferencia: 'Transferencia',
   tarjeta: 'Tarjeta',
+  cheque: 'Cheque',
   otro: 'Otro',
 };
 const FRECUENCIAS_EN_TEXTO: Record<(typeof FRECUENCIAS)[number], string> = {
