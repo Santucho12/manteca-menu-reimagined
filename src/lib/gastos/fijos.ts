@@ -29,10 +29,11 @@ export function proximoPago(serie: Serie, hoy: string): string {
   return proximoVencimiento(serie.primer_vencimiento, serie.frecuencia, desde);
 }
 
-export function cuandoVence(fecha: string, hoy: string): string | null {
+/** Cuándo vence, en palabras; pasado un mes, la fecha entera: la baldosa no dice el año. */
+export function cuandoVence(fecha: string, hoy: string): string {
   const dias = Math.round((Date.parse(fecha) - Date.parse(hoy)) / UN_DIA);
   if (dias === 1) return 'Mañana';
-  return dias <= 30 ? `En ${dias} días` : null;
+  return dias <= 30 ? `En ${dias} días` : `El ${fechaParaMostrar(fecha)}`;
 }
 
 /** Cada fijo activo con su próximo pago, del más cercano al más lejano. */

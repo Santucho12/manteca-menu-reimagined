@@ -16,7 +16,7 @@ import { BaldosaDeFecha } from './BaldosaDeFecha';
 const NOMBRE = 'block text-sm font-semibold truncate hover:text-primary transition-colors';
 
 function FilaDeProximo({ proximo, hoy }: { proximo: ProximoPago; hoy: string }) {
-  const detalle = [nombreDeFrecuencia(proximo.frecuencia), cuandoVence(proximo.fecha, hoy)];
+  const detalle = `${nombreDeFrecuencia(proximo.frecuencia)} · ${cuandoVence(proximo.fecha, hoy)}`;
   return (
     <li className="px-4 md:px-5 py-3 flex items-center gap-3 hover:bg-secondary/40 transition-colors">
       <BaldosaDeFecha fecha={proximo.fecha} viene />
@@ -24,9 +24,7 @@ function FilaDeProximo({ proximo, hoy }: { proximo: ProximoPago; hoy: string }) 
         <Link href={`/admin/gastos/fijos/${proximo.id}`} className={NOMBRE}>
           {proximo.nombre}
         </Link>
-        <p className="text-[11px] text-muted-foreground truncate">
-          {detalle.filter(Boolean).join(' · ')}
-        </p>
+        <p className="text-[11px] text-muted-foreground">{detalle}</p>
       </div>
       <span className="text-sm font-bold tabular-nums whitespace-nowrap">
         {formatearPesos(proximo.montoCentavos)}

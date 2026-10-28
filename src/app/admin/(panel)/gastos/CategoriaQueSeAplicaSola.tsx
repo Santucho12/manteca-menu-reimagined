@@ -23,7 +23,7 @@ export function CategoriaQueSeAplicaSola({ filtros, hoy, categorias }: Props) {
         id="filtro-categoria"
         name="categoria"
         defaultValue={filtros.categoriaId ?? ''}
-        className={`${CAMPO_DE_FILTRO} md:h-10 md:rounded-xl`}
+        className={`${CAMPO_DE_FILTRO} sm:w-auto md:h-10 md:rounded-xl`}
       >
         <option value="">Todas las categorías</option>
         {categorias.map((categoria) => (

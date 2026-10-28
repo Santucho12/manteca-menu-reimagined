@@ -57,11 +57,11 @@ describe('proximoPago', () => {
 });
 
 describe('cuandoVence', () => {
-  it('mañana, en N días hasta 30, y nada más lejos', () => {
+  it('mañana, en N días hasta 30, y más lejos la fecha entera, con el año', () => {
     expect(cuandoVence('2026-10-28', HOY)).toBe('Mañana');
     expect(cuandoVence('2026-11-05', HOY)).toBe('En 9 días');
     expect(cuandoVence('2026-11-26', HOY)).toBe('En 30 días');
-    expect(cuandoVence('2026-11-27', HOY)).toBeNull();
+    expect(cuandoVence('2027-07-01', HOY)).toBe('El 01/07/2027');
   });
 });
 

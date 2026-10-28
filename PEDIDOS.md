@@ -150,6 +150,40 @@ Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, 
 
 **Excepción (Santiago, 2026-10-21):** los colores del panel son los exactos de Plan Reminder Pro aunque no pasen el contraste AA que pide el pedido 21 (letra blanca sobre el verde, 2,6 a 1; el rojo de error, 3,6; el anillo de foco, 2,5; los grises chicos, 2,6). Las pruebas de contraste (`tests/contraste.test.ts`) siguen mirando solo la carta pública; no se extienden al panel. El panel no bloquea el zoom en el celular, a diferencia de Plan Reminder Pro (Santiago, 2026-10-22).
 
+### 61. Control de cierres: tolerancia en una tuerca y fila que abre el detalle
+En `/admin/caja/control`, la tolerancia sale de su sección y queda detrás de una tuerca de configuración que abre una ventana con el mismo campo. Cada cierre de la lista se abre al tocar cualquier parte de la fila, con una flecha que lo avisa.
+
+### 60. Ventas: tarjetas de resumen y una tabla más clara
+En Ventas, el resumen de arriba ("Cobrado: … en N ventas") pasa a tarjetas de estadísticas rápidas (cobrado, ticket promedio, canceladas y anuladas). La tabla muestra siempre el estado con una insignia, la hora de la venta cuando se conoce, el canal debajo del origen (sin columna propia), íconos en el origen y el medio de pago, y cada fila se abre con un clic. El detalle de la venta suma la hora, los íconos y, para las del Excel de Fudo, avisa que vienen sin productos. Las ventas del Excel dejan de llevar una hora inventada (Santiago, 2026-10-27).
+
+### 59. Importar las ventas de Fudo desde el Excel
+En Ventas, poder importar las ventas de Fudo desde su Excel (Santiago, 2026-10-27). Hoy `CLAUDE.md`, `docs/producto.md` y `docs/modulos/05-ventas.md` lo dejan afuera: las ventas entran por la API de Fudo, que espera las credenciales, y el Excel "Reporte de ventas" trae totales por día y por medio de pago, sin productos ni tickets. Hacerlo es una excepción que decide Santiago conociendo eso.
+
+**Excepción decidida (Santiago, 2026-10-27):** mientras no esté la API, se sube el "Reporte-Ventas" desde Ventas, con vista previa antes de guardar. Se usa la hoja de medios de pago: cada día y medio entra como tantas ventas de origen Fudo como diga el Excel, de partes iguales (el resto en la primera), sin productos. Subir otra vez el mismo período no duplica: actualiza lo de ese día y medio y anula las que sobren. Sin productos, "Más vendidos" y ventas por producto no reflejan estas ventas. Queda sin hacer la API de Fudo.
+
+### 58. Gastos desde cero, más simple
+Rediseño estético y estructural de toda la sección Gastos, con todo dentro de Gastos (Santiago, 2026-10-27). No se entiende cuáles gastos se repiten y cuáles no, no se ven separados los ya pagados de los que vienen, el apartado de recurrentes no es claro, y el campo y la columna Proveedor aparecen siempre aunque la categoría no lo pida. Incluye lo pedido antes en la misma sesión: sacar el filtro de proveedor y que los filtros se apliquen solos, sin el botón "Filtrar".
+
+**Excepción (Santiago, 2026-10-27):** se hace en la rama `feat/mes-a-mes-aireado`, junto con lo que está en curso (pedidos 52 a 57 y cambios de Usuarios sin registrar), y no en una rama propia: hay otras sesiones de Claude trabajando en la misma carpeta, y cambiar de rama las movería a todas.
+
+### 57. Un solo botón «Nuevo» en el Menú
+En el encabezado del Menú, "Nueva categoría" y "Nuevo producto" pasan a un solo botón Nuevo que abre dos opciones: Categoría ("Para agrupar productos") y Producto ("Con sus precios"). Quedan dos botones en vez de tres (Santiago, 2026-10-27, idea 13).
+
+### 56. "Cómo funciona" completo en todos los módulos
+La ayuda de cada pantalla (el botón ⓘ) se completa como la de Inicio: cada dato, cada filtro, cada estado y cada acción explicados, a partir de lo que la pantalla hace hoy. Se corrigen los atajos de Reportes (decía "esta semana") y Ventas avisa que Fudo todavía no está conectado (2026-10-27).
+
+### 55. Editar categoría con nombres que se entienden
+En el formulario de categoría del menú, "Presentaciones" pasa a "Cómo se vende" y cada forma de venta lleva su nombre ("Se vende por") y su precio en una sola línea. La casilla "Precio compartido" pasa a "Mismo precio para todos los productos", con una frase que explica qué hace, y en la tabla del aumento el renglón de la categoría dice "Facturas · precio para todos". Santiago no entendía la pantalla (2026-10-27).
+
+### 54. Ingreso y registro con otra estética
+La tarjeta de ingreso y la de registro siguen la imagen que pasó Santiago, con los colores de Manteca: título con la última palabra en dorado y subtítulo, campos sin etiqueta a la vista con su ícono, ojito en la contraseña, botón principal con degradé dorado, "¿Olvidaste tu contraseña?" (avisa que la resetea el administrador) y "Crear cuenta" / "Ya tengo cuenta" como botón secundario. Sin flecha para volver. El lema "Sistema de gestión" queda pegado al logo (Santiago, 2026-10-27).
+
+### 53. Pantalla de carga al cambiar de sección
+Al tocar otra sección del panel, la pantalla quedaba quieta 1,5 a 2 segundos hasta que llegaban los datos. `loading.tsx` en el panel muestra enseguida un esqueleto y deja que Next precargue cada sección (Santiago, 2026-10-27).
+
+### 52. Mes a mes más aireado
+El gráfico mes a mes con el eje en montos cortos ("$20 M"), la ventanita del mouse más chica y prolija, la franja de fondo más suave y más aire en la leyenda (Santiago, 2026-10-27).
+
 **Excepción (Santiago, 2026-10-27):** los pedidos 47 a 51 entraron a `main` sin `npm run verificar` ni `npm run e2e` completos; solo lint, tipos y los 540 tests puros en verde. Del 50 entraron los cálculos y la consulta, pero no la pantalla: otra sesión sacó `Ayer.tsx`, `Vencimientos.tsx` y sus pruebas de Playwright. Falta el cierre completo de los cinco.
 
 ### 51. `npm run local`: la aplicación armada entera, sin compilar al navegar
@@ -200,6 +234,16 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 61 | Control de cierres: tolerancia en una tuerca y fila que abre el detalle | Todo |
+| 60 | Ventas: tarjetas de resumen y una tabla más clara | Todo |
+| 59 | Importar las ventas de Fudo desde el Excel | Hecho con TDD (2026-10-27): lector del Excel y reparto en partes iguales (`excelDeFudo.test.ts`, `leerExcelDeFudo.test.ts`, `mensajesDeLaSubida.test.ts`), función de la base `ventas_importar_excel` aplicada solo en pruebas (`tests/reglas/ventas-excel.base.test.ts`, 19 casos), servicio (`tests/servicios/ventas-excel.base.test.ts`) y pantalla `/admin/ventas/subir` (`e2e/ventas-excel.spec.ts`, 9 en verde en computadora y celular). Falta: OK de Santiago para aplicar la migración `20261028120000_ventas_excel_de_fudo.sql` a la base real, actualizar `docs/producto.md` y `docs/modulos/05-ventas.md`, `schema.sql`, y el cierre completo |
+| 58 | Gastos desde cero, más simple | Hecho con TDD (2026-10-27): diseño en `docs/superpowers/specs/2026-10-27-gastos-desde-cero-design.md`, migración `20261027210000_gastos_fijos.sql` aplicada y verificada solo en pruebas (reversa probada), tests de base de Gastos (69), puros (596) y Playwright de Gastos en computadora y celular (58: `gastos`, `gastos-carga`, `gastos-categorias`, `gastos-fijos`) en verde, más `caja-control` (clasificar), `inicio-admin` (aviso) y `proveedores` (aviso) en computadora; tipos y lint de lo tocado limpios. Falta: OK de Santiago para aplicar la migración a la base real y el cierre completo (`npm run verificar` y `npm run e2e` enteros), que hoy no da verde por trabajo en curso de otras sesiones (gráficos de Inicio, fila del control de Caja, largo de `numerosDelMes`) |
+| 57 | Un solo botón «Nuevo» en el Menú | Hecho con TDD: `e2e/menu-nuevo.spec.ts` falló con los tres botones y pasó con Nuevo, en computadora; lint y tipos limpios (2026-10-27). Falta el cierre completo |
+| 56 | "Cómo funciona" completo en todos los módulos | Hecho con TDD: `src/lib/panel/ayudas.test.ts` falló en las 14 ayudas y en los atajos de Reportes, y pasó después (19 en verde); lint y tipos limpios (2026-10-27). Falta el cierre completo (`npm run verificar` y `npm run e2e`) |
+| 55 | Editar categoría con nombres que se entienden | Hecho con TDD: `src/lib/menu/esquemas.test.ts`, `e2e/menu-formularios.spec.ts` y `e2e/menu-aumento.spec.ts` fallaron con los nombres viejos y pasan con los nuevos, en computadora (2026-10-27); en celular, todo menos "se lee simple", que se cortó por el 3211 y se comprobó con un script contra el 3210. Tipos, lint y formato de lo tocado limpios. Falta el cierre completo. "una categoria que no existe da 404" da 200 por el `loading.tsx` del 53, no por este |
+| 54 | Ingreso y registro con otra estética | Hecho con TDD: `e2e/ingreso-estetica.spec.ts` y `e2e/acceso.spec.ts` en verde en computadora y celular (2026-10-27). Falta el cierre completo |
+| 53 | Pantalla de carga al cambiar de sección | Hecho con TDD: `e2e/carga.spec.ts` falla sin `loading.tsx` y pasa con él, en computadora (2026-10-27). Falta el cierre completo |
+| 52 | Mes a mes más aireado | Hechos y probados los montos sin centavos en las tarjetas y el formato corto del eje (`formatearPesosRedondeados`, `pesosCortos`). Falta conectar el eje corto y la ventanita nueva en el gráfico, con `e2e/inicio-montos.spec.ts`, y el cierre completo |
 | 51 | `npm run local`: la aplicación armada entera | Probado el 2026-10-27 en el 3212 (el 3210 estaba con `npm run dev`): arma y sirve, `/` en 1,1 s y el ingreso en 0,18 s. Falta que Santiago lo use con sesión y confirme que las secciones van rápido; entra al repo con el commit de la rama |
 | 50 | Inicio: ayer en una línea y vencimientos de la semana | Hecho con TDD: tests puros (`ayer`, `vencimientos`), de base (`inicio.base.test.ts`) y sus dos pruebas de Playwright en computadora, en verde; lint de lo tocado y tipos limpios (2026-10-27). Falta el cierre completo (`npm run verificar` y `npm run e2e` en los dos tamaños), junto con el 47 y el 48 |
 | 49 | Inicio: el mes en curso marcado y "Más vendidos" por plata | Todo |

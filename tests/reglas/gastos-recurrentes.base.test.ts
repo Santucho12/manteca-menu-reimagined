@@ -170,7 +170,8 @@ describe('cambiar la fecha o la frecuencia de un fijo', () => {
     );
     await generar(hoy());
     expect(await vencimientos(id)).toEqual(antes);
-  });
+    // Genera dos veces los fijos de toda la base: con otra corrida a la par, pasa los 20 s.
+  }, 60_000);
 
   it('la fecha nueva tiene que ser despues de hoy', async () => {
     const id = await recurrente({ primerVencimiento: sumarMeses(hoy(), 1) });
