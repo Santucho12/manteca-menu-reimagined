@@ -17,6 +17,7 @@ import { generarAlAbrir } from '@/lib/gastos/generacion';
 import { pagosPendientes, vencimientosTomados } from '@/lib/gastos/pagos';
 import { resumenPorCategoria } from '@/lib/gastos/resumenPorCategoria';
 import { filtrosDeGastos, type ParametrosDeGastos } from '@/lib/gastos/pantalla';
+import { unValor } from '@/lib/usuarios/presentacion';
 import { Pagados } from './Pagados';
 import { ParaClasificar } from './ParaClasificar';
 import { ProximosPagos } from './ProximosPagos';
@@ -45,7 +46,9 @@ export default async function PaginaDeGastos({
   const hoy = diaEnArgentina(new Date());
   // Lo vencido aparece al abrir, sin esperar al proceso de la madrugada.
   await generarAlAbrir(estado, hoy);
-  const filtros = filtrosDeGastos(await searchParams, hoy);
+  const parametros = await searchParams;
+  const filtros = filtrosDeGastos(parametros, hoy);
+  const pagar = unValor(parametros.pagar);
   const [lista, opciones, recurrentes, pendientes, categorias, porPagar, tomados, resumen] =
     await Promise.all([
       listarGastos(cliente, filtros),
@@ -76,6 +79,9 @@ export default async function PaginaDeGastos({
             porPagar={porPagar}
             tomados={tomados}
             hoy={hoy}
+            pagar={pagar}
+            adelante={unValor(parametros.proximos) ?? '30'}
+            filtros={filtros}
           />
         </div>
       </div>

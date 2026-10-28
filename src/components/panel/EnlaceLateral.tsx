@@ -46,7 +46,7 @@ export function EnlaceLateral({
         compacto ? 'gap-2.5 px-3.5 py-2 text-[13px] rounded-xl' : 'gap-3 px-4 py-3.5 text-sm',
         activo
           ? 'text-foreground font-bold bg-secondary/70'
-          : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50',
+          : 'border border-transparent text-muted-foreground hover:text-foreground hover:bg-white hover:border-border hover:shadow-md hover:shadow-slate-900/5',
       )}
     >
       <Icono size={compacto ? 18 : 20} strokeWidth={activo ? 2.5 : 2} />

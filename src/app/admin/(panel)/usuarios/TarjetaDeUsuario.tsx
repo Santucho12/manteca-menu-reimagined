@@ -23,7 +23,7 @@ const FRANJAS: Record<EstadoDeCuenta, string> = {
 };
 
 const TARJETA =
-  'flex flex-col gap-4 rounded-2xl border border-l-4 border-border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg';
+  'flex min-h-[16.4rem] flex-col gap-4 rounded-3xl border border-l-4 border-border bg-white p-5 shadow-sm shadow-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-900/10';
 
 export function TarjetaDeUsuario({ fila, yo }: { fila: FilaDeUsuario; yo: string }) {
   const cuenta = { id: fila.id, nombre: fila.nombre, email: fila.email };
@@ -40,7 +40,7 @@ export function TarjetaDeUsuario({ fila, yo }: { fila: FilaDeUsuario; yo: string
         </div>
         <InsigniaDeEstado tono={TONOS[estado]}>{estado}</InsigniaDeEstado>
       </div>
-      <div className="border-t border-border pt-4">
+      <div className="mt-auto">
         <AccionesDeUsuario
           cuenta={cuenta}
           rol={fila.rol}

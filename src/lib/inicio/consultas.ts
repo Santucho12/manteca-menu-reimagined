@@ -104,7 +104,14 @@ type Leido = {
 function ayerYVencimientos({ dias, avisos, cierres, recurrentes }: Leido, hoy: string) {
   const ayer = resumenDeAyer(dias, cierres, hoy);
   const vencimientos = vencimientosDeLaSemana(recurrentes, hoy);
-  const datos = { ...avisos, vencenEstaSemana: vencimientos.items.length };
+  const [unico] = vencimientos.items;
+  const datos = {
+    ...avisos,
+    vencenEstaSemana: vencimientos.items.length,
+    ...(vencimientos.items.length === 1 && unico
+      ? { unVencimiento: { id: unico.id, fecha: unico.fecha } }
+      : {}),
+  };
   return {
     ayer,
     vencimientos,

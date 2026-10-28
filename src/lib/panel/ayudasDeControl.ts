@@ -71,7 +71,6 @@ export const AYUDAS_DE_CONTROL: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'Qué podés hacer',
         puntos: [
           'Dar rol de Caja o de Admin a quien se registró; también cambiar el rol de alguien que ya entra.',
-          'Rechazar a un invitado le corta el acceso, y no puede volver a registrarse con ese email.',
           'Con el interruptor Cuenta activa, Desactivar le saca el acceso en el momento, aunque tenga la sesión abierta, y Reactivar se lo devuelve con el rol que tenía.',
           'En los tres puntos, Resetear contraseña muestra una temporal una sola vez: pasásela a la persona, que la cambia apenas entra. Después no la vas a poder ver de nuevo.',
           'En los tres puntos, Corregir datos cambia el nombre y el email. El email no se puede repetir.',
@@ -80,7 +79,7 @@ export const AYUDAS_DE_CONTROL: Partial<Record<ClaveDeAyuda, Ayuda>> = {
       {
         titulo: 'Límites',
         puntos: [
-          'Sobre tu propia cuenta solo corregís los datos: no te cambiás el rol ni te desactivás, y tu contraseña la cambiás en Mi cuenta.',
+          'Sobre tu propia cuenta solo corregís los datos: no te cambiás el rol ni te desactivás. Si necesitás otra contraseña, pedile a otro administrador que te la resetee.',
           'Tiene que quedar al menos un administrador activo: conviene tener dos, por si uno se olvida la contraseña.',
           'Nada se borra: una cuenta desactivada conserva todo lo que cargó.',
         ],

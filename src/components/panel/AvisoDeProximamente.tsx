@@ -37,23 +37,14 @@ export function AvisoDeProximamente() {
         initial={{ opacity: 0, scale: 0.92, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-        className="pointer-events-auto relative w-[520px] max-w-full cursor-pointer overflow-hidden rounded-3xl border border-border bg-white p-9 shadow-2xl shadow-[#2b1d14]/25"
+        className="pointer-events-auto w-[380px] max-w-full cursor-pointer rounded-2xl border border-border bg-white px-6 py-5 text-center shadow-xl shadow-slate-900/10"
       >
-        <div className="min-w-0 text-center">
-          <p className="font-display text-4xl font-extrabold leading-none tracking-tight text-foreground">
-            Próximamente
-          </p>
-          <p className="mt-3 text-lg font-medium leading-snug text-muted-foreground">
-            {aviso.seccion} todavía no está disponible. Lo estamos programando.
-          </p>
-        </div>
-        <motion.span
-          aria-hidden="true"
-          initial={{ width: '100%' }}
-          animate={{ width: '0%' }}
-          transition={{ duration: SEGUNDOS, ease: 'linear' }}
-          className="absolute bottom-0 left-0 h-1.5 bg-primary"
-        />
+        <p className="font-display text-xl font-bold tracking-tight text-foreground">
+          Próximamente
+        </p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {aviso.seccion} todavía no está disponible. Lo estamos programando.
+        </p>
       </motion.div>
     </div>
   );

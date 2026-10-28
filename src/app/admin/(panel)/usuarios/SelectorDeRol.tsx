@@ -33,10 +33,18 @@ export function SelectorDeRol({ rol, deshabilitado, alElegir }: Props) {
       disabled={deshabilitado}
       onValueChange={(valor) => alElegir(ACCION_DE[valor]!)}
     >
-      <SelectTrigger aria-label="Rol" className="h-10 w-40 rounded-xl text-sm font-bold">
+      <SelectTrigger
+        aria-label="Rol"
+        className="h-10 w-40 rounded-xl text-sm font-bold focus:ring-0 focus:ring-offset-0 focus:border-border data-[state=open]:border-border"
+      >
         <SelectValue placeholder="Elegí un rol" />
       </SelectTrigger>
-      <SelectContent side="right" align="start" sideOffset={20} className={LISTA_DE_DESPLEGABLE}>
+      <SelectContent
+        side="right"
+        align="start"
+        sideOffset={44}
+        className={`${LISTA_DE_DESPLEGABLE} shadow-2xl shadow-slate-900/10`}
+      >
         {rol === 'encargado' ? (
           <SelectItem value="encargado" disabled className={OPCION_DE_DESPLEGABLE}>
             {nombreDeRol('encargado')}

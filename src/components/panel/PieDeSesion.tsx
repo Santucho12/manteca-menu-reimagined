@@ -7,10 +7,10 @@ import { BotonSalir } from './BotonSalir';
 export function PieDeSesion({ nombre }: { nombre: string }) {
   return (
     <div className="p-3">
-      <div className="flex items-center gap-2.5 pl-3 pr-1 py-1.5 rounded-2xl bg-secondary/40">
+      <div className="group flex items-center gap-2.5 pl-3 pr-1 py-1.5 rounded-2xl bg-secondary/40 border border-transparent transition-all duration-300 hover:bg-white hover:border-border hover:shadow-md hover:shadow-slate-900/5">
         <span
           aria-hidden="true"
-          className="w-7 h-7 shrink-0 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase"
+          className="w-7 h-7 shrink-0 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground"
         >
           {nombre.charAt(0)}
         </span>

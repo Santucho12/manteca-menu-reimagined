@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { pagarDesdeElPanel } from './acciones';
 
 type Props = { item: ItemPorPagar; hoy: string };
+type PropsDelBoton = Props & { abierta?: boolean };
 
 function FormularioDePago({ item, hoy, cerrar }: Props & { cerrar: () => void }) {
   const router = useRouter();
@@ -89,8 +90,8 @@ function FormularioDePago({ item, hoy, cerrar }: Props & { cerrar: () => void })
 }
 
 /** Pagado: una ventana con la fecha, el monto y el medio ya completos, para confirmar o corregir. */
-export function BotonDePago({ item, hoy }: Props) {
-  const [abierta, setAbierta] = useState(false);
+export function BotonDePago({ item, hoy, abierta: alInicio = false }: PropsDelBoton) {
+  const [abierta, setAbierta] = useState(alInicio);
   return (
     <>
       <button

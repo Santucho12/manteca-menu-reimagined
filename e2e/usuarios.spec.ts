@@ -62,23 +62,6 @@ test('una cuenta con rol puede volver a pendiente', async ({ page }) => {
   }
 });
 
-test('rechazar a quien espera pide confirmacion y deja la cuenta rechazada', async ({ page }) => {
-  const cuenta = await crearCuentaTemporal();
-  try {
-    const fila = await abrirLaCuenta(page, cuenta.email);
-    await fila.getByRole('button', { name: 'Rechazar' }).click();
-    await expect(
-      fila.getByText(
-        '¿Rechazar a Cuenta temporal? No va a poder entrar ni volver a registrarse con ese email.',
-      ),
-    ).toBeVisible();
-    await fila.getByRole('button', { name: 'Sí, rechazar' }).click();
-    await expect(fila.getByText('Rechazada', { exact: true })).toBeVisible();
-  } finally {
-    await borrarCuentaTemporal(cuenta.id);
-  }
-});
-
 test('el filtro Esperando rol y la busqueda encuentran a quien espera', async ({ page }) => {
   const cuenta = await crearCuentaTemporal();
   try {

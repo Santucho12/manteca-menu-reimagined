@@ -4,7 +4,7 @@ import { Chip } from '@/components/panel/Insignias';
 import { cuandoVence } from '@/lib/gastos/fijos';
 import { tonoDeLaMarca } from '@/lib/gastos/filas';
 import { nombreDeFrecuencia } from '@/lib/gastos/pantalla';
-import type { ItemPorPagar } from '@/lib/gastos/porPagar';
+import { esElPagoPedido, type ItemPorPagar } from '@/lib/gastos/porPagar';
 import { formatearPesos } from '@/lib/plata';
 import { cn } from '@/lib/utils';
 import { anularPorPagarDesdeElPanel } from './acciones';
@@ -28,7 +28,15 @@ function Nombre({ item }: { item: ItemPorPagar }) {
 }
 
 /** Una fila de Próximos pagos: cuándo vence, qué es y cuánto. Lo vencido, en rosa. */
-export function FilaPorPagar({ item, hoy }: { item: ItemPorPagar; hoy: string }) {
+export function FilaPorPagar({
+  item,
+  hoy,
+  pagar,
+}: {
+  item: ItemPorPagar;
+  hoy: string;
+  pagar?: string | undefined;
+}) {
   const vencido = item.fecha < hoy;
   return (
     <li className="px-4 md:px-5 py-2 flex items-center gap-2.5 hover:bg-secondary/40 transition-colors">
@@ -53,7 +61,7 @@ export function FilaPorPagar({ item, hoy }: { item: ItemPorPagar; hoy: string })
           {formatearPesos(item.montoCentavos)}
         </span>
         <div className="flex items-center gap-1">
-          <BotonDePago item={item} hoy={hoy} />
+          <BotonDePago item={item} hoy={hoy} abierta={esElPagoPedido(item, pagar)} />
           {item.porPagarId ? (
             <BotonDeAnular
               id={item.porPagarId}

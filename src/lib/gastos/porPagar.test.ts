@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import type { ProximoPago } from './fijos';
-import { itemsPorPagar, pagoInicial, tomadosDe, type Pendiente } from './porPagar';
+import {
+  dentroDeLosProximos,
+  diasDeAdelanto,
+  esElPagoPedido,
+  itemsPorPagar,
+  pagoInicial,
+  tomadosDe,
+  type Pendiente,
+} from './porPagar';
 
 const pendiente = (id: string, extra: Partial<Pendiente> = {}): Pendiente => ({
   id,
@@ -113,5 +121,54 @@ describe('tomadosDe', () => {
     const tomados = tomadosDe([{ recurrente_id: 'fijo-a', vencimiento: '2026-11-05' }]);
     expect(tomados.has('fijo-a|2026-11-05')).toBe(true);
     expect(tomados.has('fijo-a|2026-12-05')).toBe(false);
+  });
+});
+
+describe('esElPagoPedido', () => {
+  const [item] = itemsPorPagar([], [proximo]);
+
+  it('reconoce el pago de un fijo por su id y su vencimiento', () => {
+    expect(esElPagoPedido(item!, `${item!.fijoId}|${item!.vencimiento}`)).toBe(true);
+  });
+
+  it('con otro vencimiento, otro fijo o nada pedido, no', () => {
+    expect(esElPagoPedido(item!, `${item!.fijoId}|2000-01-01`)).toBe(false);
+    expect(esElPagoPedido(item!, `otro|${item!.vencimiento}`)).toBe(false);
+    expect(esElPagoPedido(item!, undefined)).toBe(false);
+  });
+});
+
+describe('dentroDeLosProximos', () => {
+  const en = (fecha: string) => ({ fecha });
+  const items = [
+    en('2026-10-25'),
+    en('2026-10-28'),
+    en('2026-11-12'),
+    en('2026-11-27'),
+    en('2026-11-28'),
+    en('2027-02-01'),
+  ];
+  const fechas = (dias: number | null) =>
+    dentroDeLosProximos(items, '2026-10-28', dias).map((i) => i.fecha);
+
+  it('deja lo vencido y lo que vence dentro de los dias pedidos', () => {
+    expect(fechas(15)).toEqual(['2026-10-25', '2026-10-28', '2026-11-12']);
+    expect(fechas(30)).toEqual(['2026-10-25', '2026-10-28', '2026-11-12', '2026-11-27']);
+    expect(fechas(365)).toHaveLength(6);
+  });
+
+  it('con null deja todo, y sin pedir nada son 30 dias', () => {
+    expect(fechas(null)).toHaveLength(6);
+    expect(dentroDeLosProximos(items, '2026-10-28')).toHaveLength(4);
+  });
+});
+
+describe('diasDeAdelanto', () => {
+  it('lee 15, 30, 365 o todos de la URL; cualquier otra cosa, 30', () => {
+    expect(diasDeAdelanto('15')).toBe(15);
+    expect(diasDeAdelanto('365')).toBe(365);
+    expect(diasDeAdelanto('todos')).toBeNull();
+    expect(diasDeAdelanto(undefined)).toBe(30);
+    expect(diasDeAdelanto('7')).toBe(30);
   });
 });

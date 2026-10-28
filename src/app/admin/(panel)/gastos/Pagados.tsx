@@ -84,6 +84,10 @@ export function Pagados({ lista, filtros, hoy, categorias }: Props) {
   return (
     <PanelDeLista
       titulo="Pagados"
+      desplegable={{
+        abierto: conFiltros || filtros.pagina > 1 || !esElMesDeHoy(filtros.mes, hoy),
+        tituloCerrado: 'Ver los pagados',
+      }}
       cantidad={cantidadDeResultados(lista.total)}
       extra={<MesConFlechas filtros={filtros} hoy={hoy} />}
     >

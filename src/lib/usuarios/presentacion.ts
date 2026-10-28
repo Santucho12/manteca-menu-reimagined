@@ -64,7 +64,7 @@ export function estadoDeCuenta({ rol, activo }: Cuenta): EstadoDeCuenta {
 export function accionesDisponibles(cuenta: Cuenta, yo: string): AccionDeUsuario[] {
   if (cuenta.id === yo) return ['corregir'];
   if (!cuenta.activo) return ['reactivar'];
-  if (cuenta.rol === 'invitado') return [...CAMBIOS_DE_ROL.invitado, 'rechazar'];
+  if (cuenta.rol === 'invitado') return CAMBIOS_DE_ROL.invitado;
   return [...CAMBIOS_DE_ROL[cuenta.rol], 'desactivar', 'resetear', 'corregir'];
 }
 

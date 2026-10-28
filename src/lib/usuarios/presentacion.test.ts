@@ -35,11 +35,10 @@ describe('accionesDisponibles', () => {
     expect(accionesDisponibles({ id: YO, rol: 'admin', activo: true }, YO)).toEqual(['corregir']);
   });
 
-  it('a quien espera se le da rol o se lo rechaza', () => {
+  it('a quien espera solo se le da rol', () => {
     expect(accionesDisponibles({ id: 'x', rol: 'invitado', activo: true }, YO)).toEqual([
       'darCaja',
       'darAdmin',
-      'rechazar',
     ]);
   });
 
@@ -82,11 +81,11 @@ describe('repartirAcciones', () => {
     });
   });
 
-  it('a quien espera: desplegable para el rol y el botón de rechazar, sin interruptor', () => {
-    expect(repartirAcciones(['darCaja', 'darAdmin', 'rechazar'])).toEqual({
+  it('a quien espera: solo el desplegable para el rol, sin interruptor ni botones', () => {
+    expect(repartirAcciones(['darCaja', 'darAdmin'])).toEqual({
       roles: ['darCaja', 'darAdmin'],
       interruptor: null,
-      botones: ['rechazar'],
+      botones: [],
     });
   });
 });
