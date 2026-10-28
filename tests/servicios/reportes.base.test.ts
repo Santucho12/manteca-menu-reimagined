@@ -73,13 +73,13 @@ describe('consultas de los reportes', () => {
     ]);
   });
 
-  it('lee los cierres con quien los cargo, lo declarado y sin diferencia mientras esperan', async () => {
+  it('lee los cierres con quien los cargo, lo declarado y su diferencia con las ventas del dia', async () => {
     expect(await cierresDelPeriodo(await clienteComo('admin'), PERIODO)).toEqual([
       {
         fecha: '2018-05-12',
         persona: 'Prueba Caja',
         declaradoCentavos: 2000000,
-        diferenciaCentavos: null,
+        diferenciaCentavos: 1000000,
       },
     ]);
   });

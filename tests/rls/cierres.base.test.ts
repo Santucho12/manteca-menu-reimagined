@@ -85,15 +85,15 @@ describe('RLS de cierres: escritura', () => {
   });
 
   it.each(['caja', ...SIN_PERMISO, 'adminOtroLocal'] as RolDePrueba[])(
-    '%s no revisa un cierre de este local',
+    '%s no cambia un cierre de este local',
     async (rol) => {
       await (
         await clienteComo(rol)
       )
         .from('cierres_de_caja')
-        .update({ comentario_revision: 'Tocado' })
+        .update({ comentario: 'Tocado' })
         .eq('id', deCaja.id);
-      expect((await cierreDe(deCaja.id)).comentario_revision).toBeNull();
+      expect((await cierreDe(deCaja.id)).comentario).not.toBe('Tocado');
     },
   );
 

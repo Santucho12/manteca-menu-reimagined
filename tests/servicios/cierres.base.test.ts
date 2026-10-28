@@ -11,9 +11,9 @@ import {
 import {
   anularCierre,
   cambiarTolerancia,
+  editarCierre,
   guardarCierre,
   MENSAJES_DE_CAJA,
-  revisarCierre,
 } from '../../src/lib/caja/escritura';
 import type { DatosDeCierre } from '../../src/lib/caja/esquemas';
 import type { FiltrosDeControl } from '../../src/lib/caja/pantalla';
@@ -59,6 +59,7 @@ const filtros = (fecha: string, cambios: Partial<FiltrosDeControl> = {}): Filtro
   hasta: fecha,
   personaId: null,
   estado: null,
+  anulados: false,
   pagina: 1,
   ...cambios,
 });
@@ -70,9 +71,9 @@ describe('guardar un cierre', () => {
     const cierre = await cierrePorId(await clienteComo('caja'), id);
     expect(cierre).toMatchObject({
       fecha,
-      estado: 'esperando_ventas',
-      efectivo_centavos: 2500050,
-      queda_en_caja_centavos: 800000,
+      estado: 'con_diferencia',
+      declarados: { efectivo: 2500050 },
+      quedaEnCajaCentavos: 800000,
       comentario: 'Todo normal',
       retiros: [{ monto_centavos: 500000, quien: 'Dueño' }],
       gastos: [{ monto_centavos: 120000, descripcion: 'Hielo', anulado: false }],
@@ -118,12 +119,12 @@ describe('listas', () => {
     const admin = await clienteComo('admin');
     const delDia = await listarCierres(admin, filtros(fecha));
     expect(delDia.filas).toEqual([
-      expect.objectContaining({ id, fecha, estado: 'esperando_ventas', persona: 'Prueba Caja' }),
+      expect.objectContaining({ id, fecha, estado: 'con_diferencia', persona: 'Prueba Caja' }),
     ]);
-    expect(delDia.filas[0]!.diferenciaTotalCentavos).toBeNull();
+    expect(delDia.filas[0]!.diferenciaTotalCentavos).not.toBe(0);
     const deOtro = filtros(fecha, { personaId: await idDeCuentaDePrueba('admin') });
     expect((await listarCierres(admin, deOtro)).filas).toEqual([]);
-    expect((await listarCierres(admin, filtros(fecha, { estado: 'revisado' }))).filas).toEqual([]);
+    expect((await listarCierres(admin, filtros(fecha, { estado: 'cierra' }))).filas).toEqual([]);
     expect(await diasConCierre(admin, fecha, fecha)).toEqual([fecha]);
     expect((await personasDeCaja(admin)).map((p) => p.nombre)).toContain('Prueba Caja');
   });
@@ -135,15 +136,19 @@ describe('listas', () => {
   });
 });
 
-describe('revisar, anular y tolerancia', () => {
-  it('el admin revisa con comentario', async () => {
-    const id = await guardarComo('caja', diaLibre());
-    const admin = await clienteComo('admin');
-    expect((await revisarCierre(admin, id, 'Lo vi')).ok).toBe(true);
-    expect(await cierrePorId(admin, id)).toMatchObject({
-      estado: 'revisado',
-      comentario_revision: 'Lo vi',
+describe('editar, anular y tolerancia', () => {
+  it('caja edita su cierre y el resultado se recalcula; el ajeno no', async () => {
+    const fecha = diaLibre();
+    const id = await guardarComo('caja', fecha);
+    const caja = await clienteComo('caja');
+    const nuevos = datos(fecha, { efectivo: '1.000', retiros: [], gastos: [] });
+    expect((await editarCierre(caja, id, nuevos)).ok).toBe(true);
+    expect(await cierrePorId(caja, id)).toMatchObject({
+      declarados: { efectivo: 100000 },
+      retiros: [],
     });
+    const ajeno = await guardarComo('admin', diaLibre());
+    expect((await editarCierre(caja, ajeno, nuevos)).ok).toBe(false);
   });
 
   it('anular anula sus gastos; caja no puede', async () => {
@@ -155,7 +160,7 @@ describe('revisar, anular y tolerancia', () => {
     const admin = await clienteComo('admin');
     expect((await anularCierre(admin, id, 'Mal contado')).ok).toBe(true);
     expect((await gastosDelCierre(id)).every((g) => g.anulado)).toBe(true);
-    expect(await revisarCierre(admin, id, '')).toEqual({
+    expect(await editarCierre(admin, id, datos(diaLibre()))).toEqual({
       ok: false,
       mensaje: MENSAJES_DE_CAJA.anulado,
     });

@@ -7,43 +7,39 @@ import {
   sembrarCierre,
   sembrarCierreConSalidas,
 } from '../cierres-de-prueba';
-import { clienteSecretoDePruebas } from '../clientes';
 import { borrarGastos, sembrarGasto, sembrarRecurrente } from '../gastos-de-prueba';
 import { sembrarVentaConRenglones } from '../reportes-de-prueba';
 import { clienteComo } from '../sesiones';
-import { borrarVentas, productoParaVender } from '../ventas-de-prueba';
+import { borrarVentas, productoParaVender, sembrarVentaConPago } from '../ventas-de-prueba';
 
 const cierres: string[] = [];
 const gastos: string[] = [];
+const ventas: string[] = [];
+const sumarUnDia = (fecha: string) => diaSiguiente(fecha);
 
 afterAll(async () => {
   await borrarGastos({ gastos });
   await borrarCierres(cierres);
+  await borrarVentas(ventas);
 }, 30_000);
 
 async function avisos(hoy = '2099-01-01') {
   return datosDeAvisos(await clienteComo('admin'), hoy);
 }
 
-async function marcar(id: string, cambios: Record<string, unknown>) {
-  const { error } = await clienteSecretoDePruebas()
-    .from('cierres_de_caja')
-    .update(cambios as never)
-    .eq('id', id);
-  if (error) throw new Error(`No pude marcar el cierre: ${error.message}`);
-}
-
 describe('avisos del inicio', () => {
-  it('cuenta los cierres con diferencia sin revisar, no los revisados', async () => {
-    const antes = (await avisos()).conDiferencia.cantidad;
+  it('cuenta los cierres con diferencia de la ultima semana, no los que cierran', async () => {
     const fecha = diaLibre();
+    const hoy = diaSiguiente(fecha);
+    const antes = (await avisos(sumarUnDia(hoy))).conDiferencia.cantidad;
+    // Sin ventas, el cierre sembrado (fondo $10.000 y $20.000 en efectivo) tiene diferencia.
     const con = await sembrarCierre({ fecha });
-    const revisado = await sembrarCierre({ fecha: diaSiguiente(fecha) });
-    cierres.push(con.id, revisado.id);
-    await marcar(con.id, { estado: 'con_diferencia' });
-    await marcar(revisado.id, { estado: 'con_diferencia' });
-    await marcar(revisado.id, { revisado: true });
-    const despues = (await avisos()).conDiferencia;
+    const cierra = await sembrarCierre({ fecha: sumarUnDia(hoy) });
+    cierres.push(con.id, cierra.id);
+    ventas.push(
+      await sembrarVentaConPago({ fecha: sumarUnDia(hoy), medio: 'efectivo', centavos: 1000000 }),
+    );
+    const despues = (await avisos(sumarUnDia(hoy))).conDiferencia;
     expect(despues.cantidad).toBe(antes + 1);
     expect(despues.desde! <= fecha).toBe(true);
   });
@@ -97,7 +93,6 @@ describe('datos del inicio', () => {
     });
     const cierre = await sembrarCierre({ fecha });
     cierres.push(cierre.id);
-    await marcar(cierre.id, { estado: 'con_diferencia' });
     try {
       const { ayer } = await datosDelInicio(await clienteComo('admin'), diaSiguiente(fecha));
       expect(ayer).toMatchObject({ dia: fecha, ventas: 1, montoCentavos: 80000 });
