@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { formatearPesosRedondeados } from '../plata';
 import { compararFilas, textoDeVariacion, variacion } from './comparacion';
 
 describe('variacion', () => {
@@ -64,4 +65,14 @@ describe('compararFilas', () => {
   it('un periodo sin filas es lo mismo que no tener datos para comparar', () => {
     expect(comparar([fila('a', 200)], [])).toEqual([null]);
   });
+});
+
+describe('textoDeVariacion con otro formato', () => {
+  it('Inicio la muestra sin centavos', () =>
+    expect(
+      textoDeVariacion(
+        { diferenciaCentavos: -42375062, porcentaje: -15.8 },
+        formatearPesosRedondeados,
+      ),
+    ).toBe('-$423.751 (-15,8 %)'));
 });

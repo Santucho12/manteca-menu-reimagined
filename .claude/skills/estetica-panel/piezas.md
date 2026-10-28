@@ -945,8 +945,9 @@ Zona para soltar un archivo (`ExcelUpload.tsx`):
 
 | Botón | Clases | Ícono |
 |---|---|---|
-| Principal de encabezado | `flex-1 lg:flex-none px-4 md:px-6 h-11 md:h-12 rounded-2xl bg-primary text-white font-bold text-sm md:uppercase md:tracking-widest whitespace-nowrap shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-2 md:gap-3` | 18 |
-| Secundario de encabezado | el anterior con `bg-emerald-600 shadow-emerald-600/20 hover:shadow-emerald-600/30` | 18 |
+| Principal de encabezado | `BOTON_DE_ENCABEZADO` de `estilos.ts`. Más simple que el de PRP por decisión de Santiago (2026-10-27): `h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-semibold`, sin mayúsculas, sin sombra y sin saltito al pasar el mouse | 16 |
+| Secundario de encabezado | `BOTON_DE_ENCABEZADO_SECUNDARIO`: el anterior con `bg-emerald-600 text-white` | 16 |
+| Neutro de encabezado (extensión) | `BOTON_DE_ENCABEZADO_NEUTRO`: la misma forma con `border border-border bg-card text-foreground` y `hover:bg-secondary` | 16 |
 | Principal de formulario | `h-12 px-6 rounded-xl bg-primary text-white font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-60` | 14 (`Save`) |
 | Principal al pie de una ventana | `flex-[2] h-12 rounded-xl bg-primary text-white font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-2` | 16 |
 | Cancelar | `flex-1 h-12 rounded-xl bg-secondary text-foreground font-bold text-[10px] uppercase tracking-widest hover:bg-secondary/80 transition-all` | — |

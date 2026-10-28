@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatearPesos, formatearPesosEnteros } from './plata';
+import { formatearPesos, formatearPesosEnteros, formatearPesosRedondeados } from './plata';
 
 describe('formatearPesos', () => {
   it('muestra cero con dos decimales', () => {
@@ -51,5 +51,17 @@ describe('formatearPesosEnteros', () => {
 
   it('rechaza un monto con centavos sueltos', () => {
     expect(() => formatearPesosEnteros(150)).toThrow();
+  });
+});
+
+describe('formatearPesosRedondeados', () => {
+  it.each([
+    [1454250000, '$14.542.500'],
+    [225592295, '$2.255.923'],
+    [225592249, '$2.255.922'],
+    [-42375062, '-$423.751'],
+    [0, '$0'],
+  ])('%i centavos se ven como %s, redondeados al peso', (centavos, texto) => {
+    expect(formatearPesosRedondeados(centavos)).toBe(texto);
   });
 });

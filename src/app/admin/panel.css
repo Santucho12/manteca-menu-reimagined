@@ -65,17 +65,17 @@
 
   /* La paleta de Tailwind 3. Tailwind 4 trae otros valores (oklch, más saturados) para los
      mismos nombres: sin esto el rosa, el ámbar y el verde se ven distintos. */
-  --color-slate-50: #f8fafc;
-  --color-slate-100: #f1f5f9;
-  --color-slate-200: #e2e8f0;
-  --color-slate-300: #cbd5e1;
-  --color-slate-400: #94a3b8;
-  --color-slate-500: #64748b;
-  --color-slate-600: #475569;
-  --color-slate-700: #334155;
-  --color-slate-800: #1e293b;
-  --color-slate-900: #0f172a;
-  --color-slate-950: #020617;
+  --color-slate-50: #faf7f0;
+  --color-slate-100: #f4efe5;
+  --color-slate-200: #e6dcc8;
+  --color-slate-300: #d3c7ae;
+  --color-slate-400: #a39580;
+  --color-slate-500: #74644f;
+  --color-slate-600: #5c4d3a;
+  --color-slate-700: #47392a;
+  --color-slate-800: #3a2c1f;
+  --color-slate-900: #2b1d14;
+  --color-slate-950: #1a110b;
   --color-emerald-50: #ecfdf5;
   --color-emerald-100: #d1fae5;
   --color-emerald-200: #a7f3d0;
@@ -120,28 +120,28 @@
   --color-violet-800: #5b21b6;
   --color-violet-900: #4c1d95;
   --color-violet-950: #2e1065;
-  --color-blue-50: #eff6ff;
-  --color-blue-100: #dbeafe;
-  --color-blue-200: #bfdbfe;
-  --color-blue-300: #93c5fd;
-  --color-blue-400: #60a5fa;
-  --color-blue-500: #3b82f6;
-  --color-blue-600: #2563eb;
-  --color-blue-700: #1d4ed8;
-  --color-blue-800: #1e40af;
-  --color-blue-900: #1e3a8a;
-  --color-blue-950: #172554;
-  --color-sky-50: #f0f9ff;
-  --color-sky-100: #e0f2fe;
-  --color-sky-200: #bae6fd;
-  --color-sky-300: #7dd3fc;
-  --color-sky-400: #38bdf8;
-  --color-sky-500: #0ea5e9;
-  --color-sky-600: #0284c7;
-  --color-sky-700: #0369a1;
-  --color-sky-800: #075985;
-  --color-sky-900: #0c4a6e;
-  --color-sky-950: #082f49;
+  --color-blue-50: #fbf7e8;
+  --color-blue-100: #f5ecc8;
+  --color-blue-200: #ecdb9a;
+  --color-blue-300: #e0c670;
+  --color-blue-400: #d0b055;
+  --color-blue-500: #bfa042;
+  --color-blue-600: #a38632;
+  --color-blue-700: #856c29;
+  --color-blue-800: #6b5524;
+  --color-blue-900: #4f3f1d;
+  --color-blue-950: #2b1d14;
+  --color-sky-50: #fbf7e8;
+  --color-sky-100: #f5ecc8;
+  --color-sky-200: #ecdb9a;
+  --color-sky-300: #e0c670;
+  --color-sky-400: #d0b055;
+  --color-sky-500: #bfa042;
+  --color-sky-600: #a38632;
+  --color-sky-700: #856c29;
+  --color-sky-800: #6b5524;
+  --color-sky-900: #4f3f1d;
+  --color-sky-950: #2b1d14;
 
   --animate-pulse-subtle: pulse-subtle 2s ease-in-out infinite;
 
@@ -258,4 +258,21 @@
   .text-primary {
     color: #8a7330;
   }
+}
+
+/* El calendario lo dibuja el navegador: solo se le puede dar el color de la marca y un icono suave. */
+input[type="date"] {
+  color-scheme: light;
+  accent-color: var(--color-primary);
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  transition: opacity 150ms, background-color 150ms;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
 }

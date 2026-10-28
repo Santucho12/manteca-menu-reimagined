@@ -14,11 +14,13 @@ export const BOTON_PRINCIPAL_AL_PIE =
 export const BOTON_CANCELAR =
   'flex-1 h-12 rounded-xl bg-secondary text-foreground font-bold text-[10px] uppercase tracking-widest border border-transparent hover:border-border hover:bg-white hover:shadow-md active:scale-95 transition-all duration-200 flex items-center justify-center';
 
+// Los botones de arriba de cada pantalla, simples: sin mayúsculas, sin sombra y sin saltito
+// (Santiago, 2026-10-27). El ícono va a 16 aunque la pantalla lo pida más grande.
 export const BOTON_DE_ENCABEZADO =
-  'flex-1 lg:flex-none px-4 md:px-6 h-11 md:h-12 rounded-2xl bg-primary text-primary-foreground font-bold text-sm md:uppercase md:tracking-widest whitespace-nowrap shadow-lg shadow-primary/20 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-primary/30 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 md:gap-3';
+  'flex-1 lg:flex-none h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-semibold whitespace-nowrap hover:brightness-105 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2 [&_svg]:size-4';
 
 export const BOTON_DE_ENCABEZADO_SECUNDARIO =
-  'flex-1 lg:flex-none px-4 md:px-6 h-11 md:h-12 rounded-2xl bg-emerald-600 text-white font-bold text-sm md:uppercase md:tracking-widest whitespace-nowrap shadow-lg shadow-emerald-600/20 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-emerald-600/30 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 md:gap-3';
+  'flex-1 lg:flex-none h-10 px-4 rounded-xl bg-emerald-600 text-white text-sm font-semibold whitespace-nowrap hover:brightness-105 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2 [&_svg]:size-4';
 
 export const BOTON_ESMERALDA =
   'h-12 px-6 rounded-xl bg-emerald-600 text-white font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-600/20 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-emerald-600/30 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60';
@@ -78,7 +80,7 @@ export const BARRA_DE_FILTROS =
   'flex flex-col xl:flex-row xl:flex-wrap gap-3 md:gap-4 mb-6 md:mb-8 bg-card border border-border p-3 md:p-5 rounded-2xl md:rounded-3xl shadow-xs';
 
 export const BOTON_DE_ENCABEZADO_NEUTRO =
-  'flex-1 lg:flex-none px-4 md:px-6 h-11 md:h-12 rounded-2xl bg-card border border-border text-slate-900 font-bold text-sm md:uppercase md:tracking-widest whitespace-nowrap shadow-md hover:bg-white hover:border-primary/40 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 md:gap-3';
+  'flex-1 lg:flex-none h-10 px-4 rounded-xl border border-border bg-card text-foreground text-sm font-semibold whitespace-nowrap hover:bg-secondary active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2 [&_svg]:size-4';
 
 /** Un icono de accion de una fila que no edita ni borra (subir, bajar, mostrar). */
 export const ICONO_DE_ACCION =
@@ -87,6 +89,26 @@ export const ICONO_DE_ACCION =
 /** El botón de las tarjetas de Inicio (Ver reportes, Ver gastos, Ver todo el año): una sola pieza. */
 export const BOTON_DE_TARJETA =
   'group inline-flex h-10 shrink-0 items-center gap-2.5 whitespace-nowrap rounded-full border border-border bg-white pl-4 pr-1.5 text-xs font-bold text-foreground shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#d8cdb6] hover:shadow-xl active:translate-y-0';
+
+/** Los accesos de arriba de Ventas: la acción principal dorada y las demás en píldora blanca con su icono en círculo. */
+export const ACCESO_PRINCIPAL =
+  'group flex-1 lg:flex-none inline-flex h-11 items-center justify-center gap-2.5 whitespace-nowrap rounded-full bg-primary pl-3 pr-5 text-sm font-bold text-primary-foreground shadow-md shadow-primary/25 transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg active:translate-y-0 active:scale-[0.98]';
+
+export const ACCESO_SECUNDARIO =
+  'group flex-1 lg:flex-none inline-flex h-11 items-center justify-center gap-2.5 whitespace-nowrap rounded-full border border-border bg-white pl-3 pr-5 text-sm font-semibold text-foreground shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-[#d8cdb6] hover:shadow-lg active:translate-y-0 active:scale-[0.98]';
+
+/** El acceso que confirma plata o importa (el Excel de Fudo): verde, como el resto del panel. */
+export const ACCESO_VERDE =
+  'group flex-1 lg:flex-none inline-flex h-11 items-center justify-center gap-2.5 whitespace-nowrap rounded-full bg-emerald-600 pl-3 pr-5 text-sm font-bold text-white shadow-md shadow-emerald-600/25 transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg active:translate-y-0 active:scale-[0.98]';
+
+export const ICONO_DE_ACCESO_SOBRE_VERDE =
+  'flex h-7 w-7 items-center justify-center rounded-full bg-white/20 transition-transform duration-200 group-hover:scale-110';
+
+export const ICONO_DE_ACCESO =
+  'flex h-7 w-7 items-center justify-center rounded-full bg-black/10 transition-transform duration-200 group-hover:scale-110';
+
+export const ICONO_DE_ACCESO_SUAVE =
+  'flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-muted-foreground transition-all duration-200 group-hover:scale-110 group-hover:bg-[#e6dcc8] group-hover:text-foreground';
 
 export const CIRCULO_DE_BOTON =
   'flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-muted-foreground transition-all duration-200 group-hover:scale-110 group-hover:bg-[#e6dcc8] group-hover:text-foreground';

@@ -68,7 +68,12 @@ export function FiltroDeSeleccion({
       <label htmlFor={id} className="sr-only">
         {etiqueta}
       </label>
-      <select id={id} name={name} defaultValue={valor ?? ''} className={CAMPO_DE_FILTRO}>
+      <select
+        id={id}
+        name={name}
+        defaultValue={valor ?? ''}
+        className={cn(CAMPO_DE_FILTRO, 'sm:w-auto sm:min-w-[180px]')}
+      >
         {opciones.map((o) => (
           <option key={o.valor} value={o.valor}>
             {o.texto}

@@ -44,7 +44,7 @@ export function AvisoDeProximamente() {
             Próximamente
           </p>
           <p className="mt-3 text-lg font-medium leading-snug text-muted-foreground">
-            {aviso.seccion} todavía no está disponible. Lo estamos preparando.
+            {aviso.seccion} todavía no está disponible. Lo estamos programando.
           </p>
         </div>
         <motion.span

@@ -17,9 +17,9 @@ const TAMANOS = {
   },
   ingreso: {
     caja: 'flex flex-col items-center text-center',
-    recuadro: 'px-6 py-4 mb-4',
+    recuadro: 'px-6',
     logo: 'w-[200px]',
-    lema: 'text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1',
+    lema: 'text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]',
   },
 } as const;
 

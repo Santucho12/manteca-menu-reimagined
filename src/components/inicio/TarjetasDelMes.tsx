@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Receipt, ShoppingBag, Ticket, TrendingUp, type LucideIcon } from 'lucide-react';
 import { textoDeVariacion } from '@/lib/reportes/comparacion';
+import { formatearPesosRedondeados } from '@/lib/plata';
 import type { NumeroDelMes } from '@/lib/inicio/numeros';
 
 // Un tono por dato, de la tabla de tarjetas de numeros de la skill estetica-panel.
@@ -76,7 +77,7 @@ export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
             <div className="mt-auto pt-6">
               <div className="pt-4 border-t border-border/60 flex items-center justify-between gap-2">
                 <span className="text-xs font-bold text-muted-foreground uppercase leading-snug">
-                  {textoDeVariacion(item.variacion)}
+                  {textoDeVariacion(item.variacion, formatearPesosRedondeados)}
                 </span>
                 <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               </div>

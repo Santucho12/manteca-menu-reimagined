@@ -12,6 +12,14 @@ export function formatearPesos(centavos: number): string {
   return `${signo}$${pesos},${resto}`;
 }
 
+/** Un monto redondeado al peso, para los numeros grandes de Inicio: $14.542.500. */
+export function formatearPesosRedondeados(centavos: number): string {
+  // Se redondea el valor absoluto: asi -$0,50 y $0,50 redondean igual, hacia afuera.
+  const pesos = Math.trunc((Math.abs(centavos) + 50) / 100);
+  const signo = centavos < 0 && pesos > 0 ? '-' : '';
+  return `${signo}${formatearPesosEnteros(pesos * 100)}`;
+}
+
 /** Un monto en pesos enteros como lo ve el publico del menu: $4.000. */
 export function formatearPesosEnteros(centavos: number): string {
   if (!Number.isSafeInteger(centavos) || centavos % 100 !== 0) {

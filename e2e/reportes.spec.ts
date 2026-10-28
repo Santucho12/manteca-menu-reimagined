@@ -46,7 +46,6 @@ test('ventas por periodo: elige las fechas y ve el total, el ticket y la variaci
   await page.goto('/admin/reportes/ventas');
   await page.getByLabel('Desde', { exact: true }).fill(PERIODO_E2E.desde);
   await page.getByLabel('Hasta', { exact: true }).fill(PERIODO_E2E.hasta);
-  await page.getByRole('button', { name: 'Ver' }).click();
   await expect(page).toHaveURL(new RegExp(DE_ABRIL));
   await expect(total(page, '$5.000,00')).toBeVisible();
   await expect(page.getByText('+$2.500,00 (+100 %)')).toBeVisible();

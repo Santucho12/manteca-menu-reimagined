@@ -30,22 +30,22 @@ describe('numerosDelMes', () => {
     expect(numerosDelMes(actual, anterior)).toEqual([
       {
         etiqueta: 'Ventas',
-        valor: '$4.000,00',
+        valor: '$4.000',
         variacion: { diferenciaCentavos: 200000, porcentaje: 100 },
       },
       {
         etiqueta: 'Gastos',
-        valor: '$1.000,00',
+        valor: '$1.000',
         variacion: { diferenciaCentavos: 50000, porcentaje: 100 },
       },
       {
         etiqueta: 'Balance',
-        valor: '$3.000,00',
+        valor: '$3.000',
         variacion: { diferenciaCentavos: 150000, porcentaje: 100 },
       },
       {
         etiqueta: 'Ticket promedio',
-        valor: '$2.000,00',
+        valor: '$2.000',
         variacion: { diferenciaCentavos: 100000, porcentaje: 100 },
       },
     ]);
@@ -53,12 +53,12 @@ describe('numerosDelMes', () => {
 
   it('sin gastos no calcula el resultado, y sin el mes anterior no compara', () => {
     const numeros = numerosDelMes(datos([venta('2026-10-01', 100)], []), datos([], []));
-    expect(numeros.map((n) => n.valor)).toEqual(['$1,00', '$0,00', 'Sin calcular', '$1,00']);
+    expect(numeros.map((n) => n.valor)).toEqual(['$1', '$0', 'Sin calcular', '$1']);
     expect(numeros.map((n) => n.variacion)).toEqual([null, null, null, null]);
   });
 
   it('un mes sin ventas da todo en cero sin romper', () => {
     const numeros = numerosDelMes(datos([], []), datos([], []));
-    expect(numeros.map((n) => n.valor)).toEqual(['$0,00', '$0,00', 'Sin calcular', '$0,00']);
+    expect(numeros.map((n) => n.valor)).toEqual(['$0', '$0', 'Sin calcular', '$0']);
   });
 });

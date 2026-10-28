@@ -2,6 +2,7 @@
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { formatearPesos } from '@/lib/plata';
+import { TOOLTIP_DE_BARRAS } from './estiloDelTooltip';
 
 const EJE = { stroke: '#94a3b8', fontSize: 10, fontWeight: 700 };
 const pesos = (valor: unknown) => formatearPesos(Math.round(Number(valor)));
@@ -20,7 +21,7 @@ export function GraficoDeBarras({ datos }: { datos: { nombre: string; montoCenta
           <CartesianGrid stroke="#e2e8f0" horizontal={false} />
           <XAxis type="number" tickFormatter={pesos} {...EJE} tickLine={false} />
           <YAxis type="category" dataKey="nombre" width={120} {...EJE} tickLine={false} />
-          <Tooltip formatter={pesos} />
+          <Tooltip {...TOOLTIP_DE_BARRAS} formatter={pesos} />
           <Bar
             name="Monto"
             dataKey="montoCentavos"
