@@ -3,12 +3,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
+import { toast } from 'sonner';
 import { AvisoDeError } from '@/components/formularios/AvisoDeError';
 import { Campo } from '@/components/formularios/Campo';
 import { PieDelFormulario } from '@/components/formularios/PieDelFormulario';
 import { conValorInicial } from '@/lib/formularios/valorInicial';
 import type { Opcion, OpcionDeCategoria } from '@/lib/gastos/consultas';
-import { esquemaCarga, type DatosDeCarga } from '@/lib/gastos/esquemas';
+import { esquemaCarga, quedaPorPagar, type DatosDeCarga } from '@/lib/gastos/esquemas';
+import { avisoDeLaCarga } from '@/lib/gastos/pantalla';
 import { muestraProveedor } from '@/lib/gastos/proveedor';
 import { useGuardar } from '@/lib/gastos/useGuardar';
 import { cargarGastoDesdeElPanel, editarGastoDesdeElPanel } from './acciones';
@@ -30,12 +32,18 @@ export function FormularioDeGasto({ inicial, id, categorias, proveedores, ...res
   const router = useRouter();
   const guardar = (datos: DatosDeCarga) =>
     id ? editarGastoDesdeElPanel({ ...datos, id }) : cargarGastoDesdeElPanel(datos);
-  const guardado = useGuardar(guardar, () => router.push('/admin/gastos'));
+  const guardado = useGuardar(guardar, (respuesta) => {
+    if (respuesta) toast.success(avisoDeLaCarga(respuesta.tipo));
+    router.push('/admin/gastos');
+  });
   const { register, handleSubmit, control, formState } = useForm<DatosDeCarga>({
     resolver: zodResolver(esquemaCarga(hoy)),
     defaultValues: inicial,
   });
-  const [categoriaId, seRepite] = useWatch({ control, name: ['categoriaId', 'seRepite'] });
+  const [categoriaId, seRepite, yaPagado] = useWatch({
+    control,
+    name: ['categoriaId', 'seRepite', 'yaPagado'],
+  });
   const conProveedor = muestraProveedor(categorias, categoriaId, inicial);
   // Sin el campo a la vista, el gasto se guarda sin proveedor.
   const enviar = handleSubmit((datos) =>
@@ -55,6 +63,7 @@ export function FormularioDeGasto({ inicial, id, categorias, proveedores, ...res
           proveedores={proveedores}
           conProveedor={conProveedor}
           deCaja={deCaja}
+          medioOpcional={quedaPorPagar({ seRepite, yaPagado })}
         />
         {seRepite === 'no' ? (
           <Campo

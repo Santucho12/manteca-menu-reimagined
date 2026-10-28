@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  avisoDeLaCarga,
   enlaceDeGastos,
   fechaParaMostrar,
   filtrosDeGastos,
@@ -85,6 +86,14 @@ describe('opcionesParaElegir', () => {
       { valor: 'a', texto: 'Alquiler' },
       { valor: 'b', texto: 'Viejo (desactivado)' },
     ]);
+  });
+});
+
+describe('avisoDeLaCarga', () => {
+  it('dice qué quedó anotado', () => {
+    expect(avisoDeLaCarga('gasto')).toBe('Gasto cargado');
+    expect(avisoDeLaCarga('fijo')).toBe('Gasto fijo creado');
+    expect(avisoDeLaCarga('porPagar')).toBe('Quedó por pagar');
   });
 });
 

@@ -25,6 +25,8 @@ export type PropsDeCampos = {
   conProveedor: boolean;
   /** El gasto salio de un cierre: su monto se corrige anulando el cierre. */
   deCaja?: boolean;
+  /** Lo por pagar elige el medio al pagarse. */
+  medioOpcional?: boolean;
 };
 
 export function CamposDelGasto({
@@ -35,6 +37,7 @@ export function CamposDelGasto({
   proveedores,
   conProveedor,
   deCaja = false,
+  medioOpcional = false,
 }: PropsDeCampos) {
   return (
     <>
@@ -70,9 +73,9 @@ export function CamposDelGasto({
       />
       <CampoDeSeleccion
         id="medio-de-pago"
-        etiqueta="Medio de pago"
+        etiqueta={medioOpcional ? 'Medio de pago (opcional)' : 'Medio de pago'}
         opciones={[
-          { valor: '', texto: 'Elegí cómo se pagó' },
+          { valor: '', texto: medioOpcional ? 'Lo elegís al pagarlo' : 'Elegí cómo se pagó' },
           ...opcionesDeMedio(inicial.medioDePago),
         ]}
         error={errors.medioDePago?.message}

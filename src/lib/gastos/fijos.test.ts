@@ -118,27 +118,29 @@ describe('proximosPagos y faltaPagarEsteMes', () => {
 });
 
 describe('resumenDeRepeticion', () => {
+  const MARCAR = ' Cada pago queda en Próximos pagos hasta que lo marques Pagado.';
+
   it('con la fecha de hoy y con otra', () => {
     expect(resumenDeRepeticion(HOY, 'mensual', HOY)).toBe(
-      'Se carga hoy y después todos los meses, el día 27.',
+      `Vence hoy y después todos los meses, el día 27.${MARCAR}`,
     );
     expect(resumenDeRepeticion('2026-11-05', 'bimestral', HOY)).toBe(
-      'Se carga el 05/11 y después cada dos meses, el día 5.',
+      `Vence el 05/11 y después cada dos meses, el día 5.${MARCAR}`,
     );
     expect(resumenDeRepeticion('2026-11-05', 'anual', HOY)).toBe(
-      'Se carga el 05/11 y después todos los años, el 05/11.',
+      `Vence el 05/11 y después todos los años, el 05/11.${MARCAR}`,
     );
   });
 
-  it('con una fecha pasada carga hasta hoy', () => {
+  it('con una fecha pasada, lo de esa fecha a hoy queda por pagar', () => {
     expect(resumenDeRepeticion('2026-07-05', 'mensual', HOY)).toBe(
-      'Se cargan los pagos del 05/07 a hoy, y después todos los meses, el día 5.',
+      `Quedan por pagar los pagos del 05/07 a hoy, y después todos los meses, el día 5.${MARCAR}`,
     );
   });
 
   it('del 29 al 31 avisa el último día de los meses cortos', () => {
     expect(resumenDeRepeticion('2026-10-31', 'mensual', '2026-10-31')).toBe(
-      'Se carga hoy y después todos los meses, el día 31. En los meses más cortos, el último día.',
+      `Vence hoy y después todos los meses, el día 31. En los meses más cortos, el último día.${MARCAR}`,
     );
   });
 });

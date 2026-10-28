@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { numeroDePagina, unValor } from '../usuarios/presentacion';
+import type { TipoDeCarga } from './escritura';
 import type { FRECUENCIAS, MedioDePago } from './esquemas';
 import { esElMesDeHoy, mesDeLaUrl, rangoDelMes } from './meses';
 import { sumarMeses } from './vencimientos';
@@ -98,3 +99,12 @@ export const opcionesDeMedio = (actual?: MedioDePago | ''): OpcionDeLista[] =>
 
 export const opcionesDeFrecuencia = (): OpcionDeLista[] =>
   Object.entries(FRECUENCIAS_EN_TEXTO).map(([valor, texto]) => ({ valor, texto }));
+
+const AVISOS_DE_CARGA: Record<TipoDeCarga, string> = {
+  gasto: 'Gasto cargado',
+  fijo: 'Gasto fijo creado',
+  porPagar: 'Quedó por pagar',
+};
+
+/** El aviso al guardar una carga: dice qué quedó anotado. */
+export const avisoDeLaCarga = (tipo: TipoDeCarga) => AVISOS_DE_CARGA[tipo];

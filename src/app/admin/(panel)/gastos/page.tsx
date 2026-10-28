@@ -14,6 +14,7 @@ import {
   type FilaDeCategoria,
 } from '@/lib/gastos/consultas';
 import { generarAlAbrir } from '@/lib/gastos/generacion';
+import { pagosPendientes, vencimientosTomados } from '@/lib/gastos/pagos';
 import { filtrosDeGastos, type ParametrosDeGastos } from '@/lib/gastos/pantalla';
 import { Pagados } from './Pagados';
 import { ParaClasificar } from './ParaClasificar';
@@ -43,13 +44,16 @@ export default async function PaginaDeGastos({
   // Lo vencido aparece al abrir, sin esperar al proceso de la madrugada.
   await generarAlAbrir(estado, hoy);
   const filtros = filtrosDeGastos(await searchParams, hoy);
-  const [lista, opciones, recurrentes, pendientes, categorias] = await Promise.all([
-    listarGastos(cliente, filtros),
-    opcionesDeGasto(cliente),
-    listarRecurrentes(cliente),
-    paraClasificar(cliente),
-    listarCategorias(cliente),
-  ]);
+  const [lista, opciones, recurrentes, pendientes, categorias, porPagar, tomados] =
+    await Promise.all([
+      listarGastos(cliente, filtros),
+      opcionesDeGasto(cliente),
+      listarRecurrentes(cliente),
+      paraClasificar(cliente),
+      listarCategorias(cliente),
+      pagosPendientes(cliente),
+      vencimientosTomados(cliente, hoy),
+    ]);
   return (
     <Pantalla
       titulo="Gastos"
@@ -63,7 +67,12 @@ export default async function PaginaDeGastos({
           <Pagados lista={lista} filtros={filtros} hoy={hoy} categorias={opciones.categorias} />
         </div>
         <div className="order-1 xl:order-2">
-          <ProximosPagos recurrentes={recurrentes} hoy={hoy} />
+          <ProximosPagos
+            recurrentes={recurrentes}
+            porPagar={porPagar}
+            tomados={tomados}
+            hoy={hoy}
+          />
         </div>
       </div>
     </Pantalla>

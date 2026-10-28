@@ -3,35 +3,12 @@ import { InsigniaDeEstado } from '@/components/panel/Insignias';
 import { PanelDeLista } from '@/components/panel/PanelDeLista';
 import type { FilaDeRecurrente } from '@/lib/gastos/consultas';
 import { nombreDelGasto } from '@/lib/gastos/filas';
-import {
-  cuandoVence,
-  faltaPagarEsteMes,
-  proximosPagos,
-  type ProximoPago,
-} from '@/lib/gastos/fijos';
-import { nombreDeFrecuencia } from '@/lib/gastos/pantalla';
+import { faltaPagarEsteMes, proximosPagos } from '@/lib/gastos/fijos';
+import { itemsPorPagar, type Pendiente } from '@/lib/gastos/porPagar';
 import { formatearPesos } from '@/lib/plata';
-import { BaldosaDeFecha } from './BaldosaDeFecha';
+import { FilaPorPagar } from './FilaPorPagar';
 
 const NOMBRE = 'block text-sm font-semibold truncate hover:text-primary transition-colors';
-
-function FilaDeProximo({ proximo, hoy }: { proximo: ProximoPago; hoy: string }) {
-  const detalle = `${nombreDeFrecuencia(proximo.frecuencia)} · ${cuandoVence(proximo.fecha, hoy)}`;
-  return (
-    <li className="px-4 md:px-5 py-3 flex items-center gap-3 hover:bg-secondary/40 transition-colors">
-      <BaldosaDeFecha fecha={proximo.fecha} viene />
-      <div className="flex-1 min-w-0">
-        <Link href={`/admin/gastos/fijos/${proximo.id}`} className={NOMBRE}>
-          {proximo.nombre}
-        </Link>
-        <p className="text-[11px] text-muted-foreground">{detalle}</p>
-      </div>
-      <span className="text-sm font-bold tabular-nums whitespace-nowrap">
-        {formatearPesos(proximo.montoCentavos)}
-      </span>
-    </li>
-  );
-}
 
 function Pausados({ pausados }: { pausados: FilaDeRecurrente[] }) {
   return (
@@ -53,34 +30,36 @@ function Pausados({ pausados }: { pausados: FilaDeRecurrente[] }) {
   );
 }
 
-/** Cada gasto fijo activo con su próximo pago, del más cercano al más lejano. */
-export function ProximosPagos({
-  recurrentes,
-  hoy,
-}: {
+type Props = {
   recurrentes: FilaDeRecurrente[];
+  porPagar: Pendiente[];
+  /** Vencimientos de fijos que ya tienen su por pagar: el próximo pago los saltea. */
+  tomados: Set<string>;
   hoy: string;
-}) {
-  const proximos = proximosPagos(recurrentes, hoy);
+};
+
+/** Lo por pagar y el próximo pago de cada fijo activo, del más cercano al más lejano. */
+export function ProximosPagos({ recurrentes, porPagar, tomados, hoy }: Props) {
+  const items = itemsPorPagar(porPagar, proximosPagos(recurrentes, hoy, tomados));
   const pausados = recurrentes.filter((fijo) => !fijo.activo);
-  const falta = faltaPagarEsteMes(proximos, hoy);
+  const falta = faltaPagarEsteMes(items, hoy);
   return (
-    <PanelDeLista titulo="Próximos pagos" cantidad={String(proximos.length)}>
-      {proximos.length === 0 ? (
+    <PanelDeLista titulo="Próximos pagos" cantidad={String(items.length)}>
+      {items.length === 0 ? (
         <p className="p-6 text-sm text-muted-foreground leading-relaxed">
-          Todavía no hay gastos fijos. Cargá uno con Cargar gasto y elegí cada cuánto se repite.
+          No hay nada por pagar. Cargá un gasto con «Todavía no», o uno que se repita.
         </p>
       ) : (
         <ul aria-label="Próximos pagos" className="divide-y divide-border">
-          {proximos.map((proximo) => (
-            <FilaDeProximo key={proximo.id} proximo={proximo} hoy={hoy} />
+          {items.map((item) => (
+            <FilaPorPagar key={item.clave} item={item} hoy={hoy} />
           ))}
         </ul>
       )}
       <p className="px-4 md:px-6 py-3 border-t border-border text-sm font-semibold">
         {falta > 0
           ? `Falta pagar este mes: ${formatearPesos(falta)}`
-          : 'Este mes no quedan pagos fijos.'}
+          : 'Este mes no queda nada por pagar.'}
       </p>
       {pausados.length > 0 ? <Pausados pausados={pausados} /> : null}
     </PanelDeLista>

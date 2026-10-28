@@ -83,10 +83,12 @@ export function faltaPagarEsteMes(
 const diaYMes = (fecha: string) => fechaParaMostrar(fecha).slice(0, 5);
 
 function comoEmpieza(fecha: string, hoy: string): string {
-  if (fecha === hoy) return 'Se carga hoy y después';
-  if (fecha < hoy) return `Se cargan los pagos del ${diaYMes(fecha)} a hoy, y después`;
-  return `Se carga el ${diaYMes(fecha)} y después`;
+  if (fecha === hoy) return 'Vence hoy y después';
+  if (fecha < hoy) return `Quedan por pagar los pagos del ${diaYMes(fecha)} a hoy, y después`;
+  return `Vence el ${diaYMes(fecha)} y después`;
 }
+
+const MARCAR = 'Cada pago queda en Próximos pagos hasta que lo marques Pagado.';
 
 const queDia = (fecha: string, frecuencia: Frecuencia) =>
   frecuencia === 'anual' ? `el ${diaYMes(fecha)}` : `el día ${Number(fecha.slice(8))}`;
@@ -95,12 +97,13 @@ const queDia = (fecha: string, frecuencia: Frecuencia) =>
 const caeEnMesesCortos = (fecha: string, frecuencia: Frecuencia) =>
   frecuencia === 'anual' ? fecha.slice(5) === '02-29' : Number(fecha.slice(8)) >= 29;
 
-/** Lo que va a pasar con un fijo que arranca en esa fecha, dicho en una frase. */
+/** Lo que va a pasar con un fijo que arranca en esa fecha, dicho en pocas frases. */
 export function resumenDeRepeticion(fecha: string, frecuencia: Frecuencia, hoy: string): string {
   const frase = `${comoEmpieza(fecha, hoy)} ${CADA[frecuencia]}, ${queDia(fecha, frecuencia)}.`;
-  return caeEnMesesCortos(fecha, frecuencia)
-    ? `${frase} En los meses más cortos, el último día.`
-    : frase;
+  const cortos = caeEnMesesCortos(fecha, frecuencia)
+    ? ' En los meses más cortos, el último día.'
+    : '';
+  return `${frase}${cortos} ${MARCAR}`;
 }
 
 /** Si al editar cambia la fecha o la frecuencia: entonces el fijo cuenta desde el próximo pago. */
