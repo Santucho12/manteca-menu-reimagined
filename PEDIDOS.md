@@ -153,6 +153,22 @@ Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, 
 ### 61. Control de cierres: tolerancia en una tuerca y fila que abre el detalle
 En `/admin/caja/control`, la tolerancia sale de su sección y queda detrás de una tuerca de configuración que abre una ventana con el mismo campo. Cada cierre de la lista se abre al tocar cualquier parte de la fila, con una flecha que lo avisa.
 
+### 65. Gastos: anotar lo que todavía no se pagó
+Al cargar un gasto se elige si ya se pagó o si todavía no: lo que se paga en el corto plazo (una factura que vence en unos días) queda anotado como por pagar, se ve con lo que viene y, cuando se paga, se marca como pagado (Santiago, 2026-10-27). Hasta ahora "cuentas a pagar" estaba fuera de alcance (`docs/modulos/04-gastos.md`). Se anotó como 63, número que también tomó otra sesión para Ventas.
+
+**Decidido (Santiago, 2026-10-28):** lo por pagar cuenta recién cuando se paga, en la fecha del pago; se ve en Próximos pagos con un botón "Pagado" que abre una ventana con fecha, monto y medio para confirmar o corregir; lo vencido queda arriba. Los fijos dejan de nacer pagados: el día que vencen quedan por pagar (cambia lo decidido el 2026-10-06). Pagar en partes queda afuera. Diseño en `docs/superpowers/specs/2026-10-28-gastos-por-pagar-design.md`.
+
+**Excepción (Santiago, 2026-10-28):** se hace en la rama `feat/caja-control-detalle`, que abrió otra sesión, y no en una rama propia: varias sesiones de Claude trabajan en la misma carpeta y cambiar de rama las movería a todas.
+
+### 62. Gastos: nueva estética de la cabecera de Pagados
+La cabecera de «Pagados» (mes, tipo, categoría y total) se rediseña con las piezas de Plan Reminder Pro: mes en una píldora, control segmentado azul marino y el total como mosaico. No cambia ningún texto ni comportamiento.
+
+### 64. Subir Excel de Fudo más realista y filtros más descriptivos
+La pantalla de subida pasa a una zona de arrastre con pasos y tarjeta del archivo elegido (con su tamaño y un botón para quitarlo). Los filtros de Control de cierres y de Auditoría dicen «Todas las personas», «Todos los estados», «Todos los módulos» y «Todas las acciones» en vez de «Todos»/«Todas».
+
+### 63. Ventas: botones de arriba y «Tipos de venta»
+En Ventas, «Cargar venta» pasa a la píldora blanca, «Subir Excel de Fudo» a verde y «Canales» se llama «Tipos de venta» en todo lo que se ve (botón, pantallas, formulario, avisos, ayuda y auditoría). Los nombres internos y la URL no cambian.
+
 ### 60. Ventas: tarjetas de resumen y una tabla más clara
 En Ventas, el resumen de arriba ("Cobrado: … en N ventas") pasa a tarjetas de estadísticas rápidas (cobrado, ticket promedio, canceladas y anuladas). La tabla muestra siempre el estado con una insignia, la hora de la venta cuando se conoce, el canal debajo del origen (sin columna propia), íconos en el origen y el medio de pago, y cada fila se abre con un clic. El detalle de la venta suma la hora, los íconos y, para las del Excel de Fudo, avisa que vienen sin productos. Las ventas del Excel dejan de llevar una hora inventada (Santiago, 2026-10-27).
 
@@ -234,6 +250,10 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 65 | Gastos: anotar lo que todavía no se pagó | Todo. Diseño escrito; falta el plan y construirlo |
+| 64 | Subir Excel de Fudo más realista y filtros más descriptivos | Todo |
+| 63 | Ventas: botones de arriba y «Tipos de venta» | Todo |
+| 62 | Gastos: nueva estética de la cabecera de Pagados | Todo |
 | 61 | Control de cierres: tolerancia en una tuerca y fila que abre el detalle | Todo |
 | 60 | Ventas: tarjetas de resumen y una tabla más clara | Todo |
 | 59 | Importar las ventas de Fudo desde el Excel | Hecho con TDD (2026-10-27): lector del Excel y reparto en partes iguales (`excelDeFudo.test.ts`, `leerExcelDeFudo.test.ts`, `mensajesDeLaSubida.test.ts`), función de la base `ventas_importar_excel` aplicada solo en pruebas (`tests/reglas/ventas-excel.base.test.ts`, 19 casos), servicio (`tests/servicios/ventas-excel.base.test.ts`) y pantalla `/admin/ventas/subir` (`e2e/ventas-excel.spec.ts`, 9 en verde en computadora y celular). Falta: OK de Santiago para aplicar la migración `20261028120000_ventas_excel_de_fudo.sql` a la base real, actualizar `docs/producto.md` y `docs/modulos/05-ventas.md`, `schema.sql`, y el cierre completo |
