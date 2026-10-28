@@ -44,9 +44,7 @@ function Tarjeta({
     <details
       className={cn(
         'group self-start rounded-2xl border transition-colors',
-        activa
-          ? 'bg-primary/10 border-primary/40 ring-1 ring-primary/20'
-          : 'bg-card border-border shadow-xs',
+        activa ? 'bg-secondary border-foreground/25 shadow-md' : 'bg-card border-border shadow-xs',
       )}
     >
       <summary className="flex cursor-pointer list-none items-start justify-between gap-2 p-4 [&::-webkit-details-marker]:hidden">
@@ -71,7 +69,7 @@ function Tarjeta({
       <Link
         href={enlaceDeGastos(destino, hoy)}
         aria-current={activa ? 'true' : undefined}
-        className="flex items-center gap-1.5 border-t border-border px-4 py-2 text-xs font-bold text-primary hover:bg-primary/5"
+        className="flex items-center gap-1.5 border-t border-border px-4 py-2 text-xs font-bold text-foreground hover:bg-secondary/60"
       >
         <Filter size={12} aria-hidden="true" />{' '}
         {activa ? 'Ver todos los gastos' : 'Filtrar la lista'}

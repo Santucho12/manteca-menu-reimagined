@@ -278,3 +278,21 @@ input[type='date']::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
   background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
 }
+
+/* Un modulo sin el dorado de la marca: lo que era del color de la marca va en blanco con sombra. */
+.modulo-sin-dorado {
+  --color-primary: #ffffff;
+  --color-primary-foreground: #2b1d14;
+  --color-ring: #2b1d14;
+  accent-color: #2b1d14;
+}
+.modulo-sin-dorado .text-primary,
+.modulo-sin-dorado [class*='hover:text-primary']:hover {
+  color: #2b1d14;
+}
+.modulo-sin-dorado .bg-primary {
+  border: 1px solid rgb(43 29 20 / 0.08);
+  box-shadow:
+    0 8px 20px -6px rgb(43 29 20 / 0.25),
+    0 2px 6px rgb(43 29 20 / 0.12);
+}
