@@ -2,19 +2,17 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Banknote } from 'lucide-react';
-import Link from 'next/link';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { AvisoDeError } from '@/components/formularios/AvisoDeError';
 import { Campo } from '@/components/formularios/Campo';
 import { CampoDeTextoLargo } from '@/components/formularios/CampoDeTextoLargo';
 import { PieDelFormulario } from '@/components/formularios/PieDelFormulario';
-import { BOTON_PRINCIPAL } from '@/components/panel/estilos';
 import { Seccion } from '@/components/panel/Seccion';
 import { esquemaCierre, type DatosDeCierre } from '@/lib/caja/esquemas';
 import { conValorInicial, type Registro } from '@/lib/formularios/valorInicial';
 import { useGuardar } from '@/lib/gastos/useGuardar';
-import { guardarCierreDesdeElPanel } from './acciones';
+import { editarCierreDesdeElPanel, guardarCierreDesdeElPanel } from './acciones';
 import { GastosDeCaja, Retiros } from './Salidas';
 
 type CamposDeMonto = 'fondoInicial' | 'efectivo' | 'credito' | 'debito' | 'qr' | 'transferencia';
@@ -51,30 +49,23 @@ function Montos({ registro, errors }: PropsDeMontos) {
   );
 }
 
-function Guardado() {
-  return (
-    <Seccion forma="lista">
-      <h2 className="text-xl font-bold tracking-tight text-slate-800">Cierre guardado</h2>
-      <p className="text-sm">El resultado va a estar cuando entren las ventas del día.</p>
-      <div>
-        <Link href="/admin/caja/mis-cierres" className={`${BOTON_PRINCIPAL} w-fit`}>
-          Ver mis cierres
-        </Link>
-      </div>
-    </Seccion>
-  );
-}
+type Props = { inicial: DatosDeCierre; id?: string };
 
-export function FormularioDeCierre({ inicial }: { inicial: DatosDeCierre }) {
-  const [listo, setListo] = useState(false);
-  const guardado = useGuardar(guardarCierreDesdeElPanel, () => setListo(true));
+/** Cargar un cierre nuevo o, con el id, editar uno existente; al terminar abre su resultado. */
+export function FormularioDeCierre({ inicial, id }: Props) {
+  const router = useRouter();
+  const verDetalle = (cierre: string) => router.push(`/admin/caja/cierres/${cierre}`);
+  const guardar = (datos: DatosDeCierre) =>
+    id ? editarCierreDesdeElPanel({ ...datos, id }) : guardarCierreDesdeElPanel(datos);
+  const guardado = useGuardar(guardar, (respuesta) =>
+    verDetalle(id ?? (respuesta as { id: string }).id),
+  );
   const { register, control, handleSubmit, formState } = useForm<DatosDeCierre>({
     resolver: zodResolver(esquemaCierre),
     defaultValues: inicial,
   });
   const { errors } = formState;
   const registro = conValorInicial(register, inicial);
-  if (listo) return <Guardado />;
   return (
     <Seccion icono={<Banknote className="text-primary" size={24} />}>
       <form onSubmit={handleSubmit(guardado.enviar)} noValidate className="space-y-5">
@@ -82,6 +73,7 @@ export function FormularioDeCierre({ inicial }: { inicial: DatosDeCierre }) {
           id="fecha"
           etiqueta="Fecha"
           type="date"
+          readOnly={Boolean(id)}
           error={errors.fecha?.message}
           {...registro('fecha')}
         />
@@ -102,7 +94,10 @@ export function FormularioDeCierre({ inicial }: { inicial: DatosDeCierre }) {
           {...registro('comentario')}
         />
         {guardado.mensaje ? <AvisoDeError mensaje={guardado.mensaje} /> : null}
-        <PieDelFormulario enviando={guardado.enviando} texto="Guardar cierre" />
+        <PieDelFormulario
+          enviando={guardado.enviando}
+          texto={id ? 'Guardar cambios' : 'Guardar cierre'}
+        />
       </form>
     </Seccion>
   );

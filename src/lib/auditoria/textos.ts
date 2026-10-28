@@ -104,8 +104,11 @@ export function nombreDelDato(registro: RegistroDeAuditoria, nombres: Nombres): 
 
 const RUTAS: Record<string, (registro: RegistroDeAuditoria) => string | null> = {
   gastos: (r) => `/admin/gastos/${r.registro_id}`,
-  gastos_recurrentes: (r) => `/admin/gastos/recurrentes/${r.registro_id}`,
-  categorias_de_gasto: (r) => `/admin/gastos/categorias/${r.registro_id}`,
+  gastos_recurrentes: (r) => `/admin/gastos/fijos/${r.registro_id}`,
+  // Las categorías se editan en una ventana dentro de Gastos.
+  categorias_de_gasto: () => '/admin/gastos',
+  // Lo por pagar se ve y se paga en Próximos pagos.
+  gastos_por_pagar: () => '/admin/gastos',
   proveedores: (r) => `/admin/proveedores/${r.registro_id}`,
   cierres_de_caja: (r) => `/admin/caja/cierres/${r.registro_id}`,
   retiros_de_caja: (r) => {

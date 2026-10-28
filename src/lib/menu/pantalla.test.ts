@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { PREGUNTA_DE_DESACTIVAR, ayudaDelPrecio, textoDePrecios } from './pantalla';
+import {
+  PREGUNTA_DE_DESACTIVAR,
+  ayudaDelPrecio,
+  cantidadDeProductos,
+  textoDePrecios,
+} from './pantalla';
 
 describe('textoDePrecios', () => {
   it('dice el precio de cada presentacion y de donde sale', () => {
@@ -35,6 +40,17 @@ describe('PREGUNTA_DE_DESACTIVAR', () => {
     expect(PREGUNTA_DE_DESACTIVAR('Flor')).toBe(
       '¿Desactivar Flor? Deja de usarse; lo podés reactivar desde Ver desactivados.',
     );
+  });
+});
+
+describe('cantidadDeProductos', () => {
+  it('cuenta los productos de una categoria, en singular o en plural', () => {
+    expect(cantidadDeProductos(1)).toBe('1 producto');
+    expect(cantidadDeProductos(3)).toBe('3 productos');
+  });
+
+  it('sin productos no dice nada: la tarjeta ya avisa que esta vacia', () => {
+    expect(cantidadDeProductos(0)).toBeNull();
   });
 });
 

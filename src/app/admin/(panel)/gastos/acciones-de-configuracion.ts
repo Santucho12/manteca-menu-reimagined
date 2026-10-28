@@ -2,28 +2,24 @@
 
 import { z } from 'zod';
 import { ejecutarAccion } from '@/lib/acceso/servidor';
+import { diaEnArgentina } from '@/lib/fechas';
 import {
   cambiarEstadoDeCategoria,
   cambiarEstadoDeRecurrente,
   crearCategoria,
-  crearRecurrente,
   editarCategoria,
   editarRecurrente,
 } from '@/lib/gastos/escritura';
-import { esquemaCategoria, esquemaId, esquemaRecurrente } from '@/lib/gastos/esquemas';
+import { esquemaCategoria, esquemaFijo, esquemaId } from '@/lib/gastos/esquemas';
 
 const esquemaDeEstado = esquemaId.extend({ activo: z.boolean() });
 
-export async function crearRecurrenteDesdeElPanel(datos: unknown) {
-  return ejecutarAccion('admin', esquemaRecurrente, datos, ({ cliente }, recurrente) =>
-    crearRecurrente(cliente, recurrente),
-  );
-}
-
-export async function editarRecurrenteDesdeElPanel(datos: unknown) {
-  const esquema = esquemaRecurrente.extend(esquemaId.shape);
-  return ejecutarAccion('admin', esquema, datos, ({ cliente }, { id, ...recurrente }) =>
-    editarRecurrente(cliente, id, recurrente),
+/** Editar un gasto fijo: hoy lo decide el servidor, en Argentina. */
+export async function editarFijoDesdeElPanel(datos: unknown) {
+  const hoy = diaEnArgentina(new Date());
+  const esquema = esquemaFijo(hoy).extend(esquemaId.shape);
+  return ejecutarAccion('admin', esquema, datos, ({ cliente }, { id, ...fijo }) =>
+    editarRecurrente(cliente, id, fijo, hoy),
   );
 }
 

@@ -28,8 +28,8 @@ export function compararFilas<T>(
 const signo = (numero: number) => (numero > 0 ? '+' : numero < 0 ? '-' : '');
 const porciento = (p: number) => `${signo(p)}${String(Math.abs(p)).replace('.', ',')} %`;
 
-export function textoDeVariacion(v: Variacion): string {
+export function textoDeVariacion(v: Variacion, formato = formatearPesos): string {
   if (!v) return 'Sin datos para comparar';
-  const pesos = `${signo(v.diferenciaCentavos)}${formatearPesos(Math.abs(v.diferenciaCentavos))}`;
+  const pesos = `${signo(v.diferenciaCentavos)}${formato(Math.abs(v.diferenciaCentavos))}`;
   return v.porcentaje === null ? pesos : `${pesos} (${porciento(v.porcentaje)})`;
 }

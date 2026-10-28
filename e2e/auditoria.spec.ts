@@ -42,7 +42,6 @@ test('el cambio de un gasto se ve con nombres y pesos, y lleva al gasto', async 
   await page.goto('/admin/auditoria');
   await page.getByLabel('Módulo').selectOption({ label: 'Gastos' });
   await page.getByLabel('Acción').selectOption({ label: 'Cambio' });
-  await page.getByRole('button', { name: 'Filtrar' }).click();
   await expect(page).toHaveURL(/modulo=gastos&accion=cambio/);
   const registro = page.getByRole('list', { name: 'Registros' }).getByRole('listitem').first();
   await expect(registro).toContainText('Prueba Admin');

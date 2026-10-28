@@ -46,11 +46,18 @@ export function FormularioDeCategoria({ inicial, localId }: Props) {
         </div>
         <SelectorDeIcono />
         <SubidaDeFoto localId={localId} />
-        <Casilla
-          id="precio-compartido"
-          etiqueta="Precio compartido"
-          {...registro('precioCompartido')}
-        />
+        <div className="space-y-1">
+          <Casilla
+            id="precio-compartido"
+            etiqueta="Mismo precio para todos los productos"
+            aria-describedby="precio-compartido-ayuda"
+            {...registro('precioCompartido')}
+          />
+          {/* Con sangria hasta el texto de la casilla: el cuadradito mide 16 px y el espacio 8. */}
+          <p id="precio-compartido-ayuda" className="pl-6 text-xs text-muted-foreground">
+            Lo cargás una sola vez acá. Sin marcar, cada producto lleva su propio precio.
+          </p>
+        </div>
         <EditorDePresentaciones />
         {guardado.mensaje ? <AvisoDeError mensaje={guardado.mensaje} /> : null}
         {guardado.pendiente ? (

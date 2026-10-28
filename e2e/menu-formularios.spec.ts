@@ -23,12 +23,13 @@ async function completarCategoria(page: Page, nombre: string) {
   await page.getByLabel('Nombre', { exact: true }).fill(nombre);
   await page.getByLabel('Subtítulo').fill('Hecho hoy');
   await page.getByRole('radio', { name: '☕' }).check();
-  await page.getByLabel('Nombre de la presentación 1').fill('Mediano');
-  await page.getByRole('button', { name: 'Agregar presentación' }).click();
-  await page.getByLabel('Nombre de la presentación 2').fill('Grande');
+  // Exacto: "Subir la forma de venta 1" y los otros botones de la fila tambien lo contienen.
+  await page.getByLabel('Forma de venta 1', { exact: true }).fill('Mediano');
+  await page.getByRole('button', { name: 'Agregar otra forma de venta' }).click();
+  await page.getByLabel('Forma de venta 2', { exact: true }).fill('Grande');
 }
 
-test('crea una categoria con foto y dos presentaciones; queda oculta', async ({ page }) => {
+test('crea una categoria con foto y dos formas de venta; queda oculta', async ({ page }) => {
   const nombre = nombreNuevo();
   await completarCategoria(page, nombre);
   await page.getByLabel('Foto').setInputFiles('e2e/archivos/foto-de-prueba.jpg');
@@ -39,17 +40,39 @@ test('crea una categoria con foto y dos presentaciones; queda oculta', async ({ 
   await expect(page.getByRole('region', { name: nombre })).toContainText('Oculta');
 });
 
-test('con precio compartido pide un monto por presentacion', async ({ page }) => {
+test('con el mismo precio para todos pide un monto por forma de venta', async ({ page }) => {
   const nombre = nombreNuevo();
   await completarCategoria(page, nombre);
-  await page.getByLabel('Precio compartido').check();
-  await page.getByLabel('Precio compartido de la presentación 1').fill('1.500');
+  await page.getByLabel('Mismo precio para todos los productos').check();
+  await page.getByLabel('Precio de la forma de venta 1').fill('1.500');
   await page.getByRole('button', { name: 'Guardar' }).click();
   await expect(page.getByText('Escribí el precio en pesos, sin puntos ni centavos.')).toBeVisible();
-  await page.getByLabel('Precio compartido de la presentación 1').fill('1500');
+  await page.getByLabel('Precio de la forma de venta 1').fill('1500');
   await page.getByRole('button', { name: 'Guardar' }).click();
   await expect(page).toHaveURL(/\/admin\/menu$/);
   categorias.push(await idDeCategoriaPorNombre(nombre));
+});
+
+test('editar una categoria se lee simple: como se vende, con el precio al lado', async ({
+  page,
+}) => {
+  const categoria = await sembrarCategoria({ presentaciones: ['Docena'], compartidos: [2000000] });
+  categorias.push(categoria.id);
+  await page.goto(`/admin/menu/categorias/${categoria.id}`);
+  await expect(
+    page.getByLabel('Mismo precio para todos los productos'),
+  ).toHaveAccessibleDescription(
+    'Lo cargás una sola vez acá. Sin marcar, cada producto lleva su propio precio.',
+  );
+  const formas = page.getByRole('group', { name: 'Cómo se vende' });
+  await expect(formas.getByText('Se vende por', { exact: true })).toBeVisible();
+  await expect(formas.getByText('Precio para todos', { exact: true })).toBeVisible();
+  const nombre = await formas.getByLabel('Forma de venta 1', { exact: true }).boundingBox();
+  const precio = await formas.getByLabel('Precio de la forma de venta 1').boundingBox();
+  expect(Math.abs(nombre!.y - precio!.y)).toBeLessThan(2);
+  const titulo = await formas.getByText('Precio para todos', { exact: true }).boundingBox();
+  expect(Math.abs(titulo!.x - precio!.x)).toBeLessThan(2);
+  await expect(page.getByRole('main')).not.toContainText(/presentaci|compartido/i);
 });
 
 test('marca el nombre que falta', async ({ page }) => {
@@ -60,14 +83,14 @@ test('marca el nombre que falta', async ({ page }) => {
   );
 });
 
-test('sacar una presentacion avisa que productos se ocultan y, al confirmar, los oculta', async ({
+test('sacar una forma de venta avisa que productos se ocultan y, al confirmar, los oculta', async ({
   page,
 }) => {
   const categoria = await sembrarCategoria({ presentaciones: ['Unidad', 'Docena'] });
   categorias.push(categoria.id);
   const producto = await sembrarProducto(categoria, { precios: [null, 900000] });
   await page.goto(`/admin/menu/categorias/${categoria.id}`);
-  await page.getByRole('button', { name: 'Quitar la presentación 2' }).click();
+  await page.getByRole('button', { name: 'Quitar la forma de venta 2' }).click();
   await page.getByRole('button', { name: 'Guardar' }).click();
   await expect(
     page.getByText('Estos productos se van a ocultar porque quedan sin precio:'),

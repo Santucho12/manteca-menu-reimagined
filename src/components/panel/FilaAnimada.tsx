@@ -14,7 +14,7 @@ export function FilaAnimada({ children }: { children: ReactNode }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
-      className="group hover:bg-secondary/40 transition-all duration-200"
+      className="group relative hover:bg-secondary/40 transition-all duration-200"
     >
       {children}
     </motion.tr>

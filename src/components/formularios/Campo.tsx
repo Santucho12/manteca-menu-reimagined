@@ -14,11 +14,10 @@ export type PropsDeCampo = ComponentProps<'input'> & {
   variante?: VarianteDeCampo;
 };
 
-// En el ingreso, los campos de la tarjeta de Plan Reminder Pro: etiqueta despegada e icono adelante.
-const ETIQUETA_DE_INGRESO =
-  'text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 block px-1';
+// En el ingreso, la etiqueta queda para el lector: a la vista, el icono y el texto de ayuda.
+const ETIQUETA_DE_INGRESO = 'sr-only';
 const CAMPO_DE_INGRESO =
-  'w-full h-12 rounded-xl border-none bg-secondary/30 pl-10 pr-3 text-sm font-semibold focus:ring-2 focus:ring-primary/20 transition-all outline-hidden';
+  'w-full h-11 rounded-xl border border-border bg-white/70 pl-11 pr-3 text-sm font-medium placeholder:text-muted-foreground/60 focus:border-primary focus:ring-4 focus:ring-primary/15 transition-all outline-hidden';
 
 export const clasesDeEtiqueta = (variante: VarianteDeCampo) =>
   variante === 'ingreso' ? ETIQUETA_DE_INGRESO : ETIQUETA;
@@ -63,7 +62,7 @@ export function Campo({
             size={16}
             strokeWidth={2}
             aria-hidden
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-primary"
           />
         ) : null}
         <input

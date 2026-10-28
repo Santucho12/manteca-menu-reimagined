@@ -11,6 +11,7 @@ import {
   YAxis,
 } from 'recharts';
 import { formatearPesos } from '@/lib/plata';
+import { TOOLTIP_DE_LINEAS } from './estiloDelTooltip';
 import type { PuntoSuperpuesto } from '@/lib/reportes/agrupar';
 
 const EJE = { stroke: '#94a3b8', fontSize: 10, fontWeight: 700 };
@@ -28,7 +29,7 @@ export function GraficoDeLineas({ datos }: { datos: PuntoSuperpuesto[] }) {
           <CartesianGrid stroke="#e2e8f0" vertical={false} />
           <XAxis dataKey="etiqueta" {...EJE} tickLine={false} />
           <YAxis tickFormatter={pesos} width={90} {...EJE} tickLine={false} axisLine={false} />
-          <Tooltip formatter={pesos} />
+          <Tooltip {...TOOLTIP_DE_LINEAS} formatter={pesos} />
           <Legend iconType="circle" />
           <Line
             name="Período"

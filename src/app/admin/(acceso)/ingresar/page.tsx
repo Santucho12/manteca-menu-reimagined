@@ -1,5 +1,6 @@
+import { UserPlus } from 'lucide-react';
 import type { Metadata } from 'next';
-import { EnlaceDeAcceso, TituloDeAcceso } from '@/components/formularios/Acceso';
+import { BotonSecundarioDeAcceso, TituloDeAcceso } from '@/components/formularios/Acceso';
 import { AvisoDeError } from '@/components/formularios/AvisoDeError';
 import { soloSinSesion } from '@/lib/acceso/servidor';
 import { MENSAJES } from '@/lib/usuarios/errores';
@@ -15,16 +16,16 @@ export default async function PaginaIngresar({ searchParams }: Props) {
   const desactivada = unValor((await searchParams).motivo) === 'desactivada';
   return (
     <>
-      <TituloDeAcceso>Ingresar</TituloDeAcceso>
+      <TituloDeAcceso
+        inicio="Ingresar al"
+        resaltado="sistema"
+        subtitulo="Ingresá con tu usuario del local."
+      />
       {desactivada ? (
         <AvisoDeError mensaje={MENSAJES.desactivada} variante="caja" className="mb-4" />
       ) : null}
       <FormularioIngreso />
-      <EnlaceDeAcceso
-        pregunta="¿No tenés cuenta?"
-        href="/admin/registro"
-        texto="Crear una cuenta"
-      />
+      <BotonSecundarioDeAcceso href="/admin/registro" texto="Crear cuenta" icono={UserPlus} />
     </>
   );
 }

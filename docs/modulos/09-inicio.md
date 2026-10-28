@@ -24,36 +24,54 @@ Aparece solo si hay algo pendiente. Cada aviso lleva a la pantalla donde se resu
 
 | Aviso | Lleva a |
 |---|---|
-| Cierres con diferencia sin revisar | Control de cierres |
+| Cierres con diferencia de la última semana | Control de cierres |
 | Ayer no se cargó el cierre | Control de cierres |
 | Personas que esperan un rol | Usuarios |
 | Productos de Fudo sin vincular | Vinculación |
 | Gastos sin clasificar | Gastos |
+| Pagos que vencen esta semana | Gastos (Próximos pagos) |
 | Las ventas no se sincronizan desde hace más de un día | Ventas |
 
 ### 2. Los números del mes
 
-Ventas, gastos, resultado y ticket promedio del mes en curso.
+Ventas, gastos, balance y ticket promedio del mes en curso.
 
 Cada uno se compara con **los mismos días del mes anterior**: el día 12 compara del 1 al 12
 de este mes contra del 1 al 12 del anterior. Muestra la variación en porcentaje.
 
+Al lado de los avisos va el bloque oscuro de ventas del mes: lo vendido, los gastos y el
+balance, con una barra de avance que dice qué parte de las ventas queda como balance.
+
 ### 3. Mes a mes
 
-Un gráfico con las ventas, los gastos y el resultado de los últimos 12 meses.
+Un gráfico con las ventas, los gastos y el balance. Arranca con los últimos 4 meses y se
+amplía a todo el año con "Ver todo el año". El mes en curso va más claro, con "en curso".
 
 Los meses anteriores al sistema tienen ventas, porque se trae un año de Fudo, pero no
-gastos. Esos meses muestran solo las ventas, sin resultado.
+gastos. Esos meses muestran solo las ventas, sin balance.
 
 ### 4. Más vendidos
 
-Los 5 productos que más plata dejaron en el mes, con la cantidad vendida al lado.
+Los 5 productos que más plata dejaron en el mes, con la cantidad vendida al lado y medallas
+de oro, plata y bronce para los tres primeros.
+
+### 5. Esta semana contra la anterior
+
+Un gráfico acumulado: suma las ventas día a día desde hoy y los 6 días anteriores, y las
+compara con los 7 días de antes. Una píldora dice si vas arriba o abajo (verde o rojo) y
+otra muestra los dos totales.
+
+### 6. Gastos por categoría
+
+Una torta con las 5 categorías que más pesan en el mes y el resto junto en "Otras", con el
+porcentaje de cada una.
 
 ## Reglas
 
 1. Los números salen del mismo cálculo que usa Reportes.
 2. Lo cancelado y lo anulado no cuentan.
-3. El resultado es ventas menos gastos. No se usa la palabra "margen".
+3. El balance es ventas menos gastos. En pantalla se dice "balance", no "resultado" ni
+   "margen" (Santiago, 2026-10-27).
 4. Los datos llegan hasta la última sincronización con Fudo, y se muestra de cuándo es.
 5. Los avisos no se guardan ni se marcan como vistos: se calculan al abrir la pantalla y
    desaparecen solos cuando se resuelve lo que los causa.
@@ -66,7 +84,8 @@ Los 5 productos que más plata dejaron en el mes, con la cantidad vendida al lad
   del mes anterior.
 - El mes anterior no tiene ese día (el 31): se compara contra el mes anterior completo.
 - Sin ventas en el mes: "Más vendidos" dice que todavía no hay ventas.
-- Mes anterior sin gastos cargados: gastos y resultado no muestran variación.
+- Mes anterior sin gastos cargados: gastos y balance no muestran variación.
+- Sin gastos en el mes: la torta dice que todavía no hay gastos.
 - Todo al día: el bloque de avisos no aparece.
 
 ## Fuera de alcance
@@ -81,7 +100,7 @@ Los 5 productos que más plata dejaron en el mes, con la cantidad vendida al lad
 
 | Propuesta | Acá | Por qué |
 |---|---|---|
-| KPI de margen | Resultado: ventas menos gastos | Sin costos por producto no hay margen |
+| KPI de margen | Balance: ventas menos gastos | Sin costos por producto no hay margen |
 | Más rentables, mermas y valor del stock | No están | Dependen de Costos, Producción y Stock |
 | Alertas de stock bajo y de margen bajo | No están | Dependen de Stock y de Costos |
 
@@ -94,7 +113,7 @@ Falta reflejarlo en `PROPUESTA.md`, con el texto que defina Santiago.
 | Período | El mes en curso contra los mismos días del mes anterior |
 | Orden | Primero lo que requiere acción, después los números |
 | Más vendidos | Los 5 que más plata dejaron, con la cantidad al lado |
-| Gráfico | Los últimos 12 meses |
+| Gráfico | Los últimos 4 meses, ampliable a todo el año (antes, 12 meses fijos) |
 
 ## Parte técnica
 
@@ -115,10 +134,11 @@ Construido el 2026-10-12 (pedido 33). Diseño en `docs/superpowers/specs/2026-10
 
 | Aviso | Cuenta | Lleva a |
 |---|---|---|
-| Cierres con diferencia sin revisar | Cierres en estado `con_diferencia` (revisado y anulado tienen otro estado) | `/admin/caja/control?estado=con_diferencia&desde=…` |
+| Cierres con diferencia de la última semana | Cierres no anulados de los últimos 7 días cuyo resultado contra las ventas es `con_diferencia` | `/admin/caja/control?estado=con_diferencia&desde=…` |
 | Ayer no se cargó el cierre | Ayer sin cierre sin anular, con algún cierre anterior | `/admin/caja/control?desde=<ayer>&hasta=<ayer>` |
 | Personas esperando un rol | `contarPendientes` | `/admin/usuarios?estado=pendientes` |
-| Gastos sin clasificar | Gastos sin anular de la categoría de sistema | `/admin/gastos?categoria=…&desde=…` |
+| Gastos sin clasificar | Gastos sin anular de la categoría de sistema | `/admin/gastos` (Para clasificar, de cualquier mes; pedido 58) |
+| Pagos que vencen esta semana | Fijos activos con próximo vencimiento de hoy a 6 días | `/admin/gastos` (Próximos pagos; pedido 58) |
 
 ### Código
 
@@ -127,19 +147,20 @@ Construido el 2026-10-12 (pedido 33). Diseño en `docs/superpowers/specs/2026-10
   (`datosDeAvisos` y `datosDelInicio`, con la sesión del admin).
 - Usa el cálculo de Reportes: `datosDelResultado`, `ventasPorProducto`, `periodoAnterior`,
   `resultadoPorMes`, `productosDelReporte` y `comparacionDelResultado`. Sin migración.
-- `src/components/inicio/`: `InicioAdmin`, `Avisos`, `MasVendidos`; reusa `Totales` y
-  `GraficoPorMes` de Reportes.
+- `src/components/inicio/`: `InicioAdmin`, `Avisos`, `BloqueDelMes`, `TarjetasDelMes`,
+  `MesAMes`, `MasVendidos`, `SemanaContraSemana` y `GastosEnTorta`, con
+  `EncabezadoDeTarjeta` compartido; reusa `GraficoPorMes` de Reportes. El cartel de los
+  gráficos está en `src/components/reportes/estiloDelTooltip.ts`.
 
 ### Ayer y vencimientos (pedido 50, 2026-10-27)
 
-- **Ayer**: franja arriba de todo con ventas, tickets, ticket promedio y el cierre (cargado,
-  sin cargar o con diferencia, que lleva al control de ese día). Un cierre anulado no cuenta.
-  Si ayer no hubo ventas, dice "Ayer no hubo ventas" y no sale el aviso "Ayer no se cargó el
-  cierre": un día sin ventas es un día que el local no abrió.
-- **Vencen esta semana**: los recurrentes activos cuyo próximo vencimiento cae de hoy a 6
-  días, con el mismo cálculo que la lista de Recurrentes, y su total. Sin ninguno, no aparece.
-- Código: `src/lib/inicio/ayer.ts` y `vencimientos.ts` (puros); `Ayer.tsx` y
-  `Vencimientos.tsx`.
+- Si ayer no hubo ventas no sale el aviso "Ayer no se cargó el cierre": un día sin ventas es
+  un día que el local no abrió.
+- Los recurrentes activos cuyo próximo vencimiento cae de hoy a 6 días, con el mismo cálculo
+  que la lista de Recurrentes, alimentan el aviso "Esta semana vencen N pagos".
+- Se probó una franja "Ayer" arriba de todo y una tarjeta "Vencen esta semana", y Santiago
+  las sacó de la pantalla (2026-10-27). Quedó el cálculo en `src/lib/inicio/ayer.ts` y
+  `vencimientos.ts` (puros), que usan los avisos.
 
 ### Pruebas
 

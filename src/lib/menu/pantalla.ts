@@ -12,6 +12,12 @@ export function textoDePrecios(precios: PrecioVigente[], categoria: string): str
   return precios.map((precio) => textoDe(precio, categoria)).join(' · ');
 }
 
+/** Cuantos productos tiene una categoria. Sin productos no se dice: la tarjeta ya lo avisa. */
+export function cantidadDeProductos(cantidad: number): string | null {
+  if (cantidad === 0) return null;
+  return cantidad === 1 ? '1 producto' : `${cantidad} productos`;
+}
+
 export const PREGUNTA_DE_DESACTIVAR = (nombre: string) =>
   `¿Desactivar ${nombre}? Deja de usarse; lo podés reactivar desde Ver desactivados.`;
 

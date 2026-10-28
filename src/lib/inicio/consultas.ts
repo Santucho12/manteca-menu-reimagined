@@ -1,5 +1,11 @@
-import { diasConCierre, listarCierres, primerDiaConCierre } from '../caja/consultas';
-import { listarRecurrentes } from '../gastos/consultas';
+import {
+  diasConCierre,
+  listarCierres,
+  primerDiaConCierre,
+  type FilaDeCierre,
+} from '../caja/consultas';
+import type { FiltrosDeControl } from '../caja/pantalla';
+import { listarRecurrentes, type FilaDeRecurrente } from '../gastos/consultas';
 import type { VentaDelDia } from '../reportes/ventas';
 import { resumenDeAyer, sinAvisoSiAyerNoHuboVentas } from './ayer';
 import { vencimientosDeLaSemana } from './vencimientos';
@@ -24,41 +30,33 @@ function conFecha(r: Respuesta): ConFecha {
   return { cantidad: r.count ?? 0, desde: r.data?.[0]?.fecha ?? null };
 }
 
-// Un cierre anulado o revisado ya no esta en con_diferencia: el estado alcanza.
-export async function cierresConDiferencia(cliente: Cliente): Promise<ConFecha> {
-  return conFecha(
-    await cliente
-      .from('cierres_de_caja')
-      .select('fecha', { count: 'exact' })
-      .eq('estado', 'con_diferencia')
-      .order('fecha')
-      .limit(1),
-  );
+const DIAS_DE_AVISO = 7;
+
+// Sin "revisado" un cierre con diferencia no se apaga solo: el aviso mira la ultima semana.
+export async function cierresConDiferencia(cliente: Cliente, hoy: string): Promise<ConFecha> {
+  const filtros = {
+    ...filtrosDeAyer(sumarDias(hoy, -DIAS_DE_AVISO), hoy),
+    estado: 'con_diferencia' as const,
+  };
+  const lista = await listarCierres(cliente, { ...filtros, pagina: 1 });
+  const fechas = lista.filas.map((fila) => fila.fecha).sort();
+  return { cantidad: lista.total, desde: fechas[0] ?? null };
 }
 
-async function idDeSinClasificar(cliente: Cliente): Promise<string | null> {
-  const respuesta = await cliente
-    .from('categorias_de_gasto')
-    .select('id')
-    .eq('de_sistema', true)
-    .maybeSingle();
-  if (respuesta.error) throw new Error(`No pudimos leer los avisos: ${respuesta.error.message}`);
-  return respuesta.data?.id ?? null;
-}
-
+// Un solo viaje: la categoria de sistema se filtra en el mismo pedido de los gastos.
 export async function gastosSinClasificar(
   cliente: Cliente,
 ): Promise<DatosDeAvisos['sinClasificar']> {
-  const categoriaId = await idDeSinClasificar(cliente);
-  if (!categoriaId) return { cantidad: 0, desde: null, categoriaId };
   const gastos = await cliente
     .from('gastos')
-    .select('fecha', { count: 'exact' })
-    .eq('categoria_id', categoriaId)
+    .select('fecha, categoria_id, categoria:categorias_de_gasto!inner(de_sistema)', {
+      count: 'exact',
+    })
+    .eq('categoria.de_sistema', true)
     .eq('anulado', false)
     .order('fecha')
     .limit(1);
-  return { ...conFecha(gastos), categoriaId };
+  return { ...conFecha(gastos), categoriaId: gastos.data?.[0]?.categoria_id ?? null };
 }
 
 /** Ayer, si no tiene cierre; nada si el local todavia no habia cargado ninguno. */
@@ -73,7 +71,7 @@ async function ayerSinCierre(cliente: Cliente, hoy: string): Promise<string | nu
 
 export async function datosDeAvisos(cliente: Cliente, hoy: string): Promise<DatosDeAvisos> {
   const [conDiferencia, ayer, pendientes, sinClasificar] = await Promise.all([
-    cierresConDiferencia(cliente),
+    cierresConDiferencia(cliente, hoy),
     ayerSinCierre(cliente, hoy),
     contarPendientes(cliente),
     gastosSinClasificar(cliente),
@@ -81,23 +79,29 @@ export async function datosDeAvisos(cliente: Cliente, hoy: string): Promise<Dato
   return { conDiferencia, ayerSinCierre: ayer, pendientes, sinClasificar };
 }
 
+const filtrosDeAyer = (desde: string, hasta: string): FiltrosDeControl => ({
+  desde,
+  hasta,
+  personaId: null,
+  estado: null,
+  anulados: false,
+  pagina: 1,
+});
+
 async function cierresDeAyer(cliente: Cliente, hoy: string) {
   const ayer = sumarDias(hoy, -1);
-  const filtros = { desde: ayer, hasta: ayer, personaId: null, estado: null, pagina: 1 };
-  return (await listarCierres(cliente, filtros)).filas;
+  return (await listarCierres(cliente, filtrosDeAyer(ayer, ayer))).filas;
 }
 
+type Leido = {
+  dias: VentaDelDia[];
+  avisos: DatosDeAvisos;
+  cierres: FilaDeCierre[];
+  recurrentes: FilaDeRecurrente[];
+};
+
 /** Ayer, lo que vence en la semana y los avisos, que dependen de si ayer hubo ventas. */
-async function ayerYVencimientos(
-  cliente: Cliente,
-  hoy: string,
-  dias: VentaDelDia[],
-  avisos: DatosDeAvisos,
-) {
-  const [cierres, recurrentes] = await Promise.all([
-    cierresDeAyer(cliente, hoy),
-    listarRecurrentes(cliente),
-  ]);
+function ayerYVencimientos({ dias, avisos, cierres, recurrentes }: Leido, hoy: string) {
   const ayer = resumenDeAyer(dias, cierres, hoy);
   const vencimientos = vencimientosDeLaSemana(recurrentes, hoy);
   const datos = { ...avisos, vencenEstaSemana: vencimientos.items.length };
@@ -108,19 +112,27 @@ async function ayerYVencimientos(
   };
 }
 
-/** Todo lo de Inicio, con el mismo calculo que Reportes. */
-export async function datosDelInicio(cliente: Cliente, hoy: string) {
+// Todo sale a la vez: cada viaje a la base cuesta unos 300 ms y en serie se suman.
+function leerElInicio(cliente: Cliente, hoy: string) {
   const mes = mesEnCurso(hoy);
-  const [avisos, actual, anterior, anio, productos, dias] = await Promise.all([
+  return Promise.all([
     datosDeAvisos(cliente, hoy),
     datosDelResultado(cliente, mes),
     datosDelResultado(cliente, periodoAnterior(mes)),
     datosDelResultado(cliente, ultimosDoceMeses(hoy)),
     ventasPorProducto(cliente, mes),
     ventasPorDia(cliente, rangoDeSemanas(hoy)),
+    cierresDeAyer(cliente, hoy),
+    listarRecurrentes(cliente),
   ]);
+}
+
+/** Todo lo de Inicio, con el mismo calculo que Reportes. */
+export async function datosDelInicio(cliente: Cliente, hoy: string) {
+  const [avisos, actual, anterior, anio, productos, dias, cierres, recurrentes] =
+    await leerElInicio(cliente, hoy);
   return {
-    ...(await ayerYVencimientos(cliente, hoy, dias, avisos)),
+    ...ayerYVencimientos({ dias, avisos, cierres, recurrentes }, hoy),
     actual,
     anterior,
     meses: resultadoPorMes(anio.ventas, anio.gastos),

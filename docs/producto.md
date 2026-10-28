@@ -98,7 +98,9 @@ pago y monto. Se puede filtrar por fecha, se pagina de a 500 como máximo y tien
 pedidos. Falta probarla contra la cuenta real.
 
 El Excel "Reporte de ventas" de Fudo no sirve como fuente: trae totales por día, sin
-productos ni tickets. No se construye la subida de Excel.
+productos ni tickets. Mientras no estén las credenciales de la API, el admin lo sube desde
+Ventas (Santiago, 2026-10-27, pedido 59): cada día y medio de pago entra como tantas ventas de
+Fudo como diga el Excel, de partes iguales y sin productos. Cuando entre la API, ella manda.
 
 ## Sin decidir
 

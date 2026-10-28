@@ -10,7 +10,7 @@ import { canalesDeVenta } from '@/lib/ventas/consultas';
 import { cambiarEstadoDeCanalDesdeElPanel } from '../../acciones';
 import { FormularioDeCanal } from '../FormularioDeCanal';
 
-export const metadata: Metadata = { title: 'Canal de venta' };
+export const metadata: Metadata = { title: 'Tipo de venta' };
 
 export default async function FichaDeCanal({ params }: { params: Promise<{ id: string }> }) {
   const { cliente } = await exigirPagina('admin');
@@ -40,7 +40,7 @@ export default async function FichaDeCanal({ params }: { params: Promise<{ id: s
         href="/admin/ventas/canales"
         className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
       >
-        Volver a canales
+        Volver a tipos de venta
       </Link>
     </Pantalla>
   );

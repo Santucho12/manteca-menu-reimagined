@@ -19,7 +19,7 @@ export function FormularioCambioObligado() {
   });
   const { errors, isSubmitting } = formState;
   return (
-    <form onSubmit={handleSubmit(enviar)} noValidate className="space-y-4">
+    <form onSubmit={handleSubmit(enviar)} noValidate className="space-y-3">
       <CampoContrasena
         id="nueva"
         etiqueta="Contraseña nueva"

@@ -38,21 +38,18 @@ function deAyer(ayer: string | null): Aviso[] {
 const dePendientes = (n: number): Aviso[] =>
   n === 0 ? [] : [{ texto: textoDePendientes(n), enlace: '/admin/usuarios?estado=pendientes' }];
 
-function deGastos({ cantidad, desde, categoriaId }: DatosDeAvisos['sinClasificar']): Aviso[] {
+// Gastos muestra arriba de todo los que esperan categoría, de cualquier mes, y al lado los
+// próximos pagos de los fijos: los dos avisos llevan a la pantalla, sin filtros.
+function deGastos({ cantidad }: DatosDeAvisos['sinClasificar']): Aviso[] {
   if (cantidad === 0) return [];
   const que = enPlural(cantidad, 'gasto', 'gastos');
-  return [
-    {
-      texto: `Hay ${cantidad} ${que} sin clasificar.`,
-      enlace: `/admin/gastos?categoria=${categoriaId}&desde=${desde}`,
-    },
-  ];
+  return [{ texto: `Hay ${cantidad} ${que} sin clasificar.`, enlace: '/admin/gastos' }];
 }
 
 function deVencimientos(n = 0): Aviso[] {
   if (n === 0) return [];
   const texto = n === 1 ? 'Esta semana vence 1 pago.' : `Esta semana vencen ${n} pagos.`;
-  return [{ texto, enlace: '/admin/gastos/recurrentes' }];
+  return [{ texto, enlace: '/admin/gastos' }];
 }
 
 /** Lo que requiere accion, en orden; cada aviso lleva a donde se resuelve. */

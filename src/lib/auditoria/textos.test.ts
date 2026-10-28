@@ -40,6 +40,7 @@ describe('datoDe', () => {
     expect(datoDe('perfiles')).toEqual({ modulo: 'Usuarios', dato: 'Usuario' });
     expect(datoDe('ventas')).toEqual({ modulo: 'Ventas', dato: 'Venta' });
     expect(datoDe('renglones_de_venta')).toEqual({ modulo: 'Ventas', dato: 'Producto vendido' });
+    expect(datoDe('gastos_por_pagar')).toEqual({ modulo: 'Gastos', dato: 'Por pagar' });
   });
 
   it('una tabla que no conoce se muestra igual, con su nombre', () => {
@@ -95,6 +96,13 @@ describe('cambiosDe', () => {
 describe('enlaceDe', () => {
   it('lleva al dato, o a la pantalla que lo contiene', () => {
     expect(enlaceDe(registro({ registro_id: 'g1' }))).toBe('/admin/gastos/g1');
+    expect(enlaceDe(registro({ tabla: 'gastos_recurrentes', registro_id: 'f1' }))).toBe(
+      '/admin/gastos/fijos/f1',
+    );
+    // Las categorías se editan en una ventana dentro de Gastos.
+    expect(enlaceDe(registro({ tabla: 'categorias_de_gasto' }))).toBe('/admin/gastos');
+    // Lo por pagar se ve y se paga en Próximos pagos.
+    expect(enlaceDe(registro({ tabla: 'gastos_por_pagar' }))).toBe('/admin/gastos');
     expect(enlaceDe(registro({ tabla: 'retiros_de_caja', despues: { cierre_id: 'c1' } }))).toBe(
       '/admin/caja/cierres/c1',
     );

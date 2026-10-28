@@ -1,33 +1,46 @@
-import { Plus } from 'lucide-react';
+import { FileSpreadsheet, Plus, Store } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FranjaDeAviso } from '@/components/panel/Avisos';
-import { BOTON_DE_ENCABEZADO, BOTON_DE_ENCABEZADO_NEUTRO } from '@/components/panel/estilos';
+import {
+  ACCESO_SECUNDARIO,
+  ACCESO_VERDE,
+  ICONO_DE_ACCESO_SOBRE_VERDE,
+  ICONO_DE_ACCESO_SUAVE,
+} from '@/components/panel/estilos';
 import { Paginas } from '@/components/panel/Paginas';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import { cantidadDePaginas } from '@/lib/usuarios/presentacion';
 import { listarVentas } from '@/lib/ventas/consultas';
-import {
-  enlaceDeVentas,
-  filtrosDeVentas,
-  lineasDelResumen,
-  type ParametrosDeVentas,
-} from '@/lib/ventas/pantalla';
+import { enlaceDeVentas, filtrosDeVentas, type ParametrosDeVentas } from '@/lib/ventas/pantalla';
 import { FiltrosDeVentas } from './FiltrosDeVentas';
 import { ListaDeVentas } from './ListaDeVentas';
+import { TarjetasDeVentas } from './TarjetasDeVentas';
 
 export const metadata: Metadata = { title: 'Ventas' };
 
 function Accesos() {
   return (
     <>
-      <Link href="/admin/ventas/nueva" className={BOTON_DE_ENCABEZADO}>
-        <Plus size={18} aria-hidden="true" /> Cargar venta
+      <Link href="/admin/ventas/nueva" className={ACCESO_SECUNDARIO}>
+        <span className={ICONO_DE_ACCESO_SUAVE}>
+          <Plus size={16} strokeWidth={2.6} aria-hidden="true" />
+        </span>
+        Cargar venta
       </Link>
-      <Link href="/admin/ventas/canales" className={BOTON_DE_ENCABEZADO_NEUTRO}>
-        Canales
+      <Link href="/admin/ventas/subir" className={ACCESO_VERDE}>
+        <span className={ICONO_DE_ACCESO_SOBRE_VERDE}>
+          <FileSpreadsheet size={15} aria-hidden="true" />
+        </span>
+        Subir Excel de Fudo
+      </Link>
+      <Link href="/admin/ventas/canales" className={ACCESO_SECUNDARIO}>
+        <span className={ICONO_DE_ACCESO_SUAVE}>
+          <Store size={15} aria-hidden="true" />
+        </span>
+        Tipos de venta
       </Link>
     </>
   );
@@ -50,16 +63,13 @@ export default async function PaginaDeVentas({
       ayuda="ventas"
     >
       <FranjaDeAviso>
-        <p>Fudo todavía no está conectado: por ahora se ven las ventas cargadas a mano.</p>
+        <p>
+          Fudo todavía no está conectado: sus ventas entran subiendo el Excel de Fudo, y se ven
+          junto con las cargadas a mano.
+        </p>
       </FranjaDeAviso>
       <FiltrosDeVentas filtros={filtros} />
-      <div className="space-y-1">
-        {lineasDelResumen(lista.totales, filtros.estado).map((linea) => (
-          <p key={linea} className="text-lg font-bold">
-            {linea}
-          </p>
-        ))}
-      </div>
+      <TarjetasDeVentas totales={lista.totales} />
       <ListaDeVentas filas={lista.filas} total={lista.total} />
       <Paginas
         pagina={lista.pagina}

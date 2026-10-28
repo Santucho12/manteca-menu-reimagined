@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { BarraDeFiltros, BotonDeFiltrar, FiltroDeFecha } from '@/components/panel/Filtros';
+import { BarraAutomatica } from '@/components/panel/BarraAutomatica';
+import { FiltroDeFecha } from '@/components/panel/Filtros';
 import { ATAJO } from '@/components/panel/estilos';
 import { Pantalla } from '@/components/panel/Pantalla';
 import {
@@ -76,10 +77,9 @@ export function PantallaDeReporte({
       ayuda="reportes"
     >
       <Atajos ruta={ruta} hoy={hoy} />
-      <BarraDeFiltros accion={ruta}>
+      <BarraAutomatica accion={ruta}>
         <Fechas periodos={periodos} conComparacion={conComparacion} />
-        <BotonDeFiltrar texto="Ver" />
-      </BarraDeFiltros>
+      </BarraAutomatica>
       {children}
       <Link
         href="/admin/reportes"

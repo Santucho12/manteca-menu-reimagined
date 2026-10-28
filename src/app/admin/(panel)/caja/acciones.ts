@@ -1,17 +1,12 @@
 'use server';
 
 import { ejecutarAccion } from '@/lib/acceso/servidor';
-import {
-  anularCierre,
-  cambiarTolerancia,
-  guardarCierre,
-  revisarCierre,
-} from '@/lib/caja/escritura';
+import { anularCierre, cambiarTolerancia, editarCierre, guardarCierre } from '@/lib/caja/escritura';
 import {
   centavosDeCaja,
   esquemaAnulacionDeCierre,
   esquemaCierre,
-  esquemaRevision,
+  esquemaEdicion,
   esquemaTolerancia,
 } from '@/lib/caja/esquemas';
 
@@ -22,9 +17,10 @@ export async function guardarCierreDesdeElPanel(datos: unknown) {
   );
 }
 
-export async function revisarCierreDesdeElPanel(datos: unknown) {
-  return ejecutarAccion('admin', esquemaRevision, datos, ({ cliente }, { id, comentario }) =>
-    revisarCierre(cliente, id, comentario),
+// Caja edita los suyos y el admin cualquiera: la base decide con la sesion.
+export async function editarCierreDesdeElPanel(datos: unknown) {
+  return ejecutarAccion('caja', esquemaEdicion, datos, ({ cliente }, { id, ...cierre }) =>
+    editarCierre(cliente, id, cierre),
   );
 }
 

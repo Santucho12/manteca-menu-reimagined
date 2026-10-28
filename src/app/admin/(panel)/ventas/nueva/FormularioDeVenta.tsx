@@ -48,7 +48,7 @@ export function FormularioDeVenta({ inicial, canales, opciones }: Props) {
   const { errors } = formState;
   const registro = conValorInicial(register, inicial);
   const elegirCanal = [
-    { valor: '', texto: 'Elegí el canal' },
+    { valor: '', texto: 'Elegí el tipo de venta' },
     ...canales.map((c) => ({ valor: c.id, texto: c.nombre })),
   ];
   return (
@@ -63,7 +63,7 @@ export function FormularioDeVenta({ inicial, canales, opciones }: Props) {
         />
         <CampoDeSeleccion
           id="canal"
-          etiqueta="Canal"
+          etiqueta="Tipo de venta"
           opciones={elegirCanal}
           error={errors.canalId?.message}
           {...registro('canalId')}

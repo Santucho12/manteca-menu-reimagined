@@ -300,29 +300,19 @@ export type Database = {
           anulado_por: string | null
           cargado_por: string
           comentario: string | null
-          comentario_revision: string | null
           credito_centavos: number
           debito_centavos: number
           efectivo_centavos: number
-          esperado_credito_centavos: number | null
-          esperado_debito_centavos: number | null
-          esperado_efectivo_centavos: number | null
-          esperado_qr_centavos: number | null
-          esperado_transferencia_centavos: number | null
-          estado: Database["public"]["Enums"]["estado_de_cierre"]
           fecha: string
           fecha_actualizacion: string
           fecha_anulacion: string | null
           fecha_creacion: string
-          fecha_revision: string | null
           fondo_inicial_centavos: number
           id: string
           local_id: string
           motivo_anulacion: string | null
           qr_centavos: number
           queda_en_caja_centavos: number
-          revisado: boolean
-          revisado_por: string | null
           transferencia_centavos: number
         }
         Insert: {
@@ -330,29 +320,19 @@ export type Database = {
           anulado_por?: string | null
           cargado_por?: string
           comentario?: string | null
-          comentario_revision?: string | null
           credito_centavos?: number
           debito_centavos?: number
           efectivo_centavos: number
-          esperado_credito_centavos?: number | null
-          esperado_debito_centavos?: number | null
-          esperado_efectivo_centavos?: number | null
-          esperado_qr_centavos?: number | null
-          esperado_transferencia_centavos?: number | null
-          estado?: Database["public"]["Enums"]["estado_de_cierre"]
           fecha: string
           fecha_actualizacion?: string
           fecha_anulacion?: string | null
           fecha_creacion?: string
-          fecha_revision?: string | null
           fondo_inicial_centavos: number
           id?: string
           local_id?: string
           motivo_anulacion?: string | null
           qr_centavos?: number
           queda_en_caja_centavos: number
-          revisado?: boolean
-          revisado_por?: string | null
           transferencia_centavos?: number
         }
         Update: {
@@ -360,29 +340,19 @@ export type Database = {
           anulado_por?: string | null
           cargado_por?: string
           comentario?: string | null
-          comentario_revision?: string | null
           credito_centavos?: number
           debito_centavos?: number
           efectivo_centavos?: number
-          esperado_credito_centavos?: number | null
-          esperado_debito_centavos?: number | null
-          esperado_efectivo_centavos?: number | null
-          esperado_qr_centavos?: number | null
-          esperado_transferencia_centavos?: number | null
-          estado?: Database["public"]["Enums"]["estado_de_cierre"]
           fecha?: string
           fecha_actualizacion?: string
           fecha_anulacion?: string | null
           fecha_creacion?: string
-          fecha_revision?: string | null
           fondo_inicial_centavos?: number
           id?: string
           local_id?: string
           motivo_anulacion?: string | null
           qr_centavos?: number
           queda_en_caja_centavos?: number
-          revisado?: boolean
-          revisado_por?: string | null
           transferencia_centavos?: number
         }
         Relationships: [
@@ -405,13 +375,6 @@ export type Database = {
             columns: ["local_id"]
             isOneToOne: false
             referencedRelation: "locales"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cierres_de_caja_revisado_por_fkey"
-            columns: ["revisado_por"]
-            isOneToOne: false
-            referencedRelation: "perfiles"
             referencedColumns: ["id"]
           },
         ]
@@ -467,6 +430,7 @@ export type Database = {
           medio_de_pago: Database["public"]["Enums"]["medio_de_pago"]
           monto_centavos: number
           motivo_anulacion: string | null
+          por_pagar_id: string | null
           proveedor_id: string | null
           recurrente_id: string | null
           vencimiento: string | null
@@ -489,6 +453,7 @@ export type Database = {
           medio_de_pago: Database["public"]["Enums"]["medio_de_pago"]
           monto_centavos: number
           motivo_anulacion?: string | null
+          por_pagar_id?: string | null
           proveedor_id?: string | null
           recurrente_id?: string | null
           vencimiento?: string | null
@@ -511,6 +476,7 @@ export type Database = {
           medio_de_pago?: Database["public"]["Enums"]["medio_de_pago"]
           monto_centavos?: number
           motivo_anulacion?: string | null
+          por_pagar_id?: string | null
           proveedor_id?: string | null
           recurrente_id?: string | null
           vencimiento?: string | null
@@ -552,6 +518,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "gastos_por_pagar_id_fkey"
+            columns: ["por_pagar_id"]
+            isOneToOne: false
+            referencedRelation: "gastos_por_pagar"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "gastos_proveedor_id_fkey"
             columns: ["proveedor_id"]
             isOneToOne: false
@@ -567,10 +540,117 @@ export type Database = {
           },
         ]
       }
+      gastos_por_pagar: {
+        Row: {
+          anulado: boolean
+          anulado_por: string | null
+          categoria_id: string
+          clave: string | null
+          comprobante: string | null
+          creado_por: string | null
+          descripcion: string | null
+          fecha_actualizacion: string
+          fecha_anulacion: string | null
+          fecha_creacion: string
+          id: string
+          local_id: string
+          medio_de_pago: Database["public"]["Enums"]["medio_de_pago"] | null
+          monto_centavos: number
+          motivo_anulacion: string | null
+          proveedor_id: string | null
+          recurrente_id: string | null
+          vencimiento: string
+        }
+        Insert: {
+          anulado?: boolean
+          anulado_por?: string | null
+          categoria_id: string
+          clave?: string | null
+          comprobante?: string | null
+          creado_por?: string | null
+          descripcion?: string | null
+          fecha_actualizacion?: string
+          fecha_anulacion?: string | null
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          medio_de_pago?: Database["public"]["Enums"]["medio_de_pago"] | null
+          monto_centavos: number
+          motivo_anulacion?: string | null
+          proveedor_id?: string | null
+          recurrente_id?: string | null
+          vencimiento: string
+        }
+        Update: {
+          anulado?: boolean
+          anulado_por?: string | null
+          categoria_id?: string
+          clave?: string | null
+          comprobante?: string | null
+          creado_por?: string | null
+          descripcion?: string | null
+          fecha_actualizacion?: string
+          fecha_anulacion?: string | null
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          medio_de_pago?: Database["public"]["Enums"]["medio_de_pago"] | null
+          monto_centavos?: number
+          motivo_anulacion?: string | null
+          proveedor_id?: string | null
+          recurrente_id?: string | null
+          vencimiento?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gastos_por_pagar_anulado_por_fkey"
+            columns: ["anulado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_por_pagar_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias_de_gasto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_por_pagar_creado_por_fkey"
+            columns: ["creado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_por_pagar_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_por_pagar_proveedor_id_fkey"
+            columns: ["proveedor_id"]
+            isOneToOne: false
+            referencedRelation: "proveedores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_por_pagar_recurrente_id_fkey"
+            columns: ["recurrente_id"]
+            isOneToOne: false
+            referencedRelation: "gastos_recurrentes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gastos_recurrentes: {
         Row: {
           activo: boolean
           categoria_id: string
+          clave: string | null
           creado_por: string | null
           descripcion: string | null
           fecha_actualizacion: string
@@ -587,6 +667,7 @@ export type Database = {
         Insert: {
           activo?: boolean
           categoria_id: string
+          clave?: string | null
           creado_por?: string | null
           descripcion?: string | null
           fecha_actualizacion?: string
@@ -603,6 +684,7 @@ export type Database = {
         Update: {
           activo?: boolean
           categoria_id?: string
+          clave?: string | null
           creado_por?: string | null
           descripcion?: string | null
           fecha_actualizacion?: string
@@ -1228,6 +1310,34 @@ export type Database = {
       }
     }
     Functions: {
+      cierres_con_resultado: {
+        Args: { desde: string; hasta: string; persona?: string }
+        Returns: {
+          anulado: boolean
+          cargado_por: string
+          comentario: string
+          credito_centavos: number
+          debito_centavos: number
+          efectivo_centavos: number
+          fecha: string
+          fondo_inicial_centavos: number
+          gastos_centavos: number
+          id: string
+          motivo_anulacion: string
+          persona_nombre: string
+          qr_centavos: number
+          queda_en_caja_centavos: number
+          retiros_centavos: number
+          tolerancia_centavos: number
+          transferencia_centavos: number
+          ventas_credito_centavos: number
+          ventas_debito_centavos: number
+          ventas_efectivo_centavos: number
+          ventas_qr_centavos: number
+          ventas_transferencia_centavos: number
+        }[]
+      }
+      cierres_editar: { Args: { datos: Json; el_id: string }; Returns: undefined }
       cierres_exigir_quien_carga: { Args: never; Returns: undefined }
       cierres_fondo_sugerido: { Args: { la_fecha: string }; Returns: number }
       cierres_fondos_anteriores: {
@@ -1259,6 +1369,7 @@ export type Database = {
         Args: {
           desde: string
           el_proveedor?: string
+          el_tipo?: string
           hasta: string
           la_categoria?: string
         }
@@ -1274,6 +1385,10 @@ export type Database = {
         Returns: undefined
       }
       generar_gastos_recurrentes: { Args: { hasta: string }; Returns: number }
+      generar_por_pagar: {
+        Args: { el_fijo?: string; hasta: string }
+        Returns: number
+      }
       local_del_usuario: { Args: never; Returns: string }
       menu_aplicar_aumento: { Args: { datos: Json }; Returns: string }
       menu_aumento_vigente: {
@@ -1354,6 +1469,20 @@ export type Database = {
         Args: { direccion: string; el_id: string; el_tipo: string }
         Returns: string
       }
+      pagos_pendientes: {
+        Args: never
+        Returns: {
+          categoria: string
+          descripcion: string
+          frecuencia: Database["public"]["Enums"]["frecuencia_de_gasto"]
+          id: string
+          medio_de_pago: Database["public"]["Enums"]["medio_de_pago"]
+          monto_centavos: number
+          proveedor: string
+          recurrente_id: string
+          vencimiento: string
+        }[]
+      }
       registrar_cambio_de_contrasena: {
         Args: { cuenta: string; por: string; tipo: string }
         Returns: undefined
@@ -1406,7 +1535,22 @@ export type Database = {
         Args: { cuenta: string; tipos: string[] }
         Returns: Record<string, unknown>
       }
+      ventas_aplicar_lote: {
+        Args: { el_local: string; lote: Json }
+        Returns: number[]
+      }
+      ventas_borrar_canal: { Args: { el_canal: string }; Returns: undefined }
+      ventas_crear_del_excel: {
+        Args: {
+          el_local: string
+          el_medio: Database["public"]["Enums"]["medio_de_caja"]
+          el_monto: number
+          la_fecha: string
+        }
+        Returns: undefined
+      }
       ventas_guardar_manual: { Args: { datos: Json }; Returns: string }
+      ventas_importar_excel: { Args: { lotes: Json }; Returns: Json }
       ventas_totales: {
         Args: {
           desde: string
@@ -1423,18 +1567,13 @@ export type Database = {
           cobrado_centavos: number
         }[]
       }
+      ventas_validar_excel: { Args: { lotes: Json }; Returns: undefined }
       ventas_validar_manual: {
         Args: { datos: Json; el_local: string }
         Returns: undefined
       }
     }
     Enums: {
-      estado_de_cierre:
-        | "esperando_ventas"
-        | "cierra"
-        | "con_diferencia"
-        | "revisado"
-        | "anulado"
       estado_de_venta: "cerrada" | "cancelada" | "en_curso"
       etiqueta_de_producto: "mas_vendido" | "artesanal" | "nuevo"
       frecuencia_de_gasto: "mensual" | "bimestral" | "anual"
@@ -1569,13 +1708,6 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      estado_de_cierre: [
-        "esperando_ventas",
-        "cierra",
-        "con_diferencia",
-        "revisado",
-        "anulado",
-      ],
       estado_de_venta: ["cerrada", "cancelada", "en_curso"],
       etiqueta_de_producto: ["mas_vendido", "artesanal", "nuevo"],
       frecuencia_de_gasto: ["mensual", "bimestral", "anual"],

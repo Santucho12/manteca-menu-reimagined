@@ -74,7 +74,7 @@ Si los pagos de una venta suman menos que su total, la parte sin pago se muestra
 | Cantidad | Mayor que cero |
 | Precio | Trae el del menú y se puede cambiar |
 | Medio de pago | Los mismos que usa Fudo |
-| Canal | Cheaf, Encargo, Venta a comercios u Otro. El admin puede cambiar la lista |
+| Tipo de venta (en el código, canal) | Cheaf, Encargo, Venta a comercios u Otro. El admin puede cambiar la lista |
 
 - Tiene el mismo efecto que una venta de Fudo: suma a los reportes y al resultado.
 - Si se cobró con efectivo de la caja, suma a lo esperado de la caja de ese día.
@@ -105,8 +105,8 @@ Si los pagos de una venta suman menos que su total, la parte sin pago se muestra
    sincronización trae el cambio.
 2. "El día" de una venta es el día calendario en Argentina en que se cerró.
 3. Lo cancelado y lo anulado no cuentan en ningún total y siguen visibles.
-4. Si una venta ya traída cambia y había un cierre revisado de ese día, el cierre se
-   recalcula y pierde la marca de revisado.
+4. Si una venta ya traída cambia, el resultado del cierre de ese día cambia solo: se
+   calcula al mostrar.
 5. Los precios de una venta de Fudo son los de Fudo, no los del menú del sistema.
 6. El sistema solo lee de Fudo. No escribe nada.
 
@@ -140,7 +140,7 @@ Si los pagos de una venta suman menos que su total, la parte sin pago se muestra
 
 | Propuesta | Acá | Por qué |
 |---|---|---|
-| Se sube el Excel de Fudo | Las ventas entran por la API | El Excel trae totales por día, sin productos. El cliente pasa al plan Pro |
+| Se sube el Excel de Fudo | Las ventas entran por la API; hasta tener las credenciales, se sube el "Reporte-Ventas" (pedido 59) | El Excel trae totales por día, sin productos. El cliente pasa al plan Pro |
 | Control de duplicados y anular una importación | No existen | Cada venta se reconoce por su identificador y se actualiza sola |
 | Cada venta descuenta stock | No | Stock es de la segunda fase |
 
@@ -155,7 +155,7 @@ Falta reflejarlo en `PROPUESTA.md`, con el texto que defina Santiago.
 | Historia inicial | Últimos 12 meses |
 | Productos sin vincular | Las ventas entran igual |
 | Canceladas | No cuentan, pero se muestran |
-| Canales de venta a mano | Lista inicial que el admin puede cambiar |
+| Tipos de venta a mano (antes «canales»: Santiago cambió la palabra el 2026-10-28) | Lista inicial que el admin puede cambiar |
 | Precio de venta a mano | Trae el del menú y se puede cambiar |
 
 ## Sin confirmar
@@ -179,7 +179,7 @@ excepción de Santiago a la regla de "Sin confirmar". El detalle está en
   su local las ve; nadie inserta directo ni borra.
 - **Venta a mano:** `ventas_guardar_manual` calcula cada subtotal (cantidad por precio,
   redondeado a centavos) y el total, y guarda venta, renglones y pago juntos. Rechaza un día
-  futuro (`PV301`), una venta sin productos (`PV302`) y un canal o producto que ya no está
+  futuro (`PV301`), una venta sin productos (`PV302`) y un tipo de venta o producto que ya no está
   disponible (`PV303`, `PV304`). Se anula con motivo (`PV306`) y no se cambia después
   (`PV305`); una de Fudo no se anula (`PV307`).
 - **Totales:** `ventas_totales` suma lo cobrado y, aparte, lo cancelado, sin lo anulado; con
@@ -190,4 +190,4 @@ excepción de Santiago a la regla de "Sin confirmar". El detalle está en
 
 Queda para cuando estén las credenciales de Fudo: traer las ventas (la noche, "Actualizar
 ahora" y al guardar un cierre), vincular productos y medios de pago de Fudo, y calcular lo
-esperado en los cierres. Hasta entonces los cierres siguen "Esperando ventas".
+esperado en los cierres. Desde el pedido 66 el resultado del cierre se calcula al mostrar con las ventas del día.

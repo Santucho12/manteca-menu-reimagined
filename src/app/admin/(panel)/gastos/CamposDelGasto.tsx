@@ -4,14 +4,14 @@ import type { FieldErrors } from 'react-hook-form';
 import { Campo } from '@/components/formularios/Campo';
 import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
 import type { Opcion, OpcionDeCategoria } from '@/lib/gastos/consultas';
-import type { DatosDeGasto } from '@/lib/gastos/esquemas';
+import type { DatosDeCarga } from '@/lib/gastos/esquemas';
 import { opcionesDeMedio, opcionesParaElegir } from '@/lib/gastos/pantalla';
 import type { Registro } from '@/lib/formularios/valorInicial';
 
-// Los campos que comparten un gasto y un recurrente: categoria, monto, descripcion,
-// proveedor y medio de pago.
+// Los campos que comparten un gasto y un fijo: categoria, monto, descripcion, proveedor y medio
+// de pago.
 type Campos = Pick<
-  DatosDeGasto,
+  DatosDeCarga,
   'categoriaId' | 'monto' | 'descripcion' | 'proveedorId' | 'medioDePago'
 >;
 
@@ -21,8 +21,12 @@ export type PropsDeCampos = {
   inicial: Campos;
   categorias: OpcionDeCategoria[];
   proveedores: Opcion[];
+  /** El proveedor va solo si la categoria lo pide (o si el gasto ya tenia uno). */
+  conProveedor: boolean;
   /** El gasto salio de un cierre: su monto se corrige anulando el cierre. */
   deCaja?: boolean;
+  /** Lo por pagar elige el medio al pagarse. */
+  medioOpcional?: boolean;
 };
 
 export function CamposDelGasto({
@@ -31,7 +35,9 @@ export function CamposDelGasto({
   inicial,
   categorias,
   proveedores,
+  conProveedor,
   deCaja = false,
+  medioOpcional = false,
 }: PropsDeCampos) {
   return (
     <>
@@ -42,6 +48,15 @@ export function CamposDelGasto({
         error={errors.categoriaId?.message}
         {...registro('categoriaId')}
       />
+      {conProveedor ? (
+        <CampoDeSeleccion
+          id="proveedor"
+          etiqueta="Proveedor"
+          opciones={opcionesParaElegir(proveedores, inicial.proveedorId, 'Elegí un proveedor')}
+          error={errors.proveedorId?.message}
+          {...registro('proveedorId')}
+        />
+      ) : null}
       <Campo
         id="monto"
         etiqueta="Monto"
@@ -57,17 +72,10 @@ export function CamposDelGasto({
         {...registro('descripcion')}
       />
       <CampoDeSeleccion
-        id="proveedor"
-        etiqueta="Proveedor"
-        opciones={opcionesParaElegir(proveedores, inicial.proveedorId, 'Sin proveedor')}
-        error={errors.proveedorId?.message}
-        {...registro('proveedorId')}
-      />
-      <CampoDeSeleccion
         id="medio-de-pago"
-        etiqueta="Medio de pago"
+        etiqueta={medioOpcional ? 'Medio de pago (opcional)' : 'Medio de pago'}
         opciones={[
-          { valor: '', texto: 'Elegí cómo se pagó' },
+          { valor: '', texto: medioOpcional ? 'Lo elegís al pagarlo' : 'Elegí cómo se pagó' },
           ...opcionesDeMedio(inicial.medioDePago),
         ]}
         error={errors.medioDePago?.message}

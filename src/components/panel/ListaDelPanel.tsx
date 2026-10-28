@@ -28,7 +28,7 @@ function Tarjetas<T>({ etiqueta, total, filas, clave, tarjeta }: Props<T>) {
         {filas.map((fila) => (
           <li
             key={clave(fila)}
-            className="bg-card rounded-2xl border border-border shadow-card p-4 space-y-3"
+            className="relative bg-card rounded-2xl border border-border shadow-card p-4 space-y-3"
           >
             {tarjeta(fila)}
           </li>

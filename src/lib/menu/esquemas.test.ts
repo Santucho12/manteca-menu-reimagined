@@ -27,12 +27,21 @@ describe('esquemas del menu', () => {
     expect(esquemaCategoria.safeParse(CATEGORIA).success).toBe(true);
   });
 
-  it('pide nombre y al menos una presentacion', () => {
+  it('pide nombre y al menos una forma de venta', () => {
     const sinNada = esquemaCategoria.safeParse({ ...CATEGORIA, nombre: ' ', presentaciones: [] });
     expect(sinNada.error?.issues.map((i) => i.message)).toEqual([
       'Escribí el nombre.',
-      'Tiene que tener al menos una presentación.',
+      'Agregá al menos una forma de venta.',
     ]);
+  });
+
+  it('acepta hasta 6 formas de venta', () => {
+    const forma = { id: '', nombre: 'Unidad', compartido: '', compartidoOriginal: '' };
+    const siete = esquemaCategoria.safeParse({
+      ...CATEGORIA,
+      presentaciones: Array(7).fill(forma),
+    });
+    expect(siete.error?.issues.map((i) => i.message)).toEqual(['Usá hasta 6 formas de venta.']);
   });
 
   it.each(['1.500', '1500,50', '-3', '0'])('rechaza el precio %s', (texto) => {

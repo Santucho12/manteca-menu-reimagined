@@ -31,18 +31,14 @@ describe('avisosDeInicio', () => {
         enlace: '/admin/caja/control?desde=2026-10-11&hasta=2026-10-11',
       },
       { texto: 'Hay 1 persona esperando un rol.', enlace: '/admin/usuarios?estado=pendientes' },
-      {
-        texto: 'Hay 3 gastos sin clasificar.',
-        enlace: '/admin/gastos?categoria=sc&desde=2026-08-02',
-      },
+      // Gastos muestra arriba de todo los que esperan categoría, de cualquier mes.
+      { texto: 'Hay 3 gastos sin clasificar.', enlace: '/admin/gastos' },
     ]);
   });
 
   it('avisa los pagos que vencen esta semana, al final', () => {
     const avisos = avisosDeInicio({ ...NADA, vencenEstaSemana: 2 });
-    expect(avisos).toEqual([
-      { texto: 'Esta semana vencen 2 pagos.', enlace: '/admin/gastos/recurrentes' },
-    ]);
+    expect(avisos).toEqual([{ texto: 'Esta semana vencen 2 pagos.', enlace: '/admin/gastos' }]);
     const uno = avisosDeInicio({ ...NADA, vencenEstaSemana: 1 });
     expect(uno.map((a) => a.texto)).toEqual(['Esta semana vence 1 pago.']);
   });

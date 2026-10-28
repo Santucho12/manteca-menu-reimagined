@@ -48,15 +48,14 @@ export const esquemaCierre = z.object({
   ),
 });
 
-export const esquemaRevision = z.object({
-  id: z.uuid(),
-  comentario: z.string().trim().max(500, 'Usá hasta 500 caracteres.'),
-});
 export const esquemaAnulacionDeCierre = z.object({
   id: z.uuid(),
   motivo: z.string().trim().min(1, 'Escribí el motivo.').max(300, 'Usá hasta 300 caracteres.'),
 });
 export const esquemaTolerancia = z.object({ tolerancia: montoPedido('Escribí la tolerancia.') });
+
+/** Editar un cierre: lo mismo que cargarlo, con el cierre que se cambia. */
+export const esquemaEdicion = esquemaCierre.extend({ id: z.uuid() });
 
 export type DatosDeCierre = z.infer<typeof esquemaCierre>;
 

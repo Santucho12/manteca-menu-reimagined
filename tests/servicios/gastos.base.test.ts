@@ -1,4 +1,5 @@
 import { afterAll, describe, expect, it } from 'vitest';
+import { diaEnArgentina } from '../../src/lib/fechas';
 import {
   gastoPorId,
   listarCategorias,
@@ -19,6 +20,7 @@ import {
 } from '../../src/lib/gastos/escritura';
 import type { DatosDeGasto } from '../../src/lib/gastos/esquemas';
 import { generarAlAbrir, generarAtrasados } from '../../src/lib/gastos/generacion';
+import { sumarMeses } from '../../src/lib/gastos/vencimientos';
 import {
   pagadoPorProveedor,
   recurrentesActivosDelProveedor,
@@ -173,8 +175,9 @@ describe('recurrentes', () => {
     const cliente = await admin();
     const resultado = await crearRecurrente(cliente, {
       ...datos({ categoriaId: await idDeCategoria('Alquiler'), descripcion: 'Alquiler del local' }),
-      frecuencia: 'mensual',
-      primerVencimiento: '2099-01-10',
+      fecha: '2099-01-10',
+      seRepite: 'mensual',
+      yaPagado: 'si',
     });
     if (!resultado.ok) throw new Error(resultado.mensaje);
     recurrentes.push(resultado.datos.id);
@@ -187,20 +190,22 @@ describe('recurrentes', () => {
     expect((await cambiarEstadoDeRecurrente(cliente, resultado.datos.id, false)).ok).toBe(true);
   });
 
+  // Hasta hoy, como el proceso de cada dia: con una fecha lejana, generaria pagos falsos para
+  // todos los fijos de la base de pruebas.
   it('generar lo atrasado crea los vencimientos que faltan', async () => {
-    const { id } = await sembrarRecurrente({ primerVencimiento: '2031-01-20' });
+    const hoy = diaEnArgentina(new Date());
+    const { id } = await sembrarRecurrente({ primerVencimiento: sumarMeses(hoy, -2) });
     recurrentes.push(id);
-    expect(await generarAtrasados(clienteSecretoDePruebas(), '2031-03-20')).toBeGreaterThanOrEqual(
-      3,
-    );
-    expect(await generarAtrasados(clienteSecretoDePruebas(), '2031-03-20')).toBe(0);
+    expect(await generarAtrasados(clienteSecretoDePruebas(), hoy)).toBeGreaterThanOrEqual(3);
+    expect(await generarAtrasados(clienteSecretoDePruebas(), hoy)).toBe(0);
   });
 
   it('al abrir Gastos genera solo si quien abre es admin', async () => {
-    const { id } = await sembrarRecurrente({ primerVencimiento: '2032-01-20' });
+    const hoy = diaEnArgentina(new Date());
+    const { id } = await sembrarRecurrente({ primerVencimiento: hoy });
     recurrentes.push(id);
-    expect(await generarAlAbrir('caja', '2032-01-20')).toBe(0);
-    expect(await generarAlAbrir('admin', '2032-01-20')).toBeGreaterThanOrEqual(1);
+    expect(await generarAlAbrir('caja', hoy)).toBe(0);
+    expect(await generarAlAbrir('admin', hoy)).toBeGreaterThanOrEqual(1);
   });
 });
 

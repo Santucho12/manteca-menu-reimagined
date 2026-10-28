@@ -3,15 +3,10 @@ import { mesDe } from '../gastos/pantalla';
 import { esFechaValida } from '../gastos/vencimientos';
 import { formatearPesos } from '../plata';
 import { numeroDePagina, unValor } from '../usuarios/presentacion';
-import { MEDIOS, type Medio, type ResultadoDeMedio } from './resultado';
+import type { Tono } from '../../components/panel/Insignias';
+import type { Medio } from './resultado';
 
-export const ESTADOS = [
-  'esperando_ventas',
-  'cierra',
-  'con_diferencia',
-  'revisado',
-  'anulado',
-] as const;
+export const ESTADOS = ['cierra', 'con_diferencia', 'pendiente'] as const;
 export type EstadoDeCierre = (typeof ESTADOS)[number];
 
 export type FiltrosDeControl = {
@@ -19,16 +14,16 @@ export type FiltrosDeControl = {
   hasta: string;
   personaId: string | null;
   estado: EstadoDeCierre | null;
+  /** Los cierres anulados no se muestran salvo que se pidan. */
+  anulados: boolean;
   pagina: number;
 };
 export type ParametrosDeControl = Record<string, string | string[] | undefined>;
 
 const NOMBRES_DE_ESTADO: Record<EstadoDeCierre, string> = {
-  esperando_ventas: 'Esperando ventas',
   cierra: 'Cierra',
   con_diferencia: 'Con diferencia',
-  revisado: 'Revisado',
-  anulado: 'Anulado',
+  pendiente: 'Pendiente',
 };
 const NOMBRES_DE_MEDIO: Record<Medio, string> = {
   efectivo: 'Efectivo',
@@ -57,6 +52,7 @@ export function filtrosDeControl(parametros: ParametrosDeControl, hoy: string): 
     hasta: desde <= hasta ? hasta : desde,
     personaId: idDe(unValor(parametros.persona)),
     estado: estadoDe(unValor(parametros.estado)),
+    anulados: unValor(parametros.anulados) === '1',
     pagina: numeroDePagina(unValor(parametros.pagina)),
   };
 }
@@ -68,23 +64,10 @@ export function enlaceDeControl(filtros: FiltrosDeControl, hoy: string): string 
   if (filtros.hasta !== mes.hasta) parametros.set('hasta', filtros.hasta);
   if (filtros.personaId) parametros.set('persona', filtros.personaId);
   if (filtros.estado) parametros.set('estado', filtros.estado);
+  if (filtros.anulados) parametros.set('anulados', '1');
   if (filtros.pagina > 1) parametros.set('pagina', String(filtros.pagina));
   const texto = parametros.toString();
   return texto ? `/admin/caja/control?${texto}` : '/admin/caja/control';
-}
-
-type MontosPorMedio = Record<`${Medio}_centavos`, number> &
-  Record<`esperado_${Medio}_centavos`, number | null>;
-
-/** Lo declarado, lo esperado y la diferencia de cada medio, como estan guardados en el cierre. */
-export function mediosDelCierre(cierre: MontosPorMedio): ResultadoDeMedio[] {
-  return MEDIOS.map((medio) => {
-    const declaradoCentavos = cierre[`${medio}_centavos`];
-    const esperadoCentavos = cierre[`esperado_${medio}_centavos`];
-    const diferenciaCentavos =
-      esperadoCentavos === null ? null : declaradoCentavos - esperadoCentavos;
-    return { medio, declaradoCentavos, esperadoCentavos, diferenciaCentavos };
-  });
 }
 
 /** La diferencia como se le dice a una persona: faltan o sobran, nunca un numero negativo. */
@@ -93,3 +76,13 @@ export function textoDeDiferencia(centavos: number | null): string {
   if (centavos === 0) return 'Sin diferencia';
   return `${centavos < 0 ? 'Faltan' : 'Sobran'} ${formatearPesos(Math.abs(centavos))}`;
 }
+
+const TONOS: Record<EstadoDeCierre, Tono> = {
+  cierra: 'esmeralda',
+  con_diferencia: 'rosa',
+  pendiente: 'ambar',
+};
+
+/** El color de la insignia de un cierre; uno anulado se ve apagado. */
+export const tonoDelCierre = (cierre: { estado: EstadoDeCierre; anulado: boolean }): Tono =>
+  cierre.anulado ? 'pizarra' : TONOS[cierre.estado];

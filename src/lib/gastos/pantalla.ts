@@ -1,13 +1,18 @@
 import { z } from 'zod';
 import { numeroDePagina, unValor } from '../usuarios/presentacion';
+import type { TipoDeCarga } from './escritura';
 import type { FRECUENCIAS, MedioDePago } from './esquemas';
-import { esFechaValida, sumarMeses } from './vencimientos';
+import { esElMesDeHoy, mesDeLaUrl, rangoDelMes } from './meses';
+import { sumarMeses } from './vencimientos';
 
+/** Fijos: los que cargó un gasto fijo. Caja: los que vinieron de un cierre. */
+export type TipoDeGasto = 'fijos' | 'caja';
 export type FiltrosDeGastos = {
+  mes: string;
   desde: string;
   hasta: string;
+  tipo: TipoDeGasto | null;
   categoriaId: string | null;
-  proveedorId: string | null;
   pagina: number;
 };
 export type ParametrosDeGastos = Record<string, string | string[] | undefined>;
@@ -34,30 +39,30 @@ export function mesDe(fecha: string): { desde: string; hasta: string } {
   return { desde: `${fecha.slice(0, 8)}01`, hasta: sumarMeses(`${fecha.slice(0, 8)}31`, 0) };
 }
 
-const fechaDe = (texto: string | undefined) => (texto && esFechaValida(texto) ? texto : null);
 const idDe = (texto: string | undefined) => (z.uuid().safeParse(texto).success ? texto! : null);
+const tipoDe = (texto: string | undefined): TipoDeGasto | null =>
+  texto === 'fijos' || texto === 'caja' ? texto : null;
 
-/** Los filtros de la lista, leidos de la URL; sin fechas, el mes de hoy en Argentina. */
+/** Los filtros de Pagados, leídos de la URL; sin mes, el de hoy en Argentina. */
 export function filtrosDeGastos(parametros: ParametrosDeGastos, hoy: string): FiltrosDeGastos {
-  const mes = mesDe(hoy);
-  const desde = fechaDe(unValor(parametros.desde)) ?? mes.desde;
-  const hasta = fechaDe(unValor(parametros.hasta)) ?? mes.hasta;
+  const mes = mesDeLaUrl(unValor(parametros.mes), hoy);
   return {
-    desde: desde <= hasta ? desde : hasta,
-    hasta: desde <= hasta ? hasta : desde,
+    mes,
+    ...rangoDelMes(mes),
+    tipo: tipoDe(unValor(parametros.tipo)),
     categoriaId: idDe(unValor(parametros.categoria)),
-    proveedorId: idDe(unValor(parametros.proveedor)),
     pagina: numeroDePagina(unValor(parametros.pagina)),
   };
 }
 
-export function enlaceDeGastos(filtros: FiltrosDeGastos, hoy: string): string {
-  const mes = mesDe(hoy);
+export function enlaceDeGastos(
+  filtros: Pick<FiltrosDeGastos, 'mes' | 'tipo' | 'categoriaId' | 'pagina'>,
+  hoy: string,
+): string {
   const parametros = new URLSearchParams();
-  if (filtros.desde !== mes.desde) parametros.set('desde', filtros.desde);
-  if (filtros.hasta !== mes.hasta) parametros.set('hasta', filtros.hasta);
+  if (!esElMesDeHoy(filtros.mes, hoy)) parametros.set('mes', filtros.mes);
+  if (filtros.tipo) parametros.set('tipo', filtros.tipo);
   if (filtros.categoriaId) parametros.set('categoria', filtros.categoriaId);
-  if (filtros.proveedorId) parametros.set('proveedor', filtros.proveedorId);
   if (filtros.pagina > 1) parametros.set('pagina', String(filtros.pagina));
   const texto = parametros.toString();
   return texto ? `/admin/gastos?${texto}` : '/admin/gastos';
@@ -95,7 +100,11 @@ export const opcionesDeMedio = (actual?: MedioDePago | ''): OpcionDeLista[] =>
 export const opcionesDeFrecuencia = (): OpcionDeLista[] =>
   Object.entries(FRECUENCIAS_EN_TEXTO).map(([valor, texto]) => ({ valor, texto }));
 
-export function textoDeSinClasificar(cantidad: number): string {
-  const gastos = cantidad === 1 ? 'gasto' : 'gastos';
-  return `Hay ${cantidad} ${gastos} de caja sin clasificar`;
-}
+const AVISOS_DE_CARGA: Record<TipoDeCarga, string> = {
+  gasto: 'Gasto cargado',
+  fijo: 'Gasto fijo creado',
+  porPagar: 'Quedó por pagar',
+};
+
+/** El aviso al guardar una carga: dice qué quedó anotado. */
+export const avisoDeLaCarga = (tipo: TipoDeCarga) => AVISOS_DE_CARGA[tipo];

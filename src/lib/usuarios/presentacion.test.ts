@@ -7,6 +7,7 @@ import {
   filtroDeEstado,
   nombreDeRol,
   numeroDePagina,
+  repartirAcciones,
   textoDeBusqueda,
   textoDePendientes,
   unValor,
@@ -46,17 +47,47 @@ describe('accionesDisponibles', () => {
     expect(accionesDisponibles({ id: 'x', rol: 'caja', activo: false }, YO)).toEqual(['reactivar']);
   });
 
-  it('a una caja activa se le ofrece pasarla a admin, desactivarla, resetear y corregir', () => {
+  it('a una caja activa se le ofrece pasarla a admin o a pendiente, desactivarla, resetear y corregir', () => {
     expect(accionesDisponibles({ id: 'x', rol: 'caja', activo: true }, YO)).toEqual([
       'darAdmin',
+      'darPendiente',
       'desactivar',
       'resetear',
       'corregir',
     ]);
   });
 
-  it('a un admin activo se le ofrece pasarlo a caja', () => {
-    expect(accionesDisponibles({ id: 'x', rol: 'admin', activo: true }, YO)[0]).toBe('darCaja');
+  it('a un admin activo se le ofrece pasarlo a caja o a pendiente', () => {
+    const acciones = accionesDisponibles({ id: 'x', rol: 'admin', activo: true }, YO);
+    expect(acciones.slice(0, 2)).toEqual(['darCaja', 'darPendiente']);
+  });
+});
+
+describe('repartirAcciones', () => {
+  it('el rol va al desplegable, activar o desactivar al interruptor y el resto a botones', () => {
+    expect(
+      repartirAcciones(['darAdmin', 'darPendiente', 'desactivar', 'resetear', 'corregir']),
+    ).toEqual({
+      roles: ['darAdmin', 'darPendiente'],
+      interruptor: 'desactivar',
+      botones: ['resetear', 'corregir'],
+    });
+  });
+
+  it('una cuenta desactivada solo tiene el interruptor, para reactivarla', () => {
+    expect(repartirAcciones(['reactivar'])).toEqual({
+      roles: [],
+      interruptor: 'reactivar',
+      botones: [],
+    });
+  });
+
+  it('a quien espera: desplegable para el rol y el botón de rechazar, sin interruptor', () => {
+    expect(repartirAcciones(['darCaja', 'darAdmin', 'rechazar'])).toEqual({
+      roles: ['darCaja', 'darAdmin'],
+      interruptor: null,
+      botones: ['rechazar'],
+    });
   });
 });
 

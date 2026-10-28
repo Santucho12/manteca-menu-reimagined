@@ -27,7 +27,7 @@ export function TablaDeCambios({ cambios }: { cambios: CambioDePrecio[] }) {
             <tr key={c.id}>
               {/* El nombre se parte en renglones: en el celular los precios tienen que verse. */}
               <td className={`${CELDA} font-semibold`}>
-                {c.producto ?? `Precio compartido de ${c.categoria}`}{' '}
+                {c.producto ?? `${c.categoria} · precio para todos`}{' '}
                 {c.oculto ? <Chip>Oculto</Chip> : null}
                 <span className="block text-[11px] font-normal text-muted-foreground">
                   {c.presentacion}

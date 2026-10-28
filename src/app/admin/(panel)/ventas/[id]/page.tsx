@@ -8,17 +8,24 @@ import { InsigniaDeEstado } from '@/components/panel/Insignias';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { Dato, Datos, Seccion } from '@/components/panel/Seccion';
 import { exigirPagina } from '@/lib/acceso/servidor';
-import { nombreDeMedio } from '@/lib/caja/pantalla';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import { formatearPesos } from '@/lib/plata';
 import { ventaPorId, type Venta } from '@/lib/ventas/consultas';
-import { estadoDeVenta, nombreDeOrigen } from '@/lib/ventas/pantalla';
+import { estadoDeVenta, horaDeVenta, tonoDeEstado } from '@/lib/ventas/pantalla';
 import { cantidadParaMostrar } from '@/lib/ventas/renglones';
 import { anularVentaDesdeElPanel } from '../acciones';
+import { MediosDePago, OrigenDeVenta } from '../OrigenYMedio';
 
 export const metadata: Metadata = { title: 'Venta' };
 
 function Renglones({ venta }: { venta: Venta }) {
+  if (venta.renglones.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        Esta venta no tiene detalle de productos: Fudo trae solo el total.
+      </p>
+    );
+  }
   return (
     <ul aria-label="Productos" className="divide-y divide-border">
       {venta.renglones.map((renglon) => (
@@ -40,17 +47,19 @@ function Renglones({ venta }: { venta: Venta }) {
 }
 
 function Resumen({ venta }: { venta: Venta }) {
-  const pagos = venta.pagos.map(
-    (p) => `${nombreDeMedio(p.medio)} ${formatearPesos(p.monto_centavos)}`,
-  );
+  const hora = horaDeVenta(venta.fecha, venta.cerrada_en);
   return (
     <Seccion titulo="Lo vendido" forma="lista">
       <Renglones venta={venta} />
       <p className="text-lg font-bold">Total: {formatearPesos(venta.total_centavos)}</p>
       <Datos>
-        <Dato titulo="Origen" valor={nombreDeOrigen(venta.origen)} />
-        <Dato titulo="Canal" valor={venta.canal} />
-        <Dato titulo="Cobrado con" valor={pagos.join(' · ') || null} />
+        <Dato titulo="Origen" valor={<OrigenDeVenta origen={venta.origen} />} />
+        <Dato titulo="Tipo de venta" valor={venta.canal} />
+        <Dato titulo="Hora" valor={hora} />
+        <Dato
+          titulo="Cobrado con"
+          valor={<MediosDePago medios={venta.pagos.map((p) => p.medio)} />}
+        />
       </Datos>
       {venta.comentario ? <p className="text-sm whitespace-pre-line">{venta.comentario}</p> : null}
     </Seccion>
@@ -86,9 +95,7 @@ export default async function FichaDeVenta({ params }: { params: Promise<{ id: s
       ayuda="ventas"
     >
       <div>
-        <InsigniaDeEstado tono={venta.anulado ? 'pizarra' : 'esmeralda'}>
-          {estadoDeVenta(venta)}
-        </InsigniaDeEstado>
+        <InsigniaDeEstado tono={tonoDeEstado(venta)}>{estadoDeVenta(venta)}</InsigniaDeEstado>
       </div>
       <CargadoPor cliente={cliente} tabla="ventas" id={venta.id} />
       <Resumen venta={venta} />

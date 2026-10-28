@@ -1,5 +1,6 @@
+import { LogIn } from 'lucide-react';
 import type { Metadata } from 'next';
-import { EnlaceDeAcceso, TituloDeAcceso } from '@/components/formularios/Acceso';
+import { BotonSecundarioDeAcceso, TituloDeAcceso } from '@/components/formularios/Acceso';
 import { soloSinSesion } from '@/lib/acceso/servidor';
 import { FormularioRegistro } from './FormularioRegistro';
 
@@ -10,9 +11,13 @@ export default async function PaginaRegistro() {
   await soloSinSesion();
   return (
     <>
-      <TituloDeAcceso>Crear una cuenta</TituloDeAcceso>
+      <TituloDeAcceso
+        inicio="Crear"
+        resaltado="cuenta"
+        subtitulo="Un administrador te va a dar acceso."
+      />
       <FormularioRegistro />
-      <EnlaceDeAcceso pregunta="¿Ya tenés cuenta?" href="/admin/ingresar" texto="Ingresar" />
+      <BotonSecundarioDeAcceso href="/admin/ingresar" texto="Ya tengo cuenta" icono={LogIn} />
     </>
   );
 }

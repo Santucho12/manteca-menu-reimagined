@@ -29,8 +29,8 @@ export const esquemaCategoria = z.object({
   precioCompartido: z.boolean(),
   presentaciones: z
     .array(esquemaPresentacion)
-    .min(1, 'Tiene que tener al menos una presentación.')
-    .max(6, 'Usá hasta 6 presentaciones.'),
+    .min(1, 'Agregá al menos una forma de venta.')
+    .max(6, 'Usá hasta 6 formas de venta.'),
 });
 
 export const esquemaProducto = z.object({

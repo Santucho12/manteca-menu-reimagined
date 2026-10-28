@@ -1,11 +1,11 @@
-import { Plus } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { BOTON_DE_ENCABEZADO, BOTON_DE_ENCABEZADO_NEUTRO } from '@/components/panel/estilos';
+import { BOTON_DE_ENCABEZADO_NEUTRO } from '@/components/panel/estilos';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { leerPanel } from '@/lib/menu/consultas';
 import { AvisoDeFudo } from './AvisoDeFudo';
+import { BotonNuevo } from './BotonNuevo';
 import { TarjetaDeCategoria } from './TarjetaDeCategoria';
 
 export const metadata: Metadata = { title: 'Menú' };
@@ -13,12 +13,7 @@ export const metadata: Metadata = { title: 'Menú' };
 function Accesos() {
   return (
     <>
-      <Link href="/admin/menu/categorias/nueva" className={BOTON_DE_ENCABEZADO}>
-        <Plus size={18} aria-hidden="true" /> Nueva categoría
-      </Link>
-      <Link href="/admin/menu/productos/nuevo" className={BOTON_DE_ENCABEZADO_NEUTRO}>
-        Nuevo producto
-      </Link>
+      <BotonNuevo />
       <Link href="/admin/menu/aumento" className={BOTON_DE_ENCABEZADO_NEUTRO}>
         Aumento de precios
       </Link>

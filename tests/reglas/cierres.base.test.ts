@@ -40,7 +40,6 @@ describe('guardar un cierre', () => {
     const caja = await idDeCuentaDePrueba('caja');
     expect(await cierreDe(id!)).toMatchObject({
       cargado_por: caja,
-      estado: 'esperando_ventas',
       efectivo_centavos: 2500050,
     });
     const { data: retiros } = await clienteSecretoDePruebas()
@@ -89,19 +88,7 @@ describe('guardar un cierre', () => {
   });
 });
 
-describe('revisar y anular', () => {
-  it('revisar anota quien y cuando', async () => {
-    const { id } = await sembrarCierre();
-    cierres.push(id);
-    expect((await cambiar(id, { revisado: true, comentario_revision: 'Ok' })).error).toBeNull();
-    const fila = await cierreDe(id);
-    expect(fila).toMatchObject({
-      estado: 'revisado',
-      revisado_por: await idDeCuentaDePrueba('admin'),
-    });
-    expect(fila.fecha_revision).not.toBeNull();
-  });
-
+describe('anular', () => {
   it('anular pide motivo, anula sus gastos y lo deja cerrado', async () => {
     const { data: id } = await guardar('caja', datosDeCierre(diaLibre()));
     expect((await cambiar(id!, { anulado: true })).error?.code).toBe('PC304');
@@ -109,11 +96,11 @@ describe('revisar y anular', () => {
       (await cambiar(id!, { anulado: true, motivo_anulacion: 'Mal contado' })).error,
     ).toBeNull();
     expect(await cierreDe(id!)).toMatchObject({
-      estado: 'anulado',
+      anulado: true,
       anulado_por: await idDeCuentaDePrueba('admin'),
     });
     expect((await gastosDelCierre(id!)).every((g) => g.anulado)).toBe(true);
-    expect((await cambiar(id!, { revisado: true })).error?.code).toBe('PC303');
+    expect((await cambiar(id!, { comentario: 'x' })).error?.code).toBe('42501');
   });
 });
 

@@ -1,4 +1,4 @@
-import { diferenciaTotalDe } from '../caja/consultas';
+import { resultadoDeFila, type FilaConVentas } from '../caja/resultadoDeFila';
 import type { Cliente } from '../supabase/cliente';
 import type { CierreDelReporte } from './caja';
 import type { GastoDelDia } from './gastos';
@@ -47,17 +47,7 @@ export const ventasPorCategoria = (cliente: Cliente, p: Periodo) =>
 export const gastosPorDia = (cliente: Cliente, p: Periodo) =>
   reporte<GastoDelDia>(cliente, 'reporte_gastos', p);
 
-const COLUMNAS_DE_CIERRE =
-  'fecha, efectivo_centavos, credito_centavos, debito_centavos, qr_centavos, ' +
-  'transferencia_centavos, fondo_inicial_centavos, queda_en_caja_centavos, ' +
-  'esperado_efectivo_centavos, esperado_credito_centavos, esperado_debito_centavos, ' +
-  'esperado_qr_centavos, esperado_transferencia_centavos, ' +
-  'persona:perfiles!cierres_de_caja_cargado_por_fkey(nombre)';
-
-type CierreLeido = Parameters<typeof diferenciaTotalDe>[0] & {
-  fecha: string;
-  persona: { nombre: string } | null;
-};
+type CierreLeido = FilaConVentas & { fecha: string; anulado: boolean; persona_nombre: string };
 
 function aCierre(c: CierreLeido): CierreDelReporte {
   const declaradoCentavos =
@@ -68,26 +58,20 @@ function aCierre(c: CierreLeido): CierreDelReporte {
     c.transferencia_centavos;
   return {
     fecha: c.fecha,
-    persona: c.persona?.nombre ?? '',
+    persona: c.persona_nombre,
     declaradoCentavos,
-    diferenciaCentavos: diferenciaTotalDe(c),
+    diferenciaCentavos: resultadoDeFila(c).diferenciaTotalCentavos,
   };
 }
 
-/** Los cierres sin anular del periodo. RLS deja leer todos solo al admin. */
+/** Los cierres sin anular del periodo, contra las ventas de cada dia. La base deja leer todos solo al admin. */
 export async function cierresDelPeriodo(cliente: Cliente, p: Periodo): Promise<CierreDelReporte[]> {
-  // Hay un solo cierre sin anular por dia: ordenar por fecha ya es un orden unico.
-  const cierres = await todas<CierreLeido>((desde, hasta) =>
-    cliente
-      .from('cierres_de_caja')
-      .select(COLUMNAS_DE_CIERRE)
-      .eq('anulado', false)
-      .gte('fecha', p.desde)
-      .lte('fecha', p.hasta)
-      .order('fecha', { ascending: false })
-      .range(desde, hasta),
-  );
-  return cierres.map(aCierre);
+  const { data, error } = await cliente.rpc('cierres_con_resultado', {
+    desde: p.desde,
+    hasta: p.hasta,
+  });
+  if (error) throw new Error(`No pudimos leer los cierres: ${error.message}`);
+  return (data as unknown as CierreLeido[]).filter((c) => !c.anulado).map(aCierre);
 }
 
 /** Ventas y gastos del periodo con su resultado; vacio si no hay ni una cosa ni la otra. */

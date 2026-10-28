@@ -21,12 +21,13 @@ export function FormularioRegistro() {
   });
   const { errors, isSubmitting } = formState;
   return (
-    <form onSubmit={handleSubmit(enviar)} noValidate className="space-y-4">
+    <form onSubmit={handleSubmit(enviar)} noValidate className="space-y-3">
       <Campo
         id="nombre"
         etiqueta="Nombre"
         autoComplete="name"
         icono={User}
+        placeholder="Tu nombre"
         variante="ingreso"
         error={errors.nombre?.message}
         {...register('nombre')}
@@ -36,7 +37,7 @@ export function FormularioRegistro() {
         etiqueta="Email"
         type="email"
         autoComplete="email"
-        placeholder="tu@email.com"
+        placeholder="email@ejemplo.com"
         icono={Mail}
         variante="ingreso"
         error={errors.email?.message}
@@ -46,12 +47,13 @@ export function FormularioRegistro() {
         id="contrasena"
         etiqueta="Contraseña"
         autoComplete="new-password"
+        placeholder="Contraseña"
         variante="ingreso"
         error={errors.contrasena?.message}
         {...register('contrasena')}
       />
       {mensaje ? <AvisoDeError mensaje={mensaje} variante="caja" /> : null}
-      <BotonDeAcceso enviando={isSubmitting}>Registrarme</BotonDeAcceso>
+      <BotonDeAcceso enviando={isSubmitting}>Crear cuenta</BotonDeAcceso>
     </form>
   );
 }

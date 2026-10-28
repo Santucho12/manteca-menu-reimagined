@@ -10,7 +10,7 @@ export type DatosDeTemporal = { temporal: string; nombre: string };
 
 type Cuenta = Pick<PerfilDeAcceso, 'id' | 'nombre' | 'email'>;
 type Contexto = { admin: PerfilDeAcceso; cuenta: Cuenta };
-type CambioDePerfil = { rol?: 'caja' | 'admin'; activo?: boolean; nombre?: string };
+type CambioDePerfil = { rol?: 'invitado' | 'caja' | 'admin'; activo?: boolean; nombre?: string };
 
 // Supabase Auth no tiene un bloqueo sin vencimiento: cien años alcanzan.
 const BLOQUEO = '876000h';

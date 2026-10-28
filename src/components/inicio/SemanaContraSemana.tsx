@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import { EnlaceASeccion } from '@/components/panel/EnlaceASeccion';
 import type { EstadoDeVariacion } from '@/lib/inicio/estadoDeVariacion';
+import { TOOLTIP_DE_LINEAS } from '@/components/reportes/estiloDelTooltip';
 import { EncabezadoDeTarjeta } from './EncabezadoDeTarjeta';
 import type { DiaDeLaSemana } from '@/lib/inicio/semana';
 import {
@@ -22,7 +23,7 @@ import {
 } from '@/lib/inicio/semanaAcumulada';
 
 // La semana actual en azul y la anterior en rojo, punteada (Santiago, 2026-10-25).
-const COLORES = { actual: '#3b82f6', anterior: '#f43f5e' };
+const COLORES = { actual: '#2563eb', anterior: '#f43f5e' };
 const EJE = { stroke: '#94a3b8', fontSize: 10, fontWeight: 700 };
 const CHIP: Record<EstadoDeVariacion, string> = {
   mejora: 'bg-emerald-100 text-emerald-800',
@@ -94,7 +95,7 @@ function GraficoAcumulado({ puntos }: { puntos: PuntoAcumulado[] }) {
           <CartesianGrid stroke="#e2e8f0" vertical={false} />
           <XAxis dataKey="etiqueta" {...EJE} tickLine={false} />
           <YAxis allowDecimals={false} width={36} {...EJE} tickLine={false} axisLine={false} />
-          <Tooltip formatter={ventas} />
+          <Tooltip {...TOOLTIP_DE_LINEAS} formatter={ventas} />
           <Legend iconType="circle" />
           <Area
             dataKey="actual"

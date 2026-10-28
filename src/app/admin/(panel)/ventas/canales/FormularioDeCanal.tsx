@@ -38,7 +38,7 @@ export function FormularioDeCanal({ id, inicial = '' }: { id?: string; inicial?:
     <form onSubmit={handleSubmit(guardado.enviar)} noValidate className="space-y-5">
       <Campo
         id="nombre"
-        etiqueta={id ? 'Nombre' : 'Nombre del canal nuevo'}
+        etiqueta={id ? 'Nombre' : 'Nombre del tipo de venta nuevo'}
         error={formState.errors.nombre?.message}
         {...registro('nombre')}
       />

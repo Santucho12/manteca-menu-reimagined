@@ -1,4 +1,4 @@
-import { formatearPesos } from '../plata';
+import { formatearPesosRedondeados } from '../plata';
 import { variacion, type Variacion } from '../reportes/comparacion';
 import { comparacionDelResultado, type ResultadoDelPeriodo } from '../reportes/resultado';
 import { totalesDeVentas, type VentaDelDia } from '../reportes/ventas';
@@ -14,10 +14,16 @@ function ticketDelMes(actual: DelPeriodo, anterior: DelPeriodo): NumeroDelMes {
   const ticketAnterior = anterior.ventas.length ? ticketDe(anterior.ventas) : null;
   return {
     etiqueta: 'Ticket promedio',
-    valor: formatearPesos(ticket),
+    valor: formatearPesosRedondeados(ticket),
     variacion: variacion(ticket, ticketAnterior),
   };
 }
+
+const numero = (etiqueta: string, valor: string, variacion: NumeroDelMes['variacion']) => ({
+  etiqueta,
+  valor,
+  variacion,
+});
 
 /** Los cuatro numeros del mes contra los mismos dias del mes anterior. */
 export function numerosDelMes(actual: DelPeriodo, anterior: DelPeriodo): NumeroDelMes[] {
@@ -25,13 +31,13 @@ export function numerosDelMes(actual: DelPeriodo, anterior: DelPeriodo): NumeroD
   const c = comparacionDelResultado(resultado, anterior.vacio ? null : anterior.resultado);
   const final = resultado.resultadoCentavos;
   return [
-    { etiqueta: 'Ventas', valor: formatearPesos(resultado.ventasCentavos), variacion: c.ventas },
-    { etiqueta: 'Gastos', valor: formatearPesos(resultado.gastosCentavos), variacion: c.gastos },
-    {
-      etiqueta: 'Balance',
-      valor: final === null ? 'Sin calcular' : formatearPesos(final),
-      variacion: c.resultado,
-    },
+    numero('Ventas', formatearPesosRedondeados(resultado.ventasCentavos), c.ventas),
+    numero('Gastos', formatearPesosRedondeados(resultado.gastosCentavos), c.gastos),
+    numero(
+      'Balance',
+      final === null ? 'Sin calcular' : formatearPesosRedondeados(final),
+      c.resultado,
+    ),
     ticketDelMes(actual, anterior),
   ];
 }

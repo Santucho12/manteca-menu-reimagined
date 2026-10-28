@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import type { FilaDeCierre } from '../caja/consultas';
-import type { EstadoDeCierre } from '../caja/pantalla';
 import { resumenDeAyer, sinAvisoSiAyerNoHuboVentas, textoDelCierre } from './ayer';
 
 const HOY = '2026-10-21';
@@ -10,10 +9,11 @@ const venta = (dia: string, ventas: number, monto_centavos: number) => ({
   ventas,
   monto_centavos,
 });
-const cierre = (estado: EstadoDeCierre, diferencia: number | null = null): FilaDeCierre => ({
+const cierre = (estado: FilaDeCierre['estado'], diferencia = 0, anulado = false): FilaDeCierre => ({
   id: 'c1',
   fecha: AYER,
   estado,
+  anulado,
   persona: 'Ana',
   diferenciaTotalCentavos: diferencia,
   fondoInicialCentavos: 0,
@@ -31,12 +31,10 @@ describe('resumenDeAyer', () => {
     }));
   it('sin cierre, el cierre queda sin cargar', () =>
     expect(resumenDeAyer(ventasDeAyer, [], HOY).cierre).toEqual({ estado: 'sin_cargar' }));
-  it('un cierre que cierra o revisado cuenta como cargado', () => {
-    for (const estado of ['cierra', 'revisado', 'esperando_ventas'] as const) {
-      expect(resumenDeAyer(ventasDeAyer, [cierre(estado)], HOY).cierre).toEqual({
-        estado: 'cargado',
-      });
-    }
+  it('un cierre que cierra cuenta como cargado', () => {
+    expect(resumenDeAyer(ventasDeAyer, [cierre('cierra')], HOY).cierre).toEqual({
+      estado: 'cargado',
+    });
   });
   it('con diferencia, lleva el monto y el enlace al control de ese dia', () =>
     expect(resumenDeAyer(ventasDeAyer, [cierre('con_diferencia', -1_500)], HOY).cierre).toEqual({
@@ -45,7 +43,7 @@ describe('resumenDeAyer', () => {
       enlace: `/admin/caja/control?desde=${AYER}&hasta=${AYER}`,
     }));
   it('un cierre anulado no cuenta', () =>
-    expect(resumenDeAyer(ventasDeAyer, [cierre('anulado')], HOY).cierre).toEqual({
+    expect(resumenDeAyer(ventasDeAyer, [cierre('cierra', 0, true)], HOY).cierre).toEqual({
       estado: 'sin_cargar',
     }));
   it('sin ventas ayer, queda en cero y sin ticket promedio', () =>

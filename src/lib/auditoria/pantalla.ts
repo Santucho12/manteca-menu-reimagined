@@ -10,7 +10,10 @@ export const MODULOS = {
     tablas: ['categorias', 'presentaciones', 'productos', 'precios', 'aumentos'],
   },
   proveedores: { nombre: 'Proveedores', tablas: ['proveedores'] },
-  gastos: { nombre: 'Gastos', tablas: ['gastos', 'gastos_recurrentes', 'categorias_de_gasto'] },
+  gastos: {
+    nombre: 'Gastos',
+    tablas: ['gastos', 'gastos_recurrentes', 'gastos_por_pagar', 'categorias_de_gasto'],
+  },
   ventas: {
     nombre: 'Ventas',
     tablas: ['ventas', 'renglones_de_venta', 'pagos_de_venta', 'canales_de_venta'],

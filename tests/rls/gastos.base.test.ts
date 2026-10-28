@@ -95,6 +95,31 @@ describe('RLS de gastos: escritura', () => {
     expect(error?.code).toBe('42501');
   });
 
+  it('el admin carga un fijo con su clave y caja no', async () => {
+    const fila = {
+      categoria_id: await idDeCategoria('Alquiler'),
+      monto_centavos: 1000,
+      medio_de_pago: 'transferencia' as const,
+      frecuencia: 'mensual' as const,
+      primer_vencimiento: '2099-04-10',
+    };
+    const { data, error } = await (
+      await clienteComo('admin')
+    )
+      .from('gastos_recurrentes')
+      .insert({ ...fila, clave: crypto.randomUUID() })
+      .select('id')
+      .single();
+    expect(error).toBeNull();
+    recurrentes.push(data!.id);
+    const deCaja = await (
+      await clienteComo('caja')
+    )
+      .from('gastos_recurrentes')
+      .insert({ ...fila, clave: crypto.randomUUID() });
+    expect(deCaja.error?.code).toBe('42501');
+  });
+
   it('nadie borra un gasto', async () => {
     const { error } = await (
       await clienteComo('admin')

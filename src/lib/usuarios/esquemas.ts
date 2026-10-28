@@ -28,7 +28,7 @@ export const esquemaCuenta = z.object({ id });
 // Encargado existe, pero en esta fase no se asigna.
 export const esquemaAsignarRol = z.object({
   id,
-  rol: z.enum(['caja', 'admin'], 'Elegí Caja o Admin.'),
+  rol: z.enum(['invitado', 'caja', 'admin'], 'Elegí Pendiente, Caja o Admin.'),
 });
 export const esquemaCorreccion = z.object({ id, nombre, email });
 
