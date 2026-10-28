@@ -150,6 +150,11 @@ Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, 
 
 **Excepción (Santiago, 2026-10-21):** los colores del panel son los exactos de Plan Reminder Pro aunque no pasen el contraste AA que pide el pedido 21 (letra blanca sobre el verde, 2,6 a 1; el rojo de error, 3,6; el anillo de foco, 2,5; los grises chicos, 2,6). Las pruebas de contraste (`tests/contraste.test.ts`) siguen mirando solo la carta pública; no se extienden al panel. El panel no bloquea el zoom en el celular, a diferencia de Plan Reminder Pro (Santiago, 2026-10-22).
 
+### 66. Cierres de caja: dos estados, editables y comparados con las ventas del día
+Rediseño del módulo (Santiago, 2026-10-28). Los estados pasan a ser **Cierra** y **Con diferencia**, más **Pendiente** para un día sin cierre cargado. Se saca todo lo de «Revisado» (marcar, comentario y estado). El cierre se puede **editar** (Caja el suyo, el admin cualquiera, con valor anterior y nuevo en la auditoría), y lo esperado se **calcula siempre al mostrar** contra las ventas del día, por medio de pago, con la tolerancia que se mantiene. Sigue «Anular» solo para el admin, con motivo. Cambia lo decidido el 2026-10-06 y el 2026-10-09 en `docs/modulos/06-cierres-de-caja.md` (cierre que no se edita, estado «Esperando ventas» y «Revisado»). Sin ventas el esperado es $0.
+
+**Excepción (Santiago, 2026-10-28):** se hace en la rama `feat/caja-rediseno`; lo anterior se commiteó antes por áreas, no pedido por pedido, porque estaba mezclado en los mismos archivos y nunca se corrió `npm run verificar` completo sobre esos commits.
+
 ### 61. Control de cierres: tolerancia en una tuerca y fila que abre el detalle
 En `/admin/caja/control`, la tolerancia sale de su sección y queda detrás de una tuerca de configuración que abre una ventana con el mismo campo. Cada cierre de la lista se abre al tocar cualquier parte de la fila, con una flecha que lo avisa.
 
@@ -250,6 +255,7 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 66 | Cierres de caja: dos estados, editables y comparados con las ventas del día | Todo: diseño, plan, base, servidor y pantallas |
 | 65 | Gastos: anotar lo que todavía no se pagó | Hecho con TDD (2026-10-28): diseño y plan en `docs/superpowers/`, migraciones `20261028150000_gastos_por_pagar.sql` y `20261028170000_generar_por_pagar.sql` aplicadas y verificadas solo en pruebas (columnas, grants, policies y avisos de Supabase sin nada nuevo). Tests de base de Gastos (113, con RLS de lo por pagar), puros de Gastos, ayudas y auditoría, y Playwright de Gastos en computadora y celular (`gastos-por-pagar`, `gastos`, `gastos-carga`, `gastos-fijos`, `gastos-categorias`: 37 en celular) en verde. Suite completa de Vitest: 1164 en verde; fallaron 4 de Ventas por trabajo de otra sesión (falta el canal "Cheaf") y 2 de `revision-fase-1`, regresión del 58 ya corregida. Además, los tests generaban los fijos de toda la base con fechas lejanas: ahora generan solo el suyo, y se limpiaron 305 pagos y 174 por pagar falsos de los gastos de muestra. Falta: OK de Santiago para aplicar a la base real `20261027210000`, `20261028150000`, `20261028160000` y `20261028170000`; probar las reversas (la herramienta de Supabase rechaza los `DROP` con "Invalid or expired requestState"); y el cierre completo (`npm run verificar` frena en el lint de `src/lib/inicio/numeros.ts`, de otra sesión, y `npm run e2e` entero) |
 | 64 | Subir Excel de Fudo más realista y filtros más descriptivos | Todo |
 | 63 | Ventas: botones de arriba y «Tipos de venta» | Todo |
