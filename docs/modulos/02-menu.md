@@ -55,6 +55,12 @@ El precio puede estar en dos lugares.
 
 La pantalla dice siempre de dónde sale el precio que se está viendo.
 
+En la pantalla no se usan esas palabras, porque no se entendían (Santiago, 2026-10-27, pedido 55):
+las presentaciones son "Cómo se vende", con una columna "Se vende por" para el nombre, y el
+precio compartido es la casilla "Mismo precio para todos los productos", con el "Precio para
+todos" al lado de cada forma de venta. En el aumento, ese renglón dice "Facturas · precio para
+todos".
+
 ### Etiquetas
 
 Lista fija, una por producto: **Más vendido**, **Artesanal** y **Nuevo**. La elige el admin

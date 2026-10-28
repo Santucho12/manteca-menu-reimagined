@@ -39,6 +39,16 @@ test('el panel avisa de Fudo y muestra los precios con su origen', async ({ page
   await expect(fila(page, propio.nombre)).toContainText('Unidad $3.500 (propio)');
 });
 
+test('la tarjeta rotula la categoria y cuenta sus productos', async ({ page }) => {
+  const categoria = await sembrar();
+  await sembrarProducto(categoria);
+  await sembrarProducto(categoria);
+  await page.goto('/admin/menu');
+  const laTarjeta = tarjeta(page, categoria.nombre);
+  await expect(laTarjeta.getByText('Categoría', { exact: true })).toBeVisible();
+  await expect(laTarjeta.getByText('2 productos', { exact: true })).toBeVisible();
+});
+
 test('ocultar un producto lo saca del menu publico y mostrarlo lo vuelve a poner', async ({
   page,
   browser,

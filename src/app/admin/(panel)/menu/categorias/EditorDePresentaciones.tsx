@@ -1,92 +1,54 @@
 'use client';
 
-import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
-import { Campo } from '@/components/formularios/Campo';
-import { BOTON_SUAVE, ETIQUETA, ICONO_BORRAR, ICONO_DE_ACCION } from '@/components/panel/estilos';
+import { BOTON_SUAVE, ETIQUETA } from '@/components/panel/estilos';
 import type { DatosDeCategoria } from '@/lib/menu/esquemas';
+import { cn } from '@/lib/utils';
+import { FormaDeVenta, columnasDeFormas } from './FormaDeVenta';
 
-function Mover({
-  i,
-  total,
-  mover,
-}: {
-  i: number;
-  total: number;
-  mover: (a: number, b: number) => void;
-}) {
+// Los titulos de columna son para la vista: cada campo ya lleva su nombre para el lector.
+function Encabezados({ conPrecio }: { conPrecio: boolean }) {
   return (
-    <>
-      <button
-        type="button"
-        aria-label={`Subir la presentación ${i + 1}`}
-        disabled={i === 0}
-        onClick={() => mover(i, i - 1)}
-        className={ICONO_DE_ACCION}
-      >
-        <ArrowUp size={16} aria-hidden="true" />
-      </button>
-      <button
-        type="button"
-        aria-label={`Bajar la presentación ${i + 1}`}
-        disabled={i === total - 1}
-        onClick={() => mover(i, i + 1)}
-        className={ICONO_DE_ACCION}
-      >
-        <ArrowDown size={16} aria-hidden="true" />
-      </button>
-    </>
+    <div
+      aria-hidden="true"
+      className={cn(columnasDeFormas(conPrecio), 'text-xs font-semibold text-muted-foreground')}
+    >
+      <span>Se vende por</span>
+      {conPrecio ? <span>Precio para todos</span> : null}
+    </div>
   );
 }
 
+/** Como se vende lo de la categoria (Unidad, Docena...) y, si es igual para todos, su precio. */
 export function EditorDePresentaciones() {
-  const { control, register, formState } = useFormContext<DatosDeCategoria>();
+  const { control, formState } = useFormContext<DatosDeCategoria>();
   const { fields, append, remove, move } = useFieldArray({ control, name: 'presentaciones' });
-  const compartido = useWatch({ control, name: 'precioCompartido' });
+  const conPrecio = useWatch({ control, name: 'precioCompartido' });
   const errores = formState.errors.presentaciones;
   const general = errores?.root?.message ?? errores?.message;
   return (
-    <fieldset className="space-y-4">
-      <legend className={`${ETIQUETA} mb-3`}>Presentaciones</legend>
+    <fieldset className="space-y-2">
+      <legend className={`${ETIQUETA} mb-3`}>Cómo se vende</legend>
+      <Encabezados conPrecio={conPrecio} />
       {fields.map((campo, i) => (
-        <div key={campo.id} className="space-y-3 rounded-xl bg-secondary/40 p-3">
-          <Campo
-            id={`presentacion-${i}`}
-            etiqueta={`Nombre de la presentación ${i + 1}`}
-            error={errores?.[i]?.nombre?.message}
-            {...register(`presentaciones.${i}.nombre`)}
-          />
-          {compartido ? (
-            <Campo
-              id={`compartido-${i}`}
-              etiqueta={`Precio compartido de la presentación ${i + 1}`}
-              inputMode="numeric"
-              error={errores?.[i]?.compartido?.message}
-              {...register(`presentaciones.${i}.compartido`)}
-            />
-          ) : null}
-          <div className="flex items-center gap-1">
-            <Mover i={i} total={fields.length} mover={move} />
-            <button
-              type="button"
-              aria-label={`Quitar la presentación ${i + 1}`}
-              disabled={fields.length === 1}
-              onClick={() => remove(i)}
-              className={ICONO_BORRAR}
-            >
-              <Trash2 size={16} aria-hidden="true" />
-            </button>
-          </div>
-        </div>
+        <FormaDeVenta
+          key={campo.id}
+          i={i}
+          total={fields.length}
+          conPrecio={conPrecio}
+          quitar={remove}
+          mover={move}
+        />
       ))}
       {general ? <p className="text-xs text-rose-600 font-medium">{general}</p> : null}
       <button
         type="button"
         onClick={() => append({ id: '', nombre: '', compartido: '', compartidoOriginal: '' })}
         disabled={fields.length >= 6}
-        className={BOTON_SUAVE}
+        className={cn(BOTON_SUAVE, 'mt-2')}
       >
-        <Plus size={14} aria-hidden="true" /> Agregar presentación
+        <Plus size={14} aria-hidden="true" /> Agregar otra forma de venta
       </button>
     </fieldset>
   );

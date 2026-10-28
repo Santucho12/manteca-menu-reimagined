@@ -21,7 +21,7 @@ export default async function PaginaEditarCategoria({
   return (
     <Pantalla
       titulo={`Editar ${inicial.nombre}`}
-      subtitulo="Cambiá sus datos y sus presentaciones."
+      subtitulo="Cambiá sus datos y cómo se vende."
       ayuda="menu"
     >
       <Seccion icono={<Tags className="text-primary" size={24} />}>

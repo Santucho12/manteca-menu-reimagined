@@ -24,7 +24,7 @@ test('muestra los cambios, ocultos incluidos, y los aplica', async ({ page }) =>
   const oculto = await sembrarProducto(categoria, { visible: false, precios: [500000] });
   await prepararAumento(page, categoria.nombre, '10');
   const tabla = page.getByRole('table', { name: 'Cambios de precio' });
-  await expect(tabla.getByRole('row').filter({ hasText: 'Precio compartido' })).toContainText(
+  await expect(tabla.getByRole('row').filter({ hasText: 'precio para todos' })).toContainText(
     '$3.000$3.300',
   );
   await expect(tabla.getByRole('row').filter({ hasText: oculto.nombre })).toContainText('Oculto');
