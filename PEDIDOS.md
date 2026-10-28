@@ -153,6 +153,8 @@ Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, 
 ### 67. Gastos: una tarjeta por categoría arriba de Pagados
 Sobre la lista de Pagados se ve una tarjeta por cada categoría con gastos en el mes, con cuántos gastos tiene y cuánto suman (sin los anulados). Respeta el mes y el tipo (Todos, Fijos, De caja); tocar una tarjeta filtra la lista por esa categoría y volver a tocarla la saca (Santiago, 2026-10-28).
 
+También (2026-10-28): cada tarjeta se abre y lista sus gastos; Próximos pagos más compacto, con un separador por mes (con lo que suma) y la etiqueta «Fijo · …» con un color por frecuencia; fecha en verde lo pagado y en rojo lo que falta pagar; «Fecha en que vence» / «Fecha de pago» al cargar; se saca el comprobante del formulario; y el gasto se puede pagar en **Efectivo** o **Cheque** (migración `20261028200000_gastos_efectivo_y_cheque.sql`, aplicada solo en pruebas).
+
 ### 66. Cierres de caja: dos estados, editables y comparados con las ventas del día
 Rediseño del módulo (Santiago, 2026-10-28). Los estados pasan a ser **Cierra** y **Con diferencia**, más **Pendiente** para un día sin cierre cargado. Se saca todo lo de «Revisado» (marcar, comentario y estado). El cierre se puede **editar** (Caja el suyo, el admin cualquiera, con valor anterior y nuevo en la auditoría), y lo esperado se **calcula siempre al mostrar** contra las ventas del día, por medio de pago, con la tolerancia que se mantiene. Sigue «Anular» solo para el admin, con motivo. Cambia lo decidido el 2026-10-06 y el 2026-10-09 en `docs/modulos/06-cierres-de-caja.md` (cierre que no se edita, estado «Esperando ventas» y «Revisado»). Sin ventas el esperado es $0.
 
