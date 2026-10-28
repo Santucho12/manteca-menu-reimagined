@@ -571,6 +571,7 @@ export type Database = {
         Row: {
           activo: boolean
           categoria_id: string
+          clave: string | null
           creado_por: string | null
           descripcion: string | null
           fecha_actualizacion: string
@@ -587,6 +588,7 @@ export type Database = {
         Insert: {
           activo?: boolean
           categoria_id: string
+          clave?: string | null
           creado_por?: string | null
           descripcion?: string | null
           fecha_actualizacion?: string
@@ -603,6 +605,7 @@ export type Database = {
         Update: {
           activo?: boolean
           categoria_id?: string
+          clave?: string | null
           creado_por?: string | null
           descripcion?: string | null
           fecha_actualizacion?: string
@@ -1259,6 +1262,7 @@ export type Database = {
         Args: {
           desde: string
           el_proveedor?: string
+          el_tipo?: string
           hasta: string
           la_categoria?: string
         }
@@ -1406,7 +1410,21 @@ export type Database = {
         Args: { cuenta: string; tipos: string[] }
         Returns: Record<string, unknown>
       }
+      ventas_aplicar_lote: {
+        Args: { el_local: string; lote: Json }
+        Returns: number[]
+      }
+      ventas_crear_del_excel: {
+        Args: {
+          el_local: string
+          el_medio: Database["public"]["Enums"]["medio_de_caja"]
+          el_monto: number
+          la_fecha: string
+        }
+        Returns: undefined
+      }
       ventas_guardar_manual: { Args: { datos: Json }; Returns: string }
+      ventas_importar_excel: { Args: { lotes: Json }; Returns: Json }
       ventas_totales: {
         Args: {
           desde: string
@@ -1423,6 +1441,7 @@ export type Database = {
           cobrado_centavos: number
         }[]
       }
+      ventas_validar_excel: { Args: { lotes: Json }; Returns: undefined }
       ventas_validar_manual: {
         Args: { datos: Json; el_local: string }
         Returns: undefined
