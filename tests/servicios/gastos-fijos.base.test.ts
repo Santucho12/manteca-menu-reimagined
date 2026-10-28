@@ -80,7 +80,7 @@ describe('cargar un gasto', () => {
     const resultado = await cargarGasto(await admin(), carga({ categoriaId }));
     if (!resultado.ok) throw new Error(resultado.mensaje);
     gastos.push(resultado.datos.id);
-    expect(resultado.datos.fijo).toBe(false);
+    expect(resultado.datos.tipo).toBe('gasto');
     expect((await gastoDe(resultado.datos.id)).monto_centavos).toBe(150000);
   });
 
@@ -92,7 +92,7 @@ describe('cargar un gasto', () => {
     const primera = await cargarGasto(cliente, conClave);
     if (!primera.ok) throw new Error(primera.mensaje);
     recurrentes.push(primera.datos.id);
-    expect(primera.datos.fijo).toBe(true);
+    expect(primera.datos.tipo).toBe('fijo');
     expect(await recurrentePorId(cliente, primera.datos.id)).toMatchObject({
       frecuencia: 'bimestral',
       primer_vencimiento: '2099-02-10',
