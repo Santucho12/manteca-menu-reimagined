@@ -10,10 +10,11 @@ export default async function PaginaCambioObligado() {
   const { perfil } = await exigirPagina('cambiar-contrasena');
   return (
     <>
-      <TituloDeAcceso>Cambiá tu contraseña</TituloDeAcceso>
-      <p className="-mt-4 mb-6 px-1 text-sm text-muted-foreground">
-        {perfil.nombre}, entraste con una contraseña temporal. Elegí una nueva para seguir.
-      </p>
+      <TituloDeAcceso
+        inicio="Cambiá tu"
+        resaltado="contraseña"
+        subtitulo={`${perfil.nombre}, entraste con una contraseña temporal. Elegí una nueva para seguir.`}
+      />
       <FormularioCambioObligado />
       <form action="/admin/salir" method="post" className="mt-3">
         <button

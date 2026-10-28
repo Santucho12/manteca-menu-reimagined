@@ -27,14 +27,14 @@ export function CampoContrasena(props: Omit<PropsDeCampo, 'type' | 'icono'>) {
             size={16}
             strokeWidth={2}
             aria-hidden
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-primary"
           />
         ) : null}
         <input
           {...resto}
           id={id}
           type={visible ? 'text' : 'password'}
-          className={cn(clasesDeCampo(variante), 'pr-12 font-mono', className)}
+          className={cn(clasesDeCampo(variante), 'pr-12', className)}
           {...atributosDeError(id, error)}
         />
         <button

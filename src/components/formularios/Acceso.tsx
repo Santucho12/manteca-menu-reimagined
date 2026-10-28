@@ -1,19 +1,32 @@
-import { Loader2 } from 'lucide-react';
+import { Loader2, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
-/** El titulo de la tarjeta de ingreso: el h1 de esas pantallas. */
-export function TituloDeAcceso({ children }: { children: ReactNode }) {
-  return <h1 className="text-xl font-bold tracking-tight text-slate-800 mb-8 px-1">{children}</h1>;
+type PropsDelTitulo = {
+  inicio: string;
+  resaltado: string;
+  subtitulo: string;
+};
+
+/** El titulo de la tarjeta de ingreso, con la ultima palabra en dorado. */
+export function TituloDeAcceso({ inicio, resaltado, subtitulo }: PropsDelTitulo) {
+  return (
+    <div className="mb-5">
+      <h1 className="text-2xl font-bold tracking-tight text-slate-800">
+        {inicio} <span className="text-primary">{resaltado}</span>
+      </h1>
+      <p className="mt-1 text-sm text-muted-foreground">{subtitulo}</p>
+    </div>
+  );
 }
 
-/** El boton grande del ingreso de Plan Reminder Pro. */
+/** El boton principal del ingreso: degrade dorado con letra blanca. */
 export function BotonDeAcceso({ enviando, children }: { enviando: boolean; children: ReactNode }) {
   return (
     <button
       type="submit"
       disabled={enviando}
-      className="w-full h-14 rounded-2xl bg-primary text-primary-foreground font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-primary/20 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-primary/30 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50"
+      className="w-full h-11 rounded-full bg-gradient-to-r from-[#d6b75c] to-[#a8862f] text-white font-bold text-sm shadow-lg shadow-primary/25 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-primary/30 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50"
     >
       {enviando ? <Loader2 size={16} className="animate-spin" aria-hidden /> : null}
       {children}
@@ -21,16 +34,17 @@ export function BotonDeAcceso({ enviando, children }: { enviando: boolean; child
   );
 }
 
-type Props = { pregunta: string; href: string; texto: string };
+type PropsDelSecundario = { href: string; texto: string; icono: LucideIcon };
 
-/** El enlace entre ingreso y registro (extension: Plan Reminder Pro no tiene registro). */
-export function EnlaceDeAcceso({ pregunta, href, texto }: Props) {
+/** El boton secundario de la tarjeta: lleva entre el ingreso y el registro. */
+export function BotonSecundarioDeAcceso({ href, texto, icono: Icono }: PropsDelSecundario) {
   return (
-    <p className="mt-6 px-1 text-xs font-semibold text-muted-foreground">
-      {pregunta}{' '}
-      <Link href={href} className="text-primary hover:underline underline-offset-4">
-        {texto}
-      </Link>
-    </p>
+    <Link
+      href={href}
+      className="mt-3 w-full h-11 rounded-full border border-primary/30 bg-primary/5 text-slate-800 font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary/10 hover:border-primary/50 transition-colors"
+    >
+      <Icono size={16} aria-hidden className="text-primary" />
+      {texto}
+    </Link>
   );
 }
