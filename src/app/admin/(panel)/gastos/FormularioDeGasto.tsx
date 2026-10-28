@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
 import { AvisoDeError } from '@/components/formularios/AvisoDeError';
-import { Campo } from '@/components/formularios/Campo';
 import { PieDelFormulario } from '@/components/formularios/PieDelFormulario';
 import { conValorInicial } from '@/lib/formularios/valorInicial';
 import type { Opcion, OpcionDeCategoria } from '@/lib/gastos/consultas';
@@ -65,14 +64,6 @@ export function FormularioDeGasto({ inicial, id, categorias, proveedores, ...res
           deCaja={deCaja}
           medioOpcional={quedaPorPagar({ seRepite, yaPagado })}
         />
-        {seRepite === 'no' ? (
-          <Campo
-            id="comprobante"
-            etiqueta="Comprobante (opcional)"
-            error={errors.comprobante?.message}
-            {...registro('comprobante')}
-          />
-        ) : null}
       </div>
       {guardado.mensaje ? <AvisoDeError mensaje={guardado.mensaje} /> : null}
       <PieDelFormulario enviando={guardado.enviando} cancelar="/admin/gastos" />

@@ -48,3 +48,12 @@ export function fechaCorta(fecha: string): { dia: string; mes: string } {
   const [, mes, dia] = fecha.split('-').map(Number) as [number, number, number];
   return { dia: String(dia), mes: MESES_CORTOS[mes - 1]! };
 }
+
+export type TonoDeMarca = 'violeta' | 'celeste' | 'ambar';
+
+/** Cada frecuencia de un fijo se pinta distinto; el resto de las marcas, en violeta. */
+export function tonoDeLaMarca(marca: string): TonoDeMarca {
+  if (marca === `Fijo · ${nombreDeFrecuencia('bimestral')}`) return 'celeste';
+  if (marca === `Fijo · ${nombreDeFrecuencia('anual')}`) return 'ambar';
+  return 'violeta';
+}

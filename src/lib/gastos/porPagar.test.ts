@@ -67,8 +67,15 @@ describe('itemsPorPagar', () => {
       porPagarId: 'alq-oct',
       fijoId: 'fijo-a',
       detalle: 'Todos los meses',
+      frecuencia: 'mensual',
     });
-    expect(siguiente).toMatchObject({ porPagarId: null, fijoId: 'fijo-a', medio: 'transferencia' });
+    expect(siguiente).toMatchObject({
+      porPagarId: null,
+      fijoId: 'fijo-a',
+      medio: 'transferencia',
+      frecuencia: 'mensual',
+    });
+    expect(itemsPorPagar([pendiente('luz')], [])[0]!.frecuencia).toBeNull();
   });
 });
 

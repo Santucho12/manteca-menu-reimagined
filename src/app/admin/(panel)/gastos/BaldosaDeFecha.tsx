@@ -2,12 +2,12 @@ import { fechaCorta } from '@/lib/gastos/filas';
 import { cn } from '@/lib/utils';
 
 const TONOS = {
-  paso: 'bg-secondary/60 text-slate-600 border-border',
-  viene: 'bg-amber-50 text-amber-700 border-amber-100',
-  vencido: 'bg-rose-50 text-rose-700 border-rose-100',
+  paso: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  viene: 'bg-rose-50 text-rose-600 border-rose-100',
+  vencido: 'bg-rose-100 text-rose-700 border-rose-300',
 };
 
-/** El día y el mes en un cuadradito: ámbar lo que viene, rosa lo vencido, gris lo pagado. */
+/** El día y el mes en un cuadradito: rojo lo que falta pagar (más fuerte si ya venció), verde lo pagado. */
 export function BaldosaDeFecha({
   fecha,
   viene = false,

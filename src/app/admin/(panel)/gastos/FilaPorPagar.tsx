@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { BotonDeAnular } from '@/components/panel/BotonDeAnular';
+import { Chip } from '@/components/panel/Insignias';
 import { cuandoVence } from '@/lib/gastos/fijos';
+import { tonoDeLaMarca } from '@/lib/gastos/filas';
+import { nombreDeFrecuencia } from '@/lib/gastos/pantalla';
 import type { ItemPorPagar } from '@/lib/gastos/porPagar';
 import { formatearPesos } from '@/lib/plata';
 import { cn } from '@/lib/utils';
@@ -37,8 +40,13 @@ export function FilaPorPagar({ item, hoy }: { item: ItemPorPagar; hoy: string })
           <span className={cn(vencido && 'font-bold text-rose-600')}>
             {cuandoVence(item.fecha, hoy)}
           </span>{' '}
-          · {item.detalle}
+          {item.frecuencia ? null : ` · ${item.detalle}`}
         </p>
+        {item.frecuencia ? (
+          <Chip tono={tonoDeLaMarca(`Fijo · ${nombreDeFrecuencia(item.frecuencia)}`)}>
+            {`Fijo · ${nombreDeFrecuencia(item.frecuencia)}`}
+          </Chip>
+        ) : null}
       </div>
       <div className="flex flex-col items-end gap-1 shrink-0">
         <span className="text-xs font-bold tabular-nums whitespace-nowrap">

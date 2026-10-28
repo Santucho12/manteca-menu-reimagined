@@ -64,7 +64,13 @@ describe('esquemaGasto', () => {
   it('rechaza una fecha imposible, sin categoria o un medio de pago inventado', () => {
     expect(esquemaGasto.safeParse({ ...gasto, fecha: '2026-02-30' }).success).toBe(false);
     expect(esquemaGasto.safeParse({ ...gasto, categoriaId: '' }).success).toBe(false);
-    expect(esquemaGasto.safeParse({ ...gasto, medioDePago: 'cheque' }).success).toBe(false);
+    expect(esquemaGasto.safeParse({ ...gasto, medioDePago: 'bitcoin' }).success).toBe(false);
+  });
+
+  it('acepta efectivo y cheque como medio de pago', () => {
+    for (const medioDePago of ['efectivo', 'cheque']) {
+      expect(esquemaGasto.safeParse({ ...gasto, medioDePago }).success).toBe(true);
+    }
   });
 
   it('el proveedor es opcional pero, si viene, es un id', () => {
@@ -173,6 +179,14 @@ describe('pagar lo por pagar', () => {
     medioDePago: 'transferencia',
     clave: CLAVE,
   };
+
+  it('al pagar lo por pagar se puede elegir efectivo y cheque, pero no el efectivo de la caja', () => {
+    const medios = (medioDePago: string) =>
+      esquemaPago(HOY).safeParse({ ...pago, medioDePago }).success;
+    expect(medios('efectivo')).toBe(true);
+    expect(medios('cheque')).toBe(true);
+    expect(medios('efectivo_caja')).toBe(false);
+  });
 
   it('la fecha del pago no puede ser futura', () => {
     const futuro = esquemaPago(HOY).safeParse({ ...pago, fecha: '2026-10-09' });

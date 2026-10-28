@@ -1590,7 +1590,13 @@ export type Database = {
       etiqueta_de_producto: "mas_vendido" | "artesanal" | "nuevo"
       frecuencia_de_gasto: "mensual" | "bimestral" | "anual"
       medio_de_caja: "efectivo" | "credito" | "debito" | "qr" | "transferencia"
-      medio_de_pago: "efectivo_caja" | "transferencia" | "tarjeta" | "otro"
+      medio_de_pago:
+        | "efectivo_caja"
+        | "efectivo"
+        | "transferencia"
+        | "tarjeta"
+        | "cheque"
+        | "otro"
       origen_de_venta: "manual" | "fudo"
       rol_usuario: "invitado" | "caja" | "encargado" | "admin"
     }
@@ -1724,7 +1730,14 @@ export const Constants = {
       etiqueta_de_producto: ["mas_vendido", "artesanal", "nuevo"],
       frecuencia_de_gasto: ["mensual", "bimestral", "anual"],
       medio_de_caja: ["efectivo", "credito", "debito", "qr", "transferencia"],
-      medio_de_pago: ["efectivo_caja", "transferencia", "tarjeta", "otro"],
+      medio_de_pago: [
+        "efectivo_caja",
+        "efectivo",
+        "transferencia",
+        "tarjeta",
+        "cheque",
+        "otro",
+      ],
       origen_de_venta: ["manual", "fudo"],
       rol_usuario: ["invitado", "caja", "encargado", "admin"],
     },
