@@ -1,12 +1,17 @@
 import { exito, fallo, type Resultado } from '../resultado';
 import type { Cliente } from '../supabase/cliente';
+import { recurrentePorId } from './consultas';
 import {
+  fijoParaLaBase,
   gastoParaLaBase,
   recurrenteParaLaBase,
+  type DatosDeCarga,
   type DatosDeCategoria,
+  type DatosDeClasificacion,
+  type DatosDeFijo,
   type DatosDeGasto,
-  type DatosDeRecurrente,
 } from './esquemas';
+import { cambiaLaSerie } from './fijos';
 
 export const MENSAJES_DE_GASTOS = {
   sinPermiso: 'No tenés permiso para hacer esto.',
@@ -23,6 +28,7 @@ export const MENSAJES_DE_GASTOS = {
   anularDeCierre: 'Este gasto salió de un cierre de caja: se anula anulando el cierre.',
   efectivoDeCaja:
     'El efectivo de la caja sale por el cierre del día: que lo cargue quien cierra la caja.',
+  proximoPagoPasado: 'El próximo pago tiene que ser después de hoy.',
   generico: 'No pudimos guardarlo. Revisá los datos e intentá de nuevo.',
 } as const;
 
@@ -38,6 +44,7 @@ const POR_CODIGO: Record<string, string> = {
   PC305: MENSAJES_DE_GASTOS.deCierre,
   PC306: MENSAJES_DE_GASTOS.anularDeCierre,
   PG207: MENSAJES_DE_GASTOS.efectivoDeCaja,
+  PG208: MENSAJES_DE_GASTOS.proximoPagoPasado,
 };
 
 type Respuesta = {
@@ -90,22 +97,55 @@ export async function anularGasto(cliente: Cliente, id: string, motivo: string) 
   );
 }
 
-export async function crearRecurrente(cliente: Cliente, datos: DatosDeRecurrente) {
-  return alCrear(
-    await cliente
-      .from('gastos_recurrentes')
-      .insert(recurrenteParaLaBase(datos))
-      .select('id')
-      .single(),
-  );
+async function recurrenteDeLaClave(cliente: Cliente, clave: string) {
+  return alCrear(await cliente.from('gastos_recurrentes').select('id').eq('clave', clave).single());
 }
 
-export async function editarRecurrente(cliente: Cliente, id: string, datos: DatosDeRecurrente) {
+/** Un fijo nuevo; la misma carga mandada dos veces devuelve el mismo fijo. */
+export async function crearRecurrente(cliente: Cliente, datos: DatosDeCarga) {
+  const creado = await cliente
+    .from('gastos_recurrentes')
+    .insert(recurrenteParaLaBase(datos))
+    .select('id')
+    .single();
+  if (creado.error?.code === '23505' && datos.clave) {
+    return recurrenteDeLaClave(cliente, datos.clave);
+  }
+  return alCrear(creado);
+}
+
+/** Cargar gasto: sin repetición es un gasto; con repetición, un fijo que se carga solo. */
+export async function cargarGasto(
+  cliente: Cliente,
+  datos: DatosDeCarga,
+): Promise<Resultado<{ id: string; fijo: boolean }>> {
+  const fijo = datos.seRepite !== 'no';
+  const resultado = fijo ? await crearRecurrente(cliente, datos) : await crearGasto(cliente, datos);
+  return resultado.ok ? exito({ id: resultado.datos.id, fijo }) : resultado;
+}
+
+/** Editar un fijo: si cambian la fecha o la frecuencia, cuenta desde el próximo pago. */
+export async function editarRecurrente(
+  cliente: Cliente,
+  id: string,
+  datos: DatosDeFijo,
+  hoy: string,
+) {
+  const actual = await recurrentePorId(cliente, id);
+  if (!actual) return fallo(MENSAJES_DE_GASTOS.noDisponible);
+  const fila = fijoParaLaBase(datos, cambiaLaSerie(actual, datos, hoy));
+  return alCambiar(await cliente.from('gastos_recurrentes').update(fila).eq('id', id).select('id'));
+}
+
+/** Clasificar cambia solo la categoría y el proveedor: el monto de un gasto de caja no se toca. */
+export async function clasificarGasto(cliente: Cliente, datos: DatosDeClasificacion) {
+  const cambios = { categoria_id: datos.categoriaId, proveedor_id: datos.proveedorId || null };
   return alCambiar(
     await cliente
-      .from('gastos_recurrentes')
-      .update(recurrenteParaLaBase(datos))
-      .eq('id', id)
+      .from('gastos')
+      .update(cambios)
+      .eq('id', datos.id)
+      .eq('anulado', false)
       .select('id'),
   );
 }

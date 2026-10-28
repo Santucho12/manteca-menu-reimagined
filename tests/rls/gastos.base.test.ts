@@ -103,14 +103,18 @@ describe('RLS de gastos: escritura', () => {
       frecuencia: 'mensual' as const,
       primer_vencimiento: '2099-04-10',
     };
-    const { data, error } = await (await clienteComo('admin'))
+    const { data, error } = await (
+      await clienteComo('admin')
+    )
       .from('gastos_recurrentes')
       .insert({ ...fila, clave: crypto.randomUUID() })
       .select('id')
       .single();
     expect(error).toBeNull();
     recurrentes.push(data!.id);
-    const deCaja = await (await clienteComo('caja'))
+    const deCaja = await (
+      await clienteComo('caja')
+    )
       .from('gastos_recurrentes')
       .insert({ ...fila, clave: crypto.randomUUID() });
     expect(deCaja.error?.code).toBe('42501');

@@ -1,25 +1,20 @@
-import Link from 'next/link';
 import { ListaDeGastos } from '@/app/admin/(panel)/gastos/ListaDeGastos';
 import { MOSAICO } from '@/components/panel/estilos';
 import { Seccion } from '@/components/panel/Seccion';
 import { listarGastos } from '@/lib/gastos/consultas';
-import { enlaceDeGastos } from '@/lib/gastos/pantalla';
 import { totalesDelProveedor } from '@/lib/gastos/proveedores';
 import { formatearPesos } from '@/lib/plata';
 import type { Cliente } from '@/lib/supabase/cliente';
 
 type Props = { cliente: Cliente; proveedorId: string; hoy: string };
 
-/** Lo que se le pago: los totales del mes y del año, y los gastos del año, sin anulados en la suma. */
+/**
+ * Lo que se le pago: los totales del mes y del año, y los primeros 25 gastos del año. Gastos ya
+ * no filtra por proveedor, por eso no hay "ver todos".
+ */
 export async function PagosDelProveedor({ cliente, proveedorId, hoy }: Props) {
   const anio = hoy.slice(0, 4);
-  const filtros = {
-    desde: `${anio}-01-01`,
-    hasta: `${anio}-12-31`,
-    categoriaId: null,
-    proveedorId,
-    pagina: 1,
-  };
+  const filtros = { desde: `${anio}-01-01`, hasta: `${anio}-12-31`, proveedorId, pagina: 1 };
   const [totales, lista] = await Promise.all([
     totalesDelProveedor(cliente, proveedorId, hoy),
     listarGastos(cliente, filtros),
@@ -35,14 +30,6 @@ export async function PagosDelProveedor({ cliente, proveedorId, hoy }: Props) {
         </p>
       </div>
       <ListaDeGastos filas={lista.filas} total={lista.total} />
-      {lista.total > lista.filas.length ? (
-        <Link
-          href={enlaceDeGastos(filtros, hoy)}
-          className="text-sm font-bold text-primary hover:underline underline-offset-4"
-        >
-          Ver todos sus gastos del año
-        </Link>
-      ) : null}
     </Seccion>
   );
 }

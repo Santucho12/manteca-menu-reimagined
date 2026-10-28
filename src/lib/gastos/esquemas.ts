@@ -1,12 +1,18 @@
 import { z } from 'zod';
+import { proximoPago } from './fijos';
 import { centavosDeMonto, montoParaEditar } from './plata';
-import { esFechaValida } from './vencimientos';
+import { esFechaValida, type Frecuencia } from './vencimientos';
 
 export const MEDIOS_DE_PAGO = ['efectivo_caja', 'transferencia', 'tarjeta', 'otro'] as const;
 export const FRECUENCIAS = ['mensual', 'bimestral', 'anual'] as const;
+/** "¿Se repite?" del formulario de carga: no, o cada cuánto. */
+export const REPETICIONES = ['no', ...FRECUENCIAS] as const;
+
+const NO_FUTURO = 'Un gasto que todavía no pagaste no se carga. Si se repite, elegí cada cuánto.';
 
 const texto = (maximo: number) => z.string().trim().max(maximo, `Usá hasta ${maximo} caracteres.`);
 const fecha = z.string().refine(esFechaValida, 'Elegí una fecha válida.');
+const proveedorId = z.union([z.literal(''), z.uuid('Elegí un proveedor de la lista.')]);
 
 const camposDeGasto = {
   categoriaId: z.uuid('Elegí una categoría.'),
@@ -17,7 +23,7 @@ const camposDeGasto = {
       'Escribí el monto en pesos, con coma para los centavos: 12.345,50.',
     ),
   descripcion: texto(200),
-  proveedorId: z.union([z.literal(''), z.uuid('Elegí un proveedor de la lista.')]),
+  proveedorId,
   medioDePago: z.enum(MEDIOS_DE_PAGO, 'Elegí cómo se pagó.'),
 };
 
@@ -28,11 +34,6 @@ export const esquemaGasto = z.object({
   // Una clave por formulario abierto: guardar dos veces el mismo gasto no lo duplica.
   clave: z.uuid().optional(),
 });
-export const esquemaRecurrente = z.object({
-  ...camposDeGasto,
-  frecuencia: z.enum(FRECUENCIAS, 'Elegí cada cuánto se repite.'),
-  primerVencimiento: fecha,
-});
 export const esquemaAnulacion = z.object({
   id: z.uuid(),
   motivo: z.string().trim().min(1, 'Escribí el motivo.').max(300, 'Usá hasta 300 caracteres.'),
@@ -42,15 +43,55 @@ export const esquemaCategoria = z.object({
   pideProveedor: z.boolean(),
 });
 export const esquemaId = z.object({ id: z.uuid() });
+export const esquemaClasificacion = z.object({
+  id: z.uuid(),
+  categoriaId: z.uuid('Elegí una categoría.'),
+  proveedorId,
+});
+
+const hastaHoy = (hoy: string) => (datos: { fecha: string }) => datos.fecha <= hoy;
+
+/** Cargar: un gasto suelto, con fecha hasta hoy, o un fijo, que puede empezar más adelante. */
+export const esquemaCarga = (hoy: string) =>
+  esquemaGasto
+    .extend({ seRepite: z.enum(REPETICIONES, 'Elegí si se repite.') })
+    .refine((datos) => datos.seRepite !== 'no' || hastaHoy(hoy)(datos), {
+      path: ['fecha'],
+      message: NO_FUTURO,
+    });
+
+/** Editar un gasto: sin fecha futura. Con id, para la acción del servidor. */
+export const esquemaDeGasto = (hoy: string) =>
+  esquemaGasto.refine(hastaHoy(hoy), { path: ['fecha'], message: NO_FUTURO });
+export const esquemaDeGastoEditado = (hoy: string) =>
+  esquemaGasto
+    .extend(esquemaId.shape)
+    .refine(hastaHoy(hoy), { path: ['fecha'], message: NO_FUTURO });
+
+/** Editar un fijo: el próximo pago es desde mañana; lo de hoy ya se cargó. */
+export const esquemaFijo = (hoy: string) =>
+  z.object({
+    ...camposDeGasto,
+    frecuencia: z.enum(FRECUENCIAS, 'Elegí cada cuánto se repite.'),
+    proximoPago: fecha.refine((dia) => dia > hoy, 'El próximo pago tiene que ser después de hoy.'),
+  });
 
 export type DatosDeGasto = z.infer<typeof esquemaGasto>;
-export type DatosDeRecurrente = z.infer<typeof esquemaRecurrente>;
+export type DatosDeCarga = z.infer<ReturnType<typeof esquemaCarga>>;
+export type DatosDeFijo = z.infer<ReturnType<typeof esquemaFijo>>;
+export type DatosDeClasificacion = z.infer<typeof esquemaClasificacion>;
 export type DatosDeCategoria = z.infer<typeof esquemaCategoria>;
 export type MedioDePago = (typeof MEDIOS_DE_PAGO)[number];
+export type Repeticion = (typeof REPETICIONES)[number];
 
 const vacioANulo = (escrito: string) => (escrito.trim() === '' ? null : escrito.trim());
 
-function camposParaLaBase(datos: DatosDeGasto | DatosDeRecurrente) {
+type Campos = Pick<
+  DatosDeGasto,
+  'categoriaId' | 'monto' | 'descripcion' | 'proveedorId' | 'medioDePago'
+>;
+
+function camposParaLaBase(datos: Campos) {
   return {
     categoria_id: datos.categoriaId,
     monto_centavos: centavosDeMonto(datos.monto)!,
@@ -69,12 +110,21 @@ export function gastoParaLaBase(datos: DatosDeGasto) {
   };
 }
 
-export function recurrenteParaLaBase(datos: DatosDeRecurrente) {
+/** Un fijo nuevo: se repite desde la fecha de la carga, con la clave del formulario. */
+export function recurrenteParaLaBase(datos: DatosDeCarga) {
   return {
     ...camposParaLaBase(datos),
-    frecuencia: datos.frecuencia,
-    primer_vencimiento: datos.primerVencimiento,
+    frecuencia: datos.seRepite as Frecuencia,
+    primer_vencimiento: datos.fecha,
+    clave: datos.clave ?? null,
   };
+}
+
+/** Un fijo editado: la fecha y la frecuencia viajan solo si cambian, así un 31 sigue en 31. */
+export function fijoParaLaBase(datos: DatosDeFijo, conSerie: boolean) {
+  const campos = camposParaLaBase(datos);
+  if (!conSerie) return campos;
+  return { ...campos, frecuencia: datos.frecuencia, primer_vencimiento: datos.proximoPago };
 }
 
 type FilaParaEditar = {
@@ -101,15 +151,17 @@ export function datosDeGastoParaEditar(
   return { fecha: fila.fecha, ...camposParaEditar(fila), comprobante: fila.comprobante ?? '' };
 }
 
-export function datosDeRecurrenteParaEditar(
+export function datosDeFijoParaEditar(
   fila: FilaParaEditar & {
-    frecuencia: DatosDeRecurrente['frecuencia'];
+    frecuencia: Frecuencia;
     primer_vencimiento: string;
+    generar_desde: string | null;
   },
-): DatosDeRecurrente {
+  hoy: string,
+): DatosDeFijo {
   return {
     ...camposParaEditar(fila),
     frecuencia: fila.frecuencia,
-    primerVencimiento: fila.primer_vencimiento,
+    proximoPago: proximoPago(fila, hoy),
   };
 }

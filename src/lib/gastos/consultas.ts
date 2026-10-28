@@ -1,7 +1,7 @@
 import type { Cliente } from '../supabase/cliente';
 import { POR_PAGINA, cantidadDePaginas } from '../usuarios/presentacion';
 import type { MedioDePago } from './esquemas';
-import type { FiltrosDeGastos } from './pantalla';
+import type { TipoDeGasto } from './pantalla';
 import type { Frecuencia } from './vencimientos';
 
 export type FilaDeGasto = {
@@ -15,6 +15,17 @@ export type FilaDeGasto = {
   cierre_id: string | null;
   categoria: string;
   proveedor: string | null;
+  /** La frecuencia del fijo que lo cargó, o null si no lo cargó un fijo. */
+  frecuencia: Frecuencia | null;
+};
+/** Qué gastos leer: Pagados manda el mes; la ficha de un proveedor, el año y el proveedor. */
+export type ConsultaDeGastos = {
+  desde: string;
+  hasta: string;
+  tipo?: TipoDeGasto | null;
+  categoriaId?: string | null;
+  proveedorId?: string | null;
+  pagina: number;
 };
 export type ListaDeGastos = {
   filas: FilaDeGasto[];
@@ -28,12 +39,18 @@ export type OpcionDeCategoria = Opcion & { pide_proveedor: boolean };
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const COLUMNAS_DE_FILA =
   'id, fecha, monto_centavos, descripcion, medio_de_pago, anulado, recurrente_id, cierre_id, ' +
-  'categoria:categorias_de_gasto(nombre), proveedor:proveedores(nombre)';
+  'categoria:categorias_de_gasto(nombre), proveedor:proveedores(nombre), ' +
+  'recurrente:gastos_recurrentes(frecuencia)';
 
-type FilaLeida = Omit<FilaDeGasto, 'categoria' | 'proveedor'> & {
+type FilaLeida = Omit<FilaDeGasto, 'categoria' | 'proveedor' | 'frecuencia'> & {
   categoria: { nombre: string } | null;
   proveedor: { nombre: string } | null;
+  recurrente: { frecuencia: Frecuencia } | null;
 };
+
+function aFilaDeGasto({ recurrente, ...fila }: FilaLeida): FilaDeGasto {
+  return { ...aplanar(fila), frecuencia: recurrente?.frecuencia ?? null };
+}
 
 type ConNombres = Pick<FilaLeida, 'categoria' | 'proveedor'>;
 
@@ -56,7 +73,7 @@ function comprobar<T>(
 
 function consultaDeGastos(
   cliente: Cliente,
-  filtros: FiltrosDeGastos,
+  filtros: ConsultaDeGastos,
   columnas: string,
   contar = false,
 ) {
@@ -67,20 +84,23 @@ function consultaDeGastos(
     .lte('fecha', filtros.hasta);
   if (filtros.categoriaId) consulta = consulta.eq('categoria_id', filtros.categoriaId);
   if (filtros.proveedorId) consulta = consulta.eq('proveedor_id', filtros.proveedorId);
+  if (filtros.tipo === 'fijos') consulta = consulta.not('recurrente_id', 'is', null);
+  if (filtros.tipo === 'caja') consulta = consulta.not('cierre_id', 'is', null);
   return consulta;
 }
 
-async function totalDe(cliente: Cliente, filtros: FiltrosDeGastos): Promise<number> {
+async function totalDe(cliente: Cliente, filtros: ConsultaDeGastos): Promise<number> {
   const respuesta = await cliente.rpc('gastos_total', {
     desde: filtros.desde,
     hasta: filtros.hasta,
     ...(filtros.categoriaId ? { la_categoria: filtros.categoriaId } : {}),
     ...(filtros.proveedorId ? { el_proveedor: filtros.proveedorId } : {}),
+    ...(filtros.tipo ? { el_tipo: filtros.tipo } : {}),
   });
   return comprobar(respuesta, 'el total');
 }
 
-async function contarGastos(cliente: Cliente, filtros: FiltrosDeGastos): Promise<number> {
+async function contarGastos(cliente: Cliente, filtros: ConsultaDeGastos): Promise<number> {
   const { count, error } = await consultaDeGastos(cliente, filtros, 'id', true);
   if (error) throw new Error(`No pudimos contar los gastos: ${error.message}`);
   return count ?? 0;
@@ -89,7 +109,7 @@ async function contarGastos(cliente: Cliente, filtros: FiltrosDeGastos): Promise
 /** Una pagina de gastos del local, los ultimos primero, con el total sin anulados. */
 export async function listarGastos(
   cliente: Cliente,
-  filtros: FiltrosDeGastos,
+  filtros: ConsultaDeGastos,
 ): Promise<ListaDeGastos> {
   const total = await contarGastos(cliente, filtros);
   const pagina = Math.min(filtros.pagina, cantidadDePaginas(total));
@@ -101,7 +121,7 @@ export async function listarGastos(
     .range(desde, desde + POR_PAGINA - 1);
   const filas = comprobar(respuesta, 'los gastos') as unknown as FilaLeida[];
   return {
-    filas: filas.map(aplanar),
+    filas: filas.map(aFilaDeGasto),
     total,
     pagina,
     totalCentavos: await totalDe(cliente, filtros),
@@ -159,8 +179,10 @@ export type FilaDeRecurrente = {
   id: string;
   descripcion: string | null;
   monto_centavos: number;
+  medio_de_pago: MedioDePago;
   frecuencia: Frecuencia;
   primer_vencimiento: string;
+  generar_desde: string | null;
   activo: boolean;
   categoria: string;
   proveedor: string | null;
@@ -170,7 +192,8 @@ export async function listarRecurrentes(cliente: Cliente): Promise<FilaDeRecurre
   const respuesta = await cliente
     .from('gastos_recurrentes')
     .select(
-      'id, descripcion, monto_centavos, frecuencia, primer_vencimiento, activo, ' +
+      'id, descripcion, monto_centavos, medio_de_pago, frecuencia, primer_vencimiento, ' +
+        'generar_desde, activo, ' +
         'categoria:categorias_de_gasto(nombre), proveedor:proveedores(nombre)',
     )
     .order('activo', { ascending: false })
@@ -193,6 +216,7 @@ export type Recurrente = {
   medio_de_pago: MedioDePago;
   frecuencia: Frecuencia;
   primer_vencimiento: string;
+  generar_desde: string | null;
   activo: boolean;
 };
 
@@ -202,11 +226,32 @@ export async function recurrentePorId(cliente: Cliente, id: string): Promise<Rec
     .from('gastos_recurrentes')
     .select(
       'id, categoria_id, monto_centavos, descripcion, proveedor_id, medio_de_pago, frecuencia, ' +
-        'primer_vencimiento, activo',
+        'primer_vencimiento, generar_desde, activo',
     )
     .eq('id', id)
     .maybeSingle();
   return comprobar(respuesta, 'el recurrente') as unknown as Recurrente | null;
+}
+
+export type PagoDelRecurrente = {
+  id: string;
+  fecha: string;
+  monto_centavos: number;
+  anulado: boolean;
+};
+
+/** Los últimos seis gastos que cargó un fijo, el más nuevo primero. */
+export async function pagosDelRecurrente(
+  cliente: Cliente,
+  id: string,
+): Promise<PagoDelRecurrente[]> {
+  const respuesta = await cliente
+    .from('gastos')
+    .select('id, fecha, monto_centavos, anulado')
+    .eq('recurrente_id', id)
+    .order('fecha', { ascending: false })
+    .limit(6);
+  return comprobar(respuesta, 'los pagos del fijo');
 }
 
 export type FilaDeCategoria = OpcionDeCategoria & { de_sistema: boolean };
@@ -218,6 +263,39 @@ export async function listarCategorias(cliente: Cliente): Promise<FilaDeCategori
     .order('activo', { ascending: false })
     .order('nombre');
   return comprobar(respuesta, 'las categorias');
+}
+
+export type FilaParaClasificar = {
+  id: string;
+  fecha: string;
+  descripcion: string | null;
+  monto_centavos: number;
+};
+
+async function idDeSinClasificar(cliente: Cliente): Promise<string | null> {
+  const categoria = await cliente
+    .from('categorias_de_gasto')
+    .select('id')
+    .eq('de_sistema', true)
+    .maybeSingle();
+  return comprobar(categoria, 'la categoria sin clasificar')?.id ?? null;
+}
+
+/** Los gastos de caja que esperan categoría, de cualquier mes, el más viejo primero. */
+export async function paraClasificar(
+  cliente: Cliente,
+): Promise<{ categoriaId: string | null; gastos: FilaParaClasificar[] }> {
+  const categoriaId = await idDeSinClasificar(cliente);
+  if (!categoriaId) return { categoriaId, gastos: [] };
+  const respuesta = await cliente
+    .from('gastos')
+    .select('id, fecha, descripcion, monto_centavos')
+    .eq('categoria_id', categoriaId)
+    .eq('anulado', false)
+    .order('fecha')
+    .order('id')
+    .limit(100);
+  return { categoriaId, gastos: comprobar(respuesta, 'los gastos para clasificar') };
 }
 
 /** Cuantos gastos de caja esperan categoria, y la categoria del sistema donde estan. */

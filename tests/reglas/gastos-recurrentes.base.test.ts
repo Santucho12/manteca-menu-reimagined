@@ -129,7 +129,13 @@ describe('generacion de gastos recurrentes', () => {
   });
 });
 
-async function cambiar(id: string, cambios: Record<string, unknown>) {
+type Cambios = Partial<{
+  primer_vencimiento: string;
+  frecuencia: 'mensual' | 'bimestral' | 'anual';
+  activo: boolean;
+}>;
+
+async function cambiar(id: string, cambios: Cambios) {
   return (await clienteComo('admin')).from('gastos_recurrentes').update(cambios).eq('id', id);
 }
 

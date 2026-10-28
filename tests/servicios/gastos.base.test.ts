@@ -173,8 +173,8 @@ describe('recurrentes', () => {
     const cliente = await admin();
     const resultado = await crearRecurrente(cliente, {
       ...datos({ categoriaId: await idDeCategoria('Alquiler'), descripcion: 'Alquiler del local' }),
-      frecuencia: 'mensual',
-      primerVencimiento: '2099-01-10',
+      fecha: '2099-01-10',
+      seRepite: 'mensual',
     });
     if (!resultado.ok) throw new Error(resultado.mensaje);
     recurrentes.push(resultado.datos.id);

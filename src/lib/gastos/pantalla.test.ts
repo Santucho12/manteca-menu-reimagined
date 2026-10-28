@@ -15,38 +15,35 @@ const HOY = '2026-10-08';
 const CATEGORIA = '6f1c1e0a-2b1d-4c1e-9a6b-1f2e3d4c5b6a';
 
 describe('filtrosDeGastos', () => {
-  it('por defecto, el mes en curso', () => {
+  it('por defecto, el mes en curso y todos', () => {
     expect(filtrosDeGastos({}, HOY)).toEqual({
+      mes: '2026-10',
       desde: '2026-10-01',
       hasta: '2026-10-31',
+      tipo: null,
       categoriaId: null,
-      proveedorId: null,
       pagina: 1,
     });
   });
 
-  it('lee las fechas, la categoria y la pagina de la URL', () => {
+  it('lee el mes, el tipo, la categoria y la pagina de la URL', () => {
     const filtros = filtrosDeGastos(
-      { desde: '2026-09-01', hasta: '2026-09-15', categoria: CATEGORIA, pagina: '3' },
+      { mes: '2026-09', tipo: 'fijos', categoria: CATEGORIA, pagina: '3' },
       HOY,
     );
-    expect(filtros).toMatchObject({
+    expect(filtros).toEqual({
+      mes: '2026-09',
       desde: '2026-09-01',
-      hasta: '2026-09-15',
+      hasta: '2026-09-30',
+      tipo: 'fijos',
       categoriaId: CATEGORIA,
       pagina: 3,
     });
   });
 
-  it('ignora una fecha invalida o un id que no es id', () => {
-    const filtros = filtrosDeGastos({ desde: '2026-13-01', proveedor: 'hola' }, HOY);
-    expect(filtros.desde).toBe('2026-10-01');
-    expect(filtros.proveedorId).toBeNull();
-  });
-
-  it('si las fechas vienen al reves, las da vuelta', () => {
-    const filtros = filtrosDeGastos({ desde: '2026-09-30', hasta: '2026-09-01' }, HOY);
-    expect([filtros.desde, filtros.hasta]).toEqual(['2026-09-01', '2026-09-30']);
+  it('ignora un tipo inventado o un id que no es id', () => {
+    const filtros = filtrosDeGastos({ tipo: 'todos', categoria: 'hola' }, HOY);
+    expect([filtros.tipo, filtros.categoriaId]).toEqual([null, null]);
   });
 });
 
@@ -56,8 +53,16 @@ describe('enlaceDeGastos', () => {
   });
 
   it('con los filtros que cambiaron', () => {
-    const filtros = { ...filtrosDeGastos({}, HOY), categoriaId: CATEGORIA, pagina: 2 };
-    expect(enlaceDeGastos(filtros, HOY)).toBe(`/admin/gastos?categoria=${CATEGORIA}&pagina=2`);
+    const filtros = {
+      ...filtrosDeGastos({}, HOY),
+      mes: '2026-09',
+      tipo: 'caja' as const,
+      categoriaId: CATEGORIA,
+      pagina: 2,
+    };
+    expect(enlaceDeGastos(filtros, HOY)).toBe(
+      `/admin/gastos?mes=2026-09&tipo=caja&categoria=${CATEGORIA}&pagina=2`,
+    );
   });
 });
 
