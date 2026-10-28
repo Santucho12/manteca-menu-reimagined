@@ -271,6 +271,9 @@ activo.
 - Las direcciones de Recurrentes y Categorías dejan de existir (404); nada las usaba fuera del
   panel.
 - Auditoría y Proveedores también dicen "gasto fijo".
+- La ficha de un proveedor sigue con sus gastos del año (los primeros 25, con las filas nuevas) y
+  pierde "Ver todos sus gastos del año": Gastos ya no filtra por proveedor. Se revisa cuando
+  Proveedores deje de estar en "Próximamente".
 - `react-day-picker` 10.0.2 (publicada el 2026-09-30).
 
 ## Restricciones globales (de `CLAUDE.md`)
