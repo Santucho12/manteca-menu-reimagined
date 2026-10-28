@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   enlaceDeControl,
   filtrosDeControl,
-  mediosDelCierre,
+  opcionesDeEstado,
   nombreDeEstado,
   nombreDeMedio,
   textoDeDiferencia,
@@ -18,67 +18,54 @@ describe('filtrosDeControl', () => {
       hasta: '2026-10-31',
       personaId: null,
       estado: null,
+      anulados: false,
       pagina: 1,
     });
   });
 
   it('lee persona y estado, e ignora un estado inventado', () => {
-    expect(filtrosDeControl({ persona: PERSONA, estado: 'revisado' }, HOY)).toMatchObject({
+    expect(
+      filtrosDeControl({ persona: PERSONA, estado: 'pendiente', anulados: '1' }, HOY),
+    ).toMatchObject({
       personaId: PERSONA,
-      estado: 'revisado',
+      estado: 'pendiente',
+      anulados: true,
     });
-    expect(filtrosDeControl({ estado: 'borrado' }, HOY).estado).toBeNull();
+    expect(filtrosDeControl({ estado: 'revisado' }, HOY).estado).toBeNull();
   });
 });
 
 describe('enlaceDeControl', () => {
   it('solo con lo que cambio', () => {
-    const filtros = { ...filtrosDeControl({}, HOY), estado: 'anulado' as const, pagina: 2 };
-    expect(enlaceDeControl(filtros, HOY)).toBe('/admin/caja/control?estado=anulado&pagina=2');
+    const filtros = {
+      ...filtrosDeControl({}, HOY),
+      estado: 'cierra' as const,
+      anulados: true,
+      pagina: 2,
+    };
+    expect(enlaceDeControl(filtros, HOY)).toBe(
+      '/admin/caja/control?estado=cierra&anulados=1&pagina=2',
+    );
     expect(enlaceDeControl(filtrosDeControl({}, HOY), HOY)).toBe('/admin/caja/control');
   });
 });
 
 describe('nombres', () => {
   it('de los estados y los medios', () => {
-    expect(nombreDeEstado('esperando_ventas')).toBe('Esperando ventas');
+    expect(nombreDeEstado('pendiente')).toBe('Pendiente');
+    expect(nombreDeEstado('cierra')).toBe('Cierra');
     expect(nombreDeEstado('con_diferencia')).toBe('Con diferencia');
     expect(nombreDeMedio('credito')).toBe('Tarjeta de crédito');
   });
 });
 
-const cierre = {
-  efectivo_centavos: 2500050,
-  credito_centavos: 300000,
-  debito_centavos: 0,
-  qr_centavos: 0,
-  transferencia_centavos: 150000,
-  esperado_efectivo_centavos: null,
-  esperado_credito_centavos: null,
-  esperado_debito_centavos: null,
-  esperado_qr_centavos: null,
-  esperado_transferencia_centavos: null,
-};
-
-describe('mediosDelCierre', () => {
-  it('sin ventas, solo lo declarado', () => {
-    expect(mediosDelCierre(cierre)[0]).toEqual({
-      medio: 'efectivo',
-      declaradoCentavos: 2500050,
-      esperadoCentavos: null,
-      diferenciaCentavos: null,
-    });
-    expect(mediosDelCierre(cierre)).toHaveLength(5);
-  });
-
-  it('con lo esperado, la diferencia de cada medio', () => {
-    const conVentas = {
-      ...cierre,
-      esperado_efectivo_centavos: 2600050,
-      esperado_credito_centavos: 300000,
-    };
-    expect(mediosDelCierre(conVentas)[0]).toMatchObject({ diferenciaCentavos: -100000 });
-    expect(mediosDelCierre(conVentas)[1]).toMatchObject({ diferenciaCentavos: 0 });
+describe('opcionesDeEstado', () => {
+  it('son solo tres: cierra, con diferencia y pendiente', () => {
+    expect(opcionesDeEstado().map((o) => o.valor)).toEqual([
+      'cierra',
+      'con_diferencia',
+      'pendiente',
+    ]);
   });
 });
 

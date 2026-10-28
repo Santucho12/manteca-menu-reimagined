@@ -11,13 +11,13 @@ export type CierreDeclarado = {
 export type ResultadoDeMedio = {
   medio: Medio;
   declaradoCentavos: number;
-  esperadoCentavos: number | null;
-  diferenciaCentavos: number | null;
+  esperadoCentavos: number;
+  diferenciaCentavos: number;
 };
 export type ResultadoDelCierre = {
-  estado: 'esperando_ventas' | 'cierra' | 'con_diferencia';
+  estado: 'cierra' | 'con_diferencia';
   medios: ResultadoDeMedio[];
-  diferenciaTotalCentavos: number | null;
+  diferenciaTotalCentavos: number;
 };
 
 // El efectivo arranca con el fondo y pierde lo que salio de la caja; el resto de los medios
@@ -32,31 +32,32 @@ function esperadoDe(medio: Medio, declarado: CierreDeclarado, ventas: PorMedio):
   );
 }
 
-function medioDe(medio: Medio, declarado: CierreDeclarado, ventas: PorMedio | null) {
+function medioDe(medio: Medio, declarado: CierreDeclarado, ventas: PorMedio): ResultadoDeMedio {
   const declaradoCentavos = declarado.medios[medio];
-  const esperadoCentavos = ventas ? esperadoDe(medio, declarado, ventas) : null;
-  const diferenciaCentavos =
-    esperadoCentavos === null ? null : declaradoCentavos - esperadoCentavos;
-  return { medio, declaradoCentavos, esperadoCentavos, diferenciaCentavos };
+  const esperadoCentavos = esperadoDe(medio, declarado, ventas);
+  return {
+    medio,
+    declaradoCentavos,
+    esperadoCentavos,
+    diferenciaCentavos: declaradoCentavos - esperadoCentavos,
+  };
 }
 
 /**
- * Lo esperado, la diferencia y el estado de un cierre. Sin ventas del dia todavia, espera.
- * Diferencia negativa es faltante; positiva, sobrante. Cierra si ningun medio pasa la
+ * Lo esperado, la diferencia y el estado de un cierre contra las ventas del dia (que pueden ser
+ * cero). Diferencia negativa es faltante; positiva, sobrante. Cierra si ningun medio pasa la
  * tolerancia.
  */
 export function resultadoDelCierre(
   declarado: CierreDeclarado,
-  ventas: PorMedio | null,
+  ventas: PorMedio,
   toleranciaCentavos: number,
 ): ResultadoDelCierre {
   const medios = MEDIOS.map((medio) => medioDe(medio, declarado, ventas));
-  if (!ventas) return { estado: 'esperando_ventas', medios, diferenciaTotalCentavos: null };
-  const diferencias = medios.map((medio) => medio.diferenciaCentavos ?? 0);
-  const cierra = diferencias.every((diferencia) => Math.abs(diferencia) <= toleranciaCentavos);
+  const cierra = medios.every((m) => Math.abs(m.diferenciaCentavos) <= toleranciaCentavos);
   return {
     estado: cierra ? 'cierra' : 'con_diferencia',
     medios,
-    diferenciaTotalCentavos: diferencias.reduce((suma, diferencia) => suma + diferencia, 0),
+    diferenciaTotalCentavos: medios.reduce((suma, m) => suma + m.diferenciaCentavos, 0),
   };
 }

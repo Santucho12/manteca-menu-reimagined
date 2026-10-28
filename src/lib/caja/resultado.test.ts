@@ -11,16 +11,31 @@ const declarado: CierreDeclarado = {
 const ventas = { efectivo: 2120000, credito: 300000, debito: 200000, qr: 0, transferencia: 150000 };
 
 describe('resultadoDelCierre', () => {
-  it('sin ventas espera, y no muestra esperado ni diferencia', () => {
-    const resultado = resultadoDelCierre(declarado, null, 50000);
-    expect(resultado.estado).toBe('esperando_ventas');
-    expect(resultado.diferenciaTotalCentavos).toBeNull();
-    expect(resultado.medios[0]).toEqual({
-      medio: 'efectivo',
-      declaradoCentavos: 2500050,
-      esperadoCentavos: null,
-      diferenciaCentavos: null,
-    });
+  it('un dia sin ventas con plata declarada queda con diferencia', () => {
+    const cero = { efectivo: 0, credito: 0, debito: 0, qr: 0, transferencia: 0 };
+    const solo = { ...declarado, fondoInicialCentavos: 0, retirosCentavos: 0, gastosCentavos: 0 };
+    const resultado = resultadoDelCierre(
+      { ...solo, medios: { ...solo.medios, efectivo: 0, qr: 100000 } },
+      cero,
+      50000,
+    );
+    expect(resultado.estado).toBe('con_diferencia');
+  });
+
+  it('diferencias de signo contrario dentro de la tolerancia cierran y la total es la neta', () => {
+    const resultado = resultadoDelCierre(
+      {
+        ...declarado,
+        fondoInicialCentavos: 0,
+        retirosCentavos: 0,
+        gastosCentavos: 0,
+        medios: { efectivo: 40000, credito: 0, debito: 0, qr: 0, transferencia: 0 },
+      },
+      { efectivo: 0, credito: 0, debito: 0, qr: 40000, transferencia: 0 },
+      50000,
+    );
+    expect(resultado.estado).toBe('cierra');
+    expect(resultado.diferenciaTotalCentavos).toBe(0);
   });
 
   it('el efectivo esperado es fondo mas ventas menos retiros y gastos', () => {
