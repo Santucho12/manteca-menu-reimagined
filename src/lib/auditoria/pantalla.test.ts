@@ -48,6 +48,7 @@ describe('tablasDe', () => {
       'configuracion_de_caja',
     ]);
     expect(tablasDe('menu')).toContain('precios');
+    expect(tablasDe('gastos')).toContain('gastos_por_pagar');
     expect(tablasDe('ventas')).toEqual([
       'ventas',
       'renglones_de_venta',

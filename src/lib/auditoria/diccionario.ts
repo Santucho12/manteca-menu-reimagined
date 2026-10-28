@@ -13,6 +13,7 @@ export const DATOS: Record<string, { modulo: string; dato: string }> = {
   gastos: { modulo: 'Gastos', dato: 'Gasto' },
   gastos_recurrentes: { modulo: 'Gastos', dato: 'Gasto fijo' },
   categorias_de_gasto: { modulo: 'Gastos', dato: 'Categoría de gasto' },
+  gastos_por_pagar: { modulo: 'Gastos', dato: 'Por pagar' },
   cierres_de_caja: { modulo: 'Caja', dato: 'Cierre de caja' },
   retiros_de_caja: { modulo: 'Caja', dato: 'Retiro' },
   configuracion_de_caja: { modulo: 'Caja', dato: 'Tolerancia' },
