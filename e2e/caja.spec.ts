@@ -52,7 +52,9 @@ test('carga el cierre a ciegas y despues ve su resultado completo', async ({ pag
   await page.getByRole('button', { name: 'Guardar cierre' }).click();
   await expect(page).toHaveURL(/\/admin\/caja\/cierres\//);
   await expect(page.getByText('Con diferencia', { exact: true })).toBeVisible();
-  await expect(page.getByText('$25.000,50')).toBeVisible();
+  await expect(page.getByText('$25.000,50').first()).toBeVisible();
+  await expect(page.getByText('Efectivo contado')).toBeVisible();
+  await expect(page.getByText(/Esperado = fondo inicial/)).toBeVisible();
   await expect(page.getByText('Dueño')).toBeVisible();
   await expect(page.getByText('Hielo')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Anular' })).toHaveCount(0);
@@ -62,6 +64,15 @@ test('el fondo inicial viene con lo que quedo en la caja el dia anterior', async
   const { fecha } = await sembrarCierre({ fecha: dia(), quedaEnCajaCentavos: 777700 });
   await page.goto(`/admin/caja?fecha=${diaSiguiente(fecha)}`);
   await expect(page.getByLabel('Fondo inicial')).toHaveValue('7.777');
+});
+
+test('avisa de que dia viene el fondo si ayer no se cargo cierre', async ({ page }) => {
+  const { fecha } = await sembrarCierre({ fecha: dia(), quedaEnCajaCentavos: 777700 });
+  await page.goto(`/admin/caja?fecha=${diaSiguiente(fecha)}`);
+  await expect(page.getByText(/Viene del cierre del/)).toHaveCount(0);
+  await page.goto(`/admin/caja?fecha=${diaSiguiente(diaSiguiente(fecha))}`);
+  await expect(page.getByLabel('Fondo inicial')).toHaveValue('7.777');
+  await expect(page.getByText(`Viene del cierre del ${fechaParaMostrar(fecha)}`)).toBeVisible();
 });
 
 test('no deja cargar dos cierres del mismo dia', async ({ page }) => {
@@ -79,6 +90,16 @@ test('explica lo que falta', async ({ page }) => {
   await expect(page.getByLabel('Efectivo contado')).toHaveAccessibleDescription(
     'Escribí cuánto efectivo hay en la caja.',
   );
+});
+
+test('no deja que quede en la caja mas de lo que se conto', async ({ page }) => {
+  await completar(page, dia());
+  await page.getByLabel('Queda en la caja').fill('250.000');
+  await page.getByRole('button', { name: 'Guardar cierre' }).click();
+  await expect(page.getByLabel('Queda en la caja')).toHaveAccessibleDescription(
+    'No puede quedar más efectivo del que contaste.',
+  );
+  await expect(page).toHaveURL(/\/admin\/caja(\?|$)/);
 });
 
 test('no ve los cierres de otros ni entra al control', async ({ page }) => {

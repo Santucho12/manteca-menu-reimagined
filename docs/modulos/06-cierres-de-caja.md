@@ -146,7 +146,7 @@ Ya no existen «Esperando ventas» ni «Revisado».
 | La diferencia después de guardar | Se muestra, y el empleado puede comentar |
 | Corregir un cierre | Se edita (rediseño del 2026-10-28); antes se anulaba y se cargaba de nuevo |
 | Diferencias chicas | Tolerancia que define el admin |
-| Fondo de cambio | Se declara en cada cierre, precargado con lo que quedó en la caja el día anterior |
+| Fondo de cambio | Se declara en cada cierre, precargado con lo que quedó en el último cierre anterior; si ese no es el de ayer, un aviso dice de qué día viene |
 | Turnos | Un cierre por día (Santiago, 2026-10-09) |
 | Tolerancia de arranque | $500; el admin la cambia |
 | Fecha del cierre | Se ve, con hoy por defecto; no acepta días futuros |

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { diferenciaDeFondo, textoDeFondo, totalDeRetiros } from './fondo';
+import { avisoDelFondo, diferenciaDeFondo, textoDeFondo, totalDeRetiros } from './fondo';
 
 describe('fondo de la caja', () => {
   it('compara el fondo con lo que quedo en el cierre anterior', () => {
@@ -20,5 +20,21 @@ describe('fondo de la caja', () => {
   it('suma los retiros', () => {
     expect(totalDeRetiros([{ monto_centavos: 500000 }, { monto_centavos: 1 }])).toBe(500001);
     expect(totalDeRetiros([])).toBe(0);
+  });
+});
+
+describe('avisoDelFondo', () => {
+  it('no avisa si el fondo viene del cierre de ayer', () => {
+    expect(avisoDelFondo('2026-10-27', '2026-10-28')).toBeNull();
+  });
+
+  it('no avisa si no hay un cierre del que venga', () => {
+    expect(avisoDelFondo(null, '2026-10-28')).toBeNull();
+  });
+
+  it('dice de que dia viene cuando ayer no se cargo', () => {
+    expect(avisoDelFondo('2026-10-19', '2026-10-28')).toBe(
+      'Viene del cierre del 19/10/2026: el día anterior no tiene cierre cargado.',
+    );
   });
 });

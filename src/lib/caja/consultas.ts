@@ -141,6 +141,15 @@ export async function fondoSugerido(cliente: Cliente, fecha: string): Promise<nu
   return comprobar(respuesta, 'el fondo de la caja');
 }
 
+/** El dia del cierre del que sale el fondo sugerido; nulo si todavia no hay ninguno. */
+export async function fechaDelFondoSugerido(
+  cliente: Cliente,
+  fecha: string,
+): Promise<string | null> {
+  const respuesta = await cliente.rpc('cierres_fecha_del_fondo', { la_fecha: fecha });
+  return comprobar(respuesta, 'el dia del fondo de la caja');
+}
+
 export async function toleranciaDeCaja(cliente: Cliente): Promise<number> {
   const respuesta = await cliente
     .from('configuracion_de_caja')

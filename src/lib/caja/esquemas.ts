@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { centavosDeMonto } from '../gastos/plata';
 import { esFechaValida } from '../gastos/vencimientos';
+import { quedaDeMas } from './queda';
 
 /** Un monto de la caja: vacio o cero valen cero (un medio sin ventas); undefined si no se entiende. */
 export function centavosDeCaja(texto: string): number | undefined {
@@ -20,7 +21,7 @@ const montoMayorQueCero = z
   .string()
   .refine((texto) => centavosDeMonto(texto) !== undefined, MAL_ESCRITO);
 
-export const esquemaCierre = z.object({
+const esquemaBase = z.object({
   fecha: z.string().refine(esFechaValida, 'Elegí una fecha válida.'),
   fondoInicial: montoPedido('Escribí con cuánto arrancó la caja.'),
   efectivo: montoPedido('Escribí cuánto efectivo hay en la caja.'),
@@ -48,6 +49,20 @@ export const esquemaCierre = z.object({
   ),
 });
 
+// Lo que queda para mañana sale del efectivo contado: mas que eso es un monto mal escrito.
+function quedaPosible(datos: z.infer<typeof esquemaBase>, ctx: z.RefinementCtx) {
+  const efectivo = centavosDeCaja(datos.efectivo);
+  const queda = centavosDeCaja(datos.quedaEnCaja);
+  if (efectivo === undefined || queda === undefined || !quedaDeMas(efectivo, queda)) return;
+  ctx.addIssue({
+    code: 'custom',
+    path: ['quedaEnCaja'],
+    message: 'No puede quedar más efectivo del que contaste.',
+  });
+}
+
+export const esquemaCierre = esquemaBase.superRefine(quedaPosible);
+
 export const esquemaAnulacionDeCierre = z.object({
   id: z.uuid(),
   motivo: z.string().trim().min(1, 'Escribí el motivo.').max(300, 'Usá hasta 300 caracteres.'),
@@ -55,7 +70,7 @@ export const esquemaAnulacionDeCierre = z.object({
 export const esquemaTolerancia = z.object({ tolerancia: montoPedido('Escribí la tolerancia.') });
 
 /** Editar un cierre: lo mismo que cargarlo, con el cierre que se cambia. */
-export const esquemaEdicion = esquemaCierre.extend({ id: z.uuid() });
+export const esquemaEdicion = esquemaBase.extend({ id: z.uuid() }).superRefine(quedaPosible);
 
 export type DatosDeCierre = z.infer<typeof esquemaCierre>;
 

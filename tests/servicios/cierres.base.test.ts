@@ -2,6 +2,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import {
   cierrePorId,
   diasConCierre,
+  fechaDelFondoSugerido,
   fondoSugerido,
   listarCierres,
   misCierres,
@@ -107,6 +108,15 @@ describe('guardar un cierre', () => {
       .toISOString()
       .slice(0, 10);
     expect(await fondoSugerido(await clienteComo('caja'), siguiente)).toBe(432100);
+  });
+
+  it('dice de que dia viene el fondo sugerido, aunque no sea el de ayer', async () => {
+    const { id, fecha } = await sembrarCierre({ quedaEnCajaCentavos: 432100 });
+    cierres.push(id);
+    const dosDespues = new Date(Date.parse(`${fecha}T12:00:00Z`) + 2 * 86400000)
+      .toISOString()
+      .slice(0, 10);
+    expect(await fechaDelFondoSugerido(await clienteComo('caja'), dosDespues)).toBe(fecha);
   });
 });
 

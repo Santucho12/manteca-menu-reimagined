@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { BOTON_SUAVE } from '@/components/panel/estilos';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPagina } from '@/lib/acceso/servidor';
-import { fondoSugerido } from '@/lib/caja/consultas';
+import { fechaDelFondoSugerido, fondoSugerido } from '@/lib/caja/consultas';
+import { avisoDelFondo } from '@/lib/caja/fondo';
 import { diaEnArgentina } from '@/lib/fechas';
 import { montoParaEditar } from '@/lib/gastos/plata';
 import { esFechaValida } from '@/lib/gastos/vencimientos';
@@ -31,7 +32,10 @@ export default async function CargarCierre({ searchParams }: { searchParams: Par
   const pedida = unValor((await searchParams).fecha);
   // Un dia anterior que quedo sin cargar llega por la URL; un dia futuro o invalido, no.
   const fecha = pedida && esFechaValida(pedida) && pedida <= hoy ? pedida : hoy;
-  const fondo = await fondoSugerido(cliente, fecha);
+  const [fondo, diaDelFondo] = await Promise.all([
+    fondoSugerido(cliente, fecha),
+    fechaDelFondoSugerido(cliente, fecha),
+  ]);
   const inicial = {
     fecha,
     fondoInicial: fondo === null ? '' : montoParaEditar(fondo),
@@ -52,7 +56,7 @@ export default async function CargarCierre({ searchParams }: { searchParams: Par
       ayuda="caja"
     >
       <QuienCarga nombre={perfil.nombre} />
-      <FormularioDeCierre inicial={inicial} />
+      <FormularioDeCierre inicial={inicial} avisoDelFondo={avisoDelFondo(diaDelFondo, fecha)} />
     </Pantalla>
   );
 }

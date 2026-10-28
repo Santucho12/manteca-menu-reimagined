@@ -93,12 +93,12 @@ test('toda la fila del cierre abre su detalle', async ({ page }) => {
 test('cambia la tolerancia', async ({ page }) => {
   try {
     await page.goto('/admin/caja/control');
-    await page.getByRole('button', { name: 'Configurar tolerancia' }).click();
+    await page.getByRole('button', { name: 'Diferencia aceptada' }).click();
     await page.getByLabel('Tolerancia', { exact: true }).fill('750');
     await page.getByRole('button', { name: 'Guardar tolerancia' }).click();
     await expect(page.getByText('Tolerancia guardada.')).toBeVisible();
     await page.reload();
-    await page.getByRole('button', { name: 'Configurar tolerancia' }).click();
+    await page.getByRole('button', { name: 'Diferencia aceptada' }).click();
     await expect(page.getByLabel('Tolerancia', { exact: true })).toHaveValue('750');
   } finally {
     await restaurarTolerancia();

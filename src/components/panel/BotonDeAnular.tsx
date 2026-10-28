@@ -8,7 +8,7 @@ import { AvisoDeError } from '@/components/formularios/AvisoDeError';
 import { Campo } from '@/components/formularios/Campo';
 import { useGuardar } from '@/lib/gastos/useGuardar';
 import type { Resultado } from '@/lib/resultado';
-import { BOTON_CANCELAR, BOTON_PELIGRO } from './estilos';
+import { ACCESO_DE_PELIGRO, BOTON_CANCELAR, ICONO_DE_ACCESO_PELIGRO } from './estilos';
 import { Ventana } from './Ventana';
 
 type Props = {
@@ -53,8 +53,10 @@ export function BotonDeAnular({ id, anular, titulo, ...resto }: Props) {
           <Ban size={16} aria-hidden="true" />
         </button>
       ) : (
-        <button type="button" onClick={abrir} className={BOTON_PELIGRO}>
-          <Ban size={14} aria-hidden="true" />
+        <button type="button" onClick={abrir} className={ACCESO_DE_PELIGRO}>
+          <span className={ICONO_DE_ACCESO_PELIGRO}>
+            <Ban size={15} aria-hidden="true" />
+          </span>
           {texto}
         </button>
       )}

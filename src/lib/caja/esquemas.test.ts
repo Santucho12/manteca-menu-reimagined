@@ -7,6 +7,8 @@ import {
   type DatosDeCierre,
 } from './esquemas';
 
+const IDENTIFICADOR = '6f1c1e0a-2b1d-4c1e-9a6b-1f2e3d4c5b6a';
+
 const datos: DatosDeCierre = {
   fecha: '2026-10-08',
   fondoInicial: '10.000',
@@ -57,6 +59,17 @@ describe('esquemaCierre', () => {
     const sinEfectivo = esquemaCierre.safeParse({ ...datos, efectivo: '' });
     expect(sinEfectivo.error?.issues[0]?.message).toBe('Escribí cuánto efectivo hay en la caja.');
     expect(esquemaCierre.safeParse({ ...datos, quedaEnCaja: '' }).success).toBe(false);
+  });
+
+  it('no deja que quede en la caja mas efectivo del que se conto', () => {
+    const exagerado = esquemaCierre.safeParse({ ...datos, quedaEnCaja: '250.000' });
+    expect(exagerado.error?.issues[0]?.path).toEqual(['quedaEnCaja']);
+    expect(exagerado.error?.issues[0]?.message).toBe(
+      'No puede quedar más efectivo del que contaste.',
+    );
+    expect(
+      esquemaEdicion.safeParse({ ...datos, id: IDENTIFICADOR, quedaEnCaja: '250.000' }).success,
+    ).toBe(false);
   });
 
   it('un retiro pide monto y quien; un gasto, monto y descripcion', () => {
