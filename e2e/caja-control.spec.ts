@@ -98,8 +98,11 @@ test('marca los dias sin cierre y filtra por estado', async ({ page }) => {
   fechas.push(tercero);
   await sembrarCierre({ fecha: tercero });
   await page.goto(`/admin/caja/control?desde=${fecha}&hasta=${tercero}`);
+  await expect(page.getByText(/días? sin cierre/)).toHaveCount(1);
+  await page.getByText(/días? sin cierre/).click();
+  const aviso = page.getByRole('list', { name: 'Días sin cierre' });
   await expect(
-    page.getByText(`Sin cierre: ${fechaParaMostrar(diaSiguiente(fecha))}`),
+    aviso.getByRole('link', { name: fechaParaMostrar(diaSiguiente(fecha)) }),
   ).toBeVisible();
   await page.getByLabel('Estado').selectOption({ label: 'Anulado' });
   await expect(page).toHaveURL(/estado=anulado/);

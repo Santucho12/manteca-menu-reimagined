@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { BOTON_DE_ENCABEZADO } from '@/components/panel/estilos';
 import { Paginas } from '@/components/panel/Paginas';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { Seccion } from '@/components/panel/Seccion';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import {
   diasConCierre,
@@ -21,7 +20,7 @@ import { montoParaEditar } from '@/lib/gastos/plata';
 import { cantidadDePaginas } from '@/lib/usuarios/presentacion';
 import { ListaDeCierres } from '../ListaDeCierres';
 import { DiasSinCierre, FiltrosDelControl } from './FiltrosDelControl';
-import { FormularioDeTolerancia } from './FormularioDeTolerancia';
+import { ToleranciaEnTuerca } from './ToleranciaEnTuerca';
 
 export const metadata: Metadata = { title: 'Control de cierres' };
 
@@ -45,10 +44,13 @@ async function datosDelControl(searchParams: Promise<ParametrosDeControl>) {
   return { hoy, filtros, lista, personas, tolerancia, faltan, fondos };
 }
 
-const Acceso = () => (
-  <Link href="/admin/caja" className={BOTON_DE_ENCABEZADO}>
-    <Plus size={18} aria-hidden="true" /> Cargar cierre
-  </Link>
+const Acciones = ({ tolerancia }: { tolerancia: string }) => (
+  <>
+    <ToleranciaEnTuerca inicial={tolerancia} />
+    <Link href="/admin/caja" className={BOTON_DE_ENCABEZADO}>
+      <Plus size={18} aria-hidden="true" /> Cargar cierre
+    </Link>
+  </>
 );
 
 export default async function ControlDeCierres({
@@ -62,12 +64,9 @@ export default async function ControlDeCierres({
     <Pantalla
       titulo="Control de cierres"
       subtitulo="Los cierres de cada día, quién los cargó y si cierran."
-      acciones={<Acceso />}
+      acciones={<Acciones tolerancia={montoParaEditar(tolerancia)} />}
       ayuda="control"
     >
-      <Seccion titulo="Tolerancia">
-        <FormularioDeTolerancia inicial={montoParaEditar(tolerancia)} />
-      </Seccion>
       <FiltrosDelControl filtros={filtros} personas={personas} />
       <DiasSinCierre dias={filtros.estado || filtros.personaId ? [] : faltan} />
       <ListaDeCierres filas={lista.filas} conPersona fondos={fondos} />

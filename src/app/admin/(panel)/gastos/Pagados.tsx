@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { Paginas } from '@/components/panel/Paginas';
+import { ETIQUETA } from '@/components/panel/estilos';
 import { PanelDeLista } from '@/components/panel/PanelDeLista';
 import type { ListaDeGastos as Lista, OpcionDeCategoria } from '@/lib/gastos/consultas';
 import { esElMesDeHoy, mesAnterior, mesSiguiente, nombreDelMes } from '@/lib/gastos/meses';
@@ -20,7 +21,7 @@ type Props = {
 };
 
 const FLECHA =
-  'p-2 rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors';
+  'size-9 inline-flex items-center justify-center rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 active:scale-95 transition-all';
 const TIPOS: { tipo: TipoDeGasto | null; texto: string }[] = [
   { tipo: null, texto: 'Todos' },
   { tipo: 'fijos', texto: 'Fijos' },
@@ -30,15 +31,15 @@ const TIPOS: { tipo: TipoDeGasto | null; texto: string }[] = [
 function MesConFlechas({ filtros, hoy }: Pick<Props, 'filtros' | 'hoy'>) {
   const ir = (mes: string) => enlaceDeGastos({ ...filtros, mes, pagina: 1 }, hoy);
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1 p-1 rounded-2xl bg-card border border-border shadow-xs">
       <Link href={ir(mesAnterior(filtros.mes))} aria-label="Mes anterior" className={FLECHA}>
         <ChevronLeft size={16} aria-hidden="true" />
       </Link>
-      <span className="min-w-[8.5rem] text-center text-sm font-bold capitalize">
+      <span className="min-w-[8.5rem] text-center font-display text-sm font-bold capitalize">
         {nombreDelMes(filtros.mes)}
       </span>
       {esElMesDeHoy(filtros.mes, hoy) ? (
-        <span className="w-8" aria-hidden="true" />
+        <span className="size-9" aria-hidden="true" />
       ) : (
         <Link href={ir(mesSiguiente(filtros.mes))} aria-label="Mes siguiente" className={FLECHA}>
           <ChevronRight size={16} aria-hidden="true" />
@@ -50,16 +51,19 @@ function MesConFlechas({ filtros, hoy }: Pick<Props, 'filtros' | 'hoy'>) {
 
 function Tipos({ filtros, hoy }: Pick<Props, 'filtros' | 'hoy'>) {
   return (
-    <nav aria-label="Tipo de gasto" className="flex gap-1 p-1 rounded-xl bg-secondary/40">
+    <nav
+      aria-label="Tipo de gasto"
+      className="flex gap-1 p-1.5 rounded-2xl bg-card border border-border"
+    >
       {TIPOS.map(({ tipo, texto }) => (
         <Link
           key={texto}
           href={enlaceDeGastos({ ...filtros, tipo, pagina: 1 }, hoy)}
           aria-current={filtros.tipo === tipo ? 'true' : undefined}
           className={cn(
-            'px-3 h-8 inline-flex items-center rounded-lg text-xs font-bold transition-all',
+            'px-4 h-9 inline-flex items-center rounded-xl text-sm font-bold transition-all',
             filtros.tipo === tipo
-              ? 'bg-white text-primary shadow-xs'
+              ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
               : 'text-muted-foreground hover:text-foreground',
           )}
         >
@@ -88,8 +92,11 @@ export function Pagados({ lista, filtros, hoy, categorias }: Props) {
           <Tipos filtros={filtros} hoy={hoy} />
           <CategoriaQueSeAplicaSola filtros={filtros} hoy={hoy} categorias={categorias} />
         </div>
-        <p className="font-display text-lg font-bold">
-          Total: {formatearPesos(lista.totalCentavos)}
+        <p className="rounded-2xl bg-secondary/40 px-4 py-2 flex items-baseline gap-2">
+          <span className={ETIQUETA}>Total:</span>{' '}
+          <strong className="font-display text-xl font-bold tracking-tight">
+            {formatearPesos(lista.totalCentavos)}
+          </strong>
         </p>
       </div>
       <ListaDeGastos filas={lista.filas} vacio={vacio} />
