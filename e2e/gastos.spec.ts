@@ -146,3 +146,32 @@ for (const rol of ['caja', 'invitado'] as const) {
     });
   });
 }
+
+test('una tarjeta por categoria con sus gastos y su total, que filtra la lista', async ({
+  page,
+}) => {
+  const { id, nombre } = await categoria();
+  const otra = await categoria();
+  await sembrarGasto({ categoriaId: id, fecha: HOY, montoCentavos: 100000 });
+  await sembrarGasto({ categoriaId: id, fecha: HOY, montoCentavos: 50000 });
+  await sembrarGasto({ categoriaId: otra.id, fecha: HOY, montoCentavos: 7000 });
+  await page.goto('/admin/gastos');
+  const tarjetas = page.getByRole('list', { name: 'Categorías del mes' });
+  const suya = tarjetas.getByRole('listitem').filter({ hasText: nombre });
+  await expect(suya).toContainText('2 gastos');
+  await expect(suya).toContainText('$1.500,00');
+  await expect(tarjetas.getByRole('listitem').filter({ hasText: otra.nombre })).toContainText(
+    '1 gasto',
+  );
+  await suya.locator('summary').click();
+  await expect(
+    page.getByRole('list', { name: `Gastos de ${nombre}` }).getByRole('listitem'),
+  ).toHaveCount(2);
+  await suya.getByRole('link', { name: 'Filtrar la lista' }).click();
+  await expect(page).toHaveURL(new RegExp(`categoria=${id}`));
+  await expect(filas(page, 'Gastos')).toHaveCount(2);
+  await expect(tarjetas.getByRole('listitem').filter({ hasText: otra.nombre })).toBeVisible();
+  await suya.locator('summary').click();
+  await suya.getByRole('link', { name: 'Ver todos los gastos' }).click();
+  await expect(page).not.toHaveURL(/categoria=/);
+});

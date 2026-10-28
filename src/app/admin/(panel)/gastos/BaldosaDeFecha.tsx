@@ -12,17 +12,29 @@ export function BaldosaDeFecha({
   fecha,
   viene = false,
   vencido = false,
+  chica = false,
 }: {
   fecha: string;
   viene?: boolean;
   vencido?: boolean;
+  chica?: boolean;
 }) {
   const { dia, mes } = fechaCorta(fecha);
   const tono = vencido ? 'vencido' : viene ? 'viene' : 'paso';
   return (
-    <div className={cn('w-11 shrink-0 rounded-xl border py-1.5 text-center', TONOS[tono])}>
-      <p className="font-display text-base font-bold leading-none">{dia}</p>
-      <p className="text-[10px] font-bold uppercase tracking-wider">{mes}</p>
+    <div
+      className={cn(
+        'shrink-0 rounded-xl border text-center',
+        chica ? 'w-9 py-1' : 'w-11 py-1.5',
+        TONOS[tono],
+      )}
+    >
+      <p className={cn('font-display font-bold leading-none', chica ? 'text-sm' : 'text-base')}>
+        {dia}
+      </p>
+      <p className={cn('font-bold uppercase tracking-wider', chica ? 'text-[9px]' : 'text-[10px]')}>
+        {mes}
+      </p>
     </div>
   );
 }
