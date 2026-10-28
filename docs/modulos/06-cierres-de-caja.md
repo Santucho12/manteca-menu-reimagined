@@ -47,13 +47,17 @@ esperado.
 
 ## Estados de un cierre
 
+Rediseño del 2026-10-28 (pedido 66): dos estados y uno para lo que falta. El estado **no se
+guarda**: se calcula siempre al mostrar, contra las ventas del día en ese momento.
+
 | Estado | Qué significa |
 |---|---|
-| Esperando ventas | Se guardó, pero todavía no entraron las ventas de ese día |
-| Cierra | La diferencia de cada medio está dentro de la tolerancia |
-| Con diferencia | Algún medio supera la tolerancia |
-| Revisado | El admin lo miró y lo marcó |
-| Anulado | No cuenta. Sigue en el historial, con su motivo |
+| Cierra | La diferencia de cada medio con las ventas del día está dentro de la tolerancia |
+| Con diferencia | Algún medio supera la tolerancia (sin ventas ese día, lo esperado es $0) |
+| Pendiente | El día todavía no tiene cierre cargado |
+
+Un cierre anulado no es un estado: sigue en el historial con su motivo y se ve con «Ver anulados».
+Ya no existen «Esperando ventas» ni «Revisado».
 
 ## Pantallas
 
@@ -79,7 +83,7 @@ esperado.
 - Los días sin cierre aparecen marcados.
 - Al abrir uno: lo declarado, lo esperado y la diferencia de cada medio; los retiros; los
   gastos de caja; las ventas canceladas y sin medio de pago; el comentario del empleado.
-- Acciones: marcar como revisado, con comentario opcional, y anular.
+- Acciones: editar y anular (solo el admin anula). No se marca como revisado.
 
 ### Tolerancia
 
@@ -91,15 +95,15 @@ esperado.
 1. El empleado cuenta a ciegas: no ve lo esperado hasta guardar.
 2. Un cierre por día. El segundo intento se rechaza.
 3. El cierre queda a nombre de quien tiene la sesión iniciada. No se puede elegir a otro.
-4. Un cierre guardado no se edita. Si está mal, el admin lo anula con motivo y se carga de
-   nuevo. El anulado deja libre ese día.
+4. Un cierre guardado se puede editar: Caja el suyo y el admin cualquiera. Cada cambio queda
+   en la auditoría con el valor anterior y el nuevo. El admin puede anularlo, con motivo; el
+   anulado deja libre ese día.
 5. Caja no puede anular.
-6. El cierre no espera a las ventas: se guarda igual y se calcula cuando entran.
+6. El cierre no espera a las ventas: se guarda igual y su resultado se calcula al mostrarlo.
 7. Cada gasto pagado con la caja crea un gasto "Sin clasificar" en Gastos, con el monto y la
    descripción que escribió el empleado.
 8. Anular un cierre anula también los gastos que salieron de él.
-9. Si cambian las ventas de un día con cierre revisado, el cierre se recalcula y pierde la
-   marca de revisado.
+9. Si cambian las ventas de un día, el resultado cambia solo, porque se calcula al mostrar.
 10. Se puede cargar el cierre de un día anterior que quedó sin cargar. No se puede cargar
     uno de un día futuro.
 
@@ -140,7 +144,7 @@ esperado.
 |---|---|
 | Lo esperado antes de declarar | No se muestra |
 | La diferencia después de guardar | Se muestra, y el empleado puede comentar |
-| Corregir un cierre | Lo anula el admin y se carga de nuevo |
+| Corregir un cierre | Se edita (rediseño del 2026-10-28); antes se anulaba y se cargaba de nuevo |
 | Diferencias chicas | Tolerancia que define el admin |
 | Fondo de cambio | Se declara en cada cierre, precargado con lo que quedó en la caja el día anterior |
 | Turnos | Un cierre por día (Santiago, 2026-10-09) |
@@ -148,7 +152,7 @@ esperado.
 | Fecha del cierre | Se ve, con hoy por defecto; no acepta días futuros |
 | Quién retiró | Texto libre |
 | Gasto que sale de un cierre | En Gastos se clasifica; su monto, su fecha y su medio se corrigen anulando el cierre |
-| Antes de que exista Ventas | El cierre se guarda y queda "Esperando ventas" |
+| Sin ventas ese día | Lo esperado es $0 y el cierre queda «Con diferencia» (2026-10-28) |
 
 ## Sin decidir
 

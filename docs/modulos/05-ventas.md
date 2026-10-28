@@ -105,8 +105,8 @@ Si los pagos de una venta suman menos que su total, la parte sin pago se muestra
    sincronización trae el cambio.
 2. "El día" de una venta es el día calendario en Argentina en que se cerró.
 3. Lo cancelado y lo anulado no cuentan en ningún total y siguen visibles.
-4. Si una venta ya traída cambia y había un cierre revisado de ese día, el cierre se
-   recalcula y pierde la marca de revisado.
+4. Si una venta ya traída cambia, el resultado del cierre de ese día cambia solo: se
+   calcula al mostrar.
 5. Los precios de una venta de Fudo son los de Fudo, no los del menú del sistema.
 6. El sistema solo lee de Fudo. No escribe nada.
 
@@ -190,4 +190,4 @@ excepción de Santiago a la regla de "Sin confirmar". El detalle está en
 
 Queda para cuando estén las credenciales de Fudo: traer las ventas (la noche, "Actualizar
 ahora" y al guardar un cierre), vincular productos y medios de pago de Fudo, y calcular lo
-esperado en los cierres. Hasta entonces los cierres siguen "Esperando ventas".
+esperado en los cierres. Desde el pedido 66 el resultado del cierre se calcula al mostrar con las ventas del día.

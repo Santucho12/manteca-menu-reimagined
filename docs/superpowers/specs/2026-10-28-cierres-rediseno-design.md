@@ -46,8 +46,9 @@ Para un cierre no anulado, de un local y una fecha:
 - **Sin ventas ese día** el esperado de cada medio de venta es $0 (el de efectivo es el fondo
   menos retiros y gastos): un cierre con plata declarada queda «Con diferencia». No hay estado
   «esperando ventas».
-- **Pendiente:** un día entre el primer cierre del local y ayer **sin** cierre no anulado. Hoy no
-  es pendiente hasta que pase el día (decisión mía: sigue como hoy, `dias.ts`).
+- **Pendiente:** un día entre el primer cierre del local y hoy **sin** cierre no anulado (como
+  hoy en `dias.ts`: hoy cuenta). El aviso de Inicio de «con diferencia» mira la última semana,
+  porque sin «Revisado» no habría cómo apagarlo (decisión mía).
 
 `resultadoDelCierre` (`src/lib/caja/resultado.ts`) sigue siendo la única regla de la cuenta;
 la base trae los insumos ya sumados.

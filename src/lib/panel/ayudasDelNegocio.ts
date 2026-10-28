@@ -82,13 +82,13 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         puntos: [
           'Hay un cierre por día: un segundo cierre del mismo día no se guarda.',
           'Podés cargar el de un día anterior que quedó sin cargar, pero no uno de un día futuro.',
-          'Un cierre guardado no se cambia. Si te equivocaste, avisale al admin: lo anula con un motivo y lo cargás de nuevo.',
+          'Si te equivocaste, abrí el cierre y tocá Editar: el resultado se vuelve a calcular. El admin también puede anularlo, con un motivo.',
         ],
       },
       {
         titulo: 'Después de guardar',
         puntos: [
-          'El cierre queda Esperando ventas: el resultado aparece cuando entran las ventas del día.',
+          'Ves el resultado enseguida: Cierra si lo que contaste coincide con las ventas del día, o Con diferencia si no.',
           'En Mis cierres ves los que cargaste vos, con su estado. Los de otros no se ven.',
         ],
       },
@@ -101,18 +101,17 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
       {
         titulo: 'Los estados',
         puntos: [
-          'Esperando ventas: está guardado, pero todavía no entraron las ventas del día para compararlo.',
-          'Cierra: lo contado coincide con lo esperado, o la diferencia es menor que la tolerancia.',
+          'Pendiente: el día todavía no tiene cierre cargado.',
+          'Cierra: lo contado coincide con las ventas del día, o la diferencia es menor que la tolerancia.',
           'Con diferencia: en algún medio de pago falta o sobra más que la tolerancia.',
-          'Revisado: ya lo controlaste.',
-          'Anulado: no cuenta, y ese día queda libre para cargarlo de nuevo.',
+          'Anulado: no cuenta, y ese día queda libre para cargarlo de nuevo. Se ve con Ver anulados.',
         ],
       },
       {
         titulo: 'La lista',
         puntos: [
           'Filtrá por fechas, persona y estado.',
-          'Los días sin cierre aparecen marcados, con el botón para cargarlo.',
+          'Los días pendientes aparecen en una franja que se abre, con el botón para cargar cada uno. El estado Pendiente los lista.',
           'Fondo distinto avisa que la caja arrancó con otro monto del que quedó el día anterior: puede tapar un faltante. El detalle dice cuánto.',
         ],
       },
@@ -124,10 +123,10 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         ],
       },
       {
-        titulo: 'Revisar y anular',
+        titulo: 'Editar y anular',
         puntos: [
           'Al abrir un cierre ves lo declarado en cada medio, los retiros, los gastos de caja y el comentario de quien lo cargó.',
-          'Marcá como revisado cuando lo controlaste, con un comentario si querés.',
+          'Editar cambia lo declarado, los retiros y los gastos de caja; cada cambio queda en la auditoría.',
           'Un cierre no se borra: se anula con un motivo, y los gastos que salieron de él quedan anulados también.',
         ],
       },

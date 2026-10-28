@@ -24,7 +24,7 @@ Aparece solo si hay algo pendiente. Cada aviso lleva a la pantalla donde se resu
 
 | Aviso | Lleva a |
 |---|---|
-| Cierres con diferencia sin revisar | Control de cierres |
+| Cierres con diferencia de la última semana | Control de cierres |
 | Ayer no se cargó el cierre | Control de cierres |
 | Personas que esperan un rol | Usuarios |
 | Productos de Fudo sin vincular | Vinculación |
@@ -134,7 +134,7 @@ Construido el 2026-10-12 (pedido 33). Diseño en `docs/superpowers/specs/2026-10
 
 | Aviso | Cuenta | Lleva a |
 |---|---|---|
-| Cierres con diferencia sin revisar | Cierres en estado `con_diferencia` (revisado y anulado tienen otro estado) | `/admin/caja/control?estado=con_diferencia&desde=…` |
+| Cierres con diferencia de la última semana | Cierres no anulados de los últimos 7 días cuyo resultado contra las ventas es `con_diferencia` | `/admin/caja/control?estado=con_diferencia&desde=…` |
 | Ayer no se cargó el cierre | Ayer sin cierre sin anular, con algún cierre anterior | `/admin/caja/control?desde=<ayer>&hasta=<ayer>` |
 | Personas esperando un rol | `contarPendientes` | `/admin/usuarios?estado=pendientes` |
 | Gastos sin clasificar | Gastos sin anular de la categoría de sistema | `/admin/gastos` (Para clasificar, de cualquier mes; pedido 58) |
