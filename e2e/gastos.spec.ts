@@ -4,6 +4,7 @@ import { mesAnterior, nombreDelMes } from '../src/lib/gastos/meses';
 import { sumarDias } from '../src/lib/reportes/periodos';
 import {
   borrarCategoriasConSusGastos,
+  pagarLoDelFijo,
   sembrarCategoriaDeGasto,
   sembrarGasto,
   sembrarRecurrente,
@@ -42,8 +43,11 @@ test('el mes va con flechas y no pasa al que no llegó', async ({ page }) => {
 
 test('Pagados marca los fijos y la pastilla Fijos filtra con su total', async ({ page }) => {
   const { id, nombre } = await categoria();
-  await sembrarRecurrente({ categoria: nombre, primerVencimiento: HOY });
+  const fijo = await sembrarRecurrente({ categoria: nombre, primerVencimiento: HOY });
   await sembrarGasto({ categoriaId: id, fecha: HOY, montoCentavos: 123450 });
+  // Al abrir, lo de hoy queda por pagar; pagado, pasa a Pagados.
+  await page.goto('/admin/gastos');
+  await pagarLoDelFijo(fijo.id, HOY);
   await page.goto(`/admin/gastos?categoria=${id}`);
   await expect(filas(page, 'Gastos')).toHaveCount(2);
   await expect(filas(page, 'Gastos').filter({ hasText: 'Fijo · Todos los meses' })).toHaveCount(1);
@@ -80,7 +84,9 @@ test('Próximos pagos: cada fijo activo, por fecha, y los pausados aparte', asyn
   expect(lugar(pausado.nombre)).toBe(-1);
   const fila = filas(page, 'Próximos pagos').filter({ hasText: pronto.nombre });
   await expect(fila).toContainText('En 3 días');
-  await expect(page.getByText(/Falta pagar este mes|Este mes no quedan pagos fijos/)).toBeVisible();
+  await expect(
+    page.getByText(/Falta pagar este mes|Este mes no queda nada por pagar/),
+  ).toBeVisible();
   await page.getByText(/^Pausados \(\d+\)$/).click();
   await expect(filas(page, 'Pausados').filter({ hasText: pausado.nombre })).toBeVisible();
 });

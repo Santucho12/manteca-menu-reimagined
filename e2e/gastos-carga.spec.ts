@@ -6,6 +6,7 @@ import { sumarDias } from '../src/lib/reportes/periodos';
 import { clienteSecretoDePruebas } from '../tests/clientes';
 import {
   borrarCategoriasConSusGastos,
+  pagarLoDelFijo,
   sembrarCategoriaDeGasto,
   sembrarRecurrente,
 } from '../tests/gastos-de-prueba';
@@ -72,9 +73,7 @@ test('¿Se repite? dice qué va a pasar y esconde el comprobante', async ({ page
   await expect(page.getByLabel('Comprobante (opcional)')).toBeVisible();
   await page.getByRole('radio', { name: 'Todos los meses' }).check();
   const dia = Number(HOY.slice(8));
-  await expect(
-    page.getByText(`Se carga hoy y después todos los meses, el día ${dia}.`),
-  ).toBeVisible();
+  await expect(page.getByText(`Vence hoy y después todos los meses, el día ${dia}.`)).toBeVisible();
   await expect(page.getByLabel('Comprobante (opcional)')).toHaveCount(0);
   await page.getByRole('radio', { name: 'No' }).check();
   await expect(page.getByLabel('Comprobante (opcional)')).toBeVisible();
@@ -101,7 +100,7 @@ test('sin repetición no deja elegir un día futuro; con repetición sí', async
   await abrirElMesSiguiente(page);
   await page.getByRole('button', { name: fechaParaMostrar(dia) }).click();
   await expect(page.getByLabel('Fecha')).toHaveText(fechaParaMostrar(dia));
-  const resumen = `Se carga el ${fechaParaMostrar(dia).slice(0, 5)} y después todos los meses`;
+  const resumen = `Vence el ${fechaParaMostrar(dia).slice(0, 5)} y después todos los meses`;
   await expect(page.getByText(resumen)).toBeVisible();
   await completar(page, nombre);
   await guardar(page);
@@ -110,7 +109,7 @@ test('sin repetición no deja elegir un día futuro; con repetición sí', async
   ]);
 });
 
-test('un fijo de hoy se guarda y su pago ya queda cargado', async ({ page }) => {
+test('un fijo de hoy se guarda y su pago queda por pagar', async ({ page }) => {
   const { id, nombre } = await categoria();
   await page.goto('/admin/gastos/nuevo');
   await page.getByRole('radio', { name: 'Todos los meses' }).check();
@@ -118,16 +117,22 @@ test('un fijo de hoy se guarda y su pago ya queda cargado', async ({ page }) => 
   await guardar(page);
   const { gastos, fijos } = await cargados(id);
   expect(fijos).toHaveLength(1);
-  expect(gastos).toMatchObject([{ fecha: HOY, recurrente_id: fijos[0]!.id }]);
+  expect(gastos).toEqual([]);
+  const fila = page
+    .getByRole('list', { name: 'Próximos pagos' })
+    .getByRole('listitem')
+    .filter({ hasText: nombre });
+  await expect(fila.filter({ hasText: 'Vence hoy' })).toHaveCount(1);
 });
 
-test('el gasto que cargó un fijo dice de qué fijo vino', async ({ page }) => {
-  const { id, nombre } = await categoria();
+test('el pago de un fijo dice de qué fijo es y que anulado vuelve', async ({ page }) => {
+  const { nombre } = await categoria();
   const fijo = await sembrarRecurrente({ categoria: nombre, primerVencimiento: HOY });
   await page.goto('/admin/gastos');
-  const [gasto] = (await cargados(id)).gastos;
-  await page.goto(`/admin/gastos/${gasto!.id}`);
-  await expect(page.getByText(/Lo cargó solo el gasto fijo/)).toBeVisible();
+  const [pago] = await pagarLoDelFijo(fijo.id, HOY);
+  await page.goto(`/admin/gastos/${pago}`);
+  await expect(page.getByText(/Es un pago del gasto fijo/)).toBeVisible();
+  await expect(page.getByText(/Si lo anulás, vuelve a Próximos pagos/)).toBeVisible();
   await expect(page.getByRole('link', { name: 'editá el gasto fijo' })).toHaveAttribute(
     'href',
     `/admin/gastos/fijos/${fijo.id}`,

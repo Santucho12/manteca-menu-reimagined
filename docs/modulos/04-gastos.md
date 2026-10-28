@@ -39,16 +39,32 @@ cierre. No se puede elegir a mano ni desactivar.
 
 ## Gastos fijos
 
-Un gasto fijo (en la base, `gastos_recurrentes`) se carga solo cada vez que toca: categoría,
-monto, descripción, proveedor, medio de pago, frecuencia y día. Hasta el 2026-10-27 se llamaban
-"recurrentes" (Santiago no los entendía con ese nombre, pedido 58).
+Un gasto fijo (en la base, `gastos_recurrentes`) deja un pago por pagar cada vez que toca:
+categoría, monto, descripción, proveedor, medio de pago, frecuencia y día. Hasta el 2026-10-27 se
+llamaban "recurrentes" (Santiago no los entendía con ese nombre, pedido 58).
 
 - Frecuencia: mensual, bimestral o anual.
 - Se cargan desde "Cargar gasto", eligiendo cada cuánto se repite.
-- El día que toca, el sistema crea el gasto solo, con el monto del fijo.
-- **El gasto nace ya contado** en el resultado del mes, sin esperar confirmación.
-- En la lista queda marcado "Fijo · Todos los meses", para que se lo pueda revisar.
-- Si ese mes el monto fue otro, el admin lo edita. Si no se pagó, lo anula.
+- El día que toca, el pago queda **por pagar**, con el monto del fijo, en Próximos pagos.
+- **Cuenta en el resultado cuando se marca Pagado**, con la fecha en que se pagó (Santiago,
+  2026-10-28, pedido 65). Hasta entonces nacía ya contado.
+- Su pago queda marcado "Fijo · Todos los meses" en Pagados.
+- Si ese mes el monto fue otro, se corrige al marcarlo pagado. Si no se paga, se quita con
+  "No se paga", con motivo.
+- Se puede marcar pagado antes de que venza, desde su próximo pago.
+
+## Por pagar (pedido 65, 2026-10-28)
+
+Lo que todavía no se pagó y se va a pagar en el corto plazo, como una factura que vence en unos
+días, se anota con "¿Ya lo pagaste? Todavía no". Queda con su vencimiento, en Próximos pagos, y
+**no cuenta en el resultado hasta que se paga**.
+
+- **Pagado** abre una ventana con la fecha (hoy), el monto y el medio de pago ya completos: se
+  confirma o se corrige. El gasto pasa a Pagados con la fecha del pago.
+- **No se paga** lo quita, con motivo. Nada se borra.
+- Si se anula el gasto de un pago, vuelve a Próximos pagos.
+- Lo vencido queda arriba, en rosa.
+- Se paga entero: no hay pagos parciales.
 
 ## Pantallas (pedido 58, 2026-10-27)
 
@@ -62,8 +78,9 @@ Una sola pantalla con todo a la vista:
   pastillas Todos, Fijos y De caja, y la categoría, que se aplica sola. Total de lo filtrado sin
   lo anulado, paginado de a 25. Cada fila: fecha, nombre, categoría, proveedor si tiene, medio,
   marcas (Fijo, De caja, Anulado) y monto.
-- **Próximos pagos**: cada fijo activo con su próximo pago, del más cercano al más lejano, y
-  lo que falta pagar este mes. Los pausados, aparte.
+- **Próximos pagos**: lo por pagar y el próximo pago de cada fijo activo, del más cercano al más
+  lejano, con Pagado y (en lo ya anotado) No se paga, y lo que falta pagar este mes, con lo
+  vencido. Los pausados, aparte (pedido 65).
 - **Categorías**, en una ventana: sumar, renombrar, desactivar y reactivar, con "Pide
   proveedor".
 
@@ -72,14 +89,15 @@ arriba.
 
 ### Cargar gasto y Gasto
 
-Un solo formulario: fecha con calendario propio y atajos Hoy y Ayer, "¿Se repite?", categoría,
-proveedor (si la categoría lo pide), monto, descripción, medio y comprobante (si no se repite).
-Un gasto que no se repite no puede tener fecha futura.
+Un solo formulario: "¿Se repite?", "¿Ya lo pagaste?" (si no se repite), la fecha con calendario
+propio, categoría, proveedor (si la categoría lo pide), monto, descripción, medio y comprobante
+(si no se repite). Un gasto pagado no puede tener fecha futura. Con "Todavía no", la fecha se
+llama "Vence el", puede ser cualquiera y el medio es opcional (pedido 65).
 
 ### Gasto fijo (`/admin/gastos/fijos/[id]`)
 
-Editar, "Próximo pago" con el calendario, pausar y reactivar, y los últimos seis pagos que
-cargó.
+Editar, "Próximo pago" con el calendario, pausar y reactivar, y los últimos seis pagos
+("Pagos").
 
 ## Reglas
 
@@ -103,15 +121,23 @@ cargó.
     no lo duplica: cada formulario lleva su clave.
 12. El proveedor se pide solo en las categorías que lo piden. Un gasto viejo que ya tenía uno lo
     conserva mientras no le cambien la categoría (pedido 58).
+13. Lo por pagar no cuenta en ningún total hasta que se paga; el pago cuenta en su fecha.
+14. Lo por pagar tiene un solo pago vigente: pagarlo dos veces no lo duplica. Anulado el pago,
+    vuelve a estar por pagar.
+15. Lo pagado no se quita con "No se paga": se anula el pago. Lo quitado no se paga.
+16. Un fijo deja un solo por pagar por vencimiento, aunque se haya quitado. Pagarlo antes de
+    que venza vale solo para un vencimiento del fijo posterior a hoy.
 
 ## Casos de borde
 
-- Un recurrente con el monto desactualizado sigue generando el monto viejo hasta que se
-  edite la plantilla. Es la consecuencia de que nazcan ya contados: el resultado del mes
-  puede estar mal sin que nadie lo note. La marca "generado automáticamente" es el resguardo.
-- El proceso que genera los recurrentes no corrió un día: al día siguiente genera lo
+- Un fijo con el monto desactualizado deja por pagar el monto viejo hasta que se edite; se
+  corrige al marcarlo pagado.
+- El proceso que genera los fijos no corrió un día: al día siguiente deja por pagar lo
   atrasado, con la fecha que correspondía.
-- Se anula un gasto generado por un recurrente: no se vuelve a generar para ese período.
+- Se quita con "No se paga" el pago de un fijo: no se vuelve a generar para ese período.
+- Los gastos que los fijos cargaron pagados antes del pedido 65 quedan como estaban y no se
+  vuelven a generar.
+- Se desactiva la categoría o el proveedor de algo por pagar: se paga igual.
 - Se carga un gasto con fecha de un mes anterior: cuenta en ese mes y cambia su resultado.
 - Doble clic en "Guardar": no crea dos gastos.
 - Se anula el cierre del que vino un gasto: se define en el módulo de Cierres.
@@ -120,12 +146,13 @@ cargó.
 
 - Cada alta, cambio y anulación de un gasto, con el valor anterior y el nuevo y el motivo.
 - Cada alta, cambio y desactivación de una plantilla recurrente y de una categoría.
-- Los gastos generados automáticamente figuran como hechos por el sistema.
+- Cada alta y anulación de lo por pagar; lo que deja un fijo figura como hecho por el sistema.
 
 ## Fuera de alcance
 
 - Foto del comprobante.
-- Cuentas a pagar: vencimientos, pagos parciales y saldos pendientes.
+- Pagos parciales, saldos pendientes y editar lo por pagar (se corrige al pagarlo).
+- Avisar en Inicio lo vencido.
 - Recurrentes semanales o con otra frecuencia.
 - Que Caja cargue o vea gastos.
 - El módulo Compras: recepción, stock y costo de los insumos.
@@ -136,7 +163,7 @@ cargó.
 |---|---|---|
 | Las compras de materia prima no son gastos | Se cargan como gasto, en Mercadería | Sin el módulo Compras no quedarían registradas |
 | Recurrentes mensuales | Mensuales, bimestrales y anuales | Decisión de Santiago |
-| Pagos y vencimientos en el flujo de fondos | No hay vencimientos | Cuentas a pagar queda afuera |
+| Pagos y vencimientos en el flujo de fondos | Lo por pagar con su vencimiento, sin pagos parciales | Decisión de Santiago (2026-10-28, pedido 65) |
 
 ## Decisiones tomadas
 
@@ -147,7 +174,9 @@ cargó.
 | Nombre de los recurrentes | Gastos fijos (Santiago, 2026-10-27) |
 | Pantalla | Una sola: Para clasificar, Pagados por mes y Próximos pagos; categorías en una ventana (Santiago, 2026-10-27) |
 | Comprobante | Solo el número; sin adjuntos |
-| Cómo nacen los recurrentes | Ya contados, sin confirmación |
+| Cómo nacen los fijos | Por pagar el día que vencen; cuentan al marcarlos pagados (Santiago, 2026-10-28; antes, ya contados) |
+| Por pagar | Se anota con "¿Ya lo pagaste? Todavía no", se ve en Próximos pagos y cuenta al pagarse, en la fecha del pago (Santiago, 2026-10-28) |
+| Marcar pagado | Una ventana con fecha, monto y medio ya completos, para confirmar o corregir (Santiago, 2026-10-28) |
 | Frecuencia | Mensual, bimestral y anual |
 | Gastos pagados con la caja | Caja los anota en el cierre; el admin los clasifica |
 | Corregir un gasto | Se edita, con auditoría |
@@ -184,3 +213,16 @@ Pedido 58 (2026-10-27): la pantalla se rehízo (diseño en
 `gastos_recurrentes.clave`, `PG208` en `reglas_de_recurrentes()` y `gastos_total` con `el_tipo`
 (migración `20261027210000_gastos_fijos`). Se fueron `/admin/gastos/recurrentes` y
 `/admin/gastos/categorias`; llegó `/admin/gastos/fijos/[id]`.
+
+Pedido 65 (2026-10-28): lo por pagar (diseño en
+`docs/superpowers/specs/2026-10-28-gastos-por-pagar-design.md`).
+
+- **Base:** tabla `gastos_por_pagar` y `gastos.por_pagar_id`, con un índice único sin los
+  anulados. Pagar es cargar un gasto con `por_pagar_id`: un trigger copia los datos de lo por
+  pagar.
+- **Códigos:** `PG209` (ya no está por pagar), `PG210` (lo pagado no se quita) y `PG211` (no es
+  un próximo pago del fijo).
+- **Fijos:** `generar_gastos_recurrentes` deja por pagar lo que vence, sin duplicar lo que ya
+  estaba cargado pagado.
+- **Lectura:** `pagos_pendientes()` lista lo vigente, con RLS.
+- **Migración:** `20261028150000_gastos_por_pagar`.

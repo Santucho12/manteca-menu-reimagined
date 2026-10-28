@@ -4,6 +4,7 @@ import { fechaParaMostrar } from '../src/lib/gastos/pantalla';
 import { sumarMeses } from '../src/lib/gastos/vencimientos';
 import {
   borrarCategoriasConSusGastos,
+  pagarLoDelFijo,
   sembrarCategoriaDeGasto,
   sembrarRecurrente,
 } from '../tests/gastos-de-prueba';
@@ -33,14 +34,14 @@ async function guardar(page: Page) {
   await expect(page.getByRole('heading', { level: 1, name: 'Gastos' })).toBeVisible();
 }
 
-test('cambiar el monto vale para los próximos; lo ya cargado queda', async ({ page }) => {
+test('cambiar el monto vale para los próximos; lo ya pagado queda', async ({ page }) => {
   const { id, nombre } = await fijo(HOY);
+  // Al abrir, lo de hoy queda por pagar; pagado, aparece en los pagos del fijo.
   await page.goto('/admin/gastos');
+  await pagarLoDelFijo(id, HOY);
   await page.goto(`/admin/gastos/fijos/${id}`);
   await expect(page.getByRole('heading', { level: 1, name: 'Gasto fijo' })).toBeVisible();
-  await expect(
-    page.getByRole('list', { name: 'Ya se cargaron' }).getByRole('listitem'),
-  ).toHaveCount(1);
+  await expect(page.getByRole('list', { name: 'Pagos' }).getByRole('listitem')).toHaveCount(1);
   await page.getByLabel('Monto').fill('600.000');
   await guardar(page);
   await expect(fila(page, 'Próximos pagos', nombre)).toContainText('$600.000,00');

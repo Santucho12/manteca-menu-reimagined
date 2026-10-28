@@ -162,6 +162,37 @@ export async function pagarComoAdmin(
     .single();
 }
 
+type Pendiente = { id: string; categoria_id: string; monto_centavos: number };
+
+async function pagarConLaClaveSecreta(pendiente: Pendiente, fecha: string): Promise<string> {
+  const secreto = clienteSecretoDePruebas();
+  const pago = {
+    local_id: await idDelLocalPrincipal(secreto),
+    por_pagar_id: pendiente.id,
+    categoria_id: pendiente.categoria_id,
+    fecha,
+    monto_centavos: pendiente.monto_centavos,
+    medio_de_pago: 'transferencia' as const,
+  };
+  const { data, error } = await secreto.from('gastos').insert(pago).select('id').single();
+  comprobar(error, 'pagar lo del fijo');
+  return data!.id;
+}
+
+/**
+ * Paga, con la clave secreta, todo lo que un fijo dejo por pagar, con esa fecha y su monto.
+ * Es para Playwright, que no tiene las sesiones de Vitest: la base copia los datos igual.
+ */
+export async function pagarLoDelFijo(recurrenteId: string, fecha: string): Promise<string[]> {
+  const { data } = await clienteSecretoDePruebas()
+    .from('gastos_por_pagar')
+    .select('id, categoria_id, monto_centavos')
+    .eq('recurrente_id', recurrenteId);
+  const pagos: string[] = [];
+  for (const pendiente of data ?? []) pagos.push(await pagarConLaClaveSecreta(pendiente, fecha));
+  return pagos;
+}
+
 /** Una fila de gastos, leida sin RLS. */
 export async function gastoDe(id: string) {
   const { data, error } = await clienteSecretoDePruebas()
@@ -223,13 +254,15 @@ async function gastosDe(
   return [...pedidos, ...idsDe(generados.data), ...idsDe(pagos.data)];
 }
 
-/** Borra lo que creo un test, con su auditoria. En la aplicacion nada se borra. */
-export async function borrarGastos(ids: {
+type IdsDeGastos = {
   gastos?: string[];
   recurrentes?: string[];
   porPagar?: string[];
   categorias?: string[];
-}) {
+};
+
+/** Borra lo que creo un test, con su auditoria. En la aplicacion nada se borra. */
+export async function borrarGastos(ids: IdsDeGastos) {
   const secreto = clienteSecretoDePruebas();
   const recurrentes = ids.recurrentes ?? [];
   const porPagar = await porPagarDe(secreto, recurrentes, ids.porPagar ?? []);

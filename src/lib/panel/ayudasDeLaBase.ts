@@ -92,7 +92,7 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'Desactivados',
         puntos: [
           'Un proveedor no se borra: se desactiva y conserva sus gastos. Desactivado, no se ofrece al cargar un gasto nuevo.',
-          'Si tiene gastos fijos activos, te avisa: esos gastos fijos se siguen cargando hasta que los pauses aparte, en Gastos.',
+          'Si tiene gastos fijos activos, te avisa: sus pagos siguen apareciendo por pagar hasta que los pauses aparte, en Gastos.',
           'Con Ver desactivados los ves, y desde su ficha lo podés reactivar.',
         ],
       },
@@ -108,14 +108,16 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         puntos: [
           'Los gastos del mes, del más nuevo al más viejo, de a 25 por página. Cambiá de mes con las flechas: no se pasa a un mes que no llegó.',
           'Filtrá por Fijos, De caja y categoría: la lista se actualiza sola. El total suma lo filtrado, sin lo anulado.',
-          'Fijo marca un gasto que cargó solo un gasto fijo, con cada cuánto se repite: revisalo por si el monto cambió. De caja marca uno que vino de un cierre.',
+          'Fijo marca el pago de un gasto fijo, con cada cuánto se repite. De caja marca uno que vino de un cierre.',
         ],
       },
       {
         titulo: 'Próximos pagos',
         puntos: [
-          'Cada gasto fijo con su próximo pago, del más cercano al más lejano. Lo de hoy ya está en Pagados.',
-          'Falta pagar este mes suma lo que vence de mañana a fin de mes. Los pausados quedan abajo.',
+          'Lo que falta pagar: lo que anotaste por pagar y el próximo pago de cada gasto fijo, del más cercano al más lejano. Lo vencido queda arriba, en rosa. No cuenta en el balance hasta que lo pagás.',
+          'Pagado abre una ventana con la fecha de hoy, el monto y el medio ya completos: corregí lo que haga falta y tocá Anotar el pago. Pasa a Pagados con la fecha en que lo pagaste. Un fijo se puede pagar antes de que venza.',
+          'No se paga lo saca de la lista, con un motivo. Si anulás un pago desde Pagados, vuelve a Próximos pagos.',
+          'Falta pagar este mes suma lo que vence hasta fin de mes, con lo vencido. Los pausados quedan abajo.',
         ],
       },
       {
@@ -128,9 +130,8 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
       {
         titulo: 'Cargar un gasto',
         puntos: [
-          'La fecha viene con hoy; tocá Ayer o elegí otra en el calendario. Define a qué mes cuenta.',
-          'En ¿Se repite? elegí todos los meses, cada dos meses o una vez por año, y es un gasto fijo: se carga solo cada vez que toca, y la frase de abajo dice qué va a pasar.',
-          'Un gasto que no se repite no puede tener fecha futura.',
+          'En ¿Se repite? elegí todos los meses, cada dos meses o una vez por año, y es un gasto fijo: cada pago queda por pagar el día que vence, y la frase de abajo dice qué va a pasar.',
+          '¿Ya lo pagaste? Con Sí, la fecha es la del pago, viene con hoy (tocá Ayer o elegí otra) y no puede ser futura: define a qué mes cuenta. Con Todavía no, queda por pagar: la fecha es cuándo vence y el medio lo elegís al pagarlo.',
           'El proveedor aparece solo en las categorías que lo piden, y ahí es obligatorio. El monto va con coma para los centavos: 12.345,50.',
           'Efectivo de la caja no se ofrece: lo que se paga con la caja se anota en el cierre del día.',
         ],
@@ -153,22 +154,23 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
   fijos: {
     titulo: 'Cómo funciona un gasto fijo',
     introduccion:
-      'Un gasto fijo se carga solo cada vez que toca: el alquiler, un servicio, un sueldo.',
+      'Un gasto fijo deja cada pago por pagar el día que toca: el alquiler, un servicio, un sueldo.',
     temas: [
       {
-        titulo: 'Cómo se carga',
+        titulo: 'Cómo vence',
         puntos: [
-          'El día que toca, el sistema lo carga ya contado en el balance del mes, a las 3 de la mañana y también al abrir Gastos. Si un día no corrió, carga lo atrasado con la fecha que correspondía.',
-          'Si el día no existe en ese mes (el 31 en abril), se carga el último día del mes. Nunca se carga dos veces el mismo pago.',
+          'El día que toca, el pago aparece por pagar en Próximos pagos, a las 3 de la mañana y también al abrir Gastos. Cuenta en el balance cuando lo marcás Pagado. Si un día el proceso no corrió, aparece lo atrasado con la fecha que correspondía.',
+          'Si el día no existe en ese mes (el 31 en abril), vence el último día del mes. Nunca aparece dos veces el mismo pago.',
+          'Si lo pagás antes de que venza, tocá Pagado en su próximo pago.',
         ],
       },
       {
         titulo: 'Corregir',
         puntos: [
-          'Cambiar el monto vale para los próximos: lo que ya se cargó queda. Si un mes fue otro monto, corregí ese gasto en Pagados.',
-          'Si cambiás el próximo pago o cada cuánto, vale desde el próximo pago: no se vuelven a cargar meses pasados.',
-          'Pausado, deja de cargarse. Al reactivarlo, se carga desde ese día: lo que venció mientras estuvo pausado no aparece.',
-          'Ya se cargaron muestra los últimos seis pagos que cargó.',
+          'Cambiar el monto vale para los próximos: lo que ya venció queda con el suyo, y al pagarlo lo corregís en la ventana.',
+          'Si cambiás el próximo pago o cada cuánto, vale desde el próximo pago: no vuelven meses pasados.',
+          'Pausado, deja de vencer; lo que ya venció sigue por pagar. Al reactivarlo, vence desde ese día: lo que tocaba mientras estuvo pausado no aparece.',
+          'Pagos muestra los últimos seis que pagaste.',
         ],
       },
     ],

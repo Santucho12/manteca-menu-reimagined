@@ -55,18 +55,36 @@ function DeCaja({ cierreId }: { cierreId: string }) {
   );
 }
 
-function DeUnFijo({ id, nombre }: { id: string; nombre: string }) {
+const VUELVE = 'Si lo anulás, vuelve a Próximos pagos.';
+
+function DeUnFijo({ id, nombre, vuelve }: { id: string; nombre: string; vuelve: boolean }) {
   return (
     <FranjaDeAviso>
       <p>
-        Lo cargó solo el gasto fijo «{nombre}». Si cambió para los próximos meses,{' '}
+        Es un pago del gasto fijo «{nombre}». Si cambió para los próximos meses,{' '}
         <Link href={`/admin/gastos/fijos/${id}`} className={ENLACE_EN_TEXTO}>
           editá el gasto fijo
         </Link>
-        .
+        .{vuelve ? ` ${VUELVE}` : null}
       </p>
     </FranjaDeAviso>
   );
+}
+
+// Lo que se pagó de lo anotado por pagar: anularlo lo deja por pagar otra vez.
+function DePorPagar() {
+  return (
+    <FranjaDeAviso>
+      <p>Es el pago de algo que estaba por pagar. {VUELVE}</p>
+    </FranjaDeAviso>
+  );
+}
+
+function Franjas({ gasto, fijo }: { gasto: Gasto; fijo: { id: string; nombre: string } | null }) {
+  const vuelve = gasto.por_pagar_id !== null;
+  if (gasto.cierre_id) return <DeCaja cierreId={gasto.cierre_id} />;
+  if (fijo) return <DeUnFijo id={fijo.id} nombre={fijo.nombre} vuelve={vuelve} />;
+  return vuelve ? <DePorPagar /> : null;
 }
 
 /** El nombre del fijo que cargó el gasto: su descripción, o su categoría. */
@@ -100,8 +118,7 @@ export default async function FichaDeGasto({ params }: { params: Promise<{ id: s
         <GastoAnulado gasto={gasto} />
       ) : (
         <>
-          {gasto.cierre_id ? <DeCaja cierreId={gasto.cierre_id} /> : null}
-          {fijo ? <DeUnFijo id={fijo.id} nombre={fijo.nombre} /> : null}
+          <Franjas gasto={gasto} fijo={fijo} />
           <Seccion icono={<Receipt className="text-primary" size={24} />}>
             <FormularioDeGasto
               inicial={inicial}
