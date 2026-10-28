@@ -127,7 +127,10 @@ describe('anotar y anular lo por pagar', () => {
   });
 
   it('no lleva el efectivo de la caja', async () => {
-    const { error } = await anotarComoAdmin({ vencimiento: '2099-07-01', medio_de_pago: 'efectivo_caja' });
+    const { error } = await anotarComoAdmin({
+      vencimiento: '2099-07-01',
+      medio_de_pago: 'efectivo_caja',
+    });
     expect(error?.code).toBe('PG207');
   });
 
@@ -159,7 +162,10 @@ describe('adelantar el pago de un fijo', () => {
   it('una fecha que no es un vencimiento del fijo se rechaza', async () => {
     const primero = sumarDias(hoy(), 3);
     const id = await fijo(primero);
-    const { error } = await anotarComoAdmin({ recurrente_id: id, vencimiento: sumarDias(primero, 1) });
+    const { error } = await anotarComoAdmin({
+      recurrente_id: id,
+      vencimiento: sumarDias(primero, 1),
+    });
     expect(error?.code).toBe('PG211');
   });
 

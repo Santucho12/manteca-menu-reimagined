@@ -70,6 +70,7 @@ const carga = (cambios: Partial<DatosDeCarga>): DatosDeCarga => ({
   medioDePago: 'transferencia',
   comprobante: '',
   seRepite: 'no',
+  yaPagado: 'si',
   ...cambios,
 });
 

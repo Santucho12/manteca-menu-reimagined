@@ -7,8 +7,15 @@ export const MEDIOS_DE_PAGO = ['efectivo_caja', 'transferencia', 'tarjeta', 'otr
 export const FRECUENCIAS = ['mensual', 'bimestral', 'anual'] as const;
 /** "¿Se repite?" del formulario de carga: no, o cada cuánto. */
 export const REPETICIONES = ['no', ...FRECUENCIAS] as const;
+/** "¿Ya lo pagaste?" del formulario de carga, para lo que no se repite. */
+export const YA_PAGADO = ['si', 'no'] as const;
+// Lo que se paga a mano no sale del efectivo de la caja: eso lo carga el cierre del día.
+const MEDIOS_A_MANO = ['transferencia', 'tarjeta', 'otro'] as const;
 
-const NO_FUTURO = 'Un gasto que todavía no pagaste no se carga. Si se repite, elegí cada cuánto.';
+const NO_FUTURO = 'La fecha de un gasto pagado no puede ser futura.';
+const NO_FUTURO_AL_CARGAR =
+  'Si ya lo pagaste, la fecha no puede ser futura. Si lo vas a pagar, elegí Todavía no.';
+const SIN_MEDIO = 'Elegí cómo se pagó.';
 
 const texto = (maximo: number) => z.string().trim().max(maximo, `Usá hasta ${maximo} caracteres.`);
 const fecha = z.string().refine(esFechaValida, 'Elegí una fecha válida.');
@@ -51,13 +58,44 @@ export const esquemaClasificacion = z.object({
 
 const hastaHoy = (hoy: string) => (datos: { fecha: string }) => datos.fecha <= hoy;
 
-/** Cargar: un gasto suelto, con fecha hasta hoy, o un fijo, que puede empezar más adelante. */
+/** Un gasto suelto que todavía no se pagó: queda por pagar, con la fecha en que vence. */
+export const quedaPorPagar = (datos: { seRepite: string; yaPagado: string }) =>
+  datos.seRepite === 'no' && datos.yaPagado === 'no';
+
+/**
+ * Cargar: un gasto pagado, con fecha hasta hoy; algo por pagar, que vence cuando sea y elige
+ * el medio al pagarse; o un fijo, que puede empezar más adelante.
+ */
 export const esquemaCarga = (hoy: string) =>
   esquemaGasto
-    .extend({ seRepite: z.enum(REPETICIONES, 'Elegí si se repite.') })
-    .refine((datos) => datos.seRepite !== 'no' || hastaHoy(hoy)(datos), {
+    .extend({
+      seRepite: z.enum(REPETICIONES, 'Elegí si se repite.'),
+      yaPagado: z.enum(YA_PAGADO, 'Elegí si ya lo pagaste.'),
+      medioDePago: z.union([z.literal(''), z.enum(MEDIOS_DE_PAGO)], SIN_MEDIO),
+    })
+    .refine((datos) => datos.seRepite !== 'no' || quedaPorPagar(datos) || hastaHoy(hoy)(datos), {
       path: ['fecha'],
-      message: NO_FUTURO,
+      message: NO_FUTURO_AL_CARGAR,
+    })
+    .refine((datos) => quedaPorPagar(datos) || datos.medioDePago !== '', {
+      path: ['medioDePago'],
+      message: SIN_MEDIO,
+    });
+
+/** Pagar algo por pagar ya cargado, o el próximo pago de un fijo antes de que venza. */
+export const esquemaPago = (hoy: string) =>
+  z
+    .object({
+      porPagarId: z.uuid().optional(),
+      fijoId: z.uuid().optional(),
+      vencimiento: fecha.optional(),
+      fecha: fecha.refine((dia) => dia <= hoy, 'La fecha del pago no puede ser futura.'),
+      monto: camposDeGasto.monto,
+      medioDePago: z.enum(MEDIOS_A_MANO, SIN_MEDIO),
+      clave: z.uuid(),
+    })
+    .refine((datos) => Boolean(datos.porPagarId) !== Boolean(datos.fijoId && datos.vencimiento), {
+      message: 'Eso ya no está por pagar. Recargá la página.',
     });
 
 /** Editar un gasto: sin fecha futura. Con id, para la acción del servidor. */
@@ -78,18 +116,19 @@ export const esquemaFijo = (hoy: string) =>
 
 export type DatosDeGasto = z.infer<typeof esquemaGasto>;
 export type DatosDeCarga = z.infer<ReturnType<typeof esquemaCarga>>;
+export type DatosDePago = z.infer<ReturnType<typeof esquemaPago>>;
 export type DatosDeFijo = z.infer<ReturnType<typeof esquemaFijo>>;
 export type DatosDeClasificacion = z.infer<typeof esquemaClasificacion>;
 export type DatosDeCategoria = z.infer<typeof esquemaCategoria>;
 export type MedioDePago = (typeof MEDIOS_DE_PAGO)[number];
 export type Repeticion = (typeof REPETICIONES)[number];
+export type YaPagado = (typeof YA_PAGADO)[number];
 
 const vacioANulo = (escrito: string) => (escrito.trim() === '' ? null : escrito.trim());
 
-type Campos = Pick<
-  DatosDeGasto,
-  'categoriaId' | 'monto' | 'descripcion' | 'proveedorId' | 'medioDePago'
->;
+type Campos = Pick<DatosDeGasto, 'categoriaId' | 'monto' | 'descripcion' | 'proveedorId'> & {
+  medioDePago: MedioDePago | '';
+};
 
 function camposParaLaBase(datos: Campos) {
   return {
@@ -97,7 +136,31 @@ function camposParaLaBase(datos: Campos) {
     monto_centavos: centavosDeMonto(datos.monto)!,
     descripcion: vacioANulo(datos.descripcion),
     proveedor_id: datos.proveedorId || null,
+    // Vacío solo puede venir en lo por pagar, que lo deja para cuando se pague.
+    medio_de_pago: datos.medioDePago as MedioDePago,
+  };
+}
+
+/** Lo por pagar: la fecha de la carga es la del vencimiento. */
+export function porPagarParaLaBase(datos: DatosDeCarga) {
+  return {
+    vencimiento: datos.fecha,
+    ...camposParaLaBase(datos),
+    medio_de_pago: datos.medioDePago || null,
+    comprobante: vacioANulo(datos.comprobante),
+    clave: datos.clave ?? null,
+  };
+}
+
+/** El pago: el resto de los datos la base los copia de lo por pagar. */
+export function pagoParaLaBase(datos: DatosDePago, porPagarId: string, categoriaId: string) {
+  return {
+    por_pagar_id: porPagarId,
+    categoria_id: categoriaId,
+    fecha: datos.fecha,
+    monto_centavos: centavosDeMonto(datos.monto)!,
     medio_de_pago: datos.medioDePago,
+    clave: datos.clave,
   };
 }
 

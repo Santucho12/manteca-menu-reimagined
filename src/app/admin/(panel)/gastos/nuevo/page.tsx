@@ -24,6 +24,7 @@ export default async function NuevoGasto() {
     medioDePago: '' as DatosDeCarga['medioDePago'],
     comprobante: '',
     seRepite: 'no',
+    yaPagado: 'si',
     // Una clave por formulario abierto: guardar dos veces el mismo gasto no lo duplica.
     clave: crypto.randomUUID(),
   };

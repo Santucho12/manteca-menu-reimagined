@@ -138,11 +138,7 @@ export async function sembrarPorPagar(semilla: SemillaDePorPagar = {}): Promise<
     descripcion: semilla.descripcion ?? null,
     recurrente_id: semilla.recurrenteId ?? null,
   };
-  const { data, error } = await secreto
-    .from('gastos_por_pagar')
-    .insert(fila)
-    .select('id')
-    .single();
+  const { data, error } = await secreto.from('gastos_por_pagar').insert(fila).select('id').single();
   comprobar(error, 'sembrar lo por pagar');
   return data!;
 }
@@ -214,7 +210,12 @@ async function porPagarDe(secreto: Cliente, recurrentes: string[], pedidos: stri
 }
 
 /** Los gastos pedidos, los que cargaron esos fijos y los pagos de lo por pagar. */
-async function gastosDe(secreto: Cliente, recurrentes: string[], porPagar: string[], pedidos: string[]) {
+async function gastosDe(
+  secreto: Cliente,
+  recurrentes: string[],
+  porPagar: string[],
+  pedidos: string[],
+) {
   const [generados, pagos] = await Promise.all([
     secreto.from('gastos').select('id').in('recurrente_id', recurrentes),
     secreto.from('gastos').select('id').in('por_pagar_id', porPagar),

@@ -10,6 +10,7 @@ import {
   type DatosDeClasificacion,
   type DatosDeFijo,
   type DatosDeGasto,
+  type MedioDePago,
 } from './esquemas';
 import { cambiaLaSerie } from './fijos';
 
@@ -120,7 +121,11 @@ export async function cargarGasto(
   datos: DatosDeCarga,
 ): Promise<Resultado<{ id: string; fijo: boolean }>> {
   const fijo = datos.seRepite !== 'no';
-  const resultado = fijo ? await crearRecurrente(cliente, datos) : await crearGasto(cliente, datos);
+  // Lo pagado trae el medio: el esquema lo exige.
+  const pagado = { ...datos, medioDePago: datos.medioDePago as MedioDePago };
+  const resultado = fijo
+    ? await crearRecurrente(cliente, datos)
+    : await crearGasto(cliente, pagado);
   return resultado.ok ? exito({ id: resultado.datos.id, fijo }) : resultado;
 }
 

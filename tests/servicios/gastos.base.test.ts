@@ -175,6 +175,7 @@ describe('recurrentes', () => {
       ...datos({ categoriaId: await idDeCategoria('Alquiler'), descripcion: 'Alquiler del local' }),
       fecha: '2099-01-10',
       seRepite: 'mensual',
+      yaPagado: 'si',
     });
     if (!resultado.ok) throw new Error(resultado.mensaje);
     recurrentes.push(resultado.datos.id);

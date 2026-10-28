@@ -63,6 +63,12 @@ describe('cuandoVence', () => {
     expect(cuandoVence('2026-11-26', HOY)).toBe('En 30 días');
     expect(cuandoVence('2027-07-01', HOY)).toBe('El 01/07/2027');
   });
+
+  it('lo de hoy vence hoy y lo de antes ya venció', () => {
+    expect(cuandoVence(HOY, HOY)).toBe('Vence hoy');
+    expect(cuandoVence('2026-10-26', HOY)).toBe('Vencido');
+    expect(cuandoVence('2025-12-01', HOY)).toBe('Vencido');
+  });
 });
 
 describe('proximosPagos y faltaPagarEsteMes', () => {
@@ -93,6 +99,21 @@ describe('proximosPagos y faltaPagarEsteMes', () => {
       HOY,
     );
     expect(faltaPagarEsteMes(lista, HOY)).toBe(750);
+  });
+
+  it('lo que falta pagar este mes incluye lo vencido', () => {
+    const items = [
+      { fecha: '2026-09-15', montoCentavos: 100 },
+      { fecha: '2026-10-30', montoCentavos: 500 },
+      { fecha: '2026-11-01', montoCentavos: 999 },
+    ];
+    expect(faltaPagarEsteMes(items, HOY)).toBe(600);
+  });
+
+  it('un vencimiento ya cargado por pagar o pagado antes no se repite: sigue el próximo', () => {
+    const fijos = [recurrente('a', '2026-10-30', { medio_de_pago: 'tarjeta' })];
+    const [proximo] = proximosPagos(fijos, HOY, new Set(['a|2026-10-30']));
+    expect(proximo).toMatchObject({ fecha: '2026-11-30', medio: 'tarjeta' });
   });
 });
 

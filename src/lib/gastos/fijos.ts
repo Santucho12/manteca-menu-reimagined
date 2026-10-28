@@ -1,5 +1,6 @@
 import { sumarDias } from '../reportes/periodos';
 import type { FilaDeRecurrente } from './consultas';
+import type { MedioDePago } from './esquemas';
 import { nombreDelGasto } from './filas';
 import { rangoDelMes } from './meses';
 import { fechaParaMostrar } from './pantalla';
@@ -13,6 +14,7 @@ export type ProximoPago = {
   frecuencia: Frecuencia;
   fecha: string;
   montoCentavos: number;
+  medio: MedioDePago;
 };
 
 const UN_DIA = 86_400_000;
@@ -32,26 +34,48 @@ export function proximoPago(serie: Serie, hoy: string): string {
 /** Cuándo vence, en palabras; pasado un mes, la fecha entera: la baldosa no dice el año. */
 export function cuandoVence(fecha: string, hoy: string): string {
   const dias = Math.round((Date.parse(fecha) - Date.parse(hoy)) / UN_DIA);
+  if (dias < 0) return 'Vencido';
+  if (dias === 0) return 'Vence hoy';
   if (dias === 1) return 'Mañana';
   return dias <= 30 ? `En ${dias} días` : `El ${fechaParaMostrar(fecha)}`;
 }
 
-/** Cada fijo activo con su próximo pago, del más cercano al más lejano. */
-export function proximosPagos(recurrentes: FilaDeRecurrente[], hoy: string): ProximoPago[] {
+/** El próximo pago que todavía no se cargó: uno adelantado o anulado ya está tomado. */
+function proximoLibre(r: FilaDeRecurrente, hoy: string, tomados: Set<string>): string {
+  let fecha = proximoPago(r, hoy);
+  while (tomados.has(`${r.id}|${fecha}`)) {
+    fecha = proximoVencimiento(r.primer_vencimiento, r.frecuencia, sumarDias(fecha, 1));
+  }
+  return fecha;
+}
+
+/**
+ * Cada fijo activo con su próximo pago, del más cercano al más lejano. `tomados` son los
+ * vencimientos que ya tienen su por pagar, con la clave `fijo|fecha`.
+ */
+export function proximosPagos(
+  recurrentes: FilaDeRecurrente[],
+  hoy: string,
+  tomados = new Set<string>(),
+): ProximoPago[] {
   return recurrentes
     .filter((r) => r.activo)
     .map((r) => ({
       id: r.id,
       nombre: nombreDelGasto(r),
       frecuencia: r.frecuencia,
-      fecha: proximoPago(r, hoy),
+      fecha: proximoLibre(r, hoy, tomados),
       montoCentavos: r.monto_centavos,
+      medio: r.medio_de_pago,
     }))
     .sort((a, b) => a.fecha.localeCompare(b.fecha) || a.nombre.localeCompare(b.nombre, 'es'));
 }
 
-/** Lo que vence de mañana al último día del mes de hoy. */
-export function faltaPagarEsteMes(proximos: ProximoPago[], hoy: string): number {
+/** Lo que vence hasta el último día del mes de hoy, con lo ya vencido. */
+export function faltaPagarEsteMes(
+  proximos: { fecha: string; montoCentavos: number }[],
+  hoy: string,
+): number {
   const { hasta } = rangoDelMes(hoy.slice(0, 7));
   return proximos.filter((p) => p.fecha <= hasta).reduce((suma, p) => suma + p.montoCentavos, 0);
 }

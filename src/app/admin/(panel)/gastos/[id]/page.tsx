@@ -91,6 +91,7 @@ export default async function FichaDeGasto({ params }: { params: Promise<{ id: s
     ...datos,
     categoriaId: seOfrece ? datos.categoriaId : '',
     seRepite: 'no' as const,
+    yaPagado: 'si' as const,
   };
   return (
     <Pantalla titulo="Gasto" subtitulo="Corregilo o anulalo con un motivo." ayuda="gastos">

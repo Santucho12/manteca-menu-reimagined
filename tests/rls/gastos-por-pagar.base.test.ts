@@ -66,7 +66,9 @@ describe('RLS de lo por pagar: lectura', () => {
 
 describe('RLS de lo por pagar: escritura', () => {
   it('el admin anota algo por pagar y queda en su local, a su nombre', async () => {
-    const { data, error } = await (await clienteComo('admin'))
+    const { data, error } = await (
+      await clienteComo('admin')
+    )
       .from('gastos_por_pagar')
       .insert(await nuevo())
       .select('id')
@@ -79,21 +81,27 @@ describe('RLS de lo por pagar: escritura', () => {
   });
 
   it('no puede mandar el local', async () => {
-    const { error } = await (await clienteComo('admin'))
+    const { error } = await (
+      await clienteComo('admin')
+    )
       .from('gastos_por_pagar')
       .insert({ ...(await nuevo()), local_id: await asegurarLocalB(clienteSecretoDePruebas()) });
     expect(error?.code).toBe('42501');
   });
 
   it('caja no anota nada por pagar', async () => {
-    const { error } = await (await clienteComo('caja'))
+    const { error } = await (
+      await clienteComo('caja')
+    )
       .from('gastos_por_pagar')
       .insert(await nuevo());
     expect(error?.code).toBe('42501');
   });
 
   it('nadie borra lo por pagar', async () => {
-    const { error } = await (await clienteComo('admin'))
+    const { error } = await (
+      await clienteComo('admin')
+    )
       .from('gastos_por_pagar')
       .delete()
       .eq('id', delLocal.id);
@@ -101,7 +109,9 @@ describe('RLS de lo por pagar: escritura', () => {
   });
 
   it.each([...SIN_PERMISO, 'adminOtroLocal' as const])('%s no lo anula', async (rol) => {
-    await (await clienteComo(rol))
+    await (
+      await clienteComo(rol)
+    )
       .from('gastos_por_pagar')
       .update({ anulado: true, motivo_anulacion: 'Tocado' })
       .eq('id', delLocal.id);

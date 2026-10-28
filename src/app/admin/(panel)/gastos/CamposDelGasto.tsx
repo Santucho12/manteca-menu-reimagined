@@ -4,14 +4,14 @@ import type { FieldErrors } from 'react-hook-form';
 import { Campo } from '@/components/formularios/Campo';
 import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
 import type { Opcion, OpcionDeCategoria } from '@/lib/gastos/consultas';
-import type { DatosDeGasto } from '@/lib/gastos/esquemas';
+import type { DatosDeCarga } from '@/lib/gastos/esquemas';
 import { opcionesDeMedio, opcionesParaElegir } from '@/lib/gastos/pantalla';
 import type { Registro } from '@/lib/formularios/valorInicial';
 
 // Los campos que comparten un gasto y un fijo: categoria, monto, descripcion, proveedor y medio
 // de pago.
 type Campos = Pick<
-  DatosDeGasto,
+  DatosDeCarga,
   'categoriaId' | 'monto' | 'descripcion' | 'proveedorId' | 'medioDePago'
 >;
 
