@@ -8,9 +8,17 @@ import { CargadoPor } from '@/components/panel/CargadoPor';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { Dato, Datos, Seccion } from '@/components/panel/Seccion';
 import { exigirPagina } from '@/lib/acceso/servidor';
-import { gastoPorId, opcionesDeGasto, type Gasto } from '@/lib/gastos/consultas';
+import { diaEnArgentina } from '@/lib/fechas';
+import {
+  gastoPorId,
+  opcionesDeGasto,
+  recurrentePorId,
+  type Gasto,
+  type OpcionDeCategoria,
+} from '@/lib/gastos/consultas';
 import { datosDeGastoParaEditar } from '@/lib/gastos/esquemas';
 import { fechaParaMostrar, nombreDeMedio } from '@/lib/gastos/pantalla';
+import type { Cliente } from '@/lib/supabase/cliente';
 import { formatearPesos } from '@/lib/plata';
 import { anularGastoDesdeElPanel } from '../acciones';
 import { FormularioDeGasto } from '../FormularioDeGasto';
@@ -47,15 +55,43 @@ function DeCaja({ cierreId }: { cierreId: string }) {
   );
 }
 
+function DeUnFijo({ id, nombre }: { id: string; nombre: string }) {
+  return (
+    <FranjaDeAviso>
+      <p>
+        Lo cargó solo el gasto fijo «{nombre}». Si cambió para los próximos meses,{' '}
+        <Link href={`/admin/gastos/fijos/${id}`} className={ENLACE_EN_TEXTO}>
+          editá el gasto fijo
+        </Link>
+        .
+      </p>
+    </FranjaDeAviso>
+  );
+}
+
+/** El nombre del fijo que cargó el gasto: su descripción, o su categoría. */
+async function fijoDelGasto(cliente: Cliente, gasto: Gasto, categorias: OpcionDeCategoria[]) {
+  if (!gasto.recurrente_id) return null;
+  const fijo = await recurrentePorId(cliente, gasto.recurrente_id);
+  if (!fijo) return null;
+  const categoria = categorias.find((c) => c.id === fijo.categoria_id)?.nombre ?? 'Gasto fijo';
+  return { id: fijo.id, nombre: fijo.descripcion ?? categoria };
+}
+
 export default async function FichaDeGasto({ params }: { params: Promise<{ id: string }> }) {
   const { cliente } = await exigirPagina('admin');
   const gasto = await gastoPorId(cliente, (await params).id);
   if (!gasto) notFound();
   const opciones = await opcionesDeGasto(cliente);
+  const fijo = await fijoDelGasto(cliente, gasto, opciones.categorias);
   const datos = datosDeGastoParaEditar(gasto);
   // Sin clasificar no se ofrece: el selector arranca vacio y pide elegir una categoria.
   const seOfrece = opciones.categorias.some((categoria) => categoria.id === datos.categoriaId);
-  const inicial = { ...datos, categoriaId: seOfrece ? datos.categoriaId : '' };
+  const inicial = {
+    ...datos,
+    categoriaId: seOfrece ? datos.categoriaId : '',
+    seRepite: 'no' as const,
+  };
   return (
     <Pantalla titulo="Gasto" subtitulo="Corregilo o anulalo con un motivo." ayuda="gastos">
       <CargadoPor cliente={cliente} tabla="gastos" id={gasto.id} />
@@ -64,11 +100,13 @@ export default async function FichaDeGasto({ params }: { params: Promise<{ id: s
       ) : (
         <>
           {gasto.cierre_id ? <DeCaja cierreId={gasto.cierre_id} /> : null}
+          {fijo ? <DeUnFijo id={fijo.id} nombre={fijo.nombre} /> : null}
           <Seccion icono={<Receipt className="text-primary" size={24} />}>
             <FormularioDeGasto
               inicial={inicial}
               id={gasto.id}
               deCaja={gasto.cierre_id !== null}
+              hoy={diaEnArgentina(new Date())}
               {...opciones}
             />
           </Seccion>
