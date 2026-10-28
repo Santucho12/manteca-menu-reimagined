@@ -162,6 +162,19 @@ export async function pagarComoAdmin(
     .single();
 }
 
+/**
+ * Deja por pagar lo que vence de un fijo hasta esa fecha. Solo de ese fijo: generar todos con
+ * una fecha lejana llena de pagos falsos los fijos de la base de pruebas.
+ */
+export async function generarDelFijo(fijo: string, hasta: string): Promise<number> {
+  const { data, error } = await clienteSecretoDePruebas().rpc('generar_por_pagar', {
+    hasta,
+    el_fijo: fijo,
+  });
+  comprobar(error, 'generar lo del fijo');
+  return data!;
+}
+
 type Pendiente = { id: string; categoria_id: string; monto_centavos: number };
 
 async function pagarConLaClaveSecreta(pendiente: Pendiente, fecha: string): Promise<string> {

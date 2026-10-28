@@ -1394,6 +1394,10 @@ export type Database = {
         Returns: undefined
       }
       generar_gastos_recurrentes: { Args: { hasta: string }; Returns: number }
+      generar_por_pagar: {
+        Args: { el_fijo?: string; hasta: string }
+        Returns: number
+      }
       local_del_usuario: { Args: never; Returns: string }
       menu_aplicar_aumento: { Args: { datos: Json }; Returns: string }
       menu_aumento_vigente: {

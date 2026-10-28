@@ -14,7 +14,6 @@ import {
   MENSAJES_DE_GASTOS,
 } from '../../src/lib/gastos/escritura';
 import { datosDeFijoParaEditar, type DatosDeCarga } from '../../src/lib/gastos/esquemas';
-import { generarAtrasados } from '../../src/lib/gastos/generacion';
 import { sumarMeses } from '../../src/lib/gastos/vencimientos';
 import {
   borrarCierres,
@@ -26,6 +25,7 @@ import { clienteSecretoDePruebas } from '../clientes';
 import {
   borrarGastos,
   gastoDe,
+  generarDelFijo,
   idDeCategoria,
   pagarComoAdmin,
   sembrarCategoriaDeGasto,
@@ -172,7 +172,7 @@ describe('listas', () => {
   it('por tipo, con la frecuencia del fijo, y el total respeta el tipo', async () => {
     const categoria = await categoriaPropia();
     const fijo = await recurrente('2031-04-10', categoria.nombre);
-    await generarAtrasados(clienteSecretoDePruebas(), '2031-04-10');
+    await generarDelFijo(fijo, '2031-04-10');
     await pagarLoQueVencio(fijo);
     const suelto = await sembrarGasto({ categoriaId: categoria.id, fecha: '2031-04-12' });
     gastos.push(suelto.id);
@@ -185,7 +185,7 @@ describe('listas', () => {
 
   it('los pagos de un fijo, los ultimos seis', async () => {
     const id = await recurrente('2031-01-05');
-    await generarAtrasados(clienteSecretoDePruebas(), '2031-08-05');
+    await generarDelFijo(id, '2031-08-05');
     await pagarLoQueVencio(id);
     const pagos = await pagosDelRecurrente(await admin(), id);
     expect(pagos.map((p) => p.fecha)).toEqual([

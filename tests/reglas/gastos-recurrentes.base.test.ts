@@ -29,8 +29,12 @@ async function recurrente(semilla: SemillaDeRecurrente) {
   return id;
 }
 
-async function generar(hasta: string) {
-  const { error } = await clienteSecretoDePruebas().rpc('generar_gastos_recurrentes', { hasta });
+// Cada test genera solo su fijo: generar todos con una fecha lejana ensucia los de la base.
+async function generar(hasta: string, fijo: string) {
+  const { error } = await clienteSecretoDePruebas().rpc('generar_por_pagar', {
+    hasta,
+    el_fijo: fijo,
+  });
   expect(error).toBeNull();
 }
 
@@ -50,7 +54,7 @@ const vencimientos = async (id: string) => (await generados(id)).map((g) => g.ve
 describe('generacion de gastos recurrentes', () => {
   it('genera los atrasados hasta la fecha, con el ultimo dia en los meses cortos', async () => {
     const id = await recurrente({ primerVencimiento: '2026-01-31' });
-    await generar('2026-03-31');
+    await generar('2026-03-31', id);
     expect(await vencimientos(id)).toEqual(['2026-01-31', '2026-02-28', '2026-03-31']);
     const [primero] = await generados(id);
     expect(primero).toMatchObject({ vencimiento: '2026-01-31', monto_centavos: 50000000 });
@@ -59,7 +63,7 @@ describe('generacion de gastos recurrentes', () => {
 
   it('no carga gastos pagados: lo que vence queda por pagar', async () => {
     const id = await recurrente({ primerVencimiento: '2026-04-30' });
-    await generar('2026-04-30');
+    await generar('2026-04-30', id);
     const { data } = await clienteSecretoDePruebas()
       .from('gastos')
       .select('id')
@@ -84,7 +88,7 @@ describe('generacion de gastos recurrentes', () => {
       .single();
     expect(error).toBeNull();
     gastos.push(data!.id);
-    await generar('2026-06-10');
+    await generar('2026-06-10', id);
     expect(await vencimientos(id)).toEqual(['2026-06-10']);
   });
 
@@ -94,7 +98,8 @@ describe('generacion de gastos recurrentes', () => {
       frecuencia: 'bimestral',
     });
     const anual = await recurrente({ primerVencimiento: '2028-02-29', frecuencia: 'anual' });
-    await generar('2030-03-01');
+    await generar('2030-03-01', bimestral);
+    await generar('2030-03-01', anual);
     expect((await vencimientos(bimestral)).slice(0, 3)).toEqual([
       '2026-01-15',
       '2026-03-15',
@@ -105,19 +110,19 @@ describe('generacion de gastos recurrentes', () => {
 
   it('no genera lo que vence despues de la fecha', async () => {
     const id = await recurrente({ primerVencimiento: '2026-10-20' });
-    await generar('2026-10-19');
+    await generar('2026-10-19', id);
     expect(await vencimientos(id)).toEqual([]);
   });
 
   it('correr dos veces no duplica y un anulado no vuelve', async () => {
     const id = await recurrente({ primerVencimiento: '2026-08-10' });
-    await generar('2026-09-10');
+    await generar('2026-09-10', id);
     const [agosto] = await generados(id);
     await clienteSecretoDePruebas()
       .from('gastos_por_pagar')
       .update({ anulado: true, motivo_anulacion: 'No se pago' })
       .eq('id', agosto!.id);
-    await generar('2026-09-10');
+    await generar('2026-09-10', id);
     const filas = await generados(id);
     expect(filas.map((g) => [g.vencimiento, g.anulado])).toEqual([
       ['2026-08-10', true],
@@ -127,7 +132,7 @@ describe('generacion de gastos recurrentes', () => {
 
   it('un recurrente desactivado no genera', async () => {
     const id = await recurrente({ primerVencimiento: '2026-06-01', activo: false });
-    await generar('2026-09-01');
+    await generar('2026-09-01', id);
     expect(await vencimientos(id)).toEqual([]);
   });
 
@@ -138,7 +143,7 @@ describe('generacion de gastos recurrentes', () => {
       .update({ activo: true })
       .eq('id', id);
     const hoy = diaEnArgentina(new Date());
-    await generar(sumarMeses(hoy, 2));
+    await generar(sumarMeses(hoy, 2), id);
     const generadas = await vencimientos(id);
     expect(generadas.length).toBeGreaterThanOrEqual(1);
     expect(generadas.every((vencimiento) => vencimiento! >= hoy)).toBe(true);
@@ -146,20 +151,21 @@ describe('generacion de gastos recurrentes', () => {
 
   it('cambiar la plantilla no toca lo ya generado', async () => {
     const id = await recurrente({ primerVencimiento: '2026-07-05' });
-    await generar('2026-07-05');
+    await generar('2026-07-05', id);
     await clienteSecretoDePruebas()
       .from('gastos_recurrentes')
       .update({ monto_centavos: 99 })
       .eq('id', id);
-    await generar('2026-08-05');
+    await generar('2026-08-05', id);
     expect((await generados(id)).map((g) => g.monto_centavos)).toEqual([50000000, 99]);
   });
 
   it('solo el proceso del sistema la ejecuta', async () => {
-    const { error } = await (
-      await clienteComo('admin')
-    ).rpc('generar_gastos_recurrentes', { hasta: '2026-10-01' });
-    expect(error?.code).toBe('42501');
+    const admin = await clienteComo('admin');
+    const todos = await admin.rpc('generar_gastos_recurrentes', { hasta: '2026-10-01' });
+    expect(todos.error?.code).toBe('42501');
+    const uno = await admin.rpc('generar_por_pagar', { hasta: '2026-10-01' });
+    expect(uno.error?.code).toBe('42501');
   });
 });
 
@@ -185,24 +191,24 @@ async function fechasDe(id: string) {
 describe('cambiar la fecha o la frecuencia de un fijo', () => {
   it('vale desde el proximo pago', async () => {
     const id = await recurrente({ primerVencimiento: sumarMeses(hoy(), -3) });
-    await generar(hoy());
+    await generar(hoy(), id);
     const antes = await vencimientos(id);
     const nueva = sumarDias(hoy(), 3);
     expect((await cambiar(id, { primer_vencimiento: nueva })).error).toBeNull();
     expect((await fechasDe(id)).generar_desde).toBe(nueva);
-    await generar(nueva);
+    await generar(nueva, id);
     expect(await vencimientos(id)).toEqual([...antes, nueva]);
   });
 
   it('mover el dia a una fecha pasada no duplica los meses ya cargados', async () => {
     const primero = sumarMeses(hoy(), -3);
     const id = await recurrente({ primerVencimiento: primero });
-    await generar(hoy());
+    await generar(hoy(), id);
     const antes = await vencimientos(id);
     expect((await cambiar(id, { primer_vencimiento: sumarDias(primero, 2) })).error?.code).toBe(
       'PG208',
     );
-    await generar(hoy());
+    await generar(hoy(), id);
     expect(await vencimientos(id)).toEqual(antes);
     // Genera dos veces los fijos de toda la base: con otra corrida a la par, pasa los 20 s.
   }, 60_000);
@@ -246,12 +252,26 @@ describe('la clave de un fijo', () => {
   });
 });
 
+describe('generar para un solo fijo', () => {
+  it('con el_fijo genera lo de ese fijo y no toca los demas', async () => {
+    const uno = await recurrente({ primerVencimiento: '2026-02-10' });
+    const otro = await recurrente({ primerVencimiento: '2026-02-10' });
+    const { error } = await clienteSecretoDePruebas().rpc('generar_por_pagar', {
+      hasta: '2026-03-10',
+      el_fijo: uno,
+    });
+    expect(error).toBeNull();
+    expect(await vencimientos(uno)).toEqual(['2026-02-10', '2026-03-10']);
+    expect(await vencimientos(otro)).toEqual([]);
+  });
+});
+
 describe('el total por tipo', () => {
   it('con el_tipo fijos suma lo pagado de los fijos, no lo por pagar', async () => {
     const categoria = await sembrarCategoriaDeGasto();
     categorias.push(categoria.id);
     const id = await recurrente({ categoria: categoria.nombre, primerVencimiento: '2026-03-10' });
-    await generar('2026-03-10');
+    await generar('2026-03-10', id);
     const [marzo] = await generados(id);
     const pago = await pagarComoAdmin(marzo!.id, { fecha: '2026-03-12', montoCentavos: 50000000 });
     expect(pago.error).toBeNull();
