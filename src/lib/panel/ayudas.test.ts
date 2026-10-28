@@ -99,7 +99,7 @@ describe('ayudas', () => {
       [
         'todavía no está conectado',
         'cancelado',
-        'Canales',
+        'Tipos de venta',
         'precio del menú',
         'efectivo',
         'motivo',

@@ -26,7 +26,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
       {
         titulo: 'Cargar una venta a mano',
         puntos: [
-          'Es para lo que no pasa por Fudo: Cheaf, encargos, ventas a comercios. El canal se elige de la lista que armás en Canales.',
+          'Es para lo que no pasa por Fudo: Cheaf, encargos, ventas a comercios. El tipo de venta se elige de la lista que armás en Tipos de venta.',
           'Sumá uno o varios productos. Cada uno trae el precio del menú, y lo podés cambiar. El total se calcula mientras escribís.',
           'La fecha viene con hoy; puede ser un día anterior, pero no uno futuro.',
           'Si se cobró en efectivo, suma a lo que debería haber en la caja de ese día.',
@@ -42,16 +42,16 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
     ],
   },
   canales: {
-    titulo: 'Cómo funciona Canales',
+    titulo: 'Cómo funciona Tipos de venta',
     introduccion:
       'Por dónde entran las ventas que no pasan por Fudo. Arrancan Cheaf, Encargo, Venta a comercios y Otro.',
     temas: [
       {
         titulo: 'Qué tenés que saber',
         puntos: [
-          'Sumá, renombrá y desactivá canales. No se repite un nombre.',
-          'Un canal desactivado no se ofrece al cargar una venta, pero conserva las que ya tiene.',
-          'Renombrar un canal cambia el nombre también en sus ventas anteriores.',
+          'Sumá, renombrá y desactivá tipos de venta. No se repite un nombre.',
+          'Un tipo de venta desactivado no se ofrece al cargar una venta, pero conserva las que ya tiene.',
+          'Renombrar un tipo de venta cambia el nombre también en sus ventas anteriores.',
         ],
       },
     ],

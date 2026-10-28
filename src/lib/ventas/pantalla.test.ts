@@ -3,8 +3,10 @@ import {
   enlaceDeVentas,
   estadoDeVenta,
   filtrosDeVentas,
-  lineasDelResumen,
+  horaDeVenta,
   nombreDeOrigen,
+  tarjetasDelResumen,
+  tonoDeEstado,
 } from './pantalla';
 
 const HOY = '2026-10-10';
@@ -48,7 +50,16 @@ describe('nombres', () => {
   });
 });
 
-describe('lineasDelResumen', () => {
+describe('tonoDeEstado', () => {
+  it('verde si cuenta, ambar si no se cobro y gris si se anulo', () => {
+    expect(tonoDeEstado({ estado: 'cerrada', anulado: false })).toBe('esmeralda');
+    expect(tonoDeEstado({ estado: 'cancelada', anulado: false })).toBe('ambar');
+    expect(tonoDeEstado({ estado: 'en_curso', anulado: false })).toBe('ambar');
+    expect(tonoDeEstado({ estado: 'cerrada', anulado: true })).toBe('pizarra');
+  });
+});
+
+describe('tarjetasDelResumen', () => {
   const totales = {
     cobradoCentavos: 600000,
     cobradas: 2,
@@ -58,19 +69,55 @@ describe('lineasDelResumen', () => {
     anuladas: 1,
   };
 
-  it('sin estado elegido, lo cobrado y aparte lo cancelado', () => {
-    expect(lineasDelResumen(totales, null)).toEqual([
-      'Cobrado: $6.000,00 en 2 ventas',
-      'Canceladas: $1.000,00 en 1 venta',
-    ]);
-    expect(lineasDelResumen({ ...totales, canceladas: 0 }, null)).toEqual([
-      'Cobrado: $6.000,00 en 2 ventas',
+  it('cuatro tarjetas: cobrado, ticket promedio, canceladas y anuladas', () => {
+    expect(tarjetasDelResumen(totales)).toEqual([
+      { etiqueta: 'Cobrado', valor: '$6.000,00', detalle: '2 ventas' },
+      { etiqueta: 'Ticket promedio', valor: '$3.000,00', detalle: 'por venta cobrada' },
+      {
+        etiqueta: 'Canceladas',
+        valor: '$1.000,00',
+        detalle: '1 venta',
+        ayuda: 'Pedidos cancelados en Fudo: no se cobraron.',
+      },
+      {
+        etiqueta: 'Anuladas',
+        valor: '$3.000,00',
+        detalle: '1 venta',
+        ayuda: 'Cargadas por error y anuladas acá, con motivo.',
+      },
     ]);
   });
 
-  it('con un estado, el total de lo que se ve', () => {
-    expect(lineasDelResumen(totales, 'cerrada')).toEqual(['Cobrado: $6.000,00 en 2 ventas']);
-    expect(lineasDelResumen(totales, 'cancelada')).toEqual(['Canceladas: $1.000,00 en 1 venta']);
-    expect(lineasDelResumen(totales, 'anulada')).toEqual(['Anuladas: $3.000,00 en 1 venta']);
+  it('sin ventas cobradas no hay ticket promedio', () => {
+    const vacio = { ...totales, cobradoCentavos: 0, cobradas: 0 };
+    expect(tarjetasDelResumen(vacio)[1]).toEqual({
+      etiqueta: 'Ticket promedio',
+      valor: '—',
+      detalle: 'sin ventas cobradas',
+    });
+    expect(tarjetasDelResumen(vacio)[0]!.detalle).toBe('0 ventas');
+  });
+
+  it('el ticket promedio se redondea a centavos', () => {
+    const t = { ...totales, cobradoCentavos: 1000, cobradas: 3 };
+    expect(tarjetasDelResumen(t)[1]!.valor).toBe('$3,33');
+  });
+});
+
+describe('horaDeVenta', () => {
+  it('la hora en Argentina cuando la venta se cerro ese mismo dia', () => {
+    expect(horaDeVenta('2026-10-27', '2026-10-27T15:30:00Z')).toBe('12:30');
+  });
+
+  it('sin hora conocida no inventa una', () => {
+    expect(horaDeVenta('2026-10-27', null)).toBeNull();
+  });
+
+  it('si se cargo otro dia, la hora no es la de la venta', () => {
+    expect(horaDeVenta('2026-10-20', '2026-10-27T15:30:00Z')).toBeNull();
+  });
+
+  it('cuenta el dia en Argentina, no en UTC', () => {
+    expect(horaDeVenta('2026-10-26', '2026-10-27T01:15:00Z')).toBe('22:15');
   });
 });

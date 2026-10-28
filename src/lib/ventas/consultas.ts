@@ -8,11 +8,15 @@ import type { FiltrosDeVentas, Origen } from './pantalla';
 export type FilaDeVenta = {
   id: string;
   fecha: string;
+  /** Cuando se cerro, o null si no se sabe: las del Excel de Fudo solo traen el dia. */
+  cerrada_en: string | null;
   origen: Origen;
   estado: string;
   anulado: boolean;
   total_centavos: number;
   canal: string | null;
+  /** El nombre de quien la cargo; null si nadie (las de Fudo entran solas). */
+  cargada_por: string | null;
   medios: Medio[];
 };
 export type Totales = {
@@ -44,7 +48,7 @@ function comprobar<T>(
 function columnasDe(filtros: FiltrosDeVentas, contar: boolean): string {
   const pagos = `pagos:pagos_de_venta${filtros.medio ? '!inner' : ''}(medio)`;
   if (contar) return `id, ${pagos}`;
-  return `id, fecha, origen, estado, anulado, total_centavos, canal:canales_de_venta(nombre), ${pagos}`;
+  return `id, fecha, cerrada_en, origen, estado, anulado, total_centavos, canal:canales_de_venta(nombre), autor:perfiles!ventas_creado_por_fkey(nombre), ${pagos}`;
 }
 
 function consultaDe(cliente: Cliente, filtros: FiltrosDeVentas, contar = false) {
@@ -78,14 +82,16 @@ async function totalesDe(cliente: Cliente, filtros: FiltrosDeVentas): Promise<To
   };
 }
 
-type Leida = Omit<FilaDeVenta, 'canal' | 'medios'> & {
+type Leida = Omit<FilaDeVenta, 'canal' | 'cargada_por' | 'medios'> & {
   canal: { nombre: string } | null;
+  autor: { nombre: string } | null;
   pagos: { medio: Medio }[];
 };
 
-const aFila = ({ canal, pagos, ...venta }: Leida): FilaDeVenta => ({
+const aFila = ({ canal, autor, pagos, ...venta }: Leida): FilaDeVenta => ({
   ...venta,
   canal: canal?.nombre ?? null,
+  cargada_por: autor?.nombre ?? null,
   medios: [...new Set(pagos.map((pago) => pago.medio))],
 });
 
@@ -125,7 +131,7 @@ export type Venta = Omit<FilaDeVenta, 'medios'> & {
 };
 
 const COLUMNAS_DE_VENTA =
-  'id, fecha, origen, estado, anulado, total_centavos, comentario, motivo_anulacion, ' +
+  'id, fecha, cerrada_en, origen, estado, anulado, total_centavos, comentario, motivo_anulacion, ' +
   'canal:canales_de_venta(nombre), ' +
   'renglones:renglones_de_venta(id, descripcion, cantidad, precio_unitario_centavos, subtotal_centavos), ' +
   'pagos:pagos_de_venta(medio, monto_centavos)';
@@ -156,5 +162,5 @@ export async function canalesDeVenta(
     .select('id, nombre, activo')
     .order('activo', { ascending: false })
     .order('nombre');
-  return comprobar(respuesta, 'los canales');
+  return comprobar(respuesta, 'los tipos de venta');
 }

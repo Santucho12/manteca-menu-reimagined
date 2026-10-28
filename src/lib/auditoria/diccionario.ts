@@ -20,13 +20,13 @@ export const DATOS: Record<string, { modulo: string; dato: string }> = {
   ventas: { modulo: 'Ventas', dato: 'Venta' },
   renglones_de_venta: { modulo: 'Ventas', dato: 'Producto vendido' },
   pagos_de_venta: { modulo: 'Ventas', dato: 'Pago' },
-  canales_de_venta: { modulo: 'Ventas', dato: 'Canal' },
+  canales_de_venta: { modulo: 'Ventas', dato: 'Tipo de venta' },
 };
 
 export const CAMPOS: Record<string, string> = {
   activo: 'Activo',
   anulado: 'Anulado',
-  canal_id: 'Canal',
+  canal_id: 'Tipo de venta',
   cantidad: 'Cantidad',
   cargado_por: 'Cargado por',
   cerrada_en: 'Cerrada',

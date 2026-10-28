@@ -7,12 +7,13 @@ export const MENSAJES_DE_VENTAS = {
   noDisponible: 'Esa venta no está disponible. Recargá la página.',
   diaFuturo: 'No se puede cargar una venta de un día que todavía no llegó.',
   sinRenglones: 'Sumá al menos un producto.',
-  canalNoDisponible: 'Ese canal ya no está disponible. Elegí otro.',
+  canalNoDisponible: 'Ese tipo de venta ya no está disponible. Elegí otro.',
   productoNoDisponible: 'Uno de los productos ya no está disponible. Revisá la venta.',
   anulada: 'Esta venta está anulada y ya no se puede cambiar.',
   sinMotivo: 'Escribí el motivo de la anulación.',
   deFudo: 'Las ventas de Fudo se corrigen en Fudo: el cambio llega solo.',
-  canalRepetido: 'Ya hay un canal con ese nombre.',
+  canalRepetido: 'Ya hay un tipo de venta con ese nombre.',
+  canalConVentas: 'Ese tipo de venta ya tiene ventas: desactivalo en lugar de borrarlo.',
   generico: 'No pudimos guardarlo. Revisá los datos e intentá de nuevo.',
 } as const;
 
@@ -25,6 +26,7 @@ const POR_CODIGO: Record<string, string> = {
   PV305: MENSAJES_DE_VENTAS.anulada,
   PV306: MENSAJES_DE_VENTAS.sinMotivo,
   PV307: MENSAJES_DE_VENTAS.deFudo,
+  PV309: MENSAJES_DE_VENTAS.canalConVentas,
   '23505': MENSAJES_DE_VENTAS.canalRepetido,
 };
 
@@ -81,6 +83,12 @@ export async function editarCanal(cliente: Cliente, id: string, { nombre }: { no
       .eq('id', id)
       .select('id'),
   );
+}
+
+/** Borra un canal que nunca se uso; uno con ventas se desactiva (lo dice la base). */
+export async function borrarCanal(cliente: Cliente, id: string): Promise<Resultado> {
+  const { error } = await cliente.rpc('ventas_borrar_canal', { el_canal: id });
+  return error ? fallo(mensajeDe(error)) : exito(undefined);
 }
 
 export async function cambiarEstadoDeCanal(cliente: Cliente, id: string, activo: boolean) {

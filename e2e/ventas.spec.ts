@@ -38,7 +38,7 @@ test('carga una venta con dos productos y ve su total y su detalle', async ({ pa
   await page.goto('/admin/ventas');
   await page.getByRole('link', { name: 'Cargar venta' }).click();
   await expect(page.getByLabel('Fecha')).toHaveValue(HOY);
-  await page.getByLabel('Canal').selectOption({ label: 'Encargo' });
+  await page.getByLabel('Tipo de venta', { exact: true }).selectOption({ label: 'Encargo' });
   await page.getByLabel('Medio de pago').selectOption({ label: 'Transferencia' });
   await page.getByRole('button', { name: 'Sumar producto' }).click();
   await page.getByLabel('Producto 1').selectOption({ label: producto.texto });
@@ -82,12 +82,69 @@ test('filtra por fechas y origen y muestra el total', async ({ page }) => {
   await venta({ fecha: dia, origen: 'fudo' });
   await page.goto(`/admin/ventas?desde=${dia}&hasta=${dia}`);
   await expect(page.getByText('Fudo todavía no está conectado')).toBeVisible();
-  await expect(page.getByText('Cobrado: $3.000,00 en 3 ventas')).toBeVisible();
-  await page.getByLabel('Origen').selectOption({ label: 'Fudo' });
-  await page.getByRole('button', { name: 'Filtrar' }).click();
-  await expect(page).toHaveURL(/origen=fudo/);
+  const resumen = page.getByRole('region', { name: 'Resumen de ventas' });
+  await expect(resumen).toContainText('$3.000,00');
+  await expect(resumen).toContainText('3 ventas');
+  await page.goto(`/admin/ventas?desde=${dia}&hasta=${dia}&origen=fudo`);
   await expect(page.getByRole('list', { name: 'Ventas' }).getByRole('listitem')).toHaveCount(1);
-  await expect(page.getByText('Cobrado: $1.000,00 en 1 venta')).toBeVisible();
+  await expect(resumen).toContainText('$1.000,00');
+  await expect(resumen).toContainText('1 venta');
+});
+
+test('los filtros actualizan la lista solos: sin boton Filtrar ni filtro de origen', async ({
+  page,
+}) => {
+  const dia = diaLibre();
+  await venta({ fecha: dia });
+  await page.goto(`/admin/ventas?desde=${dia}&hasta=${dia}`);
+  await expect(page.getByRole('button', { name: 'Filtrar' })).toHaveCount(0);
+  await expect(page.getByLabel('Origen')).toHaveCount(0);
+  const lista = page.getByRole('list', { name: 'Ventas' });
+  await expect(lista.getByRole('listitem')).toHaveCount(1);
+  await page.getByLabel('Estado').selectOption({ label: 'Anuladas' });
+  await expect(page).toHaveURL(/estado=anulada/);
+  await expect(page.getByText('No hay ventas para mostrar')).toBeVisible();
+});
+
+test('el resumen son cuatro tarjetas, con el ticket promedio', async ({ page }) => {
+  const dia = diaLibre();
+  await venta({ fecha: dia });
+  await venta({ fecha: dia });
+  await page.goto(`/admin/ventas?desde=${dia}&hasta=${dia}`);
+  const resumen = page.getByRole('region', { name: 'Resumen de ventas' });
+  for (const etiqueta of ['Cobrado', 'Ticket promedio', 'Canceladas', 'Anuladas']) {
+    await expect(resumen.getByRole('term').filter({ hasText: etiqueta })).toBeVisible();
+  }
+  const ticket = resumen.getByRole('listitem').filter({ hasText: 'Ticket promedio' });
+  await expect(ticket).toContainText('$1.000,00');
+});
+
+test('cada venta muestra su estado, su hora y de donde viene', async ({ page }) => {
+  await venta({ fecha: HOY });
+  await page.goto('/admin/ventas');
+  const fila = page.getByRole('list', { name: 'Ventas' }).getByRole('listitem').first();
+  await expect(fila).toContainText('Cerrada');
+  // La fecha y la hora van pegadas en el texto de la fila: no hay un borde de palabra entre ellas.
+  await expect(fila).toContainText(/\d{2}:\d{2}/);
+  await expect(fila).toContainText('A mano');
+});
+
+test('un clic en cualquier parte de la fila abre la venta', async ({ page }) => {
+  const id = await venta({ fecha: HOY });
+  await page.goto(`/admin/ventas?desde=${HOY}&hasta=${HOY}`);
+  const fila = page
+    .getByRole('list', { name: 'Ventas' })
+    .getByRole('listitem')
+    .filter({ has: page.locator(`a[href="/admin/ventas/${id}"]`) });
+  // El total queda a la derecha de todo: ahi no hay enlace propio, y el clic igual abre la venta.
+  await fila.getByText('$1.000,00').click();
+  await expect(page).toHaveURL(new RegExp(`/admin/ventas/${id}$`));
+});
+
+test('una venta de Fudo sin productos avisa que no tiene detalle', async ({ page }) => {
+  const id = await venta({ fecha: HOY, origen: 'fudo' });
+  await page.goto(`/admin/ventas/${id}`);
+  await expect(page.getByText(/no tiene detalle de productos/)).toBeVisible();
 });
 
 test('guarda capturas de la lista y la carga', async ({ page }, info) => {

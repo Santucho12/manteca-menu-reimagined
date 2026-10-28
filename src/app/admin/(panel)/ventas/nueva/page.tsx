@@ -16,11 +16,13 @@ export default async function NuevaVenta() {
     canalesDeVenta(cliente),
     opcionesParaVender(cliente),
   ]);
+  const activos = canales.filter((canal) => canal.activo);
+  const enElLocal = activos.find((canal) => canal.nombre.trim().toLowerCase() === 'en el local');
   const inicial = {
     // Una clave por formulario abierto: guardar dos veces la misma venta no la duplica.
     clave: crypto.randomUUID(),
     fecha: diaEnArgentina(new Date()),
-    canalId: '',
+    canalId: enElLocal?.id ?? '',
     // Vacio a proposito: la persona elige como se cobro, el formulario no lo supone.
     medio: '' as DatosDeVenta['medio'],
     comentario: '',
@@ -33,11 +35,7 @@ export default async function NuevaVenta() {
       ayuda="ventas"
     >
       <Seccion icono={<ShoppingBag className="text-primary" size={24} />}>
-        <FormularioDeVenta
-          inicial={inicial}
-          canales={canales.filter((canal) => canal.activo)}
-          opciones={opciones}
-        />
+        <FormularioDeVenta inicial={inicial} canales={activos} opciones={opciones} />
       </Seccion>
     </Pantalla>
   );

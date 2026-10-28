@@ -1,5 +1,6 @@
 import { MEDIOS, type Medio } from '../caja/resultado';
 import { mesDe } from '../gastos/pantalla';
+import { diaEnArgentina } from '../fechas';
 import { esFechaValida } from '../gastos/vencimientos';
 import { formatearPesos } from '../plata';
 import { numeroDePagina, unValor } from '../usuarios/presentacion';
@@ -31,6 +32,12 @@ export const nombreDeOrigen = (origen: Origen) => NOMBRES_DE_ORIGEN[origen];
 /** Como se ve el estado: lo anulado manda sobre lo que dijera la venta. */
 export function estadoDeVenta(venta: { estado: string; anulado: boolean }): string {
   return venta.anulado ? 'Anulada' : (NOMBRES_DE_ESTADO[venta.estado] ?? venta.estado);
+}
+
+/** El color de la insignia: verde si la venta cuenta, ambar si no se cobro, gris si se anulo. */
+export function tonoDeEstado(venta: { estado: string; anulado: boolean }) {
+  if (venta.anulado) return 'pizarra';
+  return venta.estado === 'cerrada' ? 'esmeralda' : 'ambar';
 }
 
 function unoDe<T extends string>(lista: readonly T[], texto: string | undefined): T | null {
@@ -77,14 +84,63 @@ type Totales = {
   anuladas: number;
 };
 
-/** El total de lo que se esta viendo: con un estado elegido, solo el de ese estado. */
-export function lineasDelResumen(totales: Totales, estado: EstadoDeLista | null): string[] {
-  const cobrado = `Cobrado: ${formatearPesos(totales.cobradoCentavos)} en ${ventas(totales.cobradas)}`;
-  const canceladas = `Canceladas: ${formatearPesos(totales.canceladoCentavos)} en ${ventas(totales.canceladas)}`;
-  if (estado === 'anulada') {
-    return [`Anuladas: ${formatearPesos(totales.anuladoCentavos)} en ${ventas(totales.anuladas)}`];
+export type TarjetaDelResumen = {
+  etiqueta: string;
+  valor: string;
+  detalle: string;
+  /** Una linea que explica que es, para las que se pueden confundir. */
+  ayuda?: string;
+};
+
+const tarjeta = (etiqueta: string, centavos: number, cantidad: number, ayuda?: string) => ({
+  etiqueta,
+  valor: formatearPesos(centavos),
+  detalle: ventas(cantidad),
+  ...(ayuda ? { ayuda } : {}),
+});
+
+function tarjetaDeTicket({ cobradoCentavos, cobradas }: Totales): TarjetaDelResumen {
+  if (cobradas === 0) {
+    return { etiqueta: 'Ticket promedio', valor: '—', detalle: 'sin ventas cobradas' };
   }
-  if (estado === 'cancelada') return [canceladas];
-  if (estado === 'cerrada' || totales.canceladas === 0) return [cobrado];
-  return [cobrado, canceladas];
+  const valor = formatearPesos(Math.round(cobradoCentavos / cobradas));
+  return { etiqueta: 'Ticket promedio', valor, detalle: 'por venta cobrada' };
 }
+
+/** Las tarjetas de arriba de la lista: lo cobrado, el ticket promedio y lo que no cuenta. */
+export function tarjetasDelResumen(totales: Totales): TarjetaDelResumen[] {
+  return [
+    tarjeta('Cobrado', totales.cobradoCentavos, totales.cobradas),
+    tarjetaDeTicket(totales),
+    tarjeta(
+      'Canceladas',
+      totales.canceladoCentavos,
+      totales.canceladas,
+      'Pedidos cancelados en Fudo: no se cobraron.',
+    ),
+    tarjeta(
+      'Anuladas',
+      totales.anuladoCentavos,
+      totales.anuladas,
+      'Cargadas por error y anuladas acá, con motivo.',
+    ),
+  ];
+}
+
+/**
+ * La hora (en Argentina) a la que se cerro la venta, o null si no se sabe. Una venta cargada
+ * despues, un dia distinto al suyo, guarda la hora de la carga: esa no es la de la venta.
+ */
+export function horaDeVenta(fecha: string, cerradaEn: string | null): string | null {
+  if (!cerradaEn) return null;
+  const instante = new Date(cerradaEn);
+  if (diaEnArgentina(instante) !== fecha) return null;
+  return HORA_EN_ARGENTINA.format(instante);
+}
+
+const HORA_EN_ARGENTINA = new Intl.DateTimeFormat('es-AR', {
+  timeZone: 'America/Argentina/Buenos_Aires',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+});
