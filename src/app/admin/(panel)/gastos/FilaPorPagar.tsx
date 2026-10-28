@@ -8,7 +8,8 @@ import { anularPorPagarDesdeElPanel } from './acciones';
 import { BaldosaDeFecha } from './BaldosaDeFecha';
 import { BotonDePago } from './VentanaDePago';
 
-const NOMBRE = 'block text-sm font-semibold truncate';
+// En la columna angosta, el nombre ocupa hasta dos renglones antes de cortarse.
+const NOMBRE = 'block text-sm font-semibold line-clamp-2 break-words';
 
 /** Lo de un fijo lleva a su ficha; lo anotado suelto no tiene otra pantalla. */
 function Nombre({ item }: { item: ItemPorPagar }) {
@@ -31,11 +32,12 @@ export function FilaPorPagar({ item, hoy }: { item: ItemPorPagar; hoy: string })
       <BaldosaDeFecha fecha={item.fecha} viene={!vencido} vencido={vencido} />
       <div className="flex-1 min-w-0">
         <Nombre item={item} />
+        {/* Primero cuándo vence: si no entra, lo que se corta es el detalle. */}
         <p className="text-[11px] text-muted-foreground truncate">
-          {item.detalle} ·{' '}
           <span className={cn(vencido && 'font-bold text-rose-600')}>
             {cuandoVence(item.fecha, hoy)}
-          </span>
+          </span>{' '}
+          · {item.detalle}
         </p>
       </div>
       <div className="flex flex-col items-end gap-1.5 shrink-0">

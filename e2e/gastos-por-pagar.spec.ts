@@ -112,7 +112,8 @@ test('lo vencido queda arriba marcado Vencido', async ({ page }) => {
   await porPagarDe('Factura que vino tarde', sumarDias(HOY, 10));
   await porPagarDe('Factura vencida', sumarDias(HOY, -5));
   await page.goto('/admin/gastos');
-  await expect(fila(page, 'Factura vencida')).toContainText('Vencido');
+  // Primero cuándo vence: en la columna angosta, lo que se corta es el detalle.
+  await expect(fila(page, 'Factura vencida').getByText(/^Vencido · /)).toBeVisible();
   const textos = await filas(page, 'Próximos pagos').allTextContents();
   const vencida = textos.findIndex((texto) => texto.includes('Factura vencida'));
   const tarde = textos.findIndex((texto) => texto.includes('Factura que vino tarde'));
