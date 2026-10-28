@@ -261,18 +261,20 @@
 }
 
 /* El calendario lo dibuja el navegador: solo se le puede dar el color de la marca y un icono suave. */
-input[type="date"] {
+input[type='date'] {
   color-scheme: light;
   accent-color: var(--color-primary);
 }
-input[type="date"]::-webkit-calendar-picker-indicator {
+input[type='date']::-webkit-calendar-picker-indicator {
   cursor: pointer;
   opacity: 0.6;
   border-radius: 0.5rem;
   padding: 0.25rem;
-  transition: opacity 150ms, background-color 150ms;
+  transition:
+    opacity 150ms,
+    background-color 150ms;
 }
-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+input[type='date']::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
   background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
 }

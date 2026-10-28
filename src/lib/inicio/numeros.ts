@@ -19,27 +19,25 @@ function ticketDelMes(actual: DelPeriodo, anterior: DelPeriodo): NumeroDelMes {
   };
 }
 
+const numero = (etiqueta: string, valor: string, variacion: NumeroDelMes['variacion']) => ({
+  etiqueta,
+  valor,
+  variacion,
+});
+
 /** Los cuatro numeros del mes contra los mismos dias del mes anterior. */
 export function numerosDelMes(actual: DelPeriodo, anterior: DelPeriodo): NumeroDelMes[] {
   const { resultado } = actual;
   const c = comparacionDelResultado(resultado, anterior.vacio ? null : anterior.resultado);
   const final = resultado.resultadoCentavos;
   return [
-    {
-      etiqueta: 'Ventas',
-      valor: formatearPesosRedondeados(resultado.ventasCentavos),
-      variacion: c.ventas,
-    },
-    {
-      etiqueta: 'Gastos',
-      valor: formatearPesosRedondeados(resultado.gastosCentavos),
-      variacion: c.gastos,
-    },
-    {
-      etiqueta: 'Balance',
-      valor: final === null ? 'Sin calcular' : formatearPesosRedondeados(final),
-      variacion: c.resultado,
-    },
+    numero('Ventas', formatearPesosRedondeados(resultado.ventasCentavos), c.ventas),
+    numero('Gastos', formatearPesosRedondeados(resultado.gastosCentavos), c.gastos),
+    numero(
+      'Balance',
+      final === null ? 'Sin calcular' : formatearPesosRedondeados(final),
+      c.resultado,
+    ),
     ticketDelMes(actual, anterior),
   ];
 }

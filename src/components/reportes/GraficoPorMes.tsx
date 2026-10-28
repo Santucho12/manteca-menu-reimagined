@@ -18,7 +18,7 @@ import type { ResultadoDelMes } from '@/lib/reportes/resultado';
 
 // Los mismos colores que las tarjetas de Inicio: ventas en verde, gastos en rojo y resultado
 // (el balance) en azul (Santiago, 2026-10-26).
-const COLORES = { ventas: '#10b981', gastos: '#f43f5e', resultado: '#bfa042' };
+const COLORES = { ventas: '#10b981', gastos: '#f43f5e', resultado: '#2563eb' };
 const EJE = { stroke: '#94a3b8', fontSize: 10, fontWeight: 700 };
 // El mes en curso va más claro: todavía no terminó y no se tiene que leer como una caída.
 const OPACIDAD_EN_CURSO = 0.45;

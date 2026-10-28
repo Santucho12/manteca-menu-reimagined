@@ -164,32 +164,34 @@ type VentaConPago = {
   otroLocal?: boolean;
 };
 
+async function localDe(otroLocal: boolean | undefined) {
+  const secreto = clienteSecretoDePruebas();
+  return otroLocal ? asegurarLocalB(secreto) : idDelLocalPrincipal(secreto);
+}
+
+function filaDeVentaConPago(semilla: VentaConPago, local: string) {
+  return {
+    local_id: local,
+    origen: 'manual' as const,
+    fecha: semilla.fecha,
+    estado: semilla.estado ?? 'cerrada',
+    total_centavos: semilla.centavos,
+    anulado: semilla.anulada ?? false,
+    motivo_anulacion: semilla.anulada ? 'Prueba' : null,
+  };
+}
+
 /** Una venta de un dia con un solo pago, escrita sin la funcion de guardar. */
 export async function sembrarVentaConPago(semilla: VentaConPago): Promise<string> {
   const secreto = clienteSecretoDePruebas();
-  const local = semilla.otroLocal
-    ? await asegurarLocalB(secreto)
-    : await idDelLocalPrincipal(secreto);
-  const { data, error } = await secreto
-    .from('ventas')
-    .insert({
-      local_id: local,
-      origen: 'manual',
-      fecha: semilla.fecha,
-      estado: semilla.estado ?? 'cerrada',
-      total_centavos: semilla.centavos,
-      ...(semilla.anulada ? { anulado: true, motivo_anulacion: 'Prueba' } : {}),
-    })
-    .select('id')
-    .single();
+  const local = await localDe(semilla.otroLocal);
+  const fila = filaDeVentaConPago(semilla, local);
+  const { data, error } = await secreto.from('ventas').insert(fila).select('id').single();
   if (error) throw new Error(`No pude sembrar la venta: ${error.message}`);
-  const pago = {
-    local_id: local,
-    venta_id: data.id,
-    medio: semilla.medio,
-    monto_centavos: semilla.centavos,
-  };
-  const respuesta = await secreto.from('pagos_de_venta').insert(pago);
-  if (respuesta.error) throw new Error(`No pude sembrar el pago: ${respuesta.error.message}`);
+  const pago = { local_id: local, venta_id: data.id, medio: semilla.medio };
+  const pagado = await secreto
+    .from('pagos_de_venta')
+    .insert({ ...pago, monto_centavos: semilla.centavos });
+  if (pagado.error) throw new Error(`No pude sembrar el pago: ${pagado.error.message}`);
   return data.id;
 }

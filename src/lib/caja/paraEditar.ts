@@ -16,6 +16,13 @@ type DeUnCierre = Pick<
 // Un medio sin ventas se deja vacio, como lo escribe la persona.
 const monto = (centavos: number) => (centavos === 0 ? '' : montoParaEditar(centavos));
 
+const salidasParaEditar = ({ retiros, gastos }: Pick<DeUnCierre, 'retiros' | 'gastos'>) => ({
+  retiros: retiros.map((r) => ({ monto: montoParaEditar(r.monto_centavos), quien: r.quien })),
+  gastos: gastos
+    .filter((g) => !g.anulado)
+    .map((g) => ({ monto: montoParaEditar(g.monto_centavos), descripcion: g.descripcion ?? '' })),
+});
+
 /** El formulario de un cierre ya guardado: lo declarado, sus retiros y sus gastos sin anular. */
 export function datosParaEditar(cierre: DeUnCierre): DatosDeCierre {
   const { declarados } = cierre;
@@ -29,12 +36,6 @@ export function datosParaEditar(cierre: DeUnCierre): DatosDeCierre {
     transferencia: monto(declarados.transferencia),
     quedaEnCaja: montoParaEditar(cierre.quedaEnCajaCentavos),
     comentario: cierre.comentario ?? '',
-    retiros: cierre.retiros.map((r) => ({
-      monto: montoParaEditar(r.monto_centavos),
-      quien: r.quien,
-    })),
-    gastos: cierre.gastos
-      .filter((g) => !g.anulado)
-      .map((g) => ({ monto: montoParaEditar(g.monto_centavos), descripcion: g.descripcion ?? '' })),
+    ...salidasParaEditar(cierre),
   };
 }

@@ -4,7 +4,6 @@ import {
   borrarCierres,
   diaLibre,
   diaSiguiente,
-  gastosDelCierre,
   idsDeCierresDe,
   restaurarTolerancia,
   sembrarCierre,

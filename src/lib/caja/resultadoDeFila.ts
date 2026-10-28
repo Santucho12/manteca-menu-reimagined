@@ -18,28 +18,28 @@ export type FilaConVentas = {
   tolerancia_centavos: number;
 };
 
+const declaradoDe = (f: FilaConVentas) => ({
+  fondoInicialCentavos: f.fondo_inicial_centavos,
+  retirosCentavos: f.retiros_centavos,
+  gastosCentavos: f.gastos_centavos,
+  medios: {
+    efectivo: f.efectivo_centavos,
+    credito: f.credito_centavos,
+    debito: f.debito_centavos,
+    qr: f.qr_centavos,
+    transferencia: f.transferencia_centavos,
+  },
+});
+
+const vendidoDe = (f: FilaConVentas) => ({
+  efectivo: f.ventas_efectivo_centavos,
+  credito: f.ventas_credito_centavos,
+  debito: f.ventas_debito_centavos,
+  qr: f.ventas_qr_centavos,
+  transferencia: f.ventas_transferencia_centavos,
+});
+
 /** El estado y la diferencia de cada medio de un cierre, contra las ventas de su dia. */
 export function resultadoDeFila(fila: FilaConVentas): ResultadoDelCierre {
-  return resultadoDelCierre(
-    {
-      fondoInicialCentavos: fila.fondo_inicial_centavos,
-      retirosCentavos: fila.retiros_centavos,
-      gastosCentavos: fila.gastos_centavos,
-      medios: {
-        efectivo: fila.efectivo_centavos,
-        credito: fila.credito_centavos,
-        debito: fila.debito_centavos,
-        qr: fila.qr_centavos,
-        transferencia: fila.transferencia_centavos,
-      },
-    },
-    {
-      efectivo: fila.ventas_efectivo_centavos,
-      credito: fila.ventas_credito_centavos,
-      debito: fila.ventas_debito_centavos,
-      qr: fila.ventas_qr_centavos,
-      transferencia: fila.ventas_transferencia_centavos,
-    },
-    fila.tolerancia_centavos,
-  );
+  return resultadoDelCierre(declaradoDe(fila), vendidoDe(fila), fila.tolerancia_centavos);
 }
