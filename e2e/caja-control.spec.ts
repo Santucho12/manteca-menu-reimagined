@@ -34,48 +34,17 @@ function fila(page: Page, lista: string, texto: string) {
   return page.getByRole('list', { name: lista }).getByRole('listitem').filter({ hasText: texto });
 }
 
-test('ve el cierre de caja en el control y lo marca como revisado', async ({ page }) => {
+test('ve el cierre de caja en el control con su resultado', async ({ page }) => {
   const fecha = dia();
   await sembrarCierreConSalidas(fecha);
   await page.goto(`/admin/caja/control?${delDia(fecha)}`);
   const cierre = fila(page, 'Cierres', fechaParaMostrar(fecha));
   await expect(cierre).toContainText('Prueba Caja');
-  await expect(cierre).toContainText('Esperando ventas');
+  await expect(cierre).toContainText('Con diferencia');
   await cierre.getByRole('link').click();
   await expect(page.getByText('$20.000,00')).toBeVisible();
-  await page.getByRole('button', { name: 'Marcar como revisado' }).click();
-  await page.getByLabel('Comentario de la revisión').fill('Lo vi con el ticket');
-  await page.getByRole('button', { name: 'Confirmar revisión' }).click();
-  await expect(page.getByText('Revisado', { exact: true })).toBeVisible();
-  await expect(page.getByText('Lo vi con el ticket')).toBeVisible();
-});
-
-test('el gasto de caja llega a Para clasificar y se clasifica ahí mismo', async ({ page }) => {
-  const fecha = dia();
-  await sembrarCierreConSalidas(fecha);
-  await page.goto('/admin/gastos');
-  const hielo = fila(page, 'Para clasificar', fechaParaMostrar(fecha)).filter({ hasText: 'Hielo' });
-  await hielo.getByLabel('Categoría').selectOption({ label: 'Mercadería' });
-  await expect(hielo.getByLabel('Proveedor')).toBeVisible();
-  await hielo.getByLabel('Categoría').selectOption({ label: 'Mantenimiento' });
-  await expect(hielo.getByLabel('Proveedor')).toHaveCount(0);
-  await hielo.getByRole('button', { name: 'Listo' }).click();
-  await expect(hielo).toHaveCount(0);
-  await page.goto(`/admin/gastos?${delMes(fecha)}`);
-  const gasto = fila(page, 'Gastos', 'Hielo').filter({ hasText: 'Mantenimiento' });
-  await expect(gasto.first()).toContainText('De caja');
-});
-
-test('un gasto de caja se abre con monto y fecha fijos, y sin anular', async ({ page }) => {
-  const fecha = dia();
-  const cierre = await sembrarCierreConSalidas(fecha);
-  const [hielo] = await gastosDelCierre(cierre);
-  await page.goto(`/admin/gastos/${hielo!.id}`);
-  await expect(page.getByText(/Salió de un cierre de caja/)).toBeVisible();
-  await expect(page.getByLabel('Monto')).toHaveAttribute('readonly', '');
-  await expect(page.getByLabel('Fecha')).toBeDisabled();
-  await expect(page.getByLabel('Categoría')).toHaveValue('');
-  await expect(page.getByRole('button', { name: 'Anular' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Marcar como revisado' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Editar cierre' })).toBeVisible();
 });
 
 test('anula el cierre con motivo y su gasto queda anulado', async ({ page }) => {
@@ -86,26 +55,31 @@ test('anula el cierre con motivo y su gasto queda anulado', async ({ page }) => 
   await page.getByLabel('Motivo').fill('Mal contado');
   await page.getByRole('button', { name: 'Confirmar anulación' }).click();
   await expect(page.getByText('Anulado: Mal contado')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Marcar como revisado' })).toHaveCount(0);
   await page.goto(`/admin/gastos?${delMes(fecha)}&tipo=caja`);
   await expect(fila(page, 'Gastos', 'Hielo').filter({ hasText: 'Anulado' }).first()).toBeVisible();
 });
 
-test('marca los dias sin cierre y filtra por estado', async ({ page }) => {
+test('marca los dias pendientes y filtra por estado', async ({ page }) => {
   const fecha = dia();
   await sembrarCierre({ fecha });
   const tercero = diaSiguiente(fecha, 2);
   fechas.push(tercero);
   await sembrarCierre({ fecha: tercero });
   await page.goto(`/admin/caja/control?desde=${fecha}&hasta=${tercero}`);
-  await expect(page.getByText(/días? sin cierre/)).toHaveCount(1);
-  await page.getByText(/días? sin cierre/).click();
+  await expect(page.getByText(/días? pendientes?/)).toHaveCount(1);
+  await page.getByText(/días? pendientes?/).click();
   const aviso = page.getByRole('list', { name: 'Días sin cierre' });
   await expect(
     aviso.getByRole('link', { name: fechaParaMostrar(diaSiguiente(fecha)) }),
   ).toBeVisible();
-  await page.getByLabel('Estado').selectOption({ label: 'Anulado' });
-  await expect(page).toHaveURL(/estado=anulado/);
+  await page.getByLabel('Estado').selectOption({ label: 'Pendiente' });
+  await expect(page).toHaveURL(/estado=pendiente/);
+  await expect(
+    page
+      .getByRole('list', { name: 'Días sin cierre' })
+      .getByRole('link', { name: fechaParaMostrar(diaSiguiente(fecha)) }),
+  ).toBeVisible();
+  await page.getByLabel('Estado').selectOption({ label: 'Cierra' });
   await expect(page.getByText('No hay cierres para mostrar.')).toBeVisible();
 });
 

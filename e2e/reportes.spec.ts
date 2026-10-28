@@ -105,7 +105,7 @@ test('resultado: sin gastos cargados no lo calcula', async ({ page }) => {
   await expect(page.getByText('Sin gastos cargados: el balance no se calcula.')).toBeVisible();
 });
 
-test('caja: cada cierre esperando ventas, el dia sin cierre y el resumen por empleado', async ({
+test('caja: cada cierre con su diferencia, el dia sin cierre y el resumen por empleado', async ({
   page,
 }) => {
   await page.goto('/admin/reportes/caja?desde=2018-04-10&hasta=2018-04-12');
@@ -113,7 +113,7 @@ test('caja: cada cierre esperando ventas, el dia sin cierre y el resumen por emp
   const cierre = page.getByRole('row', { name: /10\/04\/2018/ });
   await expect(cierre).toContainText('Prueba Caja');
   await expect(cierre).toContainText('$20.000,00');
-  await expect(cierre).toContainText('Esperando ventas');
+  await expect(cierre).toContainText('Sobran');
   const resumen = page.getByRole('table', { name: 'Por empleado' });
   await expect(resumen.getByRole('row', { name: /Prueba Caja/ })).toContainText('2');
   await expect(page.getByLabel('Comparar desde')).toHaveCount(0);
