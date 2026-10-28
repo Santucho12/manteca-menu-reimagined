@@ -27,6 +27,7 @@ import {
   borrarGastos,
   gastoDe,
   idDeCategoria,
+  pagarComoAdmin,
   sembrarCategoriaDeGasto,
   sembrarGasto,
   sembrarRecurrente,
@@ -154,11 +155,24 @@ describe('clasificar', () => {
   });
 });
 
+// Desde el pedido 65 lo que vence de un fijo queda por pagar: se paga cada uno en su día.
+async function pagarLoQueVencio(fijo: string) {
+  const { data } = await clienteSecretoDePruebas()
+    .from('gastos_por_pagar')
+    .select('id, vencimiento')
+    .eq('recurrente_id', fijo);
+  for (const { id, vencimiento } of data ?? []) {
+    const pago = await pagarComoAdmin(id, { fecha: vencimiento, montoCentavos: 50000000 });
+    expect(pago.error).toBeNull();
+  }
+}
+
 describe('listas', () => {
   it('por tipo, con la frecuencia del fijo, y el total respeta el tipo', async () => {
     const categoria = await categoriaPropia();
-    await recurrente('2031-04-10', categoria.nombre);
+    const fijo = await recurrente('2031-04-10', categoria.nombre);
     await generarAtrasados(clienteSecretoDePruebas(), '2031-04-10');
+    await pagarLoQueVencio(fijo);
     const suelto = await sembrarGasto({ categoriaId: categoria.id, fecha: '2031-04-12' });
     gastos.push(suelto.id);
     const consulta = { desde: '2031-04-01', hasta: '2031-04-30', categoriaId: categoria.id };
@@ -171,6 +185,7 @@ describe('listas', () => {
   it('los pagos de un fijo, los ultimos seis', async () => {
     const id = await recurrente('2031-01-05');
     await generarAtrasados(clienteSecretoDePruebas(), '2031-08-05');
+    await pagarLoQueVencio(id);
     const pagos = await pagosDelRecurrente(await admin(), id);
     expect(pagos.map((p) => p.fecha)).toEqual([
       '2031-08-05',

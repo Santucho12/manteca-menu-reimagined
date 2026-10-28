@@ -467,6 +467,7 @@ export type Database = {
           medio_de_pago: Database["public"]["Enums"]["medio_de_pago"]
           monto_centavos: number
           motivo_anulacion: string | null
+          por_pagar_id: string | null
           proveedor_id: string | null
           recurrente_id: string | null
           vencimiento: string | null
@@ -489,6 +490,7 @@ export type Database = {
           medio_de_pago: Database["public"]["Enums"]["medio_de_pago"]
           monto_centavos: number
           motivo_anulacion?: string | null
+          por_pagar_id?: string | null
           proveedor_id?: string | null
           recurrente_id?: string | null
           vencimiento?: string | null
@@ -511,6 +513,7 @@ export type Database = {
           medio_de_pago?: Database["public"]["Enums"]["medio_de_pago"]
           monto_centavos?: number
           motivo_anulacion?: string | null
+          por_pagar_id?: string | null
           proveedor_id?: string | null
           recurrente_id?: string | null
           vencimiento?: string | null
@@ -552,6 +555,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "gastos_por_pagar_id_fkey"
+            columns: ["por_pagar_id"]
+            isOneToOne: false
+            referencedRelation: "gastos_por_pagar"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "gastos_proveedor_id_fkey"
             columns: ["proveedor_id"]
             isOneToOne: false
@@ -560,6 +570,112 @@ export type Database = {
           },
           {
             foreignKeyName: "gastos_recurrente_id_fkey"
+            columns: ["recurrente_id"]
+            isOneToOne: false
+            referencedRelation: "gastos_recurrentes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gastos_por_pagar: {
+        Row: {
+          anulado: boolean
+          anulado_por: string | null
+          categoria_id: string
+          clave: string | null
+          comprobante: string | null
+          creado_por: string | null
+          descripcion: string | null
+          fecha_actualizacion: string
+          fecha_anulacion: string | null
+          fecha_creacion: string
+          id: string
+          local_id: string
+          medio_de_pago: Database["public"]["Enums"]["medio_de_pago"] | null
+          monto_centavos: number
+          motivo_anulacion: string | null
+          proveedor_id: string | null
+          recurrente_id: string | null
+          vencimiento: string
+        }
+        Insert: {
+          anulado?: boolean
+          anulado_por?: string | null
+          categoria_id: string
+          clave?: string | null
+          comprobante?: string | null
+          creado_por?: string | null
+          descripcion?: string | null
+          fecha_actualizacion?: string
+          fecha_anulacion?: string | null
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          medio_de_pago?: Database["public"]["Enums"]["medio_de_pago"] | null
+          monto_centavos: number
+          motivo_anulacion?: string | null
+          proveedor_id?: string | null
+          recurrente_id?: string | null
+          vencimiento: string
+        }
+        Update: {
+          anulado?: boolean
+          anulado_por?: string | null
+          categoria_id?: string
+          clave?: string | null
+          comprobante?: string | null
+          creado_por?: string | null
+          descripcion?: string | null
+          fecha_actualizacion?: string
+          fecha_anulacion?: string | null
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          medio_de_pago?: Database["public"]["Enums"]["medio_de_pago"] | null
+          monto_centavos?: number
+          motivo_anulacion?: string | null
+          proveedor_id?: string | null
+          recurrente_id?: string | null
+          vencimiento?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gastos_por_pagar_anulado_por_fkey"
+            columns: ["anulado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_por_pagar_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias_de_gasto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_por_pagar_creado_por_fkey"
+            columns: ["creado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_por_pagar_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_por_pagar_proveedor_id_fkey"
+            columns: ["proveedor_id"]
+            isOneToOne: false
+            referencedRelation: "proveedores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_por_pagar_recurrente_id_fkey"
             columns: ["recurrente_id"]
             isOneToOne: false
             referencedRelation: "gastos_recurrentes"
@@ -1358,6 +1474,20 @@ export type Database = {
         Args: { direccion: string; el_id: string; el_tipo: string }
         Returns: string
       }
+      pagos_pendientes: {
+        Args: never
+        Returns: {
+          categoria: string
+          descripcion: string
+          frecuencia: Database["public"]["Enums"]["frecuencia_de_gasto"]
+          id: string
+          medio_de_pago: Database["public"]["Enums"]["medio_de_pago"]
+          monto_centavos: number
+          proveedor: string
+          recurrente_id: string
+          vencimiento: string
+        }[]
+      }
       registrar_cambio_de_contrasena: {
         Args: { cuenta: string; por: string; tipo: string }
         Returns: undefined
@@ -1414,6 +1544,7 @@ export type Database = {
         Args: { el_local: string; lote: Json }
         Returns: number[]
       }
+      ventas_borrar_canal: { Args: { el_canal: string }; Returns: undefined }
       ventas_crear_del_excel: {
         Args: {
           el_local: string
