@@ -8,7 +8,9 @@ import {
   esquemaCarga,
   esquemaClasificacion,
   esquemaDeGastoEditado,
+  esquemaPago,
 } from '@/lib/gastos/esquemas';
+import { anularPorPagar, pagar } from '@/lib/gastos/pagos';
 
 // Hoy lo decide el servidor, en Argentina: un gasto suelto no puede tener fecha futura.
 const hoy = () => diaEnArgentina(new Date());
@@ -35,5 +37,18 @@ export async function clasificarGastoDesdeElPanel(datos: unknown) {
 export async function anularGastoDesdeElPanel(datos: unknown) {
   return ejecutarAccion('admin', esquemaAnulacion, datos, ({ cliente }, { id, motivo }) =>
     anularGasto(cliente, id, motivo),
+  );
+}
+
+// La fecha del pago, como la de un gasto, no puede ser futura: hoy lo decide el servidor.
+export async function pagarDesdeElPanel(datos: unknown) {
+  return ejecutarAccion('admin', esquemaPago(hoy()), datos, ({ cliente }, pago) =>
+    pagar(cliente, pago),
+  );
+}
+
+export async function anularPorPagarDesdeElPanel(datos: unknown) {
+  return ejecutarAccion('admin', esquemaAnulacion, datos, ({ cliente }, { id, motivo }) =>
+    anularPorPagar(cliente, id, motivo),
   );
 }

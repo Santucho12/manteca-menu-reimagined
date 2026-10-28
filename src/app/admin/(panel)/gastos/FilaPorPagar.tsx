@@ -1,9 +1,12 @@
 import Link from 'next/link';
+import { BotonDeAnular } from '@/components/panel/BotonDeAnular';
 import { cuandoVence } from '@/lib/gastos/fijos';
 import type { ItemPorPagar } from '@/lib/gastos/porPagar';
 import { formatearPesos } from '@/lib/plata';
 import { cn } from '@/lib/utils';
+import { anularPorPagarDesdeElPanel } from './acciones';
 import { BaldosaDeFecha } from './BaldosaDeFecha';
+import { BotonDePago } from './VentanaDePago';
 
 const NOMBRE = 'block text-sm font-semibold truncate';
 
@@ -35,9 +38,25 @@ export function FilaPorPagar({ item, hoy }: { item: ItemPorPagar; hoy: string })
           </span>
         </p>
       </div>
-      <span className="text-sm font-bold tabular-nums whitespace-nowrap">
-        {formatearPesos(item.montoCentavos)}
-      </span>
+      <div className="flex flex-col items-end gap-1.5 shrink-0">
+        <span className="text-sm font-bold tabular-nums whitespace-nowrap">
+          {formatearPesos(item.montoCentavos)}
+        </span>
+        <div className="flex items-center gap-1">
+          <BotonDePago item={item} hoy={hoy} />
+          {item.porPagarId ? (
+            <BotonDeAnular
+              id={item.porPagarId}
+              anular={anularPorPagarDesdeElPanel}
+              titulo={`No se paga: ${item.nombre}`}
+              texto="No se paga"
+              confirmar="Confirmar"
+              aviso="Quitado de por pagar"
+              compacto
+            />
+          ) : null}
+        </div>
+      </div>
     </li>
   );
 }

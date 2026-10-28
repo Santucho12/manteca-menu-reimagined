@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ProximoPago } from './fijos';
-import { itemsPorPagar, tomadosDe, type Pendiente } from './porPagar';
+import { itemsPorPagar, pagoInicial, tomadosDe, type Pendiente } from './porPagar';
 
 const pendiente = (id: string, extra: Partial<Pendiente> = {}): Pendiente => ({
   id,
@@ -69,6 +69,35 @@ describe('itemsPorPagar', () => {
       detalle: 'Todos los meses',
     });
     expect(siguiente).toMatchObject({ porPagarId: null, fijoId: 'fijo-a', medio: 'transferencia' });
+  });
+});
+
+describe('pagoInicial', () => {
+  it('lo cargado se paga por su id; el próximo de un fijo, por el fijo y su vencimiento', () => {
+    const [cargado, delFijo] = itemsPorPagar(
+      [pendiente('luz', { medio_de_pago: 'tarjeta', monto_centavos: 835025 })],
+      [proximo],
+    );
+    expect(pagoInicial(cargado!, '2026-10-28', 'una-clave')).toEqual({
+      porPagarId: 'luz',
+      fecha: '2026-10-28',
+      monto: '8.350,25',
+      medioDePago: 'tarjeta',
+      clave: 'una-clave',
+    });
+    expect(pagoInicial(delFijo!, '2026-10-28', 'una-clave')).toEqual({
+      fijoId: 'fijo-a',
+      vencimiento: '2026-11-05',
+      fecha: '2026-10-28',
+      monto: '1.180.000',
+      medioDePago: 'transferencia',
+      clave: 'una-clave',
+    });
+  });
+
+  it('sin medio anotado, lo elige quien paga', () => {
+    const [sinMedio] = itemsPorPagar([pendiente('flete')], []);
+    expect(pagoInicial(sinMedio!, '2026-10-28', 'c').medioDePago).toBe('');
   });
 });
 

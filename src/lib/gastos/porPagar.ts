@@ -1,7 +1,8 @@
-import type { MedioDePago } from './esquemas';
+import type { DatosDePago, MedioDePago } from './esquemas';
 import { nombreDelGasto } from './filas';
 import type { ProximoPago } from './fijos';
 import { nombreDeFrecuencia } from './pantalla';
+import { montoParaEditar } from './plata';
 import type { Frecuencia } from './vencimientos';
 
 /** Una fila de pagos_pendientes(): lo por pagar vigente y sin pago. */
@@ -75,4 +76,21 @@ export function itemsPorPagar(pendientes: Pendiente[], proximos: ProximoPago[]):
 /** Los vencimientos de fijos que ya tienen su por pagar: el próximo pago los saltea. */
 export function tomadosDe(filas: { recurrente_id: string; vencimiento: string }[]): Set<string> {
   return new Set(filas.map((fila) => `${fila.recurrente_id}|${fila.vencimiento}`));
+}
+
+/**
+ * Lo que la ventana de Pagado trae ya completo: hoy, el monto y el medio anotados. Sin medio,
+ * queda vacío para que lo elija quien paga: el esquema lo pide al guardar.
+ */
+export function pagoInicial(item: ItemPorPagar, hoy: string, clave: string): DatosDePago {
+  const cual = item.porPagarId
+    ? { porPagarId: item.porPagarId }
+    : { fijoId: item.fijoId!, vencimiento: item.vencimiento };
+  return {
+    ...cual,
+    fecha: hoy,
+    monto: montoParaEditar(item.montoCentavos),
+    medioDePago: (item.medio ?? '') as DatosDePago['medioDePago'],
+    clave,
+  };
 }
