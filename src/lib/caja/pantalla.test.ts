@@ -6,6 +6,7 @@ import {
   nombreDeEstado,
   nombreDeMedio,
   textoDeDiferencia,
+  tonoDelCierre,
 } from './pantalla';
 
 const HOY = '2026-10-08';
@@ -77,5 +78,16 @@ describe('textoDeDiferencia', () => {
     [5050, 'Sobran $50,50'],
   ])('%s se lee "%s"', (centavos, texto) => {
     expect(textoDeDiferencia(centavos)).toBe(texto);
+  });
+});
+
+describe('tonoDelCierre', () => {
+  it.each([
+    [{ estado: 'cierra', anulado: false }, 'esmeralda'],
+    [{ estado: 'con_diferencia', anulado: false }, 'rosa'],
+    [{ estado: 'pendiente', anulado: false }, 'ambar'],
+    [{ estado: 'cierra', anulado: true }, 'pizarra'],
+  ] as const)('%j se pinta %s', (cierre, tono) => {
+    expect(tonoDelCierre(cierre)).toBe(tono);
   });
 });

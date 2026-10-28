@@ -14,7 +14,12 @@ import {
   toleranciaDeCaja,
 } from '@/lib/caja/consultas';
 import { diasSinCierre } from '@/lib/caja/dias';
-import { enlaceDeControl, filtrosDeControl, type ParametrosDeControl } from '@/lib/caja/pantalla';
+import {
+  enlaceDeControl,
+  filtrosDeControl,
+  type FiltrosDeControl,
+  type ParametrosDeControl,
+} from '@/lib/caja/pantalla';
 import { diaEnArgentina } from '@/lib/fechas';
 import { montoParaEditar } from '@/lib/gastos/plata';
 import { cantidadDePaginas } from '@/lib/usuarios/presentacion';
@@ -44,6 +49,10 @@ async function datosDelControl(searchParams: Promise<ParametrosDeControl>) {
   return { hoy, filtros, lista, personas, tolerancia, faltan, fondos };
 }
 
+// Los dias pendientes no son de nadie: con una persona elegida no se muestran.
+const verPendientes = (f: FiltrosDeControl) =>
+  !f.personaId && (f.estado === null || f.estado === 'pendiente');
+
 const Acciones = ({ tolerancia }: { tolerancia: string }) => (
   <>
     <ToleranciaEnTuerca inicial={tolerancia} />
@@ -67,9 +76,14 @@ export default async function ControlDeCierres({
       acciones={<Acciones tolerancia={montoParaEditar(tolerancia)} />}
       ayuda="control"
     >
-      <FiltrosDelControl filtros={filtros} personas={personas} />
-      <DiasSinCierre dias={filtros.estado || filtros.personaId ? [] : faltan} />
-      <ListaDeCierres filas={lista.filas} conPersona fondos={fondos} />
+      <FiltrosDelControl filtros={filtros} personas={personas} hoy={hoy} />
+      <DiasSinCierre
+        dias={verPendientes(filtros) ? faltan : []}
+        abierto={filtros.estado === 'pendiente'}
+      />
+      {filtros.estado === 'pendiente' ? null : (
+        <ListaDeCierres filas={lista.filas} conPersona fondos={fondos} />
+      )}
       <Paginas
         pagina={lista.pagina}
         ultima={cantidadDePaginas(lista.total)}

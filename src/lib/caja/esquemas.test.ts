@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { centavosDeCaja, cierreParaLaBase, esquemaCierre, type DatosDeCierre } from './esquemas';
+import {
+  centavosDeCaja,
+  cierreParaLaBase,
+  esquemaCierre,
+  esquemaEdicion,
+  type DatosDeCierre,
+} from './esquemas';
 
 const datos: DatosDeCierre = {
   fecha: '2026-10-08',
@@ -67,5 +73,13 @@ describe('esquemaCierre', () => {
 
   it('una fecha imposible no pasa', () => {
     expect(esquemaCierre.safeParse({ ...datos, fecha: '2026-02-30' }).success).toBe(false);
+  });
+});
+
+describe('esquemaEdicion', () => {
+  it('pide el id del cierre', () => {
+    expect(esquemaEdicion.safeParse(datos).success).toBe(false);
+    const id = '6f1c1e0a-2b1d-4c1e-9a6b-1f2e3d4c5b6a';
+    expect(esquemaEdicion.safeParse({ ...datos, id }).success).toBe(true);
   });
 });

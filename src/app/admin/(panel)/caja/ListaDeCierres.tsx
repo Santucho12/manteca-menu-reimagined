@@ -1,13 +1,13 @@
 import { Banknote, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { Chip, InsigniaDeEstado, type Tono } from '@/components/panel/Insignias';
+import { Chip, InsigniaDeEstado } from '@/components/panel/Insignias';
 import { ListaDelPanel, type Columna } from '@/components/panel/ListaDelPanel';
 import { SinResultados } from '@/components/panel/SinResultados';
 import type { FilaDeCierre } from '@/lib/caja/consultas';
 import { diaDeLaSemana } from '@/lib/caja/diaDeLaSemana';
 import { diferenciaDeFondo } from '@/lib/caja/fondo';
-import { nombreDeEstado, textoDeDiferencia, type EstadoDeCierre } from '@/lib/caja/pantalla';
+import { nombreDeEstado, textoDeDiferencia, tonoDelCierre } from '@/lib/caja/pantalla';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import { formatearPesos } from '@/lib/plata';
 import { cn } from '@/lib/utils';
@@ -18,16 +18,10 @@ type Props = { filas: FilaDeCierre[]; conPersona?: boolean; fondos?: Map<string,
 const ENLACE =
   'after:absolute after:inset-0 text-xs font-semibold text-foreground hover:text-primary rounded focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors';
 
-const TONOS: Record<EstadoDeCierre, Tono> = {
-  esperando_ventas: 'ambar',
-  cierra: 'esmeralda',
-  con_diferencia: 'rosa',
-  revisado: 'esmeralda',
-  anulado: 'pizarra',
-};
-
 const Estado = ({ cierre }: { cierre: FilaDeCierre }) => (
-  <InsigniaDeEstado tono={TONOS[cierre.estado]}>{nombreDeEstado(cierre.estado)}</InsigniaDeEstado>
+  <InsigniaDeEstado tono={tonoDelCierre(cierre)}>
+    {cierre.anulado ? 'Anulado' : nombreDeEstado(cierre.estado)}
+  </InsigniaDeEstado>
 );
 
 const EstadoConFlecha = ({ cierre }: { cierre: FilaDeCierre }) => (
@@ -37,16 +31,14 @@ const EstadoConFlecha = ({ cierre }: { cierre: FilaDeCierre }) => (
   </span>
 );
 
-const tonoDeDiferencia = (centavos: number | null) =>
-  centavos === null || centavos === 0
-    ? centavos === 0
-      ? 'text-emerald-700'
-      : 'text-muted-foreground'
+const tonoDeDiferencia = (centavos: number) =>
+  centavos === 0
+    ? 'text-emerald-700'
     : centavos < 0
       ? 'text-rose-600 font-bold'
       : 'text-amber-700 font-bold';
 
-const Diferencia = ({ centavos }: { centavos: number | null }) => (
+const Diferencia = ({ centavos }: { centavos: number }) => (
   <span className={cn('text-sm font-semibold', tonoDeDiferencia(centavos))}>
     {textoDeDiferencia(centavos)}
   </span>

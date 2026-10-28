@@ -3,6 +3,7 @@ import { mesDe } from '../gastos/pantalla';
 import { esFechaValida } from '../gastos/vencimientos';
 import { formatearPesos } from '../plata';
 import { numeroDePagina, unValor } from '../usuarios/presentacion';
+import type { Tono } from '../../components/panel/Insignias';
 import type { Medio } from './resultado';
 
 export const ESTADOS = ['cierra', 'con_diferencia', 'pendiente'] as const;
@@ -75,3 +76,13 @@ export function textoDeDiferencia(centavos: number | null): string {
   if (centavos === 0) return 'Sin diferencia';
   return `${centavos < 0 ? 'Faltan' : 'Sobran'} ${formatearPesos(Math.abs(centavos))}`;
 }
+
+const TONOS: Record<EstadoDeCierre, Tono> = {
+  cierra: 'esmeralda',
+  con_diferencia: 'rosa',
+  pendiente: 'ambar',
+};
+
+/** El color de la insignia de un cierre; uno anulado se ve apagado. */
+export const tonoDelCierre = (cierre: { estado: EstadoDeCierre; anulado: boolean }): Tono =>
+  cierre.anulado ? 'pizarra' : TONOS[cierre.estado];

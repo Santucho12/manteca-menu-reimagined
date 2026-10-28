@@ -6,7 +6,7 @@ export const MENSAJES_DE_CAJA = {
   sinPermiso: 'No tenés permiso para hacer esto.',
   noDisponible: 'Ese cierre no está disponible. Recargá la página.',
   diaFuturo: 'No se puede cargar el cierre de un día que todavía no llegó.',
-  diaRepetido: 'Ya hay un cierre cargado para ese día. Si está mal, pedile al admin que lo anule.',
+  diaRepetido: 'Ya hay un cierre cargado para ese día. Si está mal, abrilo y editalo.',
   anulado: 'Este cierre está anulado y ya no se puede cambiar.',
   sinMotivo: 'Escribí el motivo de la anulación.',
   generico: 'No pudimos guardarlo. Revisá los datos e intentá de nuevo.',
@@ -32,31 +32,34 @@ export async function guardarCierre(
   return error ? fallo(mensajeDe(error)) : exito({ id: data });
 }
 
-// RLS no da error si el cierre no es del local o quien pide no es admin: se comprueba que
-// haya cambiado una fila.
-async function cambiar(
+/** Cambia lo declarado, los retiros y los gastos de caja de un cierre sin anular. */
+export async function editarCierre(
   cliente: Cliente,
   id: string,
-  cambios:
-    | { revisado: true; comentario_revision: string | null }
-    | { anulado: true; motivo_anulacion: string },
+  datos: DatosDeCierre,
 ): Promise<Resultado> {
+  const { error } = await cliente.rpc('cierres_editar', {
+    el_id: id,
+    datos: cierreParaLaBase(datos),
+  });
+  return error ? fallo(mensajeDe(error)) : exito(undefined);
+}
+
+// RLS no da error si el cierre no es del local o quien pide no es admin: se comprueba que
+// haya cambiado una fila.
+async function anular(cliente: Cliente, id: string, motivo: string): Promise<Resultado> {
   const { data, error } = await cliente
     .from('cierres_de_caja')
-    .update(cambios)
+    .update({ anulado: true, motivo_anulacion: motivo })
     .eq('id', id)
     .select('id');
   if (error) return fallo(mensajeDe(error));
   return data.length === 1 ? exito(undefined) : fallo(MENSAJES_DE_CAJA.noDisponible);
 }
 
-export function revisarCierre(cliente: Cliente, id: string, comentario: string) {
-  return cambiar(cliente, id, { revisado: true, comentario_revision: comentario.trim() || null });
-}
-
 /** Anular deja libre el dia y anula los gastos que salieron del cierre. */
 export function anularCierre(cliente: Cliente, id: string, motivo: string) {
-  return cambiar(cliente, id, { anulado: true, motivo_anulacion: motivo });
+  return anular(cliente, id, motivo);
 }
 
 export async function cambiarTolerancia(cliente: Cliente, centavos: number): Promise<Resultado> {

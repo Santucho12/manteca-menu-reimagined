@@ -18,12 +18,12 @@ export type ResumenDeAyer = {
 };
 
 function cierreDeAyer(cierres: FilaDeCierre[], ayer: string): CierreDeAyer {
-  const vigente = cierres.find((c) => c.fecha === ayer && c.estado !== 'anulado');
+  const vigente = cierres.find((c) => c.fecha === ayer && !c.anulado);
   if (!vigente) return { estado: 'sin_cargar' };
   if (vigente.estado !== 'con_diferencia') return { estado: 'cargado' };
   return {
     estado: 'con_diferencia',
-    diferenciaCentavos: vigente.diferenciaTotalCentavos ?? 0,
+    diferenciaCentavos: vigente.diferenciaTotalCentavos,
     enlace: `/admin/caja/control?desde=${ayer}&hasta=${ayer}`,
   };
 }

@@ -300,29 +300,19 @@ export type Database = {
           anulado_por: string | null
           cargado_por: string
           comentario: string | null
-          comentario_revision: string | null
           credito_centavos: number
           debito_centavos: number
           efectivo_centavos: number
-          esperado_credito_centavos: number | null
-          esperado_debito_centavos: number | null
-          esperado_efectivo_centavos: number | null
-          esperado_qr_centavos: number | null
-          esperado_transferencia_centavos: number | null
-          estado: Database["public"]["Enums"]["estado_de_cierre"]
           fecha: string
           fecha_actualizacion: string
           fecha_anulacion: string | null
           fecha_creacion: string
-          fecha_revision: string | null
           fondo_inicial_centavos: number
           id: string
           local_id: string
           motivo_anulacion: string | null
           qr_centavos: number
           queda_en_caja_centavos: number
-          revisado: boolean
-          revisado_por: string | null
           transferencia_centavos: number
         }
         Insert: {
@@ -330,29 +320,19 @@ export type Database = {
           anulado_por?: string | null
           cargado_por?: string
           comentario?: string | null
-          comentario_revision?: string | null
           credito_centavos?: number
           debito_centavos?: number
           efectivo_centavos: number
-          esperado_credito_centavos?: number | null
-          esperado_debito_centavos?: number | null
-          esperado_efectivo_centavos?: number | null
-          esperado_qr_centavos?: number | null
-          esperado_transferencia_centavos?: number | null
-          estado?: Database["public"]["Enums"]["estado_de_cierre"]
           fecha: string
           fecha_actualizacion?: string
           fecha_anulacion?: string | null
           fecha_creacion?: string
-          fecha_revision?: string | null
           fondo_inicial_centavos: number
           id?: string
           local_id?: string
           motivo_anulacion?: string | null
           qr_centavos?: number
           queda_en_caja_centavos: number
-          revisado?: boolean
-          revisado_por?: string | null
           transferencia_centavos?: number
         }
         Update: {
@@ -360,29 +340,19 @@ export type Database = {
           anulado_por?: string | null
           cargado_por?: string
           comentario?: string | null
-          comentario_revision?: string | null
           credito_centavos?: number
           debito_centavos?: number
           efectivo_centavos?: number
-          esperado_credito_centavos?: number | null
-          esperado_debito_centavos?: number | null
-          esperado_efectivo_centavos?: number | null
-          esperado_qr_centavos?: number | null
-          esperado_transferencia_centavos?: number | null
-          estado?: Database["public"]["Enums"]["estado_de_cierre"]
           fecha?: string
           fecha_actualizacion?: string
           fecha_anulacion?: string | null
           fecha_creacion?: string
-          fecha_revision?: string | null
           fondo_inicial_centavos?: number
           id?: string
           local_id?: string
           motivo_anulacion?: string | null
           qr_centavos?: number
           queda_en_caja_centavos?: number
-          revisado?: boolean
-          revisado_por?: string | null
           transferencia_centavos?: number
         }
         Relationships: [
@@ -405,13 +375,6 @@ export type Database = {
             columns: ["local_id"]
             isOneToOne: false
             referencedRelation: "locales"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cierres_de_caja_revisado_por_fkey"
-            columns: ["revisado_por"]
-            isOneToOne: false
-            referencedRelation: "perfiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1347,6 +1310,34 @@ export type Database = {
       }
     }
     Functions: {
+      cierres_con_resultado: {
+        Args: { desde: string; hasta: string; persona?: string }
+        Returns: {
+          anulado: boolean
+          cargado_por: string
+          comentario: string
+          credito_centavos: number
+          debito_centavos: number
+          efectivo_centavos: number
+          fecha: string
+          fondo_inicial_centavos: number
+          gastos_centavos: number
+          id: string
+          motivo_anulacion: string
+          persona_nombre: string
+          qr_centavos: number
+          queda_en_caja_centavos: number
+          retiros_centavos: number
+          tolerancia_centavos: number
+          transferencia_centavos: number
+          ventas_credito_centavos: number
+          ventas_debito_centavos: number
+          ventas_efectivo_centavos: number
+          ventas_qr_centavos: number
+          ventas_transferencia_centavos: number
+        }[]
+      }
+      cierres_editar: { Args: { datos: Json; el_id: string }; Returns: undefined }
       cierres_exigir_quien_carga: { Args: never; Returns: undefined }
       cierres_fondo_sugerido: { Args: { la_fecha: string }; Returns: number }
       cierres_fondos_anteriores: {
@@ -1583,12 +1574,6 @@ export type Database = {
       }
     }
     Enums: {
-      estado_de_cierre:
-        | "esperando_ventas"
-        | "cierra"
-        | "con_diferencia"
-        | "revisado"
-        | "anulado"
       estado_de_venta: "cerrada" | "cancelada" | "en_curso"
       etiqueta_de_producto: "mas_vendido" | "artesanal" | "nuevo"
       frecuencia_de_gasto: "mensual" | "bimestral" | "anual"
@@ -1723,13 +1708,6 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      estado_de_cierre: [
-        "esperando_ventas",
-        "cierra",
-        "con_diferencia",
-        "revisado",
-        "anulado",
-      ],
       estado_de_venta: ["cerrada", "cancelada", "en_curso"],
       etiqueta_de_producto: ["mas_vendido", "artesanal", "nuevo"],
       frecuencia_de_gasto: ["mensual", "bimestral", "anual"],

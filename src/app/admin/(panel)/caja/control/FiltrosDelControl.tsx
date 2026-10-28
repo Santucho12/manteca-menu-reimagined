@@ -1,9 +1,9 @@
 import { AlertTriangle, ArrowRight, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { BarraAutomatica } from '@/components/panel/BarraAutomatica';
-import { FiltroDeFecha, FiltroDeSeleccion } from '@/components/panel/Filtros';
+import { FiltroDeFecha, FiltroDeSeleccion, FiltroEnlace } from '@/components/panel/Filtros';
 import { diaDeLaSemana } from '@/lib/caja/diaDeLaSemana';
-import { opcionesDeEstado, type FiltrosDeControl } from '@/lib/caja/pantalla';
+import { enlaceDeControl, opcionesDeEstado, type FiltrosDeControl } from '@/lib/caja/pantalla';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 
 const FILA_DEL_DIA =
@@ -14,9 +14,11 @@ type Persona = { id: string; nombre: string };
 export function FiltrosDelControl({
   filtros,
   personas,
+  hoy,
 }: {
   filtros: FiltrosDeControl;
   personas: Persona[];
+  hoy: string;
 }) {
   const quienes = personas.map((persona) => ({ valor: persona.id, texto: persona.nombre }));
   return (
@@ -37,6 +39,12 @@ export function FiltrosDelControl({
         opciones={[{ valor: '', texto: 'Todos los estados' }, ...opcionesDeEstado()]}
         valor={filtros.estado ?? ''}
       />
+      <FiltroEnlace
+        href={enlaceDeControl({ ...filtros, anulados: !filtros.anulados, pagina: 1 }, hoy)}
+        prendido={filtros.anulados}
+      >
+        Ver anulados
+      </FiltroEnlace>
     </BarraAutomatica>
   );
 }
@@ -65,11 +73,14 @@ function DiaSinCierre({ dia }: { dia: string }) {
 }
 
 // Una sola franja con la cantidad; el desplegable lista los dias, cada uno lleva a cargar ese dia.
-export function DiasSinCierre({ dias }: { dias: string[] }) {
+export function DiasSinCierre({ dias, abierto = false }: { dias: string[]; abierto?: boolean }) {
   if (dias.length === 0) return null;
-  const texto = `${dias.length} ${dias.length === 1 ? 'día sin cierre' : 'días sin cierre'}`;
+  const texto = `${dias.length} ${dias.length === 1 ? 'día pendiente' : 'días pendientes'}`;
   return (
-    <details className="group rounded-2xl border border-amber-300 bg-amber-50 text-amber-900">
+    <details
+      open={abierto}
+      className="group rounded-2xl border border-amber-300 bg-amber-50 text-amber-900"
+    >
       <summary className="flex cursor-pointer list-none items-center gap-3 p-4 [&::-webkit-details-marker]:hidden">
         <AlertTriangle size={18} className="shrink-0" aria-hidden="true" />
         <span className="text-sm font-semibold">{texto}</span>

@@ -4,6 +4,7 @@ import {
   primerDiaConCierre,
   type FilaDeCierre,
 } from '../caja/consultas';
+import type { FiltrosDeControl } from '../caja/pantalla';
 import { listarRecurrentes, type FilaDeRecurrente } from '../gastos/consultas';
 import type { VentaDelDia } from '../reportes/ventas';
 import { resumenDeAyer, sinAvisoSiAyerNoHuboVentas } from './ayer';
@@ -29,16 +30,17 @@ function conFecha(r: Respuesta): ConFecha {
   return { cantidad: r.count ?? 0, desde: r.data?.[0]?.fecha ?? null };
 }
 
-// Un cierre anulado o revisado ya no esta en con_diferencia: el estado alcanza.
-export async function cierresConDiferencia(cliente: Cliente): Promise<ConFecha> {
-  return conFecha(
-    await cliente
-      .from('cierres_de_caja')
-      .select('fecha', { count: 'exact' })
-      .eq('estado', 'con_diferencia')
-      .order('fecha')
-      .limit(1),
-  );
+const DIAS_DE_AVISO = 7;
+
+// Sin "revisado" un cierre con diferencia no se apaga solo: el aviso mira la ultima semana.
+export async function cierresConDiferencia(cliente: Cliente, hoy: string): Promise<ConFecha> {
+  const filtros = {
+    ...filtrosDeAyer(sumarDias(hoy, -DIAS_DE_AVISO), hoy),
+    estado: 'con_diferencia' as const,
+  };
+  const lista = await listarCierres(cliente, { ...filtros, pagina: 1 });
+  const fechas = lista.filas.map((fila) => fila.fecha).sort();
+  return { cantidad: lista.total, desde: fechas[0] ?? null };
 }
 
 // Un solo viaje: la categoria de sistema se filtra en el mismo pedido de los gastos.
@@ -69,7 +71,7 @@ async function ayerSinCierre(cliente: Cliente, hoy: string): Promise<string | nu
 
 export async function datosDeAvisos(cliente: Cliente, hoy: string): Promise<DatosDeAvisos> {
   const [conDiferencia, ayer, pendientes, sinClasificar] = await Promise.all([
-    cierresConDiferencia(cliente),
+    cierresConDiferencia(cliente, hoy),
     ayerSinCierre(cliente, hoy),
     contarPendientes(cliente),
     gastosSinClasificar(cliente),
@@ -77,10 +79,18 @@ export async function datosDeAvisos(cliente: Cliente, hoy: string): Promise<Dato
   return { conDiferencia, ayerSinCierre: ayer, pendientes, sinClasificar };
 }
 
+const filtrosDeAyer = (desde: string, hasta: string): FiltrosDeControl => ({
+  desde,
+  hasta,
+  personaId: null,
+  estado: null,
+  anulados: false,
+  pagina: 1,
+});
+
 async function cierresDeAyer(cliente: Cliente, hoy: string) {
   const ayer = sumarDias(hoy, -1);
-  const filtros = { desde: ayer, hasta: ayer, personaId: null, estado: null, pagina: 1 };
-  return (await listarCierres(cliente, filtros)).filas;
+  return (await listarCierres(cliente, filtrosDeAyer(ayer, ayer))).filas;
 }
 
 type Leido = {

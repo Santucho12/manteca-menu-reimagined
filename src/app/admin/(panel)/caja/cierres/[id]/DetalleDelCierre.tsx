@@ -2,20 +2,21 @@ import { FranjaDeAviso } from '@/components/panel/Avisos';
 import { Dato, Datos, Seccion } from '@/components/panel/Seccion';
 import type { Cierre } from '@/lib/caja/consultas';
 import { diferenciaDeFondo, textoDeFondo } from '@/lib/caja/fondo';
-import { mediosDelCierre, nombreDeMedio, textoDeDiferencia } from '@/lib/caja/pantalla';
+import { nombreDeMedio, textoDeDiferencia } from '@/lib/caja/pantalla';
 import { formatearPesos } from '@/lib/plata';
 
-const pesos = (centavos: number | null) => (centavos === null ? '—' : formatearPesos(centavos));
 const FILA = 'grid grid-cols-1 sm:grid-cols-4 gap-1 sm:items-center py-3 text-sm';
 
 function Medios({ cierre }: { cierre: Cierre }) {
   return (
     <ul className="divide-y divide-border">
-      {mediosDelCierre(cierre).map((medio) => (
+      {cierre.medios.map((medio) => (
         <li key={medio.medio} className={FILA}>
           <span className="font-bold">{nombreDeMedio(medio.medio)}</span>
           <span>Declarado: {formatearPesos(medio.declaradoCentavos)}</span>
-          <span className="text-muted-foreground">Esperado: {pesos(medio.esperadoCentavos)}</span>
+          <span className="text-muted-foreground">
+            Esperado: {formatearPesos(medio.esperadoCentavos)}
+          </span>
           <span>{textoDeDiferencia(medio.diferenciaCentavos)}</span>
         </li>
       ))}
@@ -48,12 +49,12 @@ function Salidas({ cierre }: { cierre: Cierre }) {
 }
 
 function Efectivo({ cierre, anterior }: { cierre: Cierre; anterior: number | null }) {
-  const fondo = diferenciaDeFondo(cierre.fondo_inicial_centavos, anterior);
+  const fondo = diferenciaDeFondo(cierre.fondoInicialCentavos, anterior);
   return (
     <Seccion titulo="Efectivo de la caja" forma="lista">
       <Datos>
-        <Dato titulo="Fondo inicial" valor={formatearPesos(cierre.fondo_inicial_centavos)} />
-        <Dato titulo="Queda en la caja" valor={formatearPesos(cierre.queda_en_caja_centavos)} />
+        <Dato titulo="Fondo inicial" valor={formatearPesos(cierre.fondoInicialCentavos)} />
+        <Dato titulo="Queda en la caja" valor={formatearPesos(cierre.quedaEnCajaCentavos)} />
       </Datos>
       {fondo ? (
         <FranjaDeAviso>
@@ -66,15 +67,10 @@ function Efectivo({ cierre, anterior }: { cierre: Cierre; anterior: number | nul
 
 type Props = { cierre: Cierre; fondoAnterior: number | null };
 
-/** Lo que se declaro en el cierre y, cuando entren las ventas, lo esperado y la diferencia. */
+/** Lo que se declaro en el cierre, lo esperado segun las ventas del dia y la diferencia. */
 export function DetalleDelCierre({ cierre, fondoAnterior }: Props) {
   return (
     <>
-      {cierre.estado === 'esperando_ventas' ? (
-        <p className="text-sm text-muted-foreground">
-          Lo esperado y la diferencia van a estar cuando entren las ventas de ese día.
-        </p>
-      ) : null}
       <Seccion titulo="Por medio de pago" forma="lista">
         <Medios cierre={cierre} />
       </Seccion>

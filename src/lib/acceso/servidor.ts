@@ -14,6 +14,7 @@ import {
   type Pagina,
   type PerfilDeAcceso,
 } from './estados';
+import { diaEnArgentina } from '../fechas';
 import { cierresConDiferencia, gastosSinClasificar } from '../inicio/consultas';
 import { enlacesDelMarco, type EnlaceDelMarco, type PendientesDelMarco } from './marco';
 
@@ -82,9 +83,10 @@ const SIN_PENDIENTES: PendientesDelMarco = { usuarios: 0, caja: 0, gastos: 0 };
 
 // Los mismos casos que los avisos de Inicio, para que la sidebar y el Inicio digan lo mismo.
 async function pendientesDelAdmin(cliente: Cliente): Promise<PendientesDelMarco> {
+  const hoy = diaEnArgentina(new Date());
   const [usuarios, caja, gastos] = await Promise.all([
     pendientesActuales(cliente),
-    cierresConDiferencia(cliente),
+    cierresConDiferencia(cliente, hoy),
     gastosSinClasificar(cliente),
   ]);
   return { usuarios, caja: caja.cantidad, gastos: gastos.cantidad };
