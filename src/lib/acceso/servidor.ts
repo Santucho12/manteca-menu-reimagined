@@ -17,13 +17,17 @@ import {
 import { diaEnArgentina } from '../fechas';
 import { cierresConDiferencia, gastosSinClasificar } from '../inicio/consultas';
 import { enlacesDelMarco, type EnlaceDelMarco, type PendientesDelMarco } from './marco';
+import { accesoYDatos, accesoYLectura } from './enParalelo';
 
 export type PaginaConSesion = Exclude<Pagina, 'publica'>;
 export type Acceso = { cliente: Cliente; perfil: PerfilDeAcceso; estado: EstadoDeAcceso };
 
-// cache: el layout, la pagina y la accion de un mismo pedido leen el perfil una sola vez.
+// cache: el layout, la pagina y la accion de un mismo pedido comparten un cliente y leen el
+// perfil una sola vez.
+const clienteActual = cache(() => crearClienteDelServidor());
+
 const accesoActual = cache(async () => {
-  const cliente = await crearClienteDelServidor();
+  const cliente = await clienteActual();
   const perfil = await perfilPropio(cliente);
   return { cliente, perfil, estado: estadoDeAcceso(perfil) };
 });
@@ -43,6 +47,24 @@ export async function exigirPagina(pagina: PaginaConSesion): Promise<Acceso> {
   const destino = destinoDe(estado, pagina);
   if (destino || !perfil) redirect(destino ?? '/admin/ingresar');
   return { cliente, perfil, estado };
+}
+
+/** La pagina y sus datos en una sola tanda: sin acceso gana la redireccion, como en exigirPagina. */
+export async function exigirPaginaYLeer<T>(
+  pagina: PaginaConSesion,
+  leer: (cliente: Cliente) => Promise<T>,
+): Promise<Acceso & { datos: T }> {
+  const cliente = await clienteActual();
+  return accesoYDatos(exigirPagina(pagina), () => leer(cliente));
+}
+
+/** Como exigirPaginaYLeer, con la lectura en curso: para la pagina que decide segun el rol. */
+export async function exigirPaginaConLectura<T>(
+  pagina: PaginaConSesion,
+  leer: (cliente: Cliente) => Promise<T>,
+): Promise<Acceso & { lectura: Promise<T> }> {
+  const cliente = await clienteActual();
+  return accesoYLectura(exigirPagina(pagina), () => leer(cliente));
 }
 
 /** Cada accion con sesion: el acceso, o el mensaje para la persona si no puede. */
