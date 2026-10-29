@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { BARRA_DE_FILTROS, CAMPO_DE_FILTRO } from './estilos';
+import { SelectorDeFiltro } from './SelectorDeFiltro';
 
 type PropsDeLaBarra = { accion: string; ocultos?: Record<string, string>; children: ReactNode };
 
@@ -55,31 +56,16 @@ export function Buscador({ etiqueta, name = 'q', valor }: PropsDeBusqueda) {
 
 type PropsDeCampo = { id: string; name: string; etiqueta: string };
 
-/** Una lista desplegable de la barra, con su etiqueta escondida para el lector de pantalla. */
+/** Una lista desplegable de la barra: al elegir, la barra se envía sola. */
 export function FiltroDeSeleccion({
-  id,
   name,
   etiqueta,
   opciones,
   valor,
 }: PropsDeCampo & { opciones: { valor: string; texto: string }[]; valor?: string }) {
   return (
-    <div>
-      <label htmlFor={id} className="sr-only">
-        {etiqueta}
-      </label>
-      <select
-        id={id}
-        name={name}
-        defaultValue={valor ?? ''}
-        className={cn(CAMPO_DE_FILTRO, 'sm:w-auto sm:min-w-[180px]')}
-      >
-        {opciones.map((o) => (
-          <option key={o.valor} value={o.valor}>
-            {o.texto}
-          </option>
-        ))}
-      </select>
+    <div className="xl:min-w-[170px] xl:flex-1">
+      <SelectorDeFiltro name={name} etiqueta={etiqueta} opciones={opciones} valor={valor ?? ''} />
     </div>
   );
 }
@@ -87,14 +73,20 @@ export function FiltroDeSeleccion({
 /** Un campo de fecha de la barra: arriba, su etiqueta chica. */
 export function FiltroDeFecha({ id, name, etiqueta, valor }: PropsDeCampo & { valor: string }) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 xl:min-w-[170px] xl:flex-1">
       <label
         htmlFor={id}
         className="text-[10px] font-black text-muted-foreground uppercase tracking-widest"
       >
         {etiqueta}
       </label>
-      <input id={id} name={name} type="date" defaultValue={valor} className={CAMPO_DE_FILTRO} />
+      <input
+        id={id}
+        name={name}
+        type="date"
+        defaultValue={valor}
+        className={cn(CAMPO_DE_FILTRO, 'sm:w-full')}
+      />
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { EnlaceDeVolver } from '@/components/panel/EnlaceDeVolver';
 import { Pencil, Send } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -100,12 +101,7 @@ export default async function FichaDeProveedor({ params }: { params: Promise<{ i
         proveedorId={proveedor.id}
         hoy={diaEnArgentina(new Date())}
       />
-      <Link
-        href="/admin/proveedores"
-        className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
-      >
-        Volver a proveedores
-      </Link>
+      <EnlaceDeVolver href="/admin/proveedores">Volver a proveedores</EnlaceDeVolver>
     </Pantalla>
   );
 }

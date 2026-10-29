@@ -1,3 +1,4 @@
+import { EnlaceDeVolver } from '@/components/panel/EnlaceDeVolver';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -72,12 +73,7 @@ export default async function RegistroDeAuditoria({ params }: { params: Promise<
         </FranjaDeAviso>
       ) : null}
       <Cambios cambios={cambiosDe(registro, nombres)} conAntes={registro.antes !== null} />
-      <Link
-        href="/admin/auditoria"
-        className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
-      >
-        Volver a la auditoría
-      </Link>
+      <EnlaceDeVolver href="/admin/auditoria">Volver a la auditoría</EnlaceDeVolver>
     </Pantalla>
   );
 }
