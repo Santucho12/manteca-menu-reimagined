@@ -11,6 +11,7 @@ import {
 import { Campo } from '@/components/formularios/Campo';
 import { BOTON_PELIGRO, BOTON_SUAVE, ETIQUETA } from '@/components/panel/estilos';
 import type { DatosDeCierre } from '@/lib/caja/esquemas';
+import { CAMPO_CONTRASTADO } from './contraste';
 
 type Props = {
   control: Control<DatosDeCierre>;
@@ -47,9 +48,15 @@ function Quitar({ alTocar }: { alTocar: () => void }) {
   );
 }
 
-function Sumar({ alTocar, children }: { alTocar: () => void; children: ReactNode }) {
+// Cada tipo de salida tiene su color para no confundir un retiro con un gasto.
+const COLOR_DE_RETIRO = 'bg-amber-100 text-amber-900 border border-amber-300 hover:bg-amber-200';
+const COLOR_DE_GASTO = 'bg-violet-100 text-violet-900 border border-violet-300 hover:bg-violet-200';
+
+type PropsDeSumar = { alTocar: () => void; color: string; children: ReactNode };
+
+function Sumar({ alTocar, color, children }: PropsDeSumar) {
   return (
-    <button type="button" onClick={alTocar} className={BOTON_SUAVE}>
+    <button type="button" onClick={alTocar} className={`${BOTON_SUAVE} ${color}`}>
       <Plus size={14} aria-hidden="true" /> {children}
     </button>
   );
@@ -63,6 +70,7 @@ export function Retiros({ control, register, errors }: Props) {
       {fields.map((retiro, i) => (
         <div key={retiro.id} className={FILA}>
           <Campo
+            className={CAMPO_CONTRASTADO}
             id={`retiro-monto-${i}`}
             etiqueta={`Monto del retiro ${i + 1}`}
             inputMode="decimal"
@@ -70,6 +78,7 @@ export function Retiros({ control, register, errors }: Props) {
             {...register(`retiros.${i}.monto`)}
           />
           <Campo
+            className={CAMPO_CONTRASTADO}
             id={`retiro-quien-${i}`}
             etiqueta={`Quién retiró ${i + 1}`}
             error={errors.retiros?.[i]?.quien?.message}
@@ -78,7 +87,9 @@ export function Retiros({ control, register, errors }: Props) {
           <Quitar alTocar={() => remove(i)} />
         </div>
       ))}
-      <Sumar alTocar={() => append({ monto: '', quien: '' })}>Sumar retiro</Sumar>
+      <Sumar color={COLOR_DE_RETIRO} alTocar={() => append({ monto: '', quien: '' })}>
+        Sumar retiro
+      </Sumar>
     </Grupo>
   );
 }
@@ -91,6 +102,7 @@ export function GastosDeCaja({ control, register, errors }: Props) {
       {fields.map((gasto, i) => (
         <div key={gasto.id} className={FILA}>
           <Campo
+            className={CAMPO_CONTRASTADO}
             id={`gasto-monto-${i}`}
             etiqueta={`Monto del gasto ${i + 1}`}
             inputMode="decimal"
@@ -98,6 +110,7 @@ export function GastosDeCaja({ control, register, errors }: Props) {
             {...register(`gastos.${i}.monto`)}
           />
           <Campo
+            className={CAMPO_CONTRASTADO}
             id={`gasto-descripcion-${i}`}
             etiqueta={`En qué se gastó ${i + 1}`}
             error={errors.gastos?.[i]?.descripcion?.message}
@@ -106,7 +119,9 @@ export function GastosDeCaja({ control, register, errors }: Props) {
           <Quitar alTocar={() => remove(i)} />
         </div>
       ))}
-      <Sumar alTocar={() => append({ monto: '', descripcion: '' })}>Sumar gasto</Sumar>
+      <Sumar color={COLOR_DE_GASTO} alTocar={() => append({ monto: '', descripcion: '' })}>
+        Sumar gasto
+      </Sumar>
     </Grupo>
   );
 }

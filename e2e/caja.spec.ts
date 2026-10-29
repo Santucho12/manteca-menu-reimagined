@@ -54,7 +54,7 @@ test('carga el cierre a ciegas y despues ve su resultado completo', async ({ pag
   await expect(page.getByText('Con diferencia', { exact: true })).toBeVisible();
   await expect(page.getByText('$25.000,50').first()).toBeVisible();
   await expect(page.getByText('Efectivo contado')).toBeVisible();
-  await expect(page.getByText(/Esperado = fondo inicial/)).toBeVisible();
+  await expect(page.getByText('¿Cómo se calcula lo esperado?')).toBeVisible();
   await expect(page.getByText('Dueño')).toBeVisible();
   await expect(page.getByText('Hielo')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Anular' })).toHaveCount(0);

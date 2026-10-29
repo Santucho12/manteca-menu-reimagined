@@ -72,7 +72,7 @@ export default async function ControlDeCierres({
       acciones={<Acciones tolerancia={montoParaEditar(tolerancia)} />}
       ayuda="control"
     >
-      <FiltrosDelControl filtros={filtros} personas={personas} hoy={hoy} />
+      <FiltrosDelControl filtros={filtros} personas={personas} />
       <DiasSinCierre
         dias={verPendientes(filtros) ? faltan : []}
         abierto={filtros.estado === 'pendiente'}

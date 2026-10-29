@@ -71,14 +71,16 @@ test('marca los dias pendientes y filtra por estado', async ({ page }) => {
   await expect(
     aviso.getByRole('link', { name: fechaParaMostrar(diaSiguiente(fecha)) }),
   ).toBeVisible();
-  await page.getByLabel('Estado').selectOption({ label: 'Pendiente' });
+  await page.getByRole('combobox', { name: 'Estado' }).click();
+  await page.getByRole('option', { name: 'Pendiente', exact: true }).click();
   await expect(page).toHaveURL(/estado=pendiente/);
   await expect(
     page
       .getByRole('list', { name: 'Días sin cierre' })
       .getByRole('link', { name: fechaParaMostrar(diaSiguiente(fecha)) }),
   ).toBeVisible();
-  await page.getByLabel('Estado').selectOption({ label: 'Cierra' });
+  await page.getByRole('combobox', { name: 'Estado' }).click();
+  await page.getByRole('option', { name: 'Cierra', exact: true }).click();
   await expect(page.getByText('No hay cierres para mostrar.')).toBeVisible();
 });
 

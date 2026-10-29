@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { BOTON_SUAVE } from '@/components/panel/estilos';
+import { BOTON_PELIGRO } from '@/components/panel/estilos';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { fechaDelFondoSugerido, fondoSugerido } from '@/lib/caja/consultas';
@@ -19,7 +19,7 @@ function QuienCarga({ nombre }: { nombre: string }) {
   return (
     <form action="/admin/salir" method="post" className="flex flex-wrap items-center gap-3">
       <p className="text-sm font-semibold">Cargando como {nombre}.</p>
-      <button type="submit" className={`${BOTON_SUAVE} h-10 px-4`}>
+      <button type="submit" className={`${BOTON_PELIGRO} bg-rose-50`}>
         ¿No sos vos? Cambiar de persona
       </button>
     </form>

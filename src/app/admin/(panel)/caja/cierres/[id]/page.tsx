@@ -6,14 +6,13 @@ import { FranjaDeAviso } from '@/components/panel/Avisos';
 import { ACCESO_SECUNDARIO, ICONO_DE_ACCESO_SUAVE } from '@/components/panel/estilos';
 import { EnlaceDeVolver } from '@/components/panel/EnlaceDeVolver';
 import { BotonDeAnular } from '@/components/panel/BotonDeAnular';
-import { InsigniaDeEstado } from '@/components/panel/Insignias';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { cierrePorId, fondosAnteriores, type Cierre } from '@/lib/caja/consultas';
-import { nombreDeEstado, tonoDelCierre } from '@/lib/caja/pantalla';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import { anularCierreDesdeElPanel } from '../../acciones';
 import { DetalleDelCierre } from './DetalleDelCierre';
+import { ResumenDelCierre } from './ResumenDelCierre';
 
 export const metadata: Metadata = { title: 'Cierre de caja' };
 
@@ -58,11 +57,7 @@ export default async function FichaDeCierre({ params }: { params: Promise<{ id: 
       subtitulo={`Cargado por ${cierre.persona}`}
       ayuda={esAdmin ? 'control' : 'caja'}
     >
-      <div>
-        <InsigniaDeEstado tono={tonoDelCierre(cierre)}>
-          {cierre.anulado ? 'Anulado' : nombreDeEstado(cierre.estado)}
-        </InsigniaDeEstado>
-      </div>
+      <ResumenDelCierre cierre={cierre} />
       <Marcas cierre={cierre} />
       <DetalleDelCierre cierre={cierre} fondoAnterior={anterior} />
       {cierre.anulado ? null : <AccionesDelCierre cierre={cierre} esAdmin={esAdmin} />}
