@@ -1,3 +1,4 @@
+import { EnlaceDeVolver } from '@/components/panel/EnlaceDeVolver';
 import { Receipt } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -137,12 +138,7 @@ export default async function FichaDeGasto({ params }: { params: Promise<{ id: s
           )}
         </>
       )}
-      <Link
-        href="/admin/gastos"
-        className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
-      >
-        Volver a gastos
-      </Link>
+      <EnlaceDeVolver href="/admin/gastos">Volver a gastos</EnlaceDeVolver>
     </Pantalla>
   );
 }

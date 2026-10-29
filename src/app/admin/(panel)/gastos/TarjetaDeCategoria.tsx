@@ -3,6 +3,7 @@
 import { Filter } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { ACCESO_SECUNDARIO, ICONO_DE_ACCESO_SUAVE } from '@/components/panel/estilos';
 import { Ventana } from '@/components/panel/Ventana';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import type { ResumenDeCategoria } from '@/lib/gastos/porCategoria';
@@ -20,16 +21,19 @@ const cantidadDe = (n: number) => (n === 1 ? '1 gasto' : `${n} gastos`);
 
 function GastosDeLaCategoria({ categoria }: { categoria: ResumenDeCategoria }) {
   return (
-    <ul aria-label={`Gastos de ${categoria.nombre}`} className="divide-y divide-border">
+    <ul aria-label={`Gastos de ${categoria.nombre}`} className="space-y-1.5">
       {categoria.gastos.map((gasto) => (
-        <li key={gasto.id} className="flex items-baseline justify-between gap-4 py-2.5 text-sm">
-          <span className="min-w-0">
-            <span className="font-bold text-muted-foreground">
-              {fechaParaMostrar(gasto.fecha).slice(0, 5)}
-            </span>{' '}
+        <li
+          key={gasto.id}
+          className="flex items-center gap-3 rounded-2xl bg-secondary/40 px-3 py-2.5 text-sm"
+        >
+          <span className="w-12 shrink-0 rounded-xl bg-white py-1 text-center text-xs font-bold text-muted-foreground shadow-xs">
+            {fechaParaMostrar(gasto.fecha).slice(0, 5)}
+          </span>
+          <span className="min-w-0 flex-1 truncate font-medium">
             {gasto.descripcion ?? 'Sin descripción'}
           </span>
-          <span className="shrink-0 font-bold tabular-nums">
+          <span className="shrink-0 font-display text-base font-bold tabular-nums">
             {formatearPesos(gasto.montoCentavos)}
           </span>
         </li>
@@ -47,31 +51,32 @@ export function TarjetaDeCategoria({ categoria, enlace, activa }: Props) {
         type="button"
         onClick={() => setAbierta(true)}
         className={cn(
-          'block w-full rounded-2xl border p-4 text-left transition-all hover:-translate-y-0.5 active:scale-[0.99]',
-          activa
-            ? 'bg-secondary border-foreground/25 shadow-md'
-            : 'bg-card border-border shadow-xs hover:shadow-md',
+          'block w-full rounded-3xl border bg-white p-4 text-left shadow-sm shadow-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.99]',
+          activa ? 'border-foreground/30 ring-2 ring-foreground/10' : 'border-border',
         )}
       >
-        <span className="block truncate text-xs font-black uppercase tracking-widest text-muted-foreground">
+        <span className="block truncate text-sm font-semibold text-muted-foreground">
           {categoria.nombre}
         </span>
-        <strong className="mt-1 block font-display text-xl font-bold tracking-tight">
+        <strong className="mt-2 block font-display text-2xl font-bold tracking-tight">
           {formatearPesos(categoria.totalCentavos)}
         </strong>
-        <span className="text-xs text-muted-foreground">{cantidadDe(categoria.cantidad)}</span>
+        <span className="mt-1 block text-sm text-muted-foreground">
+          {cantidadDe(categoria.cantidad)}
+        </span>
       </button>
       <Ventana abierta={abierta} cerrar={() => setAbierta(false)} titulo={categoria.nombre}>
-        <p className="mb-3 text-sm text-muted-foreground">
-          {cantidadDe(categoria.cantidad)} ·{' '}
-          <strong>{formatearPesos(categoria.totalCentavos)}</strong>
+        <p className="mb-4 flex items-baseline gap-2">
+          <strong className="font-display text-3xl font-bold tracking-tight">
+            {formatearPesos(categoria.totalCentavos)}
+          </strong>
+          <span className="text-sm text-muted-foreground">{cantidadDe(categoria.cantidad)}</span>
         </p>
         <GastosDeLaCategoria categoria={categoria} />
-        <Link
-          href={enlace}
-          className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-foreground hover:underline"
-        >
-          <Filter size={14} aria-hidden="true" />{' '}
+        <Link href={enlace} className={`${ACCESO_SECUNDARIO} mt-5`}>
+          <span className={ICONO_DE_ACCESO_SUAVE}>
+            <Filter size={15} aria-hidden="true" />
+          </span>
           {activa ? 'Ver todos los gastos' : 'Filtrar la lista'}
         </Link>
       </Ventana>

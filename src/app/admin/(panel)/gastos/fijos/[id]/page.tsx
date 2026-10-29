@@ -1,6 +1,6 @@
+import { EnlaceDeVolver } from '@/components/panel/EnlaceDeVolver';
 import { Repeat } from 'lucide-react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { BotonDeEstado } from '@/components/panel/BotonDeEstado';
 import { InsigniaDeEstado } from '@/components/panel/Insignias';
@@ -52,12 +52,7 @@ export default async function FichaDeFijo({ params }: { params: Promise<{ id: st
         </p>
       </div>
       <PagosDelFijo pagos={pagos} />
-      <Link
-        href="/admin/gastos"
-        className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
-      >
-        Volver a gastos
-      </Link>
+      <EnlaceDeVolver href="/admin/gastos">Volver a gastos</EnlaceDeVolver>
     </Pantalla>
   );
 }

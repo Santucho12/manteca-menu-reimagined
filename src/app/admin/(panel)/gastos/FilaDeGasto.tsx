@@ -10,7 +10,7 @@ import { BaldosaDeFecha } from './BaldosaDeFecha';
 export function FilaDeGasto({ gasto }: { gasto: Gasto }) {
   const marcas = marcasDelGasto(gasto);
   return (
-    <li className="px-4 md:px-5 py-3 flex items-center gap-3 hover:bg-secondary/40 transition-colors">
+    <li className="flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors duration-200 hover:bg-secondary/50">
       <BaldosaDeFecha fecha={gasto.fecha} />
       <div className="flex-1 min-w-0 space-y-1">
         <Link
@@ -32,7 +32,7 @@ export function FilaDeGasto({ gasto }: { gasto: Gasto }) {
       </div>
       <span
         className={cn(
-          'text-sm font-bold tabular-nums whitespace-nowrap',
+          'font-display text-base font-bold tabular-nums whitespace-nowrap',
           gasto.anulado ? 'text-muted-foreground line-through' : 'text-foreground',
         )}
       >

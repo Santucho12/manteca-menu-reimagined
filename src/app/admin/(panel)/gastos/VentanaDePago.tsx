@@ -89,7 +89,7 @@ function FormularioDePago({ item, hoy, cerrar }: Props & { cerrar: () => void })
   );
 }
 
-/** Pagado: una ventana con la fecha, el monto y el medio ya completos, para confirmar o corregir. */
+/** Marcar como pago: una ventana con la fecha, el monto y el medio ya completos, para confirmar o corregir. */
 export function BotonDePago({ item, hoy, abierta: alInicio = false }: PropsDelBoton) {
   const [abierta, setAbierta] = useState(alInicio);
   return (
@@ -97,12 +97,16 @@ export function BotonDePago({ item, hoy, abierta: alInicio = false }: PropsDelBo
       <button
         type="button"
         onClick={() => setAbierta(true)}
-        className={cn(BOTON_DE_FILA_SUAVE, 'h-7 px-2 text-[10px]')}
+        className={cn(BOTON_DE_FILA_SUAVE, 'h-8 whitespace-nowrap px-3 text-[11px]')}
       >
         <Check size={13} aria-hidden="true" />
-        Pagado
+        Marcar como pago
       </button>
-      <Ventana abierta={abierta} cerrar={() => setAbierta(false)} titulo={`Pagado: ${item.nombre}`}>
+      <Ventana
+        abierta={abierta}
+        cerrar={() => setAbierta(false)}
+        titulo={`Marcar como pago: ${item.nombre}`}
+      >
         <FormularioDePago item={item} hoy={hoy} cerrar={() => setAbierta(false)} />
       </Ventana>
     </>

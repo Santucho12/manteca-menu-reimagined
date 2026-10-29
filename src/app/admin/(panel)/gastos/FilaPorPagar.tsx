@@ -39,7 +39,7 @@ export function FilaPorPagar({
 }) {
   const vencido = item.fecha < hoy;
   return (
-    <li className="px-4 md:px-5 py-2 flex items-center gap-2.5 hover:bg-secondary/40 transition-colors">
+    <li className="flex items-center gap-2.5 rounded-2xl px-3 py-2 transition-colors duration-200 hover:bg-secondary/50">
       <BaldosaDeFecha fecha={item.fecha} viene={!vencido} vencido={vencido} chica />
       <div className="flex-1 min-w-0">
         <Nombre item={item} />

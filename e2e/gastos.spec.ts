@@ -65,7 +65,8 @@ test('la categoría se aplica sola, sin botón ni filtro de proveedor', async ({
   await expect(page.getByRole('button', { name: 'Filtrar' })).toHaveCount(0);
   const pagados = page.getByRole('region', { name: 'Pagados' });
   await expect(pagados.getByLabel('Proveedor')).toHaveCount(0);
-  await pagados.getByLabel('Categoría').selectOption({ label: nombre });
+  await pagados.getByRole('combobox', { name: 'Categoría' }).click();
+  await page.getByRole('option', { name: nombre, exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`categoria=${id}`));
   await expect(filas(page, 'Gastos')).toHaveCount(1);
 });
