@@ -1,5 +1,6 @@
 import type { Cliente } from '../supabase/cliente';
 import { POR_PAGINA, cantidadDePaginas } from '../usuarios/presentacion';
+import { fondosAnterioresDe } from './fondosAnteriores';
 import type { FiltrosDeControl } from './pantalla';
 import type { Medio, ResultadoDeMedio } from './resultado';
 import { resultadoDeFila, type FilaConVentas } from './resultadoDeFila';
@@ -139,6 +140,22 @@ function detalleDe(leida: Leida) {
 export async function fondoSugerido(cliente: Cliente, fecha: string): Promise<number | null> {
   const respuesta = await cliente.rpc('cierres_fondo_sugerido', { la_fecha: fecha });
   return comprobar(respuesta, 'el fondo de la caja');
+}
+
+/**
+ * Lo que quedo en la caja en el cierre anterior a cada cierre del rango, sin esperar la lista: los
+ * cierres de todas las personas (el anterior puede ser de otra) y el ultimo de antes del rango.
+ */
+export async function fondosDelRango(
+  cliente: Cliente,
+  desde: string,
+  hasta: string,
+): Promise<Map<string, number | null>> {
+  const [cierres, antes] = await Promise.all([
+    leerCierres(cliente, desde, hasta),
+    fondoSugerido(cliente, desde),
+  ]);
+  return fondosAnterioresDe(cierres, antes);
 }
 
 /** El dia del cierre del que sale el fondo sugerido; nulo si todavia no hay ninguno. */

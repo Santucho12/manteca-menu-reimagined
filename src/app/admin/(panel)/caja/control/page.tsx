@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { Paginas } from '@/components/panel/Paginas';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import {
   diasConCierre,
-  fondosAnteriores,
+  fondosDelRango,
   listarCierres,
   personasDeCaja,
   primerDiaConCierre,
@@ -19,6 +19,7 @@ import {
 } from '@/lib/caja/pantalla';
 import { diaEnArgentina } from '@/lib/fechas';
 import { montoParaEditar } from '@/lib/gastos/plata';
+import type { Cliente } from '@/lib/supabase/cliente';
 import { cantidadDePaginas } from '@/lib/usuarios/presentacion';
 import { AccesoACargarCierre } from '../AccesoACargarCierre';
 import { ListaDeCierres } from '../ListaDeCierres';
@@ -27,23 +28,24 @@ import { ToleranciaEnTuerca } from './ToleranciaEnTuerca';
 
 export const metadata: Metadata = { title: 'Control de cierres' };
 
-async function datosDelControl(searchParams: Promise<ParametrosDeControl>) {
-  const { cliente } = await exigirPagina('admin');
-  const hoy = diaEnArgentina(new Date());
-  const filtros = filtrosDeControl(await searchParams, hoy);
-  const [lista, personas, tolerancia, conCierre, primero] = await Promise.all([
+// Todo en una tanda: los fondos anteriores salen de los cierres del rango, no de la lista.
+const leerElControl = (cliente: Cliente, filtros: FiltrosDeControl) =>
+  Promise.all([
     listarCierres(cliente, filtros),
     personasDeCaja(cliente),
     toleranciaDeCaja(cliente),
     diasConCierre(cliente, filtros.desde, filtros.hasta),
     primerDiaConCierre(cliente),
+    fondosDelRango(cliente, filtros.desde, filtros.hasta),
   ]);
+
+async function datosDelControl(searchParams: Promise<ParametrosDeControl>) {
+  const hoy = diaEnArgentina(new Date());
+  const filtros = filtrosDeControl(await searchParams, hoy);
+  const { datos } = await exigirPaginaYLeer('admin', (cliente) => leerElControl(cliente, filtros));
+  const [lista, personas, tolerancia, conCierre, primero, fondos] = datos;
   const { desde, hasta } = filtros;
   const faltan = diasSinCierre({ desde, hasta, conCierre, primero, hoy });
-  const fondos = await fondosAnteriores(
-    cliente,
-    lista.filas.map((fila) => fila.id),
-  );
   return { hoy, filtros, lista, personas, tolerancia, faltan, fondos };
 }
 
