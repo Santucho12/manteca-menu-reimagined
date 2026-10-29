@@ -150,6 +150,18 @@ Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, 
 
 **Excepción (Santiago, 2026-10-21):** los colores del panel son los exactos de Plan Reminder Pro aunque no pasen el contraste AA que pide el pedido 21 (letra blanca sobre el verde, 2,6 a 1; el rojo de error, 3,6; el anillo de foco, 2,5; los grises chicos, 2,6). Las pruebas de contraste (`tests/contraste.test.ts`) siguen mirando solo la carta pública; no se extienden al panel. El panel no bloquea el zoom en el celular, a diferencia de Plan Reminder Pro (Santiago, 2026-10-22).
 
+### 72. Inicio: cartelito de la semana y aviso nuevo
+En «Esta semana vs la anterior» el cartelito muestra las ventas de ese día y las ventas hasta ese día, en las dos semanas, en dos bloques simples. El gráfico de gastos por categoría deja el dorado (celeste). Las flechas de «Para atender» se ponen rojas al pasar el mouse. La ayuda de Inicio suma los botones de cada tarjeta (Santiago, 2026-10-28).
+
+### 71. Menú: filas que abren el detalle, iconos nuevos y «Aumentar precios»
+En Menú, tocar un producto o una categoría abre su edición; los iconos de cada fila (flechas juntas, ojo, lápiz azul al pasar el mouse, tacho) se rediseñan; las filas de productos pierden las líneas; «Aumento de precios» pasa a «Aumentar precios»; el aviso de Fudo aclara que todavía no hay integración. La ayuda de Menú y la de Ventas se completan (Santiago, 2026-10-28).
+
+### 70. Usuarios: tarjetas más simples, sin «Rechazar» y con «Vos»
+En Usuarios se quita el botón Rechazar (queda solo el selector de rol), las tarjetas pasan a una sola fila de acciones con altura pareja, la propia cuenta lleva la etiqueta verde «Vos», y el selector de rol pierde el borde dorado. La ayuda deja de hablar de Rechazar y de Mi cuenta (Santiago, 2026-10-28).
+
+### 69. Panel: hover del menú lateral, aviso Próximamente y caja
+Todos los botones del menú lateral y la tarjeta de sesión comparten el hover blanco con borde y sombra, y el menú se ve un 1 % más chico. El aviso Próximamente se simplifica. En Caja se invierte el orden de «Cargar cierre» y «Diferencia aceptada» (Santiago, 2026-10-28).
+
 ### 68. Gastos: pagar desde el aviso de Inicio, Pagados desplegable y Próximos pagos con plazo
 Desde Inicio, «Esta semana vence 1 pago» abre Gastos con la ventana de «Pagado» de ese pago. «Pagados» pasa a un desplegable cerrado por defecto («Ver los pagados»). Cada tarjeta de categoría abre una ventana con todos sus gastos. Próximos pagos muestra por defecto los 30 días que vienen, con selector de 15 días, 30 días, 1 año o todos. El filtro de categoría dice «Filtrar por categoría» (Santiago, 2026-10-28).
 
@@ -263,6 +275,10 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 72 | Inicio: cartelito de la semana y aviso nuevo | Todo |
+| 71 | Menú: filas que abren el detalle, iconos nuevos y «Aumentar precios» | Todo |
+| 70 | Usuarios: tarjetas más simples, sin «Rechazar» y con «Vos» | Todo |
+| 69 | Panel: hover del menú lateral, aviso Próximamente y caja | Todo |
 | 68 | Gastos: pagar desde el aviso de Inicio, Pagados desplegable y Próximos pagos con plazo | Hecho con TDD en lo puro (643 tests en verde, lint y tipos); falta correr Playwright de Gastos (se cortó por tiempo) y arreglar lo que rompa por el desplegable |
 | 67 | Gastos: una tarjeta por categoría arriba de Pagados | Todo |
 | 66 | Cierres de caja: dos estados, editables y comparados con las ventas del día | Hecho con TDD (2026-10-28): migración `20261028190000_cierres_rediseno.sql` aplicada solo en pruebas (por `execute_sql`: `apply_migration` rechazaba con «Invalid or expired requestState»; no figura en el historial de migraciones) y reversa sin probar. Lint, tipos, build y 671 tests puros en verde; base: reglas, RLS y servicios en verde salvo 3 de Ventas por el canal «Cheaf» duplicado (no es de este pedido). Playwright de Caja en computadora: 16 en verde y falla `caja.spec` «no ve los cierres de otros» (404 que llega 200, anterior). En celular fallan `caja-control` «ve el cierre…» y «toda la fila abre su detalle» (sin investigar) y ese mismo 404. Falta: arreglar esos dos de celular, `npm run e2e` entero en los dos tamaños, capturas contra `referencias/`, OK de Santiago para la base real y probar la reversa |

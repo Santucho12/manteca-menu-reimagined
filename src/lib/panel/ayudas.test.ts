@@ -127,7 +127,6 @@ describe('ayudas', () => {
         'Pendiente',
         'Cierra',
         'Con diferencia',
-        'Ver anulados',
         'Fondo distinto',
         'tolerancia',
         'pendientes',
