@@ -16,6 +16,12 @@ const configuracion: NextConfig = {
       },
     ],
   },
+  experimental: {
+    // Volver a una seccion vista hace menos de 30 s la muestra sin pedirla de nuevo: cada pedido
+    // espera el viaje hasta la base (pedido 74). Guardar algo la vacia igual, porque las acciones
+    // llaman a revalidatePath('/admin', 'layout').
+    staleTimes: { dynamic: 30 },
+  },
 };
 
 export default configuracion;
