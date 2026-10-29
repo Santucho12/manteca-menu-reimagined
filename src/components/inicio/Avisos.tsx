@@ -25,10 +25,10 @@ export function Avisos({ avisos }: { avisos: Aviso[] }) {
           <li key={aviso.texto}>
             <Link
               href={aviso.enlace}
-              className="flex items-center justify-between gap-4 rounded-xl border border-border bg-white/60 px-5 py-4 text-sm font-bold hover:bg-white hover:border-[#d8cdb6] hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+              className="group flex items-center justify-between gap-4 rounded-xl border border-border bg-white/60 px-5 py-4 text-sm font-bold hover:bg-white hover:border-[#d8cdb6] hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
             >
               {aviso.texto}
-              <span className="shrink-0 h-6 w-6 rounded-full bg-secondary text-muted-foreground flex items-center justify-center">
+              <span className="shrink-0 h-6 w-6 rounded-full bg-secondary text-muted-foreground flex items-center justify-center transition-all duration-200 group-hover:bg-rose-600 group-hover:text-white">
                 <ChevronRight size={13} aria-hidden="true" />
               </span>
             </Link>

@@ -8,8 +8,8 @@ import { TOOLTIP } from '@/components/reportes/estiloDelTooltip';
 import { EncabezadoDeTarjeta } from './EncabezadoDeTarjeta';
 import type { GastoDelDia } from '@/lib/reportes/gastos';
 
-// Los colores vivos de "Mes a mes" (verde, azul y rojo), y ambar y violeta para las otras dos.
-const COLORES = ['#10b981', '#bfa042', '#f43f5e', '#f59e0b', '#8b5cf6'];
+// Los colores vivos de "Mes a mes" (verde, azul y rojo), el celeste, el ambar y el violeta para el resto.
+const COLORES = ['#10b981', '#0ea5e9', '#f43f5e', '#f59e0b', '#8b5cf6'];
 
 const pesos = (valor: unknown) => formatearPesos(Math.round(Number(valor)));
 

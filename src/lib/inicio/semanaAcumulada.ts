@@ -1,7 +1,14 @@
 import type { EstadoDeVariacion } from './estadoDeVariacion';
 import type { DiaDeLaSemana } from './semana';
 
-export type PuntoAcumulado = { etiqueta: string; actual: number; anterior: number };
+export type PuntoAcumulado = {
+  etiqueta: string;
+  actual: number;
+  anterior: number;
+  /** Lo vendido ese día solo, para el cartelito: la línea muestra lo acumulado. */
+  delDia: number;
+  delDiaAnterior: number;
+};
 export type ResumenDeLaSemana = { titulo: string; chip: string; estado: EstadoDeVariacion };
 
 /** Las ventas de cada semana sumadas día a día: un día sin ventas deja la línea plana. */
@@ -11,7 +18,13 @@ export function acumularSemana(dias: DiaDeLaSemana[]): PuntoAcumulado[] {
   return dias.map((d) => {
     actual += d.actual;
     anterior += d.anterior;
-    return { etiqueta: d.etiqueta, actual, anterior };
+    return {
+      etiqueta: d.etiqueta,
+      actual,
+      anterior,
+      delDia: d.actual,
+      delDiaAnterior: d.anterior,
+    };
   });
 }
 

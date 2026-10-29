@@ -48,7 +48,7 @@ function deGastos({ cantidad }: DatosDeAvisos['sinClasificar']): Aviso[] {
   return [{ texto: `Hay ${cantidad} ${que} sin clasificar.`, enlace: '/admin/gastos' }];
 }
 
-// Si vence uno solo, Gastos abre su ventana de "Pagado" (pagar = el fijo y su vencimiento).
+// Si vence uno solo, Gastos abre su ventana de "Marcar como pago" (pagar = el fijo y su vencimiento).
 function deVencimientos(n = 0, uno?: DatosDeAvisos['unVencimiento']): Aviso[] {
   if (n === 0) return [];
   const texto = n === 1 ? 'Esta semana vence 1 pago.' : `Esta semana vencen ${n} pagos.`;
