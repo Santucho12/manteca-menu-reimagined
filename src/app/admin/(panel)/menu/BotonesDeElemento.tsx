@@ -4,17 +4,20 @@ import { ArrowDown, ArrowUp, Eye, EyeOff, Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { AvisoDeError } from '@/components/formularios/AvisoDeError';
-import {
-  BOTON_CANCELAR,
-  BOTON_PELIGRO,
-  ICONO_BORRAR,
-  ICONO_DE_ACCION,
-  ICONO_EDITAR,
-} from '@/components/panel/estilos';
+import { BOTON_CANCELAR, BOTON_PELIGRO } from '@/components/panel/estilos';
 import { Ventana } from '@/components/panel/Ventana';
 import { PREGUNTA_DE_DESACTIVAR } from '@/lib/menu/pantalla';
 import { useAccionDelMenu } from '@/lib/menu/useAccionDelMenu';
 import { cambiarVisibilidadEnElMenu, desactivarEnElMenu, moverEnElMenu } from './acciones';
+
+// Las flechas van juntas en una pastilla y las otras tres, sueltas: se distingue mover de cambiar.
+const BASE =
+  'flex h-8 w-8 items-center justify-center rounded-full text-slate-500 transition-all duration-200 active:scale-95 disabled:opacity-40';
+const ACCION = `${BASE} hover:bg-white hover:text-foreground hover:shadow-sm`;
+const EDITAR =
+  'flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:text-[#2563eb] hover:bg-[#2563eb]/10 hover:scale-110 active:scale-95 transition-all duration-200';
+const BORRAR = `${BASE} hover:bg-rose-50 hover:text-rose-600`;
+const GRUPO = 'flex items-center rounded-full bg-secondary/60 p-0.5';
 
 type Props = {
   tipo: 'categoria' | 'producto';
@@ -80,35 +83,37 @@ export function BotonesDeElemento({ tipo, id, nombre, visible, editar }: Props) 
     hacer(() => cambiarVisibilidadEnElMenu({ tipo, id, mostrar: !visible }));
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-1">
-        <button
-          type="button"
-          disabled={enviando}
-          aria-label={`Subir ${nombre}`}
-          onClick={() => mover('arriba')}
-          className={ICONO_DE_ACCION}
-        >
-          <ArrowUp size={16} aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          disabled={enviando}
-          aria-label={`Bajar ${nombre}`}
-          onClick={() => mover('abajo')}
-          className={ICONO_DE_ACCION}
-        >
-          <ArrowDown size={16} aria-hidden="true" />
-        </button>
+      <div className="flex items-center gap-2">
+        <div className={GRUPO}>
+          <button
+            type="button"
+            disabled={enviando}
+            aria-label={`Subir ${nombre}`}
+            onClick={() => mover('arriba')}
+            className={ACCION}
+          >
+            <ArrowUp size={16} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            disabled={enviando}
+            aria-label={`Bajar ${nombre}`}
+            onClick={() => mover('abajo')}
+            className={ACCION}
+          >
+            <ArrowDown size={16} aria-hidden="true" />
+          </button>
+        </div>
         <button
           type="button"
           disabled={enviando}
           aria-label={`${accion} ${nombre}`}
           onClick={cambiarVisibilidad}
-          className={ICONO_DE_ACCION}
+          className={ACCION}
         >
           <Ojo size={16} aria-hidden="true" />
         </button>
-        <Link href={editar} aria-label={`Editar ${nombre}`} className={ICONO_EDITAR}>
+        <Link href={editar} aria-label={`Editar ${nombre}`} className={EDITAR}>
           <Pencil size={16} aria-hidden="true" />
         </Link>
         <button
@@ -119,7 +124,7 @@ export function BotonesDeElemento({ tipo, id, nombre, visible, editar }: Props) 
             setPedida(true);
             setConfirmando(true);
           }}
-          className={ICONO_BORRAR}
+          className={BORRAR}
         >
           <Trash2 size={16} aria-hidden="true" />
         </button>

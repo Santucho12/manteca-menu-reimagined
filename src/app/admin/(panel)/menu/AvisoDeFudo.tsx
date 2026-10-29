@@ -7,7 +7,10 @@ import { FranjaDeAviso } from '@/components/panel/Avisos';
 export function AvisoDeFudo() {
   return (
     <FranjaDeAviso>
-      <p>Cambiar un precio acá no lo cambia en Fudo: acordate de cambiarlo también allá.</p>
+      <p>
+        Cambiar un precio acá no lo cambia en Fudo: acordate de cambiarlo también allá. Es porque
+        todavía no estamos integrados con Fudo.
+      </p>
     </FranjaDeAviso>
   );
 }

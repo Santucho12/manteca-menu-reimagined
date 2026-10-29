@@ -15,7 +15,7 @@ function Accesos() {
     <>
       <BotonNuevo />
       <Link href="/admin/menu/aumento" className={BOTON_DE_ENCABEZADO_NEUTRO}>
-        Aumento de precios
+        Aumentar precios
       </Link>
     </>
   );

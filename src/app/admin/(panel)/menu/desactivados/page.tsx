@@ -1,5 +1,5 @@
+import { EnlaceDeVolver } from '@/components/panel/EnlaceDeVolver';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { leerFilasDelMenu } from '@/lib/menu/consultas';
@@ -18,12 +18,7 @@ export default async function PaginaDeDesactivados() {
       ayuda="menu"
     >
       <ListaDeDesactivados desactivados={desactivados(filas)} />
-      <Link
-        href="/admin/menu"
-        className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
-      >
-        Volver al menú
-      </Link>
+      <EnlaceDeVolver href="/admin/menu">Volver al menú</EnlaceDeVolver>
     </Pantalla>
   );
 }
