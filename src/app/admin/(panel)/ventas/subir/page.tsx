@@ -17,7 +17,7 @@ export default async function SubirExcelDeFudo() {
       ayuda="ventas"
     >
       <PasosDeLaSubida />
-      <Seccion icono={<FileSpreadsheet className="text-primary" size={24} />}>
+      <Seccion icono={<FileSpreadsheet className="text-emerald-600" size={24} />}>
         <FormularioDeExcel />
       </Seccion>
     </Pantalla>

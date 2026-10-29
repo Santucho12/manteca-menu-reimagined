@@ -56,11 +56,11 @@ export function ZonaDeArchivo({ archivo, elegir }: Props) {
         className={cn(
           ZONA,
           encima
-            ? 'border-primary bg-primary/5'
-            : 'border-border bg-secondary/20 hover:border-primary/50',
+            ? 'border-emerald-500 bg-emerald-50'
+            : 'border-border bg-secondary/20 hover:border-emerald-400',
         )}
       >
-        <span className="flex size-14 items-center justify-center rounded-2xl bg-card text-primary shadow-xs transition-transform group-hover:scale-105">
+        <span className="flex size-14 items-center justify-center rounded-2xl bg-card text-emerald-600 shadow-xs transition-transform group-hover:scale-105">
           <Upload size={24} aria-hidden="true" />
         </span>
         <span className="text-sm font-bold">Arrastrá el reporte de Fudo acá</span>

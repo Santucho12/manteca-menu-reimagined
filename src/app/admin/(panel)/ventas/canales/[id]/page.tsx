@@ -1,5 +1,5 @@
+import { EnlaceDeVolver } from '@/components/panel/EnlaceDeVolver';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { BotonDeEstado } from '@/components/panel/BotonDeEstado';
 import { InsigniaDeEstado } from '@/components/panel/Insignias';
@@ -36,12 +36,7 @@ export default async function FichaDeCanal({ params }: { params: Promise<{ id: s
         activo={canal.activo}
         cambiar={cambiarEstadoDeCanalDesdeElPanel}
       />
-      <Link
-        href="/admin/ventas/canales"
-        className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
-      >
-        Volver a tipos de venta
-      </Link>
+      <EnlaceDeVolver href="/admin/ventas/canales">Volver a tipos de venta</EnlaceDeVolver>
     </Pantalla>
   );
 }

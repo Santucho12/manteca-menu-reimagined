@@ -1,5 +1,5 @@
+import { EnlaceDeVolver } from '@/components/panel/EnlaceDeVolver';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { FranjaDeAviso } from '@/components/panel/Avisos';
 import { BotonDeAnular } from '@/components/panel/BotonDeAnular';
@@ -100,12 +100,7 @@ export default async function FichaDeVenta({ params }: { params: Promise<{ id: s
       <CargadoPor cliente={cliente} tabla="ventas" id={venta.id} />
       <Resumen venta={venta} />
       <Acciones venta={venta} />
-      <Link
-        href="/admin/ventas"
-        className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
-      >
-        Volver a ventas
-      </Link>
+      <EnlaceDeVolver href="/admin/ventas">Volver a ventas</EnlaceDeVolver>
     </Pantalla>
   );
 }

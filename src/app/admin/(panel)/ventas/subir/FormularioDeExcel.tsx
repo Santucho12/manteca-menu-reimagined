@@ -2,11 +2,14 @@
 
 import { useState, type FormEvent } from 'react';
 import { AvisoDeError } from '@/components/formularios/AvisoDeError';
-import { BOTON_PRINCIPAL, BOTON_SUAVE } from '@/components/panel/estilos';
 import { useUnaVez } from '@/lib/formularios/useUnaVez';
 import { guardarExcelDeFudo, revisarExcelDeFudo } from '../acciones';
 import { VistaDeLaSubida, type Vista } from './VistaDeLaSubida';
 import { ZonaDeArchivo } from './ZonaDeArchivo';
+
+// El verde del botón que lleva hasta esta pantalla (Subir Excel de Fudo).
+const VERDE =
+  'h-12 w-fit rounded-xl bg-emerald-600 px-6 text-[10px] font-bold uppercase tracking-widest text-white shadow-lg shadow-emerald-600/25 transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl active:translate-y-0 active:scale-95 disabled:opacity-60 disabled:hover:translate-y-0';
 
 // Revisar no guarda nada: el archivo se vuelve a mandar al confirmar, y la base decide.
 export function FormularioDeExcel() {
@@ -47,9 +50,11 @@ export function FormularioDeExcel() {
     <div className="space-y-5">
       <form onSubmit={revisar} noValidate className="space-y-5">
         <ZonaDeArchivo archivo={archivo} elegir={elegir} />
-        <button type="submit" disabled={enviando} className={BOTON_SUAVE}>
-          {enviando && !vista ? 'Revisando...' : 'Revisar archivo'}
-        </button>
+        {vista ? null : (
+          <button type="submit" disabled={enviando} className={VERDE}>
+            {enviando ? 'Revisando...' : 'Revisar archivo'}
+          </button>
+        )}
       </form>
       {error ? <AvisoDeError mensaje={error} /> : null}
       {listo ? (
@@ -59,7 +64,7 @@ export function FormularioDeExcel() {
       ) : null}
       {vista ? <VistaDeLaSubida vista={vista} /> : null}
       {vista ? (
-        <button type="button" onClick={guardar} disabled={enviando} className={BOTON_PRINCIPAL}>
+        <button type="button" onClick={guardar} disabled={enviando} className={VERDE}>
           {enviando ? 'Guardando...' : 'Guardar ventas'}
         </button>
       ) : null}

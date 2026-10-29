@@ -40,7 +40,6 @@ test('carga una venta con dos productos y ve su total y su detalle', async ({ pa
   await expect(page.getByLabel('Fecha')).toHaveValue(HOY);
   await page.getByLabel('Tipo de venta', { exact: true }).selectOption({ label: 'Encargo' });
   await page.getByLabel('Medio de pago').selectOption({ label: 'Transferencia' });
-  await page.getByRole('button', { name: 'Sumar producto' }).click();
   await page.getByLabel('Producto 1').selectOption({ label: producto.texto });
   await expect(page.getByLabel('Precio 1')).toHaveValue('1.000');
   await page.getByLabel('Cantidad 1').fill('2');
@@ -101,7 +100,8 @@ test('los filtros actualizan la lista solos: sin boton Filtrar ni filtro de orig
   await expect(page.getByLabel('Origen')).toHaveCount(0);
   const lista = page.getByRole('list', { name: 'Ventas' });
   await expect(lista.getByRole('listitem')).toHaveCount(1);
-  await page.getByLabel('Estado').selectOption({ label: 'Anuladas' });
+  await page.getByRole('combobox', { name: 'Estado' }).click();
+  await page.getByRole('option', { name: 'Anuladas', exact: true }).click();
   await expect(page).toHaveURL(/estado=anulada/);
   await expect(page.getByText('No hay ventas para mostrar')).toBeVisible();
 });
@@ -153,7 +153,6 @@ test('guarda capturas de la lista y la carga', async ({ page }, info) => {
   await page.evaluate(() => document.fonts.ready);
   await page.screenshot({ path: `e2e/capturas/ventas-${info.project.name}.png`, fullPage: true });
   await page.goto('/admin/ventas/nueva');
-  await page.getByRole('button', { name: 'Sumar producto' }).click();
   await page.screenshot({
     path: `e2e/capturas/venta-nueva-${info.project.name}.png`,
     fullPage: true,
