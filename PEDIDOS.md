@@ -150,6 +150,17 @@ Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, 
 
 **Excepción (Santiago, 2026-10-21):** los colores del panel son los exactos de Plan Reminder Pro aunque no pasen el contraste AA que pide el pedido 21 (letra blanca sobre el verde, 2,6 a 1; el rojo de error, 3,6; el anillo de foco, 2,5; los grises chicos, 2,6). Las pruebas de contraste (`tests/contraste.test.ts`) siguen mirando solo la carta pública; no se extienden al panel. El panel no bloquea el zoom en el celular, a diferencia de Plan Reminder Pro (Santiago, 2026-10-22).
 
+### 75. Bases de Supabase y funciones de Vercel en São Paulo
+Las dos bases (pruebas y real) están en Oregón (`us-west-2`): desde Argentina cada consulta tarda unos 250 ms, de los que Supabase procesa de 6 a 12. Se crean dos proyectos nuevos en São Paulo (`sa-east-1`), se copian con `pg_dump` la estructura, los datos, los usuarios con sus contraseñas y los trabajos programados, y al publicar las funciones de Vercel corren en São Paulo (`gru1`). Decisión de Santiago (2026-10-29).
+
+### 74. El navegador recuerda unos segundos cada sección visitada
+Volver a una sección vista hace menos de 30 segundos la muestra al instante, sin pedírsela de nuevo al servidor (`staleTimes.dynamic` de Next). Cuando alguien guarda algo, el panel entero se vuelve a pedir igual que hoy (Santiago, 2026-10-29).
+
+### 73. Cambiar de sección más rápido: una sola tanda de consultas por pantalla
+Al pasar de una sección a otra, el panel tardaba de 1,5 a 2,5 segundos: cada pantalla consultaba la base en tandas, una detrás de otra (Caja: el perfil, después cinco consultas y después los fondos anteriores), y cada tanda espera el viaje hasta la base. El control de acceso y los datos de cada pantalla salen a la vez: la base ya filtra cada consulta y quien no tiene permiso sigue yendo a su pantalla (Santiago, 2026-10-29). Diseño en `docs/superpowers/specs/2026-10-29-navegacion-rapida-design.md`, junto con el 74.
+
+**Excepción (Santiago, 2026-10-29):** el 73 y el 74 se hacen en un worktree aparte (`../Sistema-Manteca-navegacion`, rama `fix/navegacion-rapida`), con su propio `.env.local` y su `node_modules`, porque otra sesión tenía 55 archivos sin commitear en las mismas páginas y Santiago prefirió no esperarla. Las pruebas de Playwright de las dos sesiones usan el mismo puerto (3211): no se corren a la vez.
+
 ### 68. Gastos: pagar desde el aviso de Inicio, Pagados desplegable y Próximos pagos con plazo
 Desde Inicio, «Esta semana vence 1 pago» abre Gastos con la ventana de «Pagado» de ese pago. «Pagados» pasa a un desplegable cerrado por defecto («Ver los pagados»). Cada tarjeta de categoría abre una ventana con todos sus gastos. Próximos pagos muestra por defecto los 30 días que vienen, con selector de 15 días, 30 días, 1 año o todos. El filtro de categoría dice «Filtrar por categoría» (Santiago, 2026-10-28).
 
@@ -263,6 +274,9 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 75 | Bases de Supabase y funciones de Vercel en São Paulo | Postergado por Santiago (2026-10-29): se hace otro día. Ya relevado: Supabase no cambia la región de un proyecto existente; se crea uno nuevo eligiendo la región específica «South America (São Paulo)», no la general «Americas», que deja elegir a Supabase. Hay que respetar el límite de dos proyectos gratis: copia completa de las dos bases con `pg_dump` (instalado en la máquina), pausar la real vieja, crear y restaurar primero la de pruebas, y después la real. Ninguna base tiene fotos en Storage; la real tiene el menú (6 categorías y 35 productos), 1 usuario y la auditoría |
+| 74 | El navegador recuerda unos segundos cada sección visitada | Todo |
+| 73 | Cambiar de sección más rápido: una sola tanda de consultas por pantalla | Todo. Medido antes (2026-10-29, sesión de admin, Inicio ↔ Caja): con `npm run dev`, 1,5 a 2,5 s; con `npm run local`, 0,9 a 1,5 s |
 | 68 | Gastos: pagar desde el aviso de Inicio, Pagados desplegable y Próximos pagos con plazo | Hecho con TDD en lo puro (643 tests en verde, lint y tipos); falta correr Playwright de Gastos (se cortó por tiempo) y arreglar lo que rompa por el desplegable |
 | 67 | Gastos: una tarjeta por categoría arriba de Pagados | Todo |
 | 66 | Cierres de caja: dos estados, editables y comparados con las ventas del día | Hecho con TDD (2026-10-28): migración `20261028190000_cierres_rediseno.sql` aplicada solo en pruebas (por `execute_sql`: `apply_migration` rechazaba con «Invalid or expired requestState»; no figura en el historial de migraciones) y reversa sin probar. Lint, tipos, build y 671 tests puros en verde; base: reglas, RLS y servicios en verde salvo 3 de Ventas por el canal «Cheaf» duplicado (no es de este pedido). Playwright de Caja en computadora: 16 en verde y falla `caja.spec` «no ve los cierres de otros» (404 que llega 200, anterior). En celular fallan `caja-control` «ve el cierre…» y «toda la fila abre su detalle» (sin investigar) y ese mismo 404. Falta: arreglar esos dos de celular, `npm run e2e` entero en los dos tamaños, capturas contra `referencias/`, OK de Santiago para la base real y probar la reversa |
@@ -280,7 +294,7 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 | 54 | Ingreso y registro con otra estética | Hecho con TDD: `e2e/ingreso-estetica.spec.ts` y `e2e/acceso.spec.ts` en verde en computadora y celular (2026-10-27). Falta el cierre completo |
 | 53 | Pantalla de carga al cambiar de sección | Hecho con TDD: `e2e/carga.spec.ts` falla sin `loading.tsx` y pasa con él, en computadora (2026-10-27). Falta el cierre completo |
 | 52 | Mes a mes más aireado | Hechos y probados los montos sin centavos en las tarjetas y el formato corto del eje (`formatearPesosRedondeados`, `pesosCortos`). Falta conectar el eje corto y la ventanita nueva en el gráfico, con `e2e/inicio-montos.spec.ts`, y el cierre completo |
-| 51 | `npm run local`: la aplicación armada entera | Probado el 2026-10-27 en el 3212 (el 3210 estaba con `npm run dev`): arma y sirve, `/` en 1,1 s y el ingreso en 0,18 s. Falta que Santiago lo use con sesión y confirme que las secciones van rápido; entra al repo con el commit de la rama |
+| 51 | `npm run local`: la aplicación armada entera | Probado el 2026-10-27 en el 3212 (el 3210 estaba con `npm run dev`): arma y sirve, `/` en 1,1 s y el ingreso en 0,18 s. Falta que Santiago lo use con sesión y confirme que las secciones van rápido; entra al repo con el commit de la rama. El 2026-10-29 Santiago pidió usarlo en lugar de `npm run dev`: levantado en el 3210 y medido con sesión de admin, Inicio → Caja tarda de 1,42 a 1,45 s y Caja → Inicio de 0,91 a 1,48 s (con `npm run dev`, de 1,5 a 1,6 s y de 1,8 a 2,5 s, con un tirón de 10 s) |
 | 50 | Inicio: ayer en una línea y vencimientos de la semana | Hecho con TDD: tests puros (`ayer`, `vencimientos`), de base (`inicio.base.test.ts`) y sus dos pruebas de Playwright en computadora, en verde; lint de lo tocado y tipos limpios (2026-10-27). Falta el cierre completo (`npm run verificar` y `npm run e2e` en los dos tamaños), junto con el 47 y el 48 |
 | 49 | Inicio: el mes en curso marcado y "Más vendidos" por plata | Todo |
 | 48 | Proveedores, Reportes, Auditoría y Mi cuenta: "Próximamente" | Todo |
