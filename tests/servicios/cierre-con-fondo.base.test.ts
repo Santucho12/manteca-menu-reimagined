@@ -1,7 +1,14 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, describe, expect, it } from 'vitest';
-import { cierreConFondoAnterior, cierrePorId } from '../../src/lib/caja/consultas';
+import {
+  cierreConFondoAnterior,
+  cierrePorId,
+  misCierres,
+  misCierresDeLaSesion,
+} from '../../src/lib/caja/consultas';
+import { crearClienteSinSesion } from '../../src/lib/supabase/sin-sesion';
 import { borrarCierres, diaLibre, diaSiguiente, sembrarCierre } from '../cierres-de-prueba';
+import { idDeCuentaDePrueba } from '../consultas-de-prueba';
 import { clienteComo } from '../sesiones';
 
 const cierres: string[] = [];
@@ -36,5 +43,20 @@ describe('cierreConFondoAnterior', () => {
   it('Caja no ve el cierre de otra persona', async () => {
     const [ajeno] = await sembrar({ cargadoPor: 'admin' });
     expect(await cierreConFondoAnterior(await clienteComo('caja'), ajeno!.id)).toBeNull();
+  });
+});
+
+describe('misCierresDeLaSesion', () => {
+  it('da lo mismo que misCierres con el id de quien entra', async () => {
+    await sembrar({ cargadoPor: 'caja' }, { cargadoPor: 'admin' });
+    for (const rol of ['caja', 'admin'] as const) {
+      const cliente = await clienteComo(rol);
+      const esperados = await misCierres(cliente, await idDeCuentaDePrueba(rol));
+      expect(await misCierresDeLaSesion(cliente)).toEqual(esperados);
+    }
+  });
+
+  it('sin sesión no trae nada', async () => {
+    expect(await misCierresDeLaSesion(crearClienteSinSesion())).toEqual([]);
   });
 });

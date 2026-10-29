@@ -87,6 +87,13 @@ export async function misCierres(cliente: Cliente, personaId: string): Promise<F
     .slice(0, 60);
 }
 
+/** Los cierres de quien entra: el id sale de la sesion, sin esperar a que se lea el perfil. */
+export async function misCierresDeLaSesion(cliente: Cliente): Promise<FilaDeCierre[]> {
+  const { data } = await cliente.auth.getClaims();
+  const id = data?.claims.sub;
+  return id ? misCierres(cliente, id) : [];
+}
+
 export type Cierre = FilaDeCierre & {
   declarados: Record<Medio, number>;
   medios: ResultadoDeMedio[];
