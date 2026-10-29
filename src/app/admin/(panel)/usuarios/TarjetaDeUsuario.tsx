@@ -23,7 +23,7 @@ const FRANJAS: Record<EstadoDeCuenta, string> = {
 };
 
 const TARJETA =
-  'flex min-h-[16.4rem] flex-col gap-4 rounded-3xl border border-l-4 border-border bg-white p-5 shadow-sm shadow-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-900/10';
+  'flex min-h-[12rem] flex-col gap-4 rounded-3xl border border-l-4 border-border bg-white p-5 shadow-sm shadow-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-900/10';
 
 export function TarjetaDeUsuario({ fila, yo }: { fila: FilaDeUsuario; yo: string }) {
   const cuenta = { id: fila.id, nombre: fila.nombre, email: fila.email };
@@ -33,9 +33,16 @@ export function TarjetaDeUsuario({ fila, yo }: { fila: FilaDeUsuario; yo: string
       <div className="flex items-center gap-3.5">
         <Avatar nombre={fila.nombre} grande />
         <div className="min-w-0 flex-1">
-          <p className="font-display text-base font-extrabold tracking-tight text-foreground">
-            {fila.nombre}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="font-display text-base font-extrabold tracking-tight text-foreground">
+              {fila.nombre}
+            </p>
+            {fila.id === yo ? (
+              <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                Vos
+              </span>
+            ) : null}
+          </div>
           <p className="truncate text-xs text-neutral-500">{fila.email}</p>
         </div>
         <InsigniaDeEstado tono={TONOS[estado]}>{estado}</InsigniaDeEstado>
