@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { leerFilasDelMenu } from '@/lib/menu/consultas';
 import { desactivados } from '@/lib/menu/panel';
 import { ListaDeDesactivados } from './ListaDeDesactivados';
@@ -9,8 +9,7 @@ import { ListaDeDesactivados } from './ListaDeDesactivados';
 export const metadata: Metadata = { title: 'Desactivados del menú' };
 
 export default async function PaginaDeDesactivados() {
-  const { cliente } = await exigirPagina('admin');
-  const filas = await leerFilasDelMenu(cliente);
+  const { datos: filas } = await exigirPaginaYLeer('admin', leerFilasDelMenu);
   return (
     <Pantalla
       titulo="Desactivados del menú"

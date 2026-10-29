@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { leerPanel } from '@/lib/menu/consultas';
 import { FormularioDeAumento } from './FormularioDeAumento';
 
 export const metadata: Metadata = { title: 'Aumento de precios' };
 
 export default async function PaginaDeAumento() {
-  const { cliente } = await exigirPagina('admin');
-  const categorias = (await leerPanel(cliente)).map(({ id, nombre }) => ({ id, nombre }));
+  const { datos: panel } = await exigirPaginaYLeer('admin', leerPanel);
+  const categorias = panel.map(({ id, nombre }) => ({ id, nombre }));
   return (
     <Pantalla
       titulo="Aumento de precios"

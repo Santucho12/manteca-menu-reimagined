@@ -8,7 +8,7 @@ import { BOTON_DE_ENCABEZADO, BOTON_DE_ENCABEZADO_NEUTRO } from '@/components/pa
 import { InsigniaDeEstado } from '@/components/panel/Insignias';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { Dato, Datos, Seccion } from '@/components/panel/Seccion';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import { recurrentesActivosDelProveedor } from '@/lib/gastos/proveedores';
 import { proveedorPorId, type Proveedor } from '@/lib/proveedores/consultas';
@@ -72,12 +72,11 @@ function Acciones({ proveedor }: { proveedor: Proveedor }) {
 }
 
 export default async function FichaDeProveedor({ params }: { params: Promise<{ id: string }> }) {
-  const { cliente } = await exigirPagina('admin');
   const { id } = await params;
-  const [proveedor, recurrentes] = await Promise.all([
-    proveedorPorId(cliente, id),
-    recurrentesActivosDelProveedor(cliente, id),
-  ]);
+  const { cliente, datos } = await exigirPaginaYLeer('admin', (cliente) =>
+    Promise.all([proveedorPorId(cliente, id), recurrentesActivosDelProveedor(cliente, id)]),
+  );
+  const [proveedor, recurrentes] = datos;
   if (!proveedor) notFound();
   return (
     <Pantalla

@@ -7,7 +7,7 @@ import { CargadoPor } from '@/components/panel/CargadoPor';
 import { InsigniaDeEstado } from '@/components/panel/Insignias';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { Dato, Datos, Seccion } from '@/components/panel/Seccion';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import { formatearPesos } from '@/lib/plata';
 import { ventaPorId, type Venta } from '@/lib/ventas/consultas';
@@ -85,8 +85,10 @@ function Acciones({ venta }: { venta: Venta }) {
 }
 
 export default async function FichaDeVenta({ params }: { params: Promise<{ id: string }> }) {
-  const { cliente } = await exigirPagina('admin');
-  const venta = await ventaPorId(cliente, (await params).id);
+  const { id } = await params;
+  const { cliente, datos: venta } = await exigirPaginaYLeer('admin', (cliente) =>
+    ventaPorId(cliente, id),
+  );
   if (!venta) notFound();
   return (
     <Pantalla

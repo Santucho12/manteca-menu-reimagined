@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { FranjaDeAviso } from '@/components/panel/Avisos';
 import { BOTON_DE_ENCABEZADO } from '@/components/panel/estilos';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { nombresDe, registroPorId } from '@/lib/auditoria/consultas';
 import {
   cambiosDe,
@@ -46,8 +46,10 @@ function Cambios({ cambios, conAntes }: { cambios: Cambio[]; conAntes: boolean }
 }
 
 export default async function RegistroDeAuditoria({ params }: { params: Promise<{ id: string }> }) {
-  const { cliente } = await exigirPagina('admin');
-  const registro = await registroPorId(cliente, (await params).id);
+  const { id } = await params;
+  const { cliente, datos: registro } = await exigirPaginaYLeer('admin', (cliente) =>
+    registroPorId(cliente, id),
+  );
   if (!registro) notFound();
   const nombres = await nombresDe(cliente, [registro]);
   const { modulo, dato } = datoDe(registro.tabla);

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Paginas } from '@/components/panel/Paginas';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { listarRegistros, nombresDe, personasDeAuditoria } from '@/lib/auditoria/consultas';
 import {
   enlaceDeAuditoria,
@@ -20,13 +20,12 @@ export default async function PaginaDeAuditoria({
 }: {
   searchParams: Promise<ParametrosDeAuditoria>;
 }) {
-  const { cliente } = await exigirPagina('admin');
   const hoy = diaEnArgentina(new Date());
   const filtros = filtrosDeAuditoria(await searchParams, hoy);
-  const [lista, personas] = await Promise.all([
-    listarRegistros(cliente, filtros),
-    personasDeAuditoria(cliente),
-  ]);
+  const { cliente, datos } = await exigirPaginaYLeer('admin', (cliente) =>
+    Promise.all([listarRegistros(cliente, filtros), personasDeAuditoria(cliente)]),
+  );
+  const [lista, personas] = datos;
   const nombres = await nombresDe(cliente, lista.filas);
   return (
     <Pantalla

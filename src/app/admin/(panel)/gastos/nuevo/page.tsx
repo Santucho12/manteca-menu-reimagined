@@ -2,7 +2,7 @@ import { Receipt } from 'lucide-react';
 import type { Metadata } from 'next';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { Seccion } from '@/components/panel/Seccion';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import { opcionesDeGasto } from '@/lib/gastos/consultas';
 import type { DatosDeCarga } from '@/lib/gastos/esquemas';
@@ -11,8 +11,7 @@ import { FormularioDeGasto } from '../FormularioDeGasto';
 export const metadata: Metadata = { title: 'Cargar gasto' };
 
 export default async function NuevoGasto() {
-  const { cliente } = await exigirPagina('admin');
-  const opciones = await opcionesDeGasto(cliente);
+  const { datos: opciones } = await exigirPaginaYLeer('admin', opcionesDeGasto);
   const hoy = diaEnArgentina(new Date());
   const inicial: DatosDeCarga = {
     fecha: hoy,
