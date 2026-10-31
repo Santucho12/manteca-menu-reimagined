@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { exigirPagina } from '@/lib/acceso/servidor';
-import { misCierres } from '@/lib/caja/consultas';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
+import { misCierresDeLaSesion } from '@/lib/caja/consultas';
 import { AccesoACargarCierre } from '../AccesoACargarCierre';
 import { ListaDeCierres } from '../ListaDeCierres';
 
@@ -10,8 +10,7 @@ export const metadata: Metadata = { title: 'Mis cierres' };
 const Acceso = () => <AccesoACargarCierre />;
 
 export default async function MisCierres() {
-  const { cliente, perfil } = await exigirPagina('caja');
-  const filas = await misCierres(cliente, perfil.id);
+  const { datos: filas } = await exigirPaginaYLeer('caja', misCierresDeLaSesion);
   return (
     <Pantalla
       titulo="Mis cierres"

@@ -4,7 +4,7 @@ import { GraficoPorMes } from '@/components/reportes/GraficoPorMes';
 import { SinDatos } from '@/components/reportes/SinDatos';
 import { TablaComparada } from '@/components/reportes/TablaComparada';
 import { Totales } from '@/components/reportes/Totales';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import { formatearPesos } from '@/lib/plata';
 import { compararFilas } from '@/lib/reportes/comparacion';
@@ -59,13 +59,15 @@ export default async function ReporteDeResultado({
 }: {
   searchParams: Promise<ParametrosDeReporte>;
 }) {
-  const { cliente } = await exigirPagina('admin');
   const hoy = diaEnArgentina(new Date());
   const periodos = periodosDelReporte(await searchParams, hoy);
-  const [actual, anterior] = await Promise.all([
-    datosDelResultado(cliente, periodos.actual),
-    datosDelResultado(cliente, periodos.comparacion),
-  ]);
+  const { datos } = await exigirPaginaYLeer('admin', (cliente) =>
+    Promise.all([
+      datosDelResultado(cliente, periodos.actual),
+      datosDelResultado(cliente, periodos.comparacion),
+    ]),
+  );
+  const [actual, anterior] = datos;
   const otro = anterior.vacio ? null : anterior.resultado;
   return (
     <PantallaDeReporte titulo="Balance" ruta={RUTA} periodos={periodos} hoy={hoy}>

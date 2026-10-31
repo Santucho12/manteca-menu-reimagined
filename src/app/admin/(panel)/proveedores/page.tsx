@@ -5,7 +5,7 @@ import { BOTON_DE_ENCABEZADO } from '@/components/panel/estilos';
 import { BarraDeFiltros, Buscador, FiltroEnlace } from '@/components/panel/Filtros';
 import { Paginas } from '@/components/panel/Paginas';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import { pagadoPorProveedor } from '@/lib/gastos/proveedores';
 import { listarProveedores } from '@/lib/proveedores/consultas';
@@ -25,12 +25,12 @@ export default async function PaginaDeProveedores({
 }: {
   searchParams: Promise<ParametrosDeProveedores>;
 }) {
-  const { cliente } = await exigirPagina('admin');
   const filtros = filtrosDeProveedores(await searchParams);
-  const [lista, pagado] = await Promise.all([
-    listarProveedores(cliente, filtros),
-    pagadoPorProveedor(cliente, diaEnArgentina(new Date())),
-  ]);
+  const hoy = diaEnArgentina(new Date());
+  const { datos } = await exigirPaginaYLeer('admin', (cliente) =>
+    Promise.all([listarProveedores(cliente, filtros), pagadoPorProveedor(cliente, hoy)]),
+  );
+  const [lista, pagado] = datos;
   const otroEstado = enlaceDeProveedores({
     ...filtros,
     desactivados: !filtros.desactivados,

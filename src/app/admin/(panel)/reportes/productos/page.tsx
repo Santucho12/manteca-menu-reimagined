@@ -5,7 +5,7 @@ import { PaginasDeReporte } from '@/components/reportes/PaginasDeReporte';
 import { SinDatos } from '@/components/reportes/SinDatos';
 import { TablaComparada } from '@/components/reportes/TablaComparada';
 import { Totales } from '@/components/reportes/Totales';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import { formatearPesos } from '@/lib/plata';
 import { compararFilas, variacion } from '@/lib/reportes/comparacion';
@@ -42,15 +42,18 @@ export default async function ReporteDeProductos({
 }: {
   searchParams: Promise<ParametrosDeReporte>;
 }) {
-  const { cliente } = await exigirPagina('admin');
   const hoy = diaEnArgentina(new Date());
   const periodos = periodosDelReporte(await searchParams, hoy);
-  const [actual, anterior] = (
-    await Promise.all([
+  const { datos } = await exigirPaginaYLeer('admin', (cliente) =>
+    Promise.all([
       ventasPorProducto(cliente, periodos.actual),
       ventasPorProducto(cliente, periodos.comparacion),
-    ])
-  ).map(productosDelReporte) as [ProductoDelReporte[], ProductoDelReporte[]];
+    ]),
+  );
+  const [actual, anterior] = datos.map(productosDelReporte) as [
+    ProductoDelReporte[],
+    ProductoDelReporte[],
+  ];
   const comparadas = compararFilas(
     actual,
     anterior,

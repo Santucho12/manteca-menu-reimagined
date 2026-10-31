@@ -8,7 +8,7 @@ import { BotonDeAnular } from '@/components/panel/BotonDeAnular';
 import { CargadoPor } from '@/components/panel/CargadoPor';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { Dato, Datos, Seccion } from '@/components/panel/Seccion';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import {
   gastoPorId,
@@ -98,10 +98,12 @@ async function fijoDelGasto(cliente: Cliente, gasto: Gasto, categorias: OpcionDe
 }
 
 export default async function FichaDeGasto({ params }: { params: Promise<{ id: string }> }) {
-  const { cliente } = await exigirPagina('admin');
-  const gasto = await gastoPorId(cliente, (await params).id);
+  const { id } = await params;
+  const { cliente, datos: leidos } = await exigirPaginaYLeer('admin', (cliente) =>
+    Promise.all([gastoPorId(cliente, id), opcionesDeGasto(cliente)]),
+  );
+  const [gasto, opciones] = leidos;
   if (!gasto) notFound();
-  const opciones = await opcionesDeGasto(cliente);
   const fijo = await fijoDelGasto(cliente, gasto, opciones.categorias);
   const datos = datosDeGastoParaEditar(gasto);
   // Sin clasificar no se ofrece: el selector arranca vacio y pide elegir una categoria.

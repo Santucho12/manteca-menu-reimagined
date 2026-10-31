@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { Seccion } from '@/components/panel/Seccion';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { proveedorPorId } from '@/lib/proveedores/consultas';
 import { datosParaEditar } from '@/lib/proveedores/esquemas';
 import { FormularioDeProveedor } from '../../FormularioDeProveedor';
@@ -11,8 +11,10 @@ import { FormularioDeProveedor } from '../../FormularioDeProveedor';
 export const metadata: Metadata = { title: 'Editar proveedor' };
 
 export default async function EditarProveedor({ params }: { params: Promise<{ id: string }> }) {
-  const { cliente } = await exigirPagina('admin');
-  const proveedor = await proveedorPorId(cliente, (await params).id);
+  const { id } = await params;
+  const { datos: proveedor } = await exigirPaginaYLeer('admin', (cliente) =>
+    proveedorPorId(cliente, id),
+  );
   if (!proveedor) notFound();
   return (
     <Pantalla

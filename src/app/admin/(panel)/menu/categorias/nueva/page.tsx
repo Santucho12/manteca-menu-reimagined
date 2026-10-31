@@ -2,7 +2,7 @@ import { Tags } from 'lucide-react';
 import type { Metadata } from 'next';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { Seccion } from '@/components/panel/Seccion';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { localDeQuienPide } from '@/lib/menu/consultas';
 import { FormularioDeCategoria } from '../FormularioDeCategoria';
 
@@ -19,7 +19,7 @@ const VACIA = {
 };
 
 export default async function PaginaNuevaCategoria() {
-  const { cliente } = await exigirPagina('admin');
+  const { datos: localId } = await exigirPaginaYLeer('admin', localDeQuienPide);
   return (
     <Pantalla
       titulo="Nueva categoría"
@@ -27,7 +27,7 @@ export default async function PaginaNuevaCategoria() {
       ayuda="menu"
     >
       <Seccion icono={<Tags className="text-primary" size={24} />}>
-        <FormularioDeCategoria inicial={VACIA} localId={await localDeQuienPide(cliente)} />
+        <FormularioDeCategoria inicial={VACIA} localId={localId} />
       </Seccion>
     </Pantalla>
   );

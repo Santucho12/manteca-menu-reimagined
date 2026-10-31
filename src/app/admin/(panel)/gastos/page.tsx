@@ -3,8 +3,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ACCESO_VERDE, ICONO_DE_ACCESO_SOBRE_VERDE } from '@/components/panel/estilos';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
+import { listasAlDia } from '@/lib/gastos/alAbrir';
 import {
   listarCategorias,
   listarGastos,
@@ -16,7 +17,12 @@ import {
 import { generarAlAbrir } from '@/lib/gastos/generacion';
 import { pagosPendientes, vencimientosTomados } from '@/lib/gastos/pagos';
 import { resumenPorCategoria } from '@/lib/gastos/resumenPorCategoria';
-import { filtrosDeGastos, type ParametrosDeGastos } from '@/lib/gastos/pantalla';
+import {
+  filtrosDeGastos,
+  type FiltrosDeGastos,
+  type ParametrosDeGastos,
+} from '@/lib/gastos/pantalla';
+import type { Cliente } from '@/lib/supabase/cliente';
 import { unValor } from '@/lib/usuarios/presentacion';
 import { Pagados } from './Pagados';
 import { ParaClasificar } from './ParaClasificar';
@@ -40,29 +46,37 @@ function Accesos({ categorias }: { categorias: FilaDeCategoria[] }) {
   );
 }
 
+const leerGastos = (cliente: Cliente, filtros: FiltrosDeGastos, hoy: string) =>
+  Promise.all([
+    listarGastos(cliente, filtros),
+    opcionesDeGasto(cliente),
+    listarRecurrentes(cliente),
+    paraClasificar(cliente),
+    listarCategorias(cliente),
+    pagosPendientes(cliente),
+    vencimientosTomados(cliente, hoy),
+    resumenPorCategoria(cliente, filtros),
+  ]);
+
+async function datosDeGastos(parametros: ParametrosDeGastos, hoy: string) {
+  const filtros = filtrosDeGastos(parametros, hoy);
+  const leer = (cliente: Cliente) => leerGastos(cliente, filtros, hoy);
+  const { cliente, estado, datos } = await exigirPaginaYLeer('admin', leer);
+  // Lo vencido aparece al abrir, sin esperar al proceso de la madrugada.
+  const generados = await generarAlAbrir(estado, hoy);
+  return { filtros, listas: await listasAlDia(generados, datos, () => leer(cliente)) };
+}
+
 export default async function PaginaDeGastos({
   searchParams,
 }: {
   searchParams: Promise<ParametrosDeGastos>;
 }) {
-  const { cliente, estado } = await exigirPagina('admin');
   const hoy = diaEnArgentina(new Date());
-  // Lo vencido aparece al abrir, sin esperar al proceso de la madrugada.
-  await generarAlAbrir(estado, hoy);
   const parametros = await searchParams;
-  const filtros = filtrosDeGastos(parametros, hoy);
   const pagar = unValor(parametros.pagar);
-  const [lista, opciones, recurrentes, pendientes, categorias, porPagar, tomados, resumen] =
-    await Promise.all([
-      listarGastos(cliente, filtros),
-      opcionesDeGasto(cliente),
-      listarRecurrentes(cliente),
-      paraClasificar(cliente),
-      listarCategorias(cliente),
-      pagosPendientes(cliente),
-      vencimientosTomados(cliente, hoy),
-      resumenPorCategoria(cliente, filtros),
-    ]);
+  const { filtros, listas } = await datosDeGastos(parametros, hoy);
+  const [lista, opciones, recurrentes, pendientes, categorias, porPagar, tomados, resumen] = listas;
   return (
     <Pantalla
       titulo="Gastos"

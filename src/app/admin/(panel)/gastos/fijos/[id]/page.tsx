@@ -6,7 +6,7 @@ import { BotonDeEstado } from '@/components/panel/BotonDeEstado';
 import { InsigniaDeEstado } from '@/components/panel/Insignias';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { Seccion } from '@/components/panel/Seccion';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import { opcionesDeGasto, pagosDelRecurrente, recurrentePorId } from '@/lib/gastos/consultas';
 import { datosDeFijoParaEditar } from '@/lib/gastos/esquemas';
@@ -17,14 +17,14 @@ import { PagosDelFijo } from '../PagosDelFijo';
 export const metadata: Metadata = { title: 'Gasto fijo' };
 
 export default async function FichaDeFijo({ params }: { params: Promise<{ id: string }> }) {
-  const { cliente } = await exigirPagina('admin');
-  const fijo = await recurrentePorId(cliente, (await params).id);
+  const { id } = await params;
+  const { cliente, datos } = await exigirPaginaYLeer('admin', (cliente) =>
+    Promise.all([recurrentePorId(cliente, id), opcionesDeGasto(cliente)]),
+  );
+  const [fijo, opciones] = datos;
   if (!fijo) notFound();
   const hoy = diaEnArgentina(new Date());
-  const [opciones, pagos] = await Promise.all([
-    opcionesDeGasto(cliente),
-    pagosDelRecurrente(cliente, fijo.id),
-  ]);
+  const pagos = await pagosDelRecurrente(cliente, fijo.id);
   return (
     <Pantalla titulo="Gasto fijo" subtitulo="Se carga solo cada vez que toca." ayuda="fijos">
       {fijo.activo ? null : (

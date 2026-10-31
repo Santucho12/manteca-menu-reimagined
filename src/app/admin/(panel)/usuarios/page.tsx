@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Paginas } from '@/components/panel/Paginas';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { listarUsuarios } from '@/lib/usuarios/consultas';
 import { filtrosDeLaUrl, type ParametrosDeUrl } from '@/lib/usuarios/pantalla';
 import { cantidadDePaginas, enlaceDeUsuarios } from '@/lib/usuarios/presentacion';
@@ -13,9 +13,11 @@ export const metadata: Metadata = { title: 'Usuarios' };
 type Props = { searchParams: Promise<ParametrosDeUrl> };
 
 export default async function PaginaUsuarios({ searchParams }: Props) {
-  const { cliente, perfil } = await exigirPagina('admin');
   const filtros = filtrosDeLaUrl(await searchParams);
-  const { filas, total, pagina } = await listarUsuarios(cliente, filtros);
+  const { perfil, datos } = await exigirPaginaYLeer('admin', (cliente) =>
+    listarUsuarios(cliente, filtros),
+  );
+  const { filas, total, pagina } = datos;
   return (
     <Pantalla
       titulo="Usuarios"

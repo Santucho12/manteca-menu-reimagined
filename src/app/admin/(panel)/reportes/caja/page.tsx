@@ -5,7 +5,7 @@ import { GraficoDeBarras } from '@/components/reportes/GraficoDeBarras';
 import { PantallaDeReporte } from '@/components/reportes/PantallaDeReporte';
 import { SinDatos } from '@/components/reportes/SinDatos';
 import { Celda, TablaDeDatos } from '@/components/reportes/TablaDeDatos';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { primerDiaConCierre } from '@/lib/caja/consultas';
 import { textoDeDiferencia } from '@/lib/caja/pantalla';
 import { diaEnArgentina } from '@/lib/fechas';
@@ -88,13 +88,12 @@ export default async function ReporteDeCaja({
 }: {
   searchParams: Promise<ParametrosDeReporte>;
 }) {
-  const { cliente } = await exigirPagina('admin');
   const hoy = diaEnArgentina(new Date());
   const periodos = periodosDelReporte(await searchParams, hoy);
-  const [cierres, primero] = await Promise.all([
-    cierresDelPeriodo(cliente, periodos.actual),
-    primerDiaConCierre(cliente),
-  ]);
+  const { datos } = await exigirPaginaYLeer('admin', (cliente) =>
+    Promise.all([cierresDelPeriodo(cliente, periodos.actual), primerDiaConCierre(cliente)]),
+  );
+  const [cierres, primero] = datos;
   const filas = filasDeCaja(cierres, periodos.actual, primero, hoy);
   const pagina = paginaDe(filas, periodos.pagina);
   return (

@@ -5,7 +5,7 @@ import { BotonDeEstado } from '@/components/panel/BotonDeEstado';
 import { InsigniaDeEstado } from '@/components/panel/Insignias';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { Seccion } from '@/components/panel/Seccion';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { canalesDeVenta } from '@/lib/ventas/consultas';
 import { cambiarEstadoDeCanalDesdeElPanel } from '../../acciones';
 import { FormularioDeCanal } from '../FormularioDeCanal';
@@ -13,10 +13,10 @@ import { FormularioDeCanal } from '../FormularioDeCanal';
 export const metadata: Metadata = { title: 'Tipo de venta' };
 
 export default async function FichaDeCanal({ params }: { params: Promise<{ id: string }> }) {
-  const { cliente } = await exigirPagina('admin');
   const { id } = await params;
+  const { datos: canales } = await exigirPaginaYLeer('admin', canalesDeVenta);
   // Son pocos: se buscan en la lista.
-  const canal = (await canalesDeVenta(cliente)).find((c) => c.id === id);
+  const canal = canales.find((c) => c.id === id);
   if (!canal) notFound();
   return (
     <Pantalla titulo={canal.nombre} subtitulo="Renombralo o desactivalo." ayuda="canales">
