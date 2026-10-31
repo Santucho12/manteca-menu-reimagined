@@ -89,9 +89,17 @@ export async function asegurarContrasenaDeSiembra(
   if (error) throw new Error(`No pude reparar la cuenta de prueba ${cuenta.id}: ${error.message}`);
 }
 
+// Desactivar a alguien desde Usuarios lo bloquea en Auth: reactivar el perfil no alcanza.
+async function quitarBloqueo(cliente: Cliente, cuenta: User) {
+  if (!cuenta.banned_until) return;
+  const { error } = await cliente.auth.admin.updateUserById(cuenta.id, { ban_duration: 'none' });
+  if (error) throw new Error(`No pude destrabar la cuenta ${cuenta.id}: ${error.message}`);
+}
+
 async function asegurarCuenta(cliente: Cliente, email: string, password: string, cuenta?: User) {
   if (!cuenta) return { id: await crearCuenta(cliente, email, password), creada: true };
   await asegurarContrasenaDeSiembra(cliente, cuenta, password);
+  await quitarBloqueo(cliente, cuenta);
   return { id: cuenta.id, creada: false };
 }
 
