@@ -166,7 +166,7 @@ Acciones sobre una cuenta:
   que cierra el riesgo de la regla de la primera cuenta.
 - La confirmación de email ya está apagada en los dos proyectos de Supabase, por decisión de
   Santiago (verificado el 2026-10-06 leyendo la configuración de cada uno). Al pasar a los
-  proyectos nuevos quedó encendida y Santiago la volvió a apagar (2026-10-30).
+  proyectos nuevos quedó encendida y Santiago la volvió a apagar (2026-10-30 en pruebas y 2026-10-31 en la real).
 - El registro de cuentas del proyecto real quedó abierto. Cerrarlo hasta la publicación
   achica el riesgo de la regla de la primera cuenta; lo decide Santiago.
 - Los ingresos y registros salen del servidor, así que Supabase Auth los cuenta todos con la
