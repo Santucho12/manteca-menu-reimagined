@@ -1,6 +1,5 @@
 import { fechaParaMostrar } from '../gastos/pantalla';
 import { diasSinCierre } from '../caja/dias';
-import { formatearPesos } from '../plata';
 import { sumarDias, type Periodo } from './periodos';
 
 export type CierreDelReporte = {
@@ -57,9 +56,6 @@ export function resumenPorEmpleado(cierres: CierreDelReporte[]): ResumenDeEmplea
   }
   return [...personas.values()].sort((a, b) => a.persona.localeCompare(b.persona));
 }
-
-export const textoDeDiferencia = (diferencia: number | null) =>
-  diferencia === null ? 'Esperando ventas' : formatearPesos(diferencia);
 
 /** Los cierres que ya tienen diferencia, del mas viejo al mas nuevo, para el grafico. */
 export const diferenciasDelGrafico = (cierres: CierreDelReporte[]) =>

@@ -7,6 +7,7 @@ import { SinDatos } from '@/components/reportes/SinDatos';
 import { Celda, TablaDeDatos } from '@/components/reportes/TablaDeDatos';
 import { exigirPagina } from '@/lib/acceso/servidor';
 import { primerDiaConCierre } from '@/lib/caja/consultas';
+import { textoDeDiferencia } from '@/lib/caja/pantalla';
 import { diaEnArgentina } from '@/lib/fechas';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import { formatearPesos } from '@/lib/plata';
@@ -14,7 +15,6 @@ import {
   diferenciasDelGrafico,
   filasDeCaja,
   resumenPorEmpleado,
-  textoDeDiferencia,
   type FilaDeCaja,
   type ResumenDeEmpleado,
 } from '@/lib/reportes/caja';
@@ -78,11 +78,7 @@ function PorEmpleado({ resumen }: { resumen: ResumenDeEmpleado[] }) {
 
 function Diferencias({ datos }: { datos: ReturnType<typeof diferenciasDelGrafico> }) {
   if (datos.length === 0) {
-    return (
-      <p className="text-xs text-muted-foreground">
-        Todavía no hay diferencias: los cierres esperan las ventas de Fudo.
-      </p>
-    );
+    return <p className="text-xs text-muted-foreground">Todavía no hay cierres en este período.</p>;
   }
   return <GraficoDeBarras datos={datos} />;
 }

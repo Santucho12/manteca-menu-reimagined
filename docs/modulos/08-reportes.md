@@ -60,8 +60,8 @@ Solo Admin.
 - Un producto que cambió de categoría: sus ventas se cuentan en la categoría que tiene hoy.
 - Un producto desactivado con ventas en el período: aparece igual.
 - Un gasto cargado hoy con fecha de un mes anterior: cambia el resultado de ese mes.
-- En el reporte de caja, un día sin cierre aparece marcado; un cierre esperando ventas
-  aparece sin diferencia.
+- En el reporte de caja, un día sin cierre aparece marcado. La diferencia de cada cierre se
+  dice como en Caja: "Faltan" o "Sobran" y el monto (pedido 66; sin ventas, lo esperado es $0).
 
 ## Fuera de alcance
 
@@ -86,8 +86,8 @@ Construido el 2026-10-11 (pedido 31). Diseño en `docs/superpowers/specs/2026-10
 ### Decisiones al construirlo
 
 - Caja se construye antes que la sincronización con Fudo: muestra lo declarado, los días sin
-  cierre (desde el primer cierre hasta ayer) y "Esperando ventas" donde todavía no hay
-  diferencia. No tiene comparación con otro período.
+  cierre (desde el primer cierre hasta ayer) y la diferencia de cada uno. No tiene comparación
+  con otro período.
 - "Hasta cuándo están sincronizadas las ventas" (regla 7) entra con la parte de Fudo.
 - Por producto: una fila por producto con su monto y, debajo, la cantidad de cada presentación.
   Lo no vinculado va junto en "Sin vincular", siempre al final.
