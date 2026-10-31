@@ -111,6 +111,19 @@ test('las flechas de las formas de venta se tocan sin errarle', async ({ page })
   expect(await altoSinEscala(quitar)).toBeGreaterThanOrEqual(40);
 });
 
+test('los botones de arriba bajan de renglón en vez de cortarse', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 780 });
+  await page.goto('/admin/ventas');
+  for (const nombre of ['Cargar venta', 'Subir Excel de Fudo', 'Tipos de venta']) {
+    const boton = (await page.getByRole('link', { name: nombre }).boundingBox())!;
+    expect(boton.x + boton.width).toBeLessThanOrEqual(360);
+  }
+  await page.goto('/admin/caja/control');
+  const diferencia = page.getByRole('button', { name: 'Diferencia aceptada' });
+  const caja = (await diferencia.boundingBox())!;
+  expect(caja.x + caja.width).toBeLessThanOrEqual(360);
+});
+
 test('las etiquetas de las tarjetas de Inicio entran enteras', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto('/admin');
