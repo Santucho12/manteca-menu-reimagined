@@ -11,8 +11,9 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { formatearPesos } from '@/lib/plata';
+import { CartelDelMes } from './CartelDelMes';
 import { TOOLTIP_DE_BARRAS } from './estiloDelTooltip';
+import { pesosCortos } from '@/lib/reportes/ejeCorto';
 import { etiquetaDe } from '@/lib/reportes/agrupar';
 import type { ResultadoDelMes } from '@/lib/reportes/resultado';
 
@@ -22,8 +23,6 @@ const COLORES = { ventas: '#10b981', gastos: '#f43f5e', resultado: '#2563eb' };
 const EJE = { stroke: '#94a3b8', fontSize: 10, fontWeight: 700 };
 // El mes en curso va más claro: todavía no terminó y no se tiene que leer como una caída.
 const OPACIDAD_EN_CURSO = 0.45;
-
-const pesos = (valor: unknown) => formatearPesos(Math.round(Number(valor)));
 
 type Props = { datos: ResultadoDelMes[]; alto?: string; mesEnCurso?: string };
 type PropsDelTick = { x?: number; y?: number; payload?: { value: string }; enCurso: string | null };
@@ -67,8 +66,14 @@ export function GraficoPorMes({ datos, alto = 'h-72', mesEnCurso }: Props) {
             tickLine={false}
             tick={<TickDelMes enCurso={enCurso} />}
           />
-          <YAxis tickFormatter={pesos} width={90} {...EJE} tickLine={false} axisLine={false} />
-          <Tooltip {...TOOLTIP_DE_BARRAS} formatter={pesos} labelFormatter={titulo} />
+          <YAxis
+            tickFormatter={(valor) => pesosCortos(Number(valor))}
+            width={56}
+            {...EJE}
+            tickLine={false}
+            axisLine={false}
+          />
+          <Tooltip cursor={TOOLTIP_DE_BARRAS.cursor} content={<CartelDelMes titulo={titulo} />} />
           <Legend iconType="circle" />
           <Bar
             name="Ventas"
