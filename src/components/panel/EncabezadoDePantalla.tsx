@@ -24,7 +24,7 @@ export function EncabezadoDePantalla({ titulo, subtitulo, acciones, ayuda }: Pro
         {acciones ? (
           <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
             {textos}
-            <div className="flex items-center gap-3">{acciones}</div>
+            <div className="flex flex-wrap items-center gap-3">{acciones}</div>
           </div>
         ) : (
           textos
