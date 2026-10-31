@@ -1,3 +1,4 @@
+import { EnlaceDeVolver } from '@/components/panel/EnlaceDeVolver';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { BarraAutomatica } from '@/components/panel/BarraAutomatica';
@@ -81,12 +82,7 @@ export function PantallaDeReporte({
         <Fechas periodos={periodos} conComparacion={conComparacion} />
       </BarraAutomatica>
       {children}
-      <Link
-        href="/admin/reportes"
-        className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
-      >
-        Volver a reportes
-      </Link>
+      <EnlaceDeVolver href="/admin/reportes">Volver a reportes</EnlaceDeVolver>
     </Pantalla>
   );
 }

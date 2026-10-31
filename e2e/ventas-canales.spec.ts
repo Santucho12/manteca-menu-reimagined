@@ -83,11 +83,11 @@ test('borra un canal sin ventas, y uno con ventas pide desactivarlo', async ({ p
 test('renombra, desactiva y reactiva', async ({ page }) => {
   const nombre = nuevoNombre();
   await sumar(page, nombre);
-  await fila(page, nombre).getByRole('link', { name: nombre }).click();
+  await fila(page, nombre).getByRole('link', { name: nombre, exact: true }).click();
   const otro = nuevoNombre();
   await page.getByLabel('Nombre', { exact: true }).fill(otro);
   await page.getByRole('button', { name: 'Guardar' }).click();
-  await fila(page, otro).getByRole('link', { name: otro }).click();
+  await fila(page, otro).getByRole('link', { name: otro, exact: true }).click();
   await page.getByRole('button', { name: 'Desactivar' }).click();
   await expect(page.getByText('Desactivado', { exact: true })).toBeVisible();
   await page.goto('/admin/ventas/nueva');

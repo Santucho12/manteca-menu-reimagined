@@ -1,10 +1,11 @@
+import { EnlaceDeVolver } from '@/components/panel/EnlaceDeVolver';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { FranjaDeAviso } from '@/components/panel/Avisos';
 import { BOTON_DE_ENCABEZADO } from '@/components/panel/estilos';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { nombresDe, registroPorId } from '@/lib/auditoria/consultas';
 import {
   cambiosDe,
@@ -46,8 +47,10 @@ function Cambios({ cambios, conAntes }: { cambios: Cambio[]; conAntes: boolean }
 }
 
 export default async function RegistroDeAuditoria({ params }: { params: Promise<{ id: string }> }) {
-  const { cliente } = await exigirPagina('admin');
-  const registro = await registroPorId(cliente, (await params).id);
+  const { id } = await params;
+  const { cliente, datos: registro } = await exigirPaginaYLeer('admin', (cliente) =>
+    registroPorId(cliente, id),
+  );
   if (!registro) notFound();
   const nombres = await nombresDe(cliente, [registro]);
   const { modulo, dato } = datoDe(registro.tabla);
@@ -72,12 +75,7 @@ export default async function RegistroDeAuditoria({ params }: { params: Promise<
         </FranjaDeAviso>
       ) : null}
       <Cambios cambios={cambiosDe(registro, nombres)} conAntes={registro.antes !== null} />
-      <Link
-        href="/admin/auditoria"
-        className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
-      >
-        Volver a la auditoría
-      </Link>
+      <EnlaceDeVolver href="/admin/auditoria">Volver a la auditoría</EnlaceDeVolver>
     </Pantalla>
   );
 }

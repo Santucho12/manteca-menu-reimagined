@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { Seccion } from '@/components/panel/Seccion';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { leerPanel, localDeQuienPide } from '@/lib/menu/consultas';
 import { categoriaParaEditar } from '@/lib/menu/panel';
 import { FormularioDeCategoria } from '../FormularioDeCategoria';
@@ -15,8 +15,12 @@ export default async function PaginaEditarCategoria({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { cliente } = await exigirPagina('admin');
-  const inicial = categoriaParaEditar(await leerPanel(cliente), (await params).id);
+  const { id } = await params;
+  const { datos } = await exigirPaginaYLeer('admin', (cliente) =>
+    Promise.all([leerPanel(cliente), localDeQuienPide(cliente)]),
+  );
+  const [panel, localId] = datos;
+  const inicial = categoriaParaEditar(panel, id);
   if (!inicial) notFound();
   return (
     <Pantalla
@@ -25,7 +29,7 @@ export default async function PaginaEditarCategoria({
       ayuda="menu"
     >
       <Seccion icono={<Tags className="text-primary" size={24} />}>
-        <FormularioDeCategoria inicial={inicial} localId={await localDeQuienPide(cliente)} />
+        <FormularioDeCategoria inicial={inicial} localId={localId} />
       </Seccion>
     </Pantalla>
   );

@@ -8,7 +8,7 @@ import {
   sembrarCierre,
 } from '../tests/cierres-de-prueba';
 import { borrarVentas, sembrarVentaConPago } from '../tests/ventas-de-prueba';
-import { SESIONES, aviso } from './ayudas';
+import { SESIONES, aviso, esperarNoEncontrado } from './ayudas';
 
 test.use({ storageState: SESIONES.caja });
 
@@ -54,7 +54,7 @@ test('carga el cierre a ciegas y despues ve su resultado completo', async ({ pag
   await expect(page.getByText('Con diferencia', { exact: true })).toBeVisible();
   await expect(page.getByText('$25.000,50').first()).toBeVisible();
   await expect(page.getByText('Efectivo contado')).toBeVisible();
-  await expect(page.getByText(/Esperado = fondo inicial/)).toBeVisible();
+  await expect(page.getByText('¿Cómo se calcula lo esperado?')).toBeVisible();
   await expect(page.getByText('Dueño')).toBeVisible();
   await expect(page.getByText('Hielo')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Anular' })).toHaveCount(0);
@@ -106,8 +106,8 @@ test('no ve los cierres de otros ni entra al control', async ({ page }) => {
   const ajeno = await sembrarCierre({ fecha: dia(), cargadoPor: 'admin' });
   await page.goto('/admin/caja/mis-cierres');
   await expect(page.getByText(fechaParaMostrar(ajeno.fecha))).toHaveCount(0);
-  const respuesta = await page.goto(`/admin/caja/cierres/${ajeno.id}`);
-  expect(respuesta?.status()).toBe(404);
+  await page.goto(`/admin/caja/cierres/${ajeno.id}`);
+  await esperarNoEncontrado(page);
   await page.goto('/admin/caja/control');
   await expect(page).toHaveURL(/\/admin$/);
 });

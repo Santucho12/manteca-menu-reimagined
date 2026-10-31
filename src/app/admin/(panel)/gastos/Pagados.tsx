@@ -21,7 +21,7 @@ type Props = {
 };
 
 const FLECHA =
-  'size-9 inline-flex items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary active:scale-95 transition-all';
+  'size-9 inline-flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary active:scale-95 transition-all';
 const TIPOS: { tipo: TipoDeGasto | null; texto: string }[] = [
   { tipo: null, texto: 'Todos' },
   { tipo: 'fijos', texto: 'Fijos' },
@@ -31,7 +31,7 @@ const TIPOS: { tipo: TipoDeGasto | null; texto: string }[] = [
 function MesConFlechas({ filtros, hoy }: Pick<Props, 'filtros' | 'hoy'>) {
   const ir = (mes: string) => enlaceDeGastos({ ...filtros, mes, pagina: 1 }, hoy);
   return (
-    <div className="flex items-center gap-1 p-1 rounded-2xl bg-card border border-border shadow-xs">
+    <div className="flex items-center gap-1 rounded-full border border-border bg-white p-1 shadow-xs">
       <Link href={ir(mesAnterior(filtros.mes))} aria-label="Mes anterior" className={FLECHA}>
         <ChevronLeft size={16} aria-hidden="true" />
       </Link>
@@ -51,19 +51,16 @@ function MesConFlechas({ filtros, hoy }: Pick<Props, 'filtros' | 'hoy'>) {
 
 function Tipos({ filtros, hoy }: Pick<Props, 'filtros' | 'hoy'>) {
   return (
-    <nav
-      aria-label="Tipo de gasto"
-      className="flex gap-1 p-1.5 rounded-2xl bg-card border border-border"
-    >
+    <nav aria-label="Tipo de gasto" className="flex gap-1 rounded-full bg-secondary/60 p-1">
       {TIPOS.map(({ tipo, texto }) => (
         <Link
           key={texto}
           href={enlaceDeGastos({ ...filtros, tipo, pagina: 1 }, hoy)}
           aria-current={filtros.tipo === tipo ? 'true' : undefined}
           className={cn(
-            'px-4 h-9 inline-flex items-center rounded-xl text-sm font-bold transition-all',
+            'inline-flex h-9 items-center rounded-full px-4 text-sm font-semibold transition-all',
             filtros.tipo === tipo
-              ? 'bg-primary text-primary-foreground'
+              ? 'bg-white text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground',
           )}
         >
@@ -84,6 +81,11 @@ export function Pagados({ lista, filtros, hoy, categorias }: Props) {
   return (
     <PanelDeLista
       titulo="Pagados"
+      contador="verde"
+      desplegable={{
+        abierto: conFiltros || filtros.pagina > 1 || !esElMesDeHoy(filtros.mes, hoy),
+        tituloCerrado: 'Ver los pagados',
+      }}
       cantidad={cantidadDeResultados(lista.total)}
       extra={<MesConFlechas filtros={filtros} hoy={hoy} />}
     >
@@ -92,7 +94,7 @@ export function Pagados({ lista, filtros, hoy, categorias }: Props) {
           <Tipos filtros={filtros} hoy={hoy} />
           <CategoriaQueSeAplicaSola filtros={filtros} hoy={hoy} categorias={categorias} />
         </div>
-        <p className="rounded-2xl bg-secondary/40 px-4 py-2 flex items-baseline gap-2">
+        <p className="flex items-baseline gap-2 px-1">
           <span className={ETIQUETA}>Total:</span>{' '}
           <strong className="font-display text-xl font-bold tracking-tight">
             {formatearPesos(lista.totalCentavos)}

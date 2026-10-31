@@ -62,6 +62,16 @@ describe('cuentas de prueba', () => {
     expect(await sembrarCuentas(clienteSecretoDePruebas(), CONTRASENA_USUARIOS_PRUEBA)).toEqual([]);
   });
 
+  it('sembrar de nuevo destraba una cuenta de prueba que quedó bloqueada', async () => {
+    const { CONTRASENA_USUARIOS_PRUEBA } = leerEntornoPruebas();
+    const secreto = clienteSecretoDePruebas();
+    const email = emailDePrueba('encargado');
+    const cuenta = (await listarCuentas(secreto)).find((c) => c.email === email)!;
+    await secreto.auth.admin.updateUserById(cuenta.id, { ban_duration: '24h' });
+    await sembrarCuentas(secreto, CONTRASENA_USUARIOS_PRUEBA);
+    await expect(iniciarSesion(email, CONTRASENA_USUARIOS_PRUEBA)).resolves.toBeDefined();
+  });
+
   it('sembrar de nuevo no cierra las sesiones abiertas de las cuentas de prueba', async () => {
     const { CONTRASENA_USUARIOS_PRUEBA } = leerEntornoPruebas();
     const caja = await iniciarSesion(emailDePrueba('caja'), CONTRASENA_USUARIOS_PRUEBA);

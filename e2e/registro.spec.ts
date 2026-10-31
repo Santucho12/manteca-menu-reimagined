@@ -11,7 +11,7 @@ async function registrarse(page: Page, datos: Datos): Promise<void> {
   await page.getByLabel('Nombre').fill(datos.nombre);
   await page.getByLabel('Email').fill(datos.email);
   await page.getByLabel('Contraseña', { exact: true }).fill(datos.contrasena);
-  await page.getByRole('button', { name: 'Registrarme' }).click();
+  await page.getByRole('button', { name: 'Crear cuenta' }).click();
 }
 
 test('una persona se registra y queda esperando que le den acceso', async ({ page }) => {
@@ -52,9 +52,9 @@ test('marca los datos que faltan o que no sirven', async ({ page }) => {
 
 test('el ingreso y el registro se enlazan entre si', async ({ page }) => {
   await page.goto('/admin/ingresar');
-  await page.getByRole('link', { name: 'Crear una cuenta' }).click();
+  await page.getByRole('link', { name: 'Crear cuenta' }).click();
   await expect(page).toHaveURL(/\/admin\/registro$/);
-  await page.getByRole('main').getByRole('link', { name: 'Ingresar' }).click();
+  await page.getByRole('main').getByRole('link', { name: 'Ya tengo cuenta' }).click();
   await expect(page).toHaveURL(/\/admin\/ingresar$/);
 });
 

@@ -8,6 +8,8 @@ export type DatosDeAvisos = {
   sinClasificar: ConFecha & { categoriaId: string | null };
   // Sale de los recurrentes, que Inicio lee aparte de los avisos.
   vencenEstaSemana?: number;
+  /** El pago, si es uno solo: el aviso lleva a pagarlo. */
+  unVencimiento?: { id: string; fecha: string };
 };
 export type Aviso = { texto: string; enlace: string };
 
@@ -46,10 +48,12 @@ function deGastos({ cantidad }: DatosDeAvisos['sinClasificar']): Aviso[] {
   return [{ texto: `Hay ${cantidad} ${que} sin clasificar.`, enlace: '/admin/gastos' }];
 }
 
-function deVencimientos(n = 0): Aviso[] {
+// Si vence uno solo, Gastos abre su ventana de "Marcar como pago" (pagar = el fijo y su vencimiento).
+function deVencimientos(n = 0, uno?: DatosDeAvisos['unVencimiento']): Aviso[] {
   if (n === 0) return [];
   const texto = n === 1 ? 'Esta semana vence 1 pago.' : `Esta semana vencen ${n} pagos.`;
-  return [{ texto, enlace: '/admin/gastos' }];
+  const pagar = n === 1 && uno ? `?pagar=${encodeURIComponent(`${uno.id}|${uno.fecha}`)}` : '';
+  return [{ texto, enlace: `/admin/gastos${pagar}` }];
 }
 
 /** Lo que requiere accion, en orden; cada aviso lleva a donde se resuelve. */
@@ -59,6 +63,6 @@ export function avisosDeInicio(datos: DatosDeAvisos): Aviso[] {
     ...deAyer(datos.ayerSinCierre),
     ...dePendientes(datos.pendientes),
     ...deGastos(datos.sinClasificar),
-    ...deVencimientos(datos.vencenEstaSemana),
+    ...deVencimientos(datos.vencenEstaSemana, datos.unVencimiento),
   ];
 }

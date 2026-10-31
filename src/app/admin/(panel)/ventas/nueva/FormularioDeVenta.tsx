@@ -6,8 +6,6 @@ import { useForm, useWatch, type Control } from 'react-hook-form';
 import { AvisoDeError } from '@/components/formularios/AvisoDeError';
 import { Campo } from '@/components/formularios/Campo';
 import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
-import { CampoDeTextoLargo } from '@/components/formularios/CampoDeTextoLargo';
-import { PieDelFormulario } from '@/components/formularios/PieDelFormulario';
 import { nombreDeMedio } from '@/lib/caja/pantalla';
 import { MEDIOS } from '@/lib/caja/resultado';
 import { conValorInicial } from '@/lib/formularios/valorInicial';
@@ -17,7 +15,9 @@ import { esquemaVenta, type DatosDeVenta } from '@/lib/ventas/esquemas';
 import type { OpcionDeVenta } from '@/lib/ventas/opciones';
 import { totalEscrito } from '@/lib/ventas/renglones';
 import { guardarVentaDesdeElPanel } from '../acciones';
+import { BarraDeGuardar } from './BarraDeGuardar';
 import { RenglonesDeVenta } from './RenglonesDeVenta';
+import { TarjetaDePaso } from '@/components/panel/TarjetaDePaso';
 
 type Props = {
   inicial: DatosDeVenta;
@@ -33,7 +33,14 @@ const MEDIOS_PARA_ELEGIR = [
 // El total se recalcula con cada tecla, sin redibujar todo el formulario.
 function TotalDeLaVenta({ control }: { control: Control<DatosDeVenta> }) {
   const renglones = useWatch({ control, name: 'renglones' });
-  return <p className="text-lg font-bold">Total: {formatearPesos(totalEscrito(renglones))}</p>;
+  return (
+    <p className="text-sm font-semibold text-muted-foreground">
+      <span className="mr-2">Total:</span>
+      <span className="font-display text-2xl font-bold text-foreground">
+        {formatearPesos(totalEscrito(renglones))}
+      </span>
+    </p>
+  );
 }
 
 export function FormularioDeVenta({ inicial, canales, opciones }: Props) {
@@ -52,50 +59,60 @@ export function FormularioDeVenta({ inicial, canales, opciones }: Props) {
     ...canales.map((c) => ({ valor: c.id, texto: c.nombre })),
   ];
   return (
-    <form onSubmit={handleSubmit(guardado.enviar)} noValidate className="space-y-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit(guardado.enviar)} noValidate className="space-y-3">
+      <TarjetaDePaso
+        numero={1}
+        titulo="Cómo fue la venta"
+        ayuda="Cuándo, por dónde entró y cómo se cobró."
+      >
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <Campo
+            id="fecha"
+            etiqueta="Fecha"
+            type="date"
+            error={errors.fecha?.message}
+            {...registro('fecha')}
+          />
+          <CampoDeSeleccion
+            id="canal"
+            etiqueta="Tipo de venta"
+            opciones={elegirCanal}
+            error={errors.canalId?.message}
+            {...registro('canalId')}
+          />
+          <CampoDeSeleccion
+            id="medio"
+            etiqueta="Medio de pago"
+            opciones={MEDIOS_PARA_ELEGIR}
+            error={errors.medio?.message}
+            {...registro('medio')}
+          />
+        </div>
+      </TarjetaDePaso>
+      <TarjetaDePaso
+        numero={2}
+        titulo="Qué se vendió"
+        ayuda="El precio viene del menú y lo podés cambiar."
+      >
+        <RenglonesDeVenta
+          control={control}
+          register={register}
+          setValue={setValue}
+          errors={errors}
+          opciones={opciones}
+        />
+      </TarjetaDePaso>
+      <section className="rounded-3xl border border-border bg-white px-4 py-3 shadow-sm shadow-slate-900/5 md:px-6">
         <Campo
-          id="fecha"
-          etiqueta="Fecha"
-          type="date"
-          error={errors.fecha?.message}
-          {...registro('fecha')}
+          id="comentario"
+          etiqueta="Comentario (opcional)"
+          placeholder="Ej: encargo para el sábado"
+          error={errors.comentario?.message}
+          {...registro('comentario')}
         />
-        <CampoDeSeleccion
-          id="canal"
-          etiqueta="Tipo de venta"
-          opciones={elegirCanal}
-          error={errors.canalId?.message}
-          {...registro('canalId')}
-        />
-        <CampoDeSeleccion
-          id="medio"
-          etiqueta="Medio de pago"
-          opciones={MEDIOS_PARA_ELEGIR}
-          error={errors.medio?.message}
-          {...registro('medio')}
-        />
-      </div>
-      <RenglonesDeVenta
-        control={control}
-        register={register}
-        setValue={setValue}
-        errors={errors}
-        opciones={opciones}
-      />
-      <TotalDeLaVenta control={control} />
-      <CampoDeTextoLargo
-        id="comentario"
-        etiqueta="Comentario"
-        error={errors.comentario?.message}
-        {...registro('comentario')}
-      />
+      </section>
       {guardado.mensaje ? <AvisoDeError mensaje={guardado.mensaje} /> : null}
-      <PieDelFormulario
-        enviando={guardado.enviando}
-        texto="Guardar venta"
-        cancelar="/admin/ventas"
-      />
+      <BarraDeGuardar total={<TotalDeLaVenta control={control} />} enviando={guardado.enviando} />
     </form>
   );
 }

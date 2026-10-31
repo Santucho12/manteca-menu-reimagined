@@ -14,6 +14,7 @@ import {
 import { EnlaceASeccion } from '@/components/panel/EnlaceASeccion';
 import type { EstadoDeVariacion } from '@/lib/inicio/estadoDeVariacion';
 import { TOOLTIP_DE_LINEAS } from '@/components/reportes/estiloDelTooltip';
+import { CartelDeSemana } from './CartelDeSemana';
 import { EncabezadoDeTarjeta } from './EncabezadoDeTarjeta';
 import type { DiaDeLaSemana } from '@/lib/inicio/semana';
 import {
@@ -31,7 +32,6 @@ const CHIP: Record<EstadoDeVariacion, string> = {
   igual: 'bg-secondary text-foreground',
   'sin-datos': 'bg-secondary text-foreground',
 };
-const ventas = (valor: unknown) => `${valor} ${Number(valor) === 1 ? 'venta' : 'ventas'}`;
 
 type PuntoDelFinal = { cx?: number; cy?: number; index?: number };
 
@@ -85,7 +85,7 @@ function GraficoAcumulado({ puntos }: { puntos: PuntoAcumulado[] }) {
   return (
     <figure aria-label="Ventas por día" className="h-52">
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={puntos} margin={{ left: 0, right: 8, top: 8 }}>
+        <ComposedChart data={puntos} margin={{ left: 0, right: 24, top: 8 }}>
           <defs>
             <linearGradient id="semanaActual" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor={COLORES.actual} stopOpacity={0.25} />
@@ -95,7 +95,7 @@ function GraficoAcumulado({ puntos }: { puntos: PuntoAcumulado[] }) {
           <CartesianGrid stroke="#e2e8f0" vertical={false} />
           <XAxis dataKey="etiqueta" {...EJE} tickLine={false} />
           <YAxis allowDecimals={false} width={36} {...EJE} tickLine={false} axisLine={false} />
-          <Tooltip {...TOOLTIP_DE_LINEAS} formatter={ventas} />
+          <Tooltip cursor={TOOLTIP_DE_LINEAS.cursor} content={<CartelDeSemana />} />
           <Legend iconType="circle" />
           <Area
             dataKey="actual"

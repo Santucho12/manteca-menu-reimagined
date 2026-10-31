@@ -6,14 +6,13 @@ import { FranjaDeAviso } from '@/components/panel/Avisos';
 import { ACCESO_SECUNDARIO, ICONO_DE_ACCESO_SUAVE } from '@/components/panel/estilos';
 import { EnlaceDeVolver } from '@/components/panel/EnlaceDeVolver';
 import { BotonDeAnular } from '@/components/panel/BotonDeAnular';
-import { InsigniaDeEstado } from '@/components/panel/Insignias';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { exigirPagina } from '@/lib/acceso/servidor';
-import { cierrePorId, fondosAnteriores, type Cierre } from '@/lib/caja/consultas';
-import { nombreDeEstado, tonoDelCierre } from '@/lib/caja/pantalla';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
+import { cierreConFondoAnterior, type Cierre } from '@/lib/caja/consultas';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import { anularCierreDesdeElPanel } from '../../acciones';
 import { DetalleDelCierre } from './DetalleDelCierre';
+import { ResumenDelCierre } from './ResumenDelCierre';
 
 export const metadata: Metadata = { title: 'Cierre de caja' };
 
@@ -43,26 +42,23 @@ function AccionesDelCierre({ cierre, esAdmin }: { cierre: Cierre; esAdmin: boole
 }
 
 export default async function FichaDeCierre({ params }: { params: Promise<{ id: string }> }) {
-  const { cliente, estado } = await exigirPagina('caja');
+  const { id } = await params;
   // RLS decide: Caja lee solo los suyos; uno ajeno no existe para ella.
-  const cierre = await cierrePorId(cliente, (await params).id);
-  if (!cierre) notFound();
+  const { estado, datos } = await exigirPaginaYLeer('caja', (cliente) =>
+    cierreConFondoAnterior(cliente, id),
+  );
+  if (!datos) notFound();
+  const { cierre } = datos;
   const esAdmin = estado === 'admin';
   // Solo el admin ve con que se compara el fondo: Caja no lee los cierres de los demas.
-  const anterior = esAdmin
-    ? ((await fondosAnteriores(cliente, [cierre.id])).get(cierre.id) ?? null)
-    : null;
+  const anterior = esAdmin ? datos.fondoAnteriorCentavos : null;
   return (
     <Pantalla
       titulo={`Cierre del ${fechaParaMostrar(cierre.fecha)}`}
       subtitulo={`Cargado por ${cierre.persona}`}
       ayuda={esAdmin ? 'control' : 'caja'}
     >
-      <div>
-        <InsigniaDeEstado tono={tonoDelCierre(cierre)}>
-          {cierre.anulado ? 'Anulado' : nombreDeEstado(cierre.estado)}
-        </InsigniaDeEstado>
-      </div>
+      <ResumenDelCierre cierre={cierre} />
       <Marcas cierre={cierre} />
       <DetalleDelCierre cierre={cierre} fondoAnterior={anterior} />
       {cierre.anulado ? null : <AccionesDelCierre cierre={cierre} esAdmin={esAdmin} />}

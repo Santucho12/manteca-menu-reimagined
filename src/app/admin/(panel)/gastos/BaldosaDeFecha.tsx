@@ -24,7 +24,7 @@ export function BaldosaDeFecha({
   return (
     <div
       className={cn(
-        'shrink-0 rounded-xl border text-center',
+        'shrink-0 rounded-2xl border text-center',
         chica ? 'w-9 py-1' : 'w-11 py-1.5',
         TONOS[tono],
       )}

@@ -4,7 +4,7 @@ import { Chip } from '@/components/panel/Insignias';
 import { cuandoVence } from '@/lib/gastos/fijos';
 import { tonoDeLaMarca } from '@/lib/gastos/filas';
 import { nombreDeFrecuencia } from '@/lib/gastos/pantalla';
-import type { ItemPorPagar } from '@/lib/gastos/porPagar';
+import { esElPagoPedido, type ItemPorPagar } from '@/lib/gastos/porPagar';
 import { formatearPesos } from '@/lib/plata';
 import { cn } from '@/lib/utils';
 import { anularPorPagarDesdeElPanel } from './acciones';
@@ -28,10 +28,18 @@ function Nombre({ item }: { item: ItemPorPagar }) {
 }
 
 /** Una fila de Próximos pagos: cuándo vence, qué es y cuánto. Lo vencido, en rosa. */
-export function FilaPorPagar({ item, hoy }: { item: ItemPorPagar; hoy: string }) {
+export function FilaPorPagar({
+  item,
+  hoy,
+  pagar,
+}: {
+  item: ItemPorPagar;
+  hoy: string;
+  pagar?: string | undefined;
+}) {
   const vencido = item.fecha < hoy;
   return (
-    <li className="px-4 md:px-5 py-2 flex items-center gap-2.5 hover:bg-secondary/40 transition-colors">
+    <li className="flex flex-wrap items-center gap-2.5 rounded-2xl px-3 py-2 transition-colors sm:flex-nowrap duration-200 hover:bg-secondary/50">
       <BaldosaDeFecha fecha={item.fecha} viene={!vencido} vencido={vencido} chica />
       <div className="flex-1 min-w-0">
         <Nombre item={item} />
@@ -39,7 +47,7 @@ export function FilaPorPagar({ item, hoy }: { item: ItemPorPagar; hoy: string })
         <p className="text-[10px] text-muted-foreground truncate">
           <span className={cn(vencido && 'font-bold text-rose-600')}>
             {cuandoVence(item.fecha, hoy)}
-          </span>{' '}
+          </span>
           {item.frecuencia ? null : ` · ${item.detalle}`}
         </p>
         {item.frecuencia ? (
@@ -48,12 +56,12 @@ export function FilaPorPagar({ item, hoy }: { item: ItemPorPagar; hoy: string })
           </Chip>
         ) : null}
       </div>
-      <div className="flex flex-col items-end gap-1 shrink-0">
+      <div className="flex w-full items-center justify-between gap-1 sm:w-auto sm:shrink-0 sm:flex-col sm:items-end">
         <span className="text-xs font-bold tabular-nums whitespace-nowrap">
           {formatearPesos(item.montoCentavos)}
         </span>
         <div className="flex items-center gap-1">
-          <BotonDePago item={item} hoy={hoy} />
+          <BotonDePago item={item} hoy={hoy} abierta={esElPagoPedido(item, pagar)} />
           {item.porPagarId ? (
             <BotonDeAnular
               id={item.porPagarId}

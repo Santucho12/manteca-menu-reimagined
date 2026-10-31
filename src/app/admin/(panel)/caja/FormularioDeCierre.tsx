@@ -14,6 +14,7 @@ import { esquemaCierre, type DatosDeCierre } from '@/lib/caja/esquemas';
 import { conValorInicial, type Registro } from '@/lib/formularios/valorInicial';
 import { useGuardar } from '@/lib/gastos/useGuardar';
 import { editarCierreDesdeElPanel, guardarCierreDesdeElPanel } from './acciones';
+import { CAMPO_CONTRASTADO } from './contraste';
 import { GastosDeCaja, Retiros } from './Salidas';
 
 type CamposDeMonto = 'fondoInicial' | 'efectivo' | 'credito' | 'debito' | 'qr' | 'transferencia';
@@ -35,9 +36,10 @@ type PropsDeMontos = {
 // Lo declarado por medio de pago. No muestra lo esperado: el conteo es a ciegas.
 function Montos({ registro, errors }: PropsDeMontos) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       {MONTOS.map(({ campo, etiqueta }) => (
         <Campo
+          className={CAMPO_CONTRASTADO}
           key={campo}
           id={campo}
           etiqueta={etiqueta}
@@ -71,6 +73,7 @@ export function FormularioDeCierre({ inicial, id, avisoDelFondo }: Props) {
     <Seccion icono={<Banknote className="text-primary" size={24} />}>
       <form onSubmit={handleSubmit(guardado.enviar)} noValidate className="space-y-5">
         <Campo
+          className={CAMPO_CONTRASTADO}
           id="fecha"
           etiqueta="Fecha"
           type="date"
@@ -84,9 +87,12 @@ export function FormularioDeCierre({ inicial, id, avisoDelFondo }: Props) {
           </FranjaDeAviso>
         ) : null}
         <Montos registro={registro} errors={errors} />
-        <Retiros control={control} register={register} errors={errors} />
-        <GastosDeCaja control={control} register={register} errors={errors} />
+        <div className="grid grid-cols-1 items-start gap-5 md:grid-cols-2">
+          <Retiros control={control} register={register} errors={errors} />
+          <GastosDeCaja control={control} register={register} errors={errors} />
+        </div>
         <Campo
+          className={CAMPO_CONTRASTADO}
           id="queda-en-caja"
           etiqueta="Queda en la caja"
           inputMode="decimal"
@@ -94,6 +100,7 @@ export function FormularioDeCierre({ inicial, id, avisoDelFondo }: Props) {
           {...registro('quedaEnCaja')}
         />
         <CampoDeTextoLargo
+          className={CAMPO_CONTRASTADO}
           id="comentario"
           etiqueta="Comentario"
           error={errors.comentario?.message}
@@ -101,6 +108,7 @@ export function FormularioDeCierre({ inicial, id, avisoDelFondo }: Props) {
         />
         {guardado.mensaje ? <AvisoDeError mensaje={guardado.mensaje} /> : null}
         <PieDelFormulario
+          blanco
           enviando={guardado.enviando}
           texto={id ? 'Guardar cambios' : 'Guardar cierre'}
         />

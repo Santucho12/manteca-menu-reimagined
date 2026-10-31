@@ -10,7 +10,7 @@ import {
 } from '@/components/panel/estilos';
 import { Paginas } from '@/components/panel/Paginas';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import { cantidadDePaginas } from '@/lib/usuarios/presentacion';
 import { listarVentas } from '@/lib/ventas/consultas';
@@ -51,10 +51,11 @@ export default async function PaginaDeVentas({
 }: {
   searchParams: Promise<ParametrosDeVentas>;
 }) {
-  const { cliente } = await exigirPagina('admin');
   const hoy = diaEnArgentina(new Date());
   const filtros = filtrosDeVentas(await searchParams, hoy);
-  const lista = await listarVentas(cliente, filtros);
+  const { datos: lista } = await exigirPaginaYLeer('admin', (cliente) =>
+    listarVentas(cliente, filtros),
+  );
   return (
     <Pantalla
       titulo="Ventas"

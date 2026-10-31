@@ -37,7 +37,7 @@ function Repetido({ nombre, enviando, alConfirmar, alVolver }: PropsDelAviso) {
           Ya hay un proveedor llamado {nombre}. ¿Lo cargás igual?
         </p>
       </div>
-      <div className="flex flex-col-reverse sm:flex-row gap-3">
+      <div className="flex flex-col-reverse gap-3 max-sm:[&>*]:flex-none sm:flex-row">
         <button type="button" onClick={alVolver} className={BOTON_CANCELAR}>
           Volver
         </button>

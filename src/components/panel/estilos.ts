@@ -44,10 +44,10 @@ export const ICONO_EDITAR =
   'p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 hover:scale-110 active:scale-95 transition-all duration-200';
 
 export const ICONO_BORRAR =
-  'p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:scale-110 active:scale-95 transition-all duration-200';
+  'p-3 sm:p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:scale-110 active:scale-95 transition-all duration-200';
 
 export const ATAJO =
-  'inline-flex items-center gap-1 h-9 px-3 rounded-xl text-xs font-bold bg-secondary/60 text-slate-600 hover:bg-primary/10 hover:text-primary hover:-translate-y-0.5 hover:shadow-sm active:scale-95 transition-all duration-200 whitespace-nowrap';
+  'inline-flex items-center gap-1 h-10 sm:h-9 px-3 rounded-xl text-xs font-bold bg-secondary/60 text-slate-600 hover:bg-primary/10 hover:text-primary hover:-translate-y-0.5 hover:shadow-sm active:scale-95 transition-all duration-200 whitespace-nowrap';
 
 export const TARJETA_DE_SECCION =
   'bg-card rounded-[2rem] border border-border/60 shadow-xl p-5 md:p-8 space-y-6';
@@ -77,14 +77,14 @@ export const CAMPO_DE_FILTRO =
   'w-full min-w-0 sm:w-[180px] h-11 md:h-14 px-3 md:px-4 rounded-xl md:rounded-2xl bg-secondary/30 border-none text-xs md:text-sm font-semibold focus:ring-2 focus:ring-primary/20';
 
 export const BARRA_DE_FILTROS =
-  'flex flex-col xl:flex-row xl:flex-wrap gap-3 md:gap-4 mb-6 md:mb-8 bg-card border border-border p-3 md:p-5 rounded-2xl md:rounded-3xl shadow-xs';
+  'flex flex-col xl:flex-row xl:flex-wrap xl:items-end gap-3 md:gap-4 mb-6 md:mb-8 bg-card border border-border p-3 md:p-5 rounded-2xl md:rounded-3xl shadow-xs';
 
 export const BOTON_DE_ENCABEZADO_NEUTRO =
   'flex-1 lg:flex-none h-10 px-4 rounded-xl border border-border bg-card text-foreground text-sm font-semibold whitespace-nowrap hover:bg-secondary active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2 [&_svg]:size-4';
 
 /** Un icono de accion de una fila que no edita ni borra (subir, bajar, mostrar). */
 export const ICONO_DE_ACCION =
-  'p-1.5 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/10 transition-all duration-200 disabled:opacity-40';
+  'p-3 sm:p-1.5 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/10 transition-all duration-200 disabled:opacity-40';
 
 /** El botón de las tarjetas de Inicio (Ver reportes, Ver gastos, Ver todo el año): una sola pieza. */
 export const BOTON_DE_TARJETA =

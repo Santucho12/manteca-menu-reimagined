@@ -1,3 +1,4 @@
+import { EnlaceDeVolver } from '@/components/panel/EnlaceDeVolver';
 import { Receipt } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -7,7 +8,7 @@ import { BotonDeAnular } from '@/components/panel/BotonDeAnular';
 import { CargadoPor } from '@/components/panel/CargadoPor';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { Dato, Datos, Seccion } from '@/components/panel/Seccion';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import {
   gastoPorId,
@@ -97,10 +98,12 @@ async function fijoDelGasto(cliente: Cliente, gasto: Gasto, categorias: OpcionDe
 }
 
 export default async function FichaDeGasto({ params }: { params: Promise<{ id: string }> }) {
-  const { cliente } = await exigirPagina('admin');
-  const gasto = await gastoPorId(cliente, (await params).id);
+  const { id } = await params;
+  const { cliente, datos: leidos } = await exigirPaginaYLeer('admin', (cliente) =>
+    Promise.all([gastoPorId(cliente, id), opcionesDeGasto(cliente)]),
+  );
+  const [gasto, opciones] = leidos;
   if (!gasto) notFound();
-  const opciones = await opcionesDeGasto(cliente);
   const fijo = await fijoDelGasto(cliente, gasto, opciones.categorias);
   const datos = datosDeGastoParaEditar(gasto);
   // Sin clasificar no se ofrece: el selector arranca vacio y pide elegir una categoria.
@@ -137,12 +140,7 @@ export default async function FichaDeGasto({ params }: { params: Promise<{ id: s
           )}
         </>
       )}
-      <Link
-        href="/admin/gastos"
-        className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
-      >
-        Volver a gastos
-      </Link>
+      <EnlaceDeVolver href="/admin/gastos">Volver a gastos</EnlaceDeVolver>
     </Pantalla>
   );
 }

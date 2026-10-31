@@ -31,7 +31,7 @@ export async function idDeCanal(nombre: string, otroLocal = false): Promise<stri
     .from('canales_de_venta')
     .select('id')
     .eq('local_id', local)
-    .eq('nombre', nombre)
+    .ilike('nombre', nombre)
     .single();
   if (error) throw new Error(`No encontre el canal ${nombre}: ${error.message}`);
   return data.id;

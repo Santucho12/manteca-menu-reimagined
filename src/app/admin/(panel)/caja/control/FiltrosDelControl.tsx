@@ -1,9 +1,9 @@
 import { AlertTriangle, ArrowRight, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { BarraAutomatica } from '@/components/panel/BarraAutomatica';
-import { FiltroDeFecha, FiltroDeSeleccion, FiltroEnlace } from '@/components/panel/Filtros';
+import { FiltroDeFecha, FiltroDeSeleccion } from '@/components/panel/Filtros';
 import { diaDeLaSemana } from '@/lib/caja/diaDeLaSemana';
-import { enlaceDeControl, opcionesDeEstado, type FiltrosDeControl } from '@/lib/caja/pantalla';
+import { opcionesDeEstado, type FiltrosDeControl } from '@/lib/caja/pantalla';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 
 const FILA_DEL_DIA =
@@ -14,11 +14,9 @@ type Persona = { id: string; nombre: string };
 export function FiltrosDelControl({
   filtros,
   personas,
-  hoy,
 }: {
   filtros: FiltrosDeControl;
   personas: Persona[];
-  hoy: string;
 }) {
   const quienes = personas.map((persona) => ({ valor: persona.id, texto: persona.nombre }));
   return (
@@ -39,12 +37,6 @@ export function FiltrosDelControl({
         opciones={[{ valor: '', texto: 'Todos los estados' }, ...opcionesDeEstado()]}
         valor={filtros.estado ?? ''}
       />
-      <FiltroEnlace
-        href={enlaceDeControl({ ...filtros, anulados: !filtros.anulados, pagina: 1 }, hoy)}
-        prendido={filtros.anulados}
-      >
-        Ver anulados
-      </FiltroEnlace>
     </BarraAutomatica>
   );
 }

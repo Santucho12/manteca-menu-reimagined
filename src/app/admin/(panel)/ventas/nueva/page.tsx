@@ -1,8 +1,6 @@
-import { ShoppingBag } from 'lucide-react';
 import type { Metadata } from 'next';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { Seccion } from '@/components/panel/Seccion';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import { canalesDeVenta, opcionesParaVender } from '@/lib/ventas/consultas';
 import type { DatosDeVenta } from '@/lib/ventas/esquemas';
@@ -11,11 +9,10 @@ import { FormularioDeVenta } from './FormularioDeVenta';
 export const metadata: Metadata = { title: 'Cargar venta' };
 
 export default async function NuevaVenta() {
-  const { cliente } = await exigirPagina('admin');
-  const [canales, opciones] = await Promise.all([
-    canalesDeVenta(cliente),
-    opcionesParaVender(cliente),
-  ]);
+  const { datos } = await exigirPaginaYLeer('admin', (cliente) =>
+    Promise.all([canalesDeVenta(cliente), opcionesParaVender(cliente)]),
+  );
+  const [canales, opciones] = datos;
   const activos = canales.filter((canal) => canal.activo);
   const enElLocal = activos.find((canal) => canal.nombre.trim().toLowerCase() === 'en el local');
   const inicial = {
@@ -26,7 +23,8 @@ export default async function NuevaVenta() {
     // Vacio a proposito: la persona elige como se cobro, el formulario no lo supone.
     medio: '' as DatosDeVenta['medio'],
     comentario: '',
-    renglones: [],
+    // Ya viene una línea lista para elegir el producto: lo normal es vender al menos uno.
+    renglones: [{ opcion: '', cantidad: '1', precio: '' }],
   };
   return (
     <Pantalla
@@ -34,9 +32,7 @@ export default async function NuevaVenta() {
       subtitulo="Para lo que no pasa por Fudo: Cheaf, encargos, ventas a comercios."
       ayuda="ventas"
     >
-      <Seccion icono={<ShoppingBag className="text-primary" size={24} />}>
-        <FormularioDeVenta inicial={inicial} canales={activos} opciones={opciones} />
-      </Seccion>
+      <FormularioDeVenta inicial={inicial} canales={activos} opciones={opciones} />
     </Pantalla>
   );
 }

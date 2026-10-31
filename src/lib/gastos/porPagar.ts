@@ -1,6 +1,7 @@
 import type { DatosDePago, MedioDePago } from './esquemas';
 import { nombreDelGasto } from './filas';
 import type { ProximoPago } from './fijos';
+import { sumarDias } from '../reportes/periodos';
 import { nombreDeFrecuencia } from './pantalla';
 import { montoParaEditar } from './plata';
 import type { Frecuencia } from './vencimientos';
@@ -97,4 +98,22 @@ export function pagoInicial(item: ItemPorPagar, hoy: string, clave: string): Dat
     medioDePago: (item.medio ?? '') as DatosDePago['medioDePago'],
     clave,
   };
+}
+
+/** El pago que pidio un enlace ("fijo|vencimiento", como lo manda el aviso de Inicio). */
+export function esElPagoPedido(item: ItemPorPagar, pagar: string | undefined): boolean {
+  return pagar !== undefined && pagar === `${item.fijoId}|${item.vencimiento}`;
+}
+
+const DIAS_DE_ADELANTO = 30;
+
+/** Lo vencido y lo que vence de hoy a tantos dias; con null, todo lo que viene. */
+export function dentroDeLosProximos<T extends { fecha: string }>(
+  items: T[],
+  hoy: string,
+  dias: number | null = DIAS_DE_ADELANTO,
+): T[] {
+  if (dias === null) return items;
+  const hasta = sumarDias(hoy, dias);
+  return items.filter((item) => item.fecha <= hasta);
 }

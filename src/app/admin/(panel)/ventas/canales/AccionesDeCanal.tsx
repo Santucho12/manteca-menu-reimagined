@@ -5,16 +5,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { AvisoDeError } from '@/components/formularios/AvisoDeError';
-import {
-  BOTON_CANCELAR,
-  BOTON_PELIGRO,
-  ICONO_BORRAR,
-  ICONO_EDITAR,
-} from '@/components/panel/estilos';
+import { BOTON_CANCELAR, BOTON_PELIGRO } from '@/components/panel/estilos';
 import { Interruptor } from '@/components/panel/Interruptor';
 import { Ventana } from '@/components/panel/Ventana';
 import { useAccionDelMenu } from '@/lib/menu/useAccionDelMenu';
 import { borrarCanalDesdeElPanel, cambiarEstadoDeCanalDesdeElPanel } from '../acciones';
+
+const BASE =
+  'flex h-10 w-10 sm:h-7 sm:w-7 items-center justify-center rounded-full text-slate-400 transition-all duration-200 active:scale-95 disabled:opacity-40';
+const EDITAR = `${BASE} hover:bg-[#2563eb]/10 hover:text-[#2563eb] hover:scale-110`;
+const BORRAR = `${BASE} hover:bg-rose-50 hover:text-rose-600 hover:scale-110`;
 
 type Props = { id: string; nombre: string; activo: boolean };
 
@@ -38,7 +38,7 @@ function VentanaDeBorrar({
           ¿Borrar {nombre}? Solo se puede si nunca se usó en una venta; si no, desactivalo.
         </p>
         {mensaje ? <AvisoDeError mensaje={mensaje} /> : null}
-        <div className="flex flex-col-reverse sm:flex-row gap-3">
+        <div className="flex flex-col-reverse gap-3 max-sm:[&>*]:flex-none sm:flex-row">
           <button type="button" onClick={alCerrar} className={BOTON_CANCELAR}>
             Cancelar
           </button>
@@ -73,7 +73,7 @@ export function AccionesDeCanal({ id, nombre, activo }: Props) {
   };
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <Interruptor
           activo={activo}
           etiqueta={`Tipo de venta ${nombre} activo`}
@@ -83,7 +83,7 @@ export function AccionesDeCanal({ id, nombre, activo }: Props) {
         <Link
           href={`/admin/ventas/canales/${id}`}
           aria-label={`Editar ${nombre}`}
-          className={ICONO_EDITAR}
+          className={EDITAR}
         >
           <Pencil size={16} aria-hidden="true" />
         </Link>
@@ -92,7 +92,7 @@ export function AccionesDeCanal({ id, nombre, activo }: Props) {
           disabled={enviando}
           aria-label={`Borrar ${nombre}`}
           onClick={() => setBorrando(true)}
-          className={ICONO_BORRAR}
+          className={BORRAR}
         >
           <Trash2 size={16} aria-hidden="true" />
         </button>

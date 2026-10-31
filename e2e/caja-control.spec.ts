@@ -41,7 +41,7 @@ test('ve el cierre de caja en el control con su resultado', async ({ page }) => 
   await expect(cierre).toContainText('Prueba Caja');
   await expect(cierre).toContainText('Con diferencia');
   await cierre.getByRole('link').click();
-  await expect(page.getByText('$20.000,00')).toBeVisible();
+  await expect(page.getByText('$20.000,00').first()).toBeVisible();
   await expect(page.getByRole('button', { name: 'Marcar como revisado' })).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Editar cierre' })).toBeVisible();
 });
@@ -71,14 +71,16 @@ test('marca los dias pendientes y filtra por estado', async ({ page }) => {
   await expect(
     aviso.getByRole('link', { name: fechaParaMostrar(diaSiguiente(fecha)) }),
   ).toBeVisible();
-  await page.getByLabel('Estado').selectOption({ label: 'Pendiente' });
+  await page.getByRole('combobox', { name: 'Estado' }).click();
+  await page.getByRole('option', { name: 'Pendiente', exact: true }).click();
   await expect(page).toHaveURL(/estado=pendiente/);
   await expect(
     page
       .getByRole('list', { name: 'Días sin cierre' })
       .getByRole('link', { name: fechaParaMostrar(diaSiguiente(fecha)) }),
   ).toBeVisible();
-  await page.getByLabel('Estado').selectOption({ label: 'Cierra' });
+  await page.getByRole('combobox', { name: 'Estado' }).click();
+  await page.getByRole('option', { name: 'Cierra', exact: true }).click();
   await expect(page.getByText('No hay cierres para mostrar.')).toBeVisible();
 });
 

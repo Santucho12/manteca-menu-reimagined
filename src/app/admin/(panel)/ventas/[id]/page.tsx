@@ -1,5 +1,5 @@
+import { EnlaceDeVolver } from '@/components/panel/EnlaceDeVolver';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { FranjaDeAviso } from '@/components/panel/Avisos';
 import { BotonDeAnular } from '@/components/panel/BotonDeAnular';
@@ -7,7 +7,7 @@ import { CargadoPor } from '@/components/panel/CargadoPor';
 import { InsigniaDeEstado } from '@/components/panel/Insignias';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { Dato, Datos, Seccion } from '@/components/panel/Seccion';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import { formatearPesos } from '@/lib/plata';
 import { ventaPorId, type Venta } from '@/lib/ventas/consultas';
@@ -85,8 +85,10 @@ function Acciones({ venta }: { venta: Venta }) {
 }
 
 export default async function FichaDeVenta({ params }: { params: Promise<{ id: string }> }) {
-  const { cliente } = await exigirPagina('admin');
-  const venta = await ventaPorId(cliente, (await params).id);
+  const { id } = await params;
+  const { cliente, datos: venta } = await exigirPaginaYLeer('admin', (cliente) =>
+    ventaPorId(cliente, id),
+  );
   if (!venta) notFound();
   return (
     <Pantalla
@@ -100,12 +102,7 @@ export default async function FichaDeVenta({ params }: { params: Promise<{ id: s
       <CargadoPor cliente={cliente} tabla="ventas" id={venta.id} />
       <Resumen venta={venta} />
       <Acciones venta={venta} />
-      <Link
-        href="/admin/ventas"
-        className="inline-block text-sm font-semibold text-muted-foreground hover:text-primary"
-      >
-        Volver a ventas
-      </Link>
+      <EnlaceDeVolver href="/admin/ventas">Volver a ventas</EnlaceDeVolver>
     </Pantalla>
   );
 }

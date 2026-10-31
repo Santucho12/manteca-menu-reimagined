@@ -24,7 +24,7 @@ export function BarraLateral({ nombre, enlaces }: Props) {
   const activo = enlaceActivo(enlaces, usePathname());
   const { grupos, cuenta } = partirEnlaces(enlaces);
   return (
-    <aside className="fixed left-0 top-0 h-full w-[234px] border-r border-border bg-card hidden lg:flex flex-col z-50">
+    <aside className="fixed left-0 top-0 h-full w-[234px] border-r border-border bg-card hidden lg:flex flex-col z-50 [&>*]:[zoom:0.99]">
       <div className="px-6 pt-6 pb-4">
         <Marca tamano="lateral" />
       </div>

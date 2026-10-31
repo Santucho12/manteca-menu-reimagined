@@ -7,11 +7,11 @@
     },
     "supabase-pruebas": {
       "type": "http",
-      "url": "https://mcp.supabase.com/mcp?project_ref=nrevmkmpaaoobpmgkzhh&features=database%2Cdocs%2Cdebugging%2Cdevelopment"
+      "url": "https://mcp.supabase.com/mcp?project_ref=dfyresrfvawslsferjgg&features=database%2Cdocs%2Cdebugging%2Cdevelopment"
     },
     "supabase-real": {
       "type": "http",
-      "url": "https://mcp.supabase.com/mcp?project_ref=xuonreieukgonjpvksbn&features=database%2Cdocs%2Cdebugging%2Cdevelopment"
+      "url": "https://mcp.supabase.com/mcp?project_ref=jmtwopfgbvgmutinftcb&features=database%2Cdocs%2Cdebugging%2Cdevelopment"
     }
   }
 }

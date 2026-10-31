@@ -5,7 +5,7 @@ import { PaginasDeReporte } from '@/components/reportes/PaginasDeReporte';
 import { SinDatos } from '@/components/reportes/SinDatos';
 import { TablaPorPeriodo } from '@/components/reportes/TablaPorPeriodo';
 import { Totales } from '@/components/reportes/Totales';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import { formatearPesos } from '@/lib/plata';
 import { agrupar, escalaDe, serieSuperpuesta } from '@/lib/reportes/agrupar';
@@ -23,13 +23,15 @@ export default async function ReporteDeGastosPorPeriodo({
 }: {
   searchParams: Promise<ParametrosDeReporte>;
 }) {
-  const { cliente } = await exigirPagina('admin');
   const hoy = diaEnArgentina(new Date());
   const periodos = periodosDelReporte(await searchParams, hoy);
-  const [actual, anterior] = await Promise.all([
-    gastosPorDia(cliente, periodos.actual),
-    gastosPorDia(cliente, periodos.comparacion),
-  ]);
+  const { datos } = await exigirPaginaYLeer('admin', (cliente) =>
+    Promise.all([
+      gastosPorDia(cliente, periodos.actual),
+      gastosPorDia(cliente, periodos.comparacion),
+    ]),
+  );
+  const [actual, anterior] = datos;
   const escala = escalaDe(periodos.actual);
   const pagina = paginaDe(agrupar(puntosDeGastos(actual), escala), periodos.pagina);
   const serie = serieSuperpuesta(

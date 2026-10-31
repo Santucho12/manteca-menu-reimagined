@@ -12,8 +12,17 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         puntos: [
           'Arranca en el mes de hoy, de a 25 por página. Filtrá por fechas, origen (Fudo o a mano), medio de pago y estado.',
           'El total de arriba suma lo cobrado, sin lo cancelado ni lo anulado. Lo cancelado se muestra aparte, con cuánto fue.',
+          'Las tarjetas de arriba muestran lo cobrado, el ticket promedio, las canceladas y las anuladas del período filtrado.',
           'Con un medio de pago elegido, el total suma solo lo que se pagó con ese medio.',
           'Abrí una venta para ver sus productos, sus pagos y quién la cargó.',
+        ],
+      },
+      {
+        titulo: 'Subir el Excel de Fudo',
+        puntos: [
+          'Con Subir Excel de Fudo elegís el reporte de ventas que bajás de Fudo. Antes de guardar ves una vista previa de lo que va a entrar.',
+          'Cada día y medio de pago entra como tantas ventas como diga el Excel, sin productos: por eso Más vendidos no las cuenta.',
+          'Si subís dos veces el mismo período no se duplica: se actualiza lo de cada día y medio.',
         ],
       },
       {
@@ -104,7 +113,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
           'Pendiente: el día todavía no tiene cierre cargado.',
           'Cierra: lo contado coincide con las ventas del día, o la diferencia es menor que la tolerancia.',
           'Con diferencia: en algún medio de pago falta o sobra más que la tolerancia.',
-          'Anulado: no cuenta, y ese día queda libre para cargarlo de nuevo. Se ve con Ver anulados.',
+          'Anulado: no cuenta, y ese día queda libre para cargarlo de nuevo.',
         ],
       },
       {
@@ -118,8 +127,17 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
       {
         titulo: 'La tolerancia',
         puntos: [
-          'Es la diferencia por medio de pago que se acepta como Cierra, por ejemplo unos pesos de cambio.',
+          'Es la diferencia por medio de pago que se acepta como Cierra, por ejemplo unos pesos de cambio. Se cambia con el botón Diferencia aceptada, arriba.',
           'Una diferencia menor no genera aviso, pero se ve igual en el detalle.',
+        ],
+      },
+      {
+        titulo: 'Cómo se calcula si cierra',
+        puntos: [
+          'El efectivo esperado es el fondo inicial, más las ventas en efectivo, menos los retiros y los gastos de caja. En los demás medios, lo esperado son las ventas de ese medio.',
+          'Efectivo contado es todo el efectivo que había en la caja, fondo incluido. Queda en la caja no puede ser más que lo contado.',
+          'Lo que queda en la caja de un día es el fondo inicial del siguiente cierre. Si no coincide, el detalle lo avisa.',
+          'Para cargar un cierre que falta, usá el botón Cargar cierre o tocá el día pendiente.',
         ],
       },
       {
@@ -156,6 +174,13 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         ],
       },
       {
+        titulo: 'Crear y editar',
+        puntos: [
+          'Nuevo crea una categoría o un producto. Para editar uno que ya está, tocalo en la lista.',
+          'Aumentar precios sube o baja de una vez los precios de todo el menú o de una categoría. Tiene su propia ayuda.',
+        ],
+      },
+      {
         titulo: 'Ordenar, ocultar y desactivar',
         puntos: [
           'Las flechas suben y bajan categorías y productos en la carta.',
@@ -168,14 +193,14 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'Precios y Fudo',
         puntos: [
           'Los precios van en pesos enteros.',
-          'Cambiar un precio acá no lo cambia en Fudo: cambialo también allá.',
+          'Cambiar un precio acá no lo cambia en Fudo, porque todavía no estamos integrados: cambialo también allá.',
           'Cada cambio de precio queda en la Auditoría, con el anterior y el nuevo.',
         ],
       },
     ],
   },
   aumento: {
-    titulo: 'Cómo funciona el Aumento de precios',
+    titulo: 'Cómo funciona Aumentar precios',
     introduccion:
       'Sube o baja de una vez todos los precios del menú o de una categoría, con un porcentaje.',
     temas: [

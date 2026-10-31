@@ -89,8 +89,8 @@ const fila = (page: Page, nombre: string) =>
 test('Pagado: la ventana corrige el monto y el pago pasa a Pagados', async ({ page }) => {
   const { id } = await porPagarDe('Factura de luz', sumarDias(HOY, 2));
   await page.goto('/admin/gastos');
-  await fila(page, 'Factura de luz').getByRole('button', { name: 'Pagado' }).click();
-  const ventana = page.getByRole('dialog', { name: 'Pagado: Factura de luz' });
+  await fila(page, 'Factura de luz').getByRole('button', { name: 'Marcar como pago' }).click();
+  const ventana = page.getByRole('dialog', { name: 'Marcar como pago: Factura de luz' });
   await expect(ventana.getByLabel('Fecha del pago')).toHaveText(fechaParaMostrar(HOY));
   await expect(ventana.getByLabel('Monto')).toHaveValue('8.000');
   await ventana.getByLabel('Monto').fill('8.350,25');
@@ -98,6 +98,7 @@ test('Pagado: la ventana corrige el monto y el pago pasa a Pagados', async ({ pa
   await ventana.getByRole('button', { name: 'Anotar el pago' }).click();
   await expect(page.getByText('Pago anotado')).toBeVisible();
   await expect(fila(page, 'Factura de luz')).toHaveCount(0);
+  await page.getByText('Ver los pagados').click();
   await expect(filas(page, 'Gastos').filter({ hasText: 'Factura de luz' })).toContainText(
     '$8.350,25',
   );
@@ -144,13 +145,14 @@ test('un fijo se paga antes de que venza y queda el siguiente', async ({ page })
   const fijo = await sembrarRecurrente({ categoria: nombre, primerVencimiento: vence });
   await page.goto('/admin/gastos');
   await expect(fila(page, nombre)).toContainText('En 5 días');
-  await fila(page, nombre).getByRole('button', { name: 'Pagado' }).click();
-  const ventana = page.getByRole('dialog', { name: `Pagado: ${nombre}` });
+  await fila(page, nombre).getByRole('button', { name: 'Marcar como pago' }).click();
+  const ventana = page.getByRole('dialog', { name: `Marcar como pago: ${nombre}` });
   await expect(ventana.getByLabel('Monto')).toHaveValue('500.000');
   await expect(ventana.getByLabel('Medio de pago')).toHaveValue('transferencia');
   await ventana.getByRole('button', { name: 'Anotar el pago' }).click();
   await expect(page.getByText('Pago anotado')).toBeVisible();
-  await expect(fila(page, nombre)).not.toContainText('En 5 días');
+  // El siguiente vence en más de un mes: queda fuera del plazo que se ve por defecto.
+  await expect(fila(page, nombre).filter({ hasText: 'En 5 días' })).toHaveCount(0);
   const { data } = await clienteSecretoDePruebas()
     .from('gastos')
     .select('fecha, recurrente_id')

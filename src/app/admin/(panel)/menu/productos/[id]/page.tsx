@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { CargadoPor } from '@/components/panel/CargadoPor';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { Seccion } from '@/components/panel/Seccion';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { leerPanel } from '@/lib/menu/consultas';
 import { productoParaEditar } from '@/lib/menu/panel';
 import { FormularioDeProducto } from '../FormularioDeProducto';
@@ -16,9 +16,8 @@ export default async function PaginaEditarProducto({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { cliente } = await exigirPagina('admin');
-  const panel = await leerPanel(cliente);
   const { id } = await params;
+  const { cliente, datos: panel } = await exigirPaginaYLeer('admin', leerPanel);
   const inicial = productoParaEditar(panel, id);
   if (!inicial) notFound();
   const opciones = panel.map(({ id, nombre, presentaciones, compartidos }) => ({

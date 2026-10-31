@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BOTON_DE_ENCABEZADO_NEUTRO } from '@/components/panel/estilos';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { leerPanel } from '@/lib/menu/consultas';
 import { AvisoDeFudo } from './AvisoDeFudo';
 import { BotonNuevo } from './BotonNuevo';
@@ -15,15 +15,14 @@ function Accesos() {
     <>
       <BotonNuevo />
       <Link href="/admin/menu/aumento" className={BOTON_DE_ENCABEZADO_NEUTRO}>
-        Aumento de precios
+        Aumentar precios
       </Link>
     </>
   );
 }
 
 export default async function PaginaDelMenu() {
-  const { cliente } = await exigirPagina('admin');
-  const categorias = await leerPanel(cliente);
+  const { datos: categorias } = await exigirPaginaYLeer('admin', leerPanel);
   return (
     <Pantalla
       titulo="Menú"

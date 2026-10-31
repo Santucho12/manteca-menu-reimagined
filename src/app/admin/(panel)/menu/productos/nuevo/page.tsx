@@ -2,7 +2,7 @@ import { Package } from 'lucide-react';
 import type { Metadata } from 'next';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { Seccion } from '@/components/panel/Seccion';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { leerPanel } from '@/lib/menu/consultas';
 import { FormularioDeProducto } from '../FormularioDeProducto';
 
@@ -19,10 +19,13 @@ const VACIO = {
 };
 
 export default async function PaginaNuevoProducto() {
-  const { cliente } = await exigirPagina('admin');
-  const opciones = (await leerPanel(cliente)).map(
-    ({ id, nombre, presentaciones, compartidos }) => ({ id, nombre, presentaciones, compartidos }),
-  );
+  const { datos: panel } = await exigirPaginaYLeer('admin', leerPanel);
+  const opciones = panel.map(({ id, nombre, presentaciones, compartidos }) => ({
+    id,
+    nombre,
+    presentaciones,
+    compartidos,
+  }));
   return (
     <Pantalla
       titulo="Nuevo producto"

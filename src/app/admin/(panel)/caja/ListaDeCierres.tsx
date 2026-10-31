@@ -114,13 +114,22 @@ function columnas(conPersona: boolean, fondos?: Map<string, number | null>) {
   ] satisfies Columna<FilaDeCierre>[];
 }
 
-function Tarjeta({ cierre, conPersona }: { cierre: FilaDeCierre; conPersona: boolean }) {
+function Tarjeta({
+  cierre,
+  conPersona,
+  anterior,
+}: {
+  cierre: FilaDeCierre;
+  conPersona: boolean;
+  anterior: number | null;
+}) {
   return (
     <>
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
           <Fecha cierre={cierre} />
           {conPersona ? <p className="text-xs text-muted-foreground">{cierre.persona}</p> : null}
+          {conPersona ? <ParaControlar cierre={cierre} anterior={anterior} /> : null}
         </div>
         <Estado cierre={cierre} />
       </div>
@@ -142,7 +151,9 @@ export function ListaDeCierres({ filas, conPersona = false, fondos }: Props) {
       filas={filas}
       clave={(c) => c.id}
       columnas={columnas(conPersona, fondos)}
-      tarjeta={(c) => <Tarjeta cierre={c} conPersona={conPersona} />}
+      tarjeta={(c) => (
+        <Tarjeta cierre={c} conPersona={conPersona} anterior={fondos?.get(c.id) ?? null} />
+      )}
     />
   );
 }

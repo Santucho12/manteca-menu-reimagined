@@ -1,5 +1,6 @@
 import type { Cliente } from '../supabase/cliente';
 import { POR_PAGINA, cantidadDePaginas } from '../usuarios/presentacion';
+import { fondosAnterioresDe } from './fondosAnteriores';
 import type { FiltrosDeControl } from './pantalla';
 import type { Medio, ResultadoDeMedio } from './resultado';
 import { resultadoDeFila, type FilaConVentas } from './resultadoDeFila';
@@ -86,6 +87,13 @@ export async function misCierres(cliente: Cliente, personaId: string): Promise<F
     .slice(0, 60);
 }
 
+/** Los cierres de quien entra: el id sale de la sesion, sin esperar a que se lea el perfil. */
+export async function misCierresDeLaSesion(cliente: Cliente): Promise<FilaDeCierre[]> {
+  const { data } = await cliente.auth.getClaims();
+  const id = data?.claims.sub;
+  return id ? misCierres(cliente, id) : [];
+}
+
 export type Cierre = FilaDeCierre & {
   declarados: Record<Medio, number>;
   medios: ResultadoDeMedio[];
@@ -100,23 +108,48 @@ const COLUMNAS_DE_CIERRE =
   'id, fecha, retiros:retiros_de_caja(monto_centavos, quien), ' +
   'gastos(id, monto_centavos, descripcion, anulado)';
 
-/** Un cierre con su cuenta, sus retiros y sus gastos, o null si no existe o no le corresponde verlo. */
-export async function cierrePorId(cliente: Cliente, id: string): Promise<Cierre | null> {
+type Salidas = Pick<Cierre, 'retiros' | 'gastos'> & { fecha: string };
+
+// La fila del cierre con sus retiros y sus gastos: de ahi sale la fecha para leer su cuenta.
+async function salidasDelCierre(cliente: Cliente, id: string): Promise<Salidas | null> {
   if (!UUID.test(id)) return null;
   const base = await cliente
     .from('cierres_de_caja')
     .select(COLUMNAS_DE_CIERRE)
     .eq('id', id)
     .maybeSingle();
-  const salidas = comprobar(base, 'el cierre') as unknown as
-    | (Pick<Cierre, 'retiros' | 'gastos'> & {
-        fecha: string;
-      })
-    | null;
-  if (!salidas) return null;
-  const leida = (await leerCierres(cliente, salidas.fecha, salidas.fecha)).find((c) => c.id === id);
+  return comprobar(base, 'el cierre') as unknown as Salidas | null;
+}
+
+function armarCierre(id: string, salidas: Salidas, delDia: Leida[]): Cierre | null {
+  const leida = delDia.find((cierre) => cierre.id === id);
   if (!leida) return null;
   return { ...aFila(leida), ...detalleDe(leida), retiros: salidas.retiros, gastos: salidas.gastos };
+}
+
+/** Un cierre con su cuenta, sus retiros y sus gastos, o null si no existe o no le corresponde verlo. */
+export async function cierrePorId(cliente: Cliente, id: string): Promise<Cierre | null> {
+  const salidas = await salidasDelCierre(cliente, id);
+  if (!salidas) return null;
+  return armarCierre(id, salidas, await leerCierres(cliente, salidas.fecha, salidas.fecha));
+}
+
+/**
+ * El cierre y lo que quedo en el anterior, en dos tandas: con la fecha, su cuenta y el fondo salen
+ * a la vez. Para un solo cierre, el fondo anterior es el fondo sugerido de su fecha.
+ */
+export async function cierreConFondoAnterior(
+  cliente: Cliente,
+  id: string,
+): Promise<{ cierre: Cierre; fondoAnteriorCentavos: number | null } | null> {
+  const salidas = await salidasDelCierre(cliente, id);
+  if (!salidas) return null;
+  const [delDia, fondoAnteriorCentavos] = await Promise.all([
+    leerCierres(cliente, salidas.fecha, salidas.fecha),
+    fondoSugerido(cliente, salidas.fecha),
+  ]);
+  const cierre = armarCierre(id, salidas, delDia);
+  return cierre ? { cierre, fondoAnteriorCentavos } : null;
 }
 
 function detalleDe(leida: Leida) {
@@ -139,6 +172,22 @@ function detalleDe(leida: Leida) {
 export async function fondoSugerido(cliente: Cliente, fecha: string): Promise<number | null> {
   const respuesta = await cliente.rpc('cierres_fondo_sugerido', { la_fecha: fecha });
   return comprobar(respuesta, 'el fondo de la caja');
+}
+
+/**
+ * Lo que quedo en la caja en el cierre anterior a cada cierre del rango, sin esperar la lista: los
+ * cierres de todas las personas (el anterior puede ser de otra) y el ultimo de antes del rango.
+ */
+export async function fondosDelRango(
+  cliente: Cliente,
+  desde: string,
+  hasta: string,
+): Promise<Map<string, number | null>> {
+  const [cierres, antes] = await Promise.all([
+    leerCierres(cliente, desde, hasta),
+    fondoSugerido(cliente, desde),
+  ]);
+  return fondosAnterioresDe(cierres, antes);
 }
 
 /** El dia del cierre del que sale el fondo sugerido; nulo si todavia no hay ninguno. */

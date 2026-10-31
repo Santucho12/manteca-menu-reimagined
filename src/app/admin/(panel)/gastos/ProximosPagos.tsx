@@ -6,7 +6,12 @@ import { nombreDelGasto } from '@/lib/gastos/filas';
 import { faltaPagarEsteMes, proximosPagos } from '@/lib/gastos/fijos';
 import { nombreDelMes } from '@/lib/gastos/meses';
 import { agruparPorMes, type GrupoDeMes } from '@/lib/gastos/porMes';
-import { itemsPorPagar, type ItemPorPagar, type Pendiente } from '@/lib/gastos/porPagar';
+import {
+  dentroDeLosProximos,
+  itemsPorPagar,
+  type ItemPorPagar,
+  type Pendiente,
+} from '@/lib/gastos/porPagar';
 import { formatearPesos } from '@/lib/plata';
 import { FilaPorPagar } from './FilaPorPagar';
 
@@ -38,45 +43,59 @@ type Props = {
   /** Vencimientos de fijos que ya tienen su por pagar: el próximo pago los saltea. */
   tomados: Set<string>;
   hoy: string;
+  /** El pago que se abre al entrar, si el enlace lo pide. */
+  pagar?: string | undefined;
 };
 
 // Cada mes abre con su nombre y lo que suma: se nota cuando lo que viene pasa al mes siguiente.
-function Mes({ grupo, hoy }: { grupo: GrupoDeMes<ItemPorPagar>; hoy: string }) {
+function Mes({
+  grupo,
+  hoy,
+  pagar,
+}: {
+  grupo: GrupoDeMes<ItemPorPagar>;
+  hoy: string;
+  pagar?: string | undefined;
+}) {
   return (
     <>
       <li
         role="presentation"
-        className="flex items-baseline justify-between gap-3 bg-secondary/50 px-4 md:px-5 py-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+        className="mt-2 flex items-baseline justify-between gap-3 px-3 pb-1 pt-1.5 text-[11px] font-bold uppercase tracking-widest text-muted-foreground first:mt-0"
       >
         <span>{nombreDelMes(grupo.mes)}</span>
         <span className="tabular-nums">{formatearPesos(grupo.totalCentavos)}</span>
       </li>
       {grupo.items.map((item) => (
-        <FilaPorPagar key={item.clave} item={item} hoy={hoy} />
+        <FilaPorPagar key={item.clave} item={item} hoy={hoy} pagar={pagar} />
       ))}
     </>
   );
 }
 
+// Se ve lo que vence en los próximos 30 días.
+const DIAS_POR_DELANTE = 30;
+
 /** Lo por pagar y el próximo pago de cada fijo activo, del más cercano al más lejano. */
-export function ProximosPagos({ recurrentes, porPagar, tomados, hoy }: Props) {
-  const items = itemsPorPagar(porPagar, proximosPagos(recurrentes, hoy, tomados));
+export function ProximosPagos({ recurrentes, porPagar, tomados, hoy, pagar }: Props) {
+  const todos = itemsPorPagar(porPagar, proximosPagos(recurrentes, hoy, tomados));
+  const items = dentroDeLosProximos(todos, hoy, DIAS_POR_DELANTE);
   const pausados = recurrentes.filter((fijo) => !fijo.activo);
-  const falta = faltaPagarEsteMes(items, hoy);
+  const falta = faltaPagarEsteMes(todos, hoy);
   return (
-    <PanelDeLista titulo="Próximos pagos" cantidad={String(items.length)}>
+    <PanelDeLista titulo="Próximos pagos" cantidad={String(items.length)} contador="rojo">
       {items.length === 0 ? (
         <p className="p-6 text-sm text-muted-foreground leading-relaxed">
-          No hay nada por pagar. Cargá un gasto con «Todavía no», o uno que se repita.
+          No hay nada por pagar en ese plazo. Cargá un gasto con «Todavía no», o uno que se repita.
         </p>
       ) : (
-        <ul aria-label="Próximos pagos" className="divide-y divide-border">
+        <ul aria-label="Próximos pagos" className="space-y-0.5 p-2">
           {agruparPorMes(items).map((grupo) => (
-            <Mes key={grupo.mes} grupo={grupo} hoy={hoy} />
+            <Mes key={grupo.mes} grupo={grupo} hoy={hoy} pagar={pagar} />
           ))}
         </ul>
       )}
-      <p className="px-4 md:px-6 py-3 border-t border-border text-sm font-semibold">
+      <p className="m-3 rounded-2xl bg-secondary/50 px-4 py-3 text-sm font-semibold">
         {falta > 0
           ? `Falta pagar este mes: ${formatearPesos(falta)}`
           : 'Este mes no queda nada por pagar.'}

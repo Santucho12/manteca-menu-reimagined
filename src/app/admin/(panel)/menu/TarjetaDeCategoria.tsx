@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Chip } from '@/components/panel/Insignias';
 import { TARJETA_DE_SECCION } from '@/components/panel/estilos';
 import type { CategoriaDelPanel } from '@/lib/menu/panel';
@@ -11,22 +12,24 @@ export function TarjetaDeCategoria({ categoria }: { categoria: CategoriaDelPanel
   const cantidad = cantidadDeProductos(categoria.productos.length);
   return (
     <section aria-labelledby={titulo} className={TARJETA_DE_SECCION}>
-      <div className="mb-1 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
+      <div className="mb-1 flex flex-wrap items-center justify-between gap-3 border-b border-border px-1 pb-4">
         <div className="flex flex-wrap items-center gap-3">
-          <span aria-hidden="true" className="text-[32px] leading-none">
-            {categoria.icono}
-          </span>
-          <div className="flex flex-col">
-            <p className="text-[10px] font-bold uppercase leading-snug tracking-[0.18em] text-primary">
-              Categoría
-            </p>
-            <h2
-              id={titulo}
-              className="font-display text-[25px] font-bold leading-[1.1] tracking-[-0.03em] text-foreground"
-            >
-              {categoria.nombre}
-            </h2>
-          </div>
+          <Link href={`/admin/menu/categorias/${categoria.id}`} className="flex items-center gap-3">
+            <span aria-hidden="true" className="text-[32px] leading-none">
+              {categoria.icono}
+            </span>
+            <div className="flex flex-col">
+              <p className="text-[10px] font-bold uppercase leading-snug tracking-[0.18em] text-primary">
+                Categoría
+              </p>
+              <h2
+                id={titulo}
+                className="font-display text-[25px] font-bold leading-[1.1] tracking-[-0.03em] text-foreground"
+              >
+                {categoria.nombre}
+              </h2>
+            </div>
+          </Link>
           {cantidad ? (
             <span className="mb-0.5 self-end rounded-full border border-border px-2.5 py-0.5 text-[11px] font-semibold text-muted-foreground">
               {cantidad}
@@ -45,7 +48,7 @@ export function TarjetaDeCategoria({ categoria }: { categoria: CategoriaDelPanel
       {categoria.productos.length === 0 ? (
         <p className="pt-3 text-sm text-muted-foreground">Todavía no tiene productos.</p>
       ) : (
-        <ul aria-label={`Productos de ${categoria.nombre}`} className="divide-y divide-border">
+        <ul aria-label={`Productos de ${categoria.nombre}`} className="mt-2 space-y-0.5">
           {categoria.productos.map((p) => (
             <FilaDeProducto key={p.id} producto={p} categoria={categoria.nombre} />
           ))}

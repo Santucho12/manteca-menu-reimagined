@@ -1,15 +1,15 @@
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { ACCESO_SECUNDARIO, ICONO_DE_ACCESO_SUAVE } from './estilos';
 
-const BOTON =
-  'inline-flex h-10 items-center gap-2 rounded-xl border border-transparent bg-secondary px-4 text-sm font-semibold text-foreground transition-all duration-200 hover:border-border hover:bg-white hover:shadow-md active:scale-95';
-
-/** El "Volver a ..." de las fichas: un enlace con la forma de un boton suave. */
+/** El "Volver a ..." de las fichas: la misma píldora blanca que los demás botones del panel. */
 export function EnlaceDeVolver({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <Link href={href} className={BOTON}>
-      <ArrowLeft size={16} aria-hidden="true" />
+    <Link href={href} className={`${ACCESO_SECUNDARIO} w-fit flex-none`}>
+      <span className={ICONO_DE_ACCESO_SUAVE}>
+        <ArrowLeft size={15} aria-hidden="true" />
+      </span>
       {children}
     </Link>
   );

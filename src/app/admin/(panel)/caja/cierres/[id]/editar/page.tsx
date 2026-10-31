@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { exigirPagina } from '@/lib/acceso/servidor';
+import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { cierrePorId } from '@/lib/caja/consultas';
 import { datosParaEditar } from '@/lib/caja/paraEditar';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
@@ -10,9 +10,11 @@ import { FormularioDeCierre } from '../../../FormularioDeCierre';
 export const metadata: Metadata = { title: 'Editar cierre' };
 
 export default async function EditarCierre({ params }: { params: Promise<{ id: string }> }) {
-  const { cliente, estado } = await exigirPagina('caja');
+  const { id } = await params;
   // La base decide: Caja lee solo los suyos; uno ajeno o anulado no se edita.
-  const cierre = await cierrePorId(cliente, (await params).id);
+  const { estado, datos: cierre } = await exigirPaginaYLeer('caja', (cliente) =>
+    cierrePorId(cliente, id),
+  );
   if (!cierre || cierre.anulado) notFound();
   return (
     <Pantalla

@@ -56,6 +56,13 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
           'Más vendidos: los 5 productos que más plata dejaron en el mes, con medallas de oro, plata y bronce para los tres primeros.',
         ],
       },
+      {
+        titulo: 'Los botones de cada tarjeta',
+        puntos: [
+          'Ver reportes, Ver gastos y Ver todo el año abren el detalle de cada gráfico.',
+          'Ver costos todavía no está disponible: al tocarlo avisa Próximamente.',
+        ],
+      },
     ],
   },
   proveedores: {
@@ -161,7 +168,7 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         puntos: [
           'El día que toca, el pago aparece por pagar en Próximos pagos, a las 3 de la mañana y también al abrir Gastos. Cuenta en el balance cuando lo marcás Pagado. Si un día el proceso no corrió, aparece lo atrasado con la fecha que correspondía.',
           'Si el día no existe en ese mes (el 31 en abril), vence el último día del mes. Nunca aparece dos veces el mismo pago.',
-          'Si lo pagás antes de que venza, tocá Pagado en su próximo pago.',
+          'Si lo pagás antes de que venza, tocá Marcar como pago en su próximo pago.',
         ],
       },
       {

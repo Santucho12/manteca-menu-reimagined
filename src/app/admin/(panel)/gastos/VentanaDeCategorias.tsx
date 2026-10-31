@@ -2,7 +2,7 @@
 
 import { Tags } from 'lucide-react';
 import { useState } from 'react';
-import { BOTON_DE_ENCABEZADO_NEUTRO } from '@/components/panel/estilos';
+import { ACCESO_SECUNDARIO, ICONO_DE_ACCESO_SUAVE } from '@/components/panel/estilos';
 import { Ventana } from '@/components/panel/Ventana';
 import type { FilaDeCategoria as Categoria } from '@/lib/gastos/consultas';
 import { FilaDeCategoria } from './FilaDeCategoria';
@@ -13,8 +13,11 @@ export function VentanaDeCategorias({ categorias }: { categorias: Categoria[] })
   const [abierta, setAbierta] = useState(false);
   return (
     <>
-      <button type="button" onClick={() => setAbierta(true)} className={BOTON_DE_ENCABEZADO_NEUTRO}>
-        <Tags aria-hidden="true" /> Categorías
+      <button type="button" onClick={() => setAbierta(true)} className={ACCESO_SECUNDARIO}>
+        <span className={ICONO_DE_ACCESO_SUAVE}>
+          <Tags size={15} aria-hidden="true" />
+        </span>
+        Categorías
       </button>
       <Ventana
         abierta={abierta}

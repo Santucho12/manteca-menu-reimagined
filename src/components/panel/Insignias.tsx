@@ -25,8 +25,9 @@ export function InsigniaDeEstado({ tono, icono, children }: Props) {
   const Icono = icono ?? porDefecto;
   return (
     <span
+      // Va encima del enlace estirado de la tarjeta: el toque tiene que atravesarla.
       className={cn(
-        'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap border transition-all duration-300 shadow-xs',
+        'pointer-events-none inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap border transition-all duration-300 shadow-xs',
         clases,
       )}
     >

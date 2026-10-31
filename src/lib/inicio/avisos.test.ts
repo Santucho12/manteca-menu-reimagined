@@ -43,6 +43,15 @@ describe('avisosDeInicio', () => {
     expect(uno.map((a) => a.texto)).toEqual(['Esta semana vence 1 pago.']);
   });
 
+  it('si vence uno solo, el aviso lleva a Gastos con ese pago para pagarlo', () => {
+    const [aviso] = avisosDeInicio({
+      ...NADA,
+      vencenEstaSemana: 1,
+      unVencimiento: { id: 'fijo-1', fecha: '2026-10-30' },
+    });
+    expect(aviso!.enlace).toBe('/admin/gastos?pagar=fijo-1%7C2026-10-30');
+  });
+
   it('en singular cuando es uno', () => {
     const avisos = avisosDeInicio({
       ...NADA,

@@ -1,37 +1,39 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Receipt, ShoppingBag, Ticket, TrendingUp, type LucideIcon } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUp,
+  Receipt,
+  ShoppingBag,
+  Ticket,
+  TrendingUp,
+  type LucideIcon,
+} from 'lucide-react';
+import {
+  estadoDeVariacion,
+  flechaDeVariacion,
+  type EstadoDeVariacion,
+} from '@/lib/inicio/estadoDeVariacion';
 import { textoDeVariacion } from '@/lib/reportes/comparacion';
 import { formatearPesosRedondeados } from '@/lib/plata';
 import type { NumeroDelMes } from '@/lib/inicio/numeros';
 
-// Un tono por dato, de la tabla de tarjetas de numeros de la skill estetica-panel.
-const TONOS: Record<string, { icono: LucideIcon; borde: string; cuadro: string; punto: string }> = {
-  Ventas: {
-    icono: ShoppingBag,
-    borde: 'border-emerald-100',
-    cuadro: 'bg-emerald-50 text-emerald-600',
-    punto: 'bg-emerald-600',
-  },
-  Gastos: {
-    icono: Receipt,
-    borde: 'border-rose-100',
-    cuadro: 'bg-rose-50 text-rose-600',
-    punto: 'bg-rose-600',
-  },
-  Balance: {
-    icono: TrendingUp,
-    borde: 'border-blue-100',
-    cuadro: 'bg-blue-50 text-blue-600',
-    punto: 'bg-blue-600',
-  },
-  'Ticket promedio': {
-    icono: Ticket,
-    borde: 'border-slate-100',
-    cuadro: 'bg-slate-50 text-slate-600',
-    punto: 'bg-slate-600',
-  },
+// El azul de Balance es decision de Santiago (2026-10-26, pedido 45). Va literal: en el panel,
+// la familia blue esta remapeada al dorado.
+const ICONOS: Record<string, { icono: LucideIcon; tono: string }> = {
+  Ventas: { icono: ShoppingBag, tono: 'text-foreground' },
+  Gastos: { icono: Receipt, tono: 'text-foreground' },
+  Balance: { icono: TrendingUp, tono: 'text-[#2563eb]' },
+  'Ticket promedio': { icono: Ticket, tono: 'text-foreground' },
+};
+
+// Verde si mejora y rojo si empeora (Santiago, 2026-10-27, pedido 47).
+const COLORES: Record<EstadoDeVariacion, string> = {
+  mejora: 'text-emerald-600',
+  empeora: 'text-rose-600',
+  igual: 'text-muted-foreground',
+  'sin-datos': 'text-muted-foreground',
 };
 
 const GRILLA = {
@@ -39,6 +41,28 @@ const GRILLA = {
   show: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 const TARJETA = { hidden: { y: 20, opacity: 0 }, show: { y: 0, opacity: 1 } };
+
+function VariacionDelMes({ item }: { item: NumeroDelMes }) {
+  const flecha = flechaDeVariacion(item.variacion);
+  const color = COLORES[estadoDeVariacion(item.etiqueta, item.variacion)];
+  const Flecha = flecha === 'sube' ? ArrowUp : ArrowDown;
+  return (
+    <div className="pt-4 border-t border-border/60 flex items-center justify-between gap-2">
+      <span className={`text-xs font-bold uppercase leading-snug ${color}`}>
+        {textoDeVariacion(item.variacion, formatearPesosRedondeados)}
+      </span>
+      {flecha ? (
+        <Flecha
+          size={14}
+          strokeWidth={2.6}
+          aria-hidden="true"
+          data-testid={`flecha-${flecha}`}
+          className={`shrink-0 ${color}`}
+        />
+      ) : null}
+    </div>
+  );
+}
 
 /** Las tarjetas de numeros de Plan Reminder Pro: ventas, gastos, balance y ticket del mes. */
 export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
@@ -50,7 +74,7 @@ export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
       className="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4"
     >
       {items.map((item) => {
-        const { icono: Icono } = TONOS[item.etiqueta]!;
+        const { icono: Icono, tono } = ICONOS[item.etiqueta]!;
         return (
           <motion.div
             key={item.etiqueta}
@@ -63,24 +87,19 @@ export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
             />
             <div className="flex justify-between items-start gap-2 relative z-10">
               <div className="space-y-1 min-w-0">
-                <dt className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">
+                <dt className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-tight">
                   {item.etiqueta}
                 </dt>
                 <dd className="text-sm md:text-lg xl:text-base 2xl:text-xl font-bold tracking-tight text-foreground break-all">
                   {item.valor}
                 </dd>
               </div>
-              <div className="shrink-0 rounded-xl p-1.5 md:p-2 bg-secondary text-foreground">
+              <div className={`shrink-0 rounded-xl p-1.5 md:p-2 bg-secondary ${tono}`}>
                 <Icono size={18} aria-hidden="true" />
               </div>
             </div>
             <div className="mt-auto pt-6">
-              <div className="pt-4 border-t border-border/60 flex items-center justify-between gap-2">
-                <span className="text-xs font-bold text-muted-foreground uppercase leading-snug">
-                  {textoDeVariacion(item.variacion, formatearPesosRedondeados)}
-                </span>
-                <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-              </div>
+              <VariacionDelMes item={item} />
             </div>
           </motion.div>
         );
