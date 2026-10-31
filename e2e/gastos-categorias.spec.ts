@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { borrarCategoriasConSusGastos, idsDeCategoriasLlamadas } from '../tests/gastos-de-prueba';
-import { SESIONES, aviso } from './ayudas';
+import { SESIONES, aviso, esperarHidratacion } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -41,6 +41,7 @@ test('suma una categoría que pide proveedor y se usa al cargar', async ({ page 
   await sumar(ventana, nombre, true);
   await expect(fila(ventana, nombre)).toContainText('Pide proveedor');
   await page.goto('/admin/gastos/nuevo');
+  await esperarHidratacion(page.getByLabel('Categoría'));
   await page.getByLabel('Categoría').selectOption({ label: nombre });
   await expect(page.getByLabel('Proveedor')).toBeVisible();
 });

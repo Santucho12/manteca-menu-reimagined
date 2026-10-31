@@ -9,7 +9,7 @@ import {
   sembrarPorPagar,
   sembrarRecurrente,
 } from '../tests/gastos-de-prueba';
-import { SESIONES } from './ayudas';
+import { SESIONES, esperarHidratacion } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -55,6 +55,7 @@ test('anotar algo por pagar: queda en Próximos pagos y no en Pagados', async ({
   await page.goto('/admin/gastos/nuevo');
   await page.getByRole('radio', { name: 'Todavía no' }).check();
   await elegirFecha(page, 'Fecha en que vence', vence);
+  await esperarHidratacion(page.getByLabel('Categoría'));
   await page.getByLabel('Categoría').selectOption({ label: nombre });
   await page.getByLabel('Monto').fill('45.000');
   await expect(page.getByLabel('Medio de pago (opcional)')).toHaveValue('');

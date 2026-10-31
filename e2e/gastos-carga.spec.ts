@@ -10,7 +10,7 @@ import {
   sembrarCategoriaDeGasto,
   sembrarRecurrente,
 } from '../tests/gastos-de-prueba';
-import { SESIONES } from './ayudas';
+import { SESIONES, esperarHidratacion } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -80,6 +80,7 @@ test('el proveedor aparece solo con una categoría que lo pide', async ({ page }
   const { nombre } = await categoria();
   await page.goto('/admin/gastos/nuevo');
   await expect(page.getByLabel('Proveedor')).toHaveCount(0);
+  await esperarHidratacion(page.getByLabel('Categoría'));
   await page.getByLabel('Categoría').selectOption({ label: 'Mercadería' });
   await expect(page.getByLabel('Proveedor')).toBeVisible();
   await page.getByLabel('Categoría').selectOption({ label: nombre });

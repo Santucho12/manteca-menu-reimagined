@@ -8,7 +8,7 @@ import {
   productoParaVender,
   sembrarVenta,
 } from '../tests/ventas-de-prueba';
-import { SESIONES } from './ayudas';
+import { SESIONES, esperarHidratacion } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -43,6 +43,7 @@ test('carga una venta con dos productos y ve su total y su detalle', async ({ pa
   await page.goto('/admin/ventas');
   await page.getByRole('link', { name: 'Cargar venta' }).click();
   await expect(page.getByLabel('Fecha')).toHaveValue(HOY);
+  await esperarHidratacion(page.getByLabel('Tipo de venta', { exact: true }));
   await page.getByLabel('Tipo de venta', { exact: true }).selectOption({ label: 'Mayorista' });
   await page.getByLabel('Medio de pago').selectOption({ label: 'Transferencia' });
   await elegirProducto(page, 'Producto 1', producto.texto);

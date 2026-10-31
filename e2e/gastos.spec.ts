@@ -9,7 +9,7 @@ import {
   sembrarGasto,
   sembrarRecurrente,
 } from '../tests/gastos-de-prueba';
-import { SESIONES, aviso } from './ayudas';
+import { SESIONES, aviso, esperarHidratacion } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -95,6 +95,7 @@ test('Próximos pagos: cada fijo activo, por fecha, y los pausados aparte', asyn
 
 test('un monto mal escrito y Mercadería sin proveedor se explican', async ({ page }) => {
   await page.goto('/admin/gastos/nuevo');
+  await esperarHidratacion(page.getByLabel('Categoría'));
   await page.getByLabel('Categoría').selectOption({ label: 'Mercadería' });
   await page.getByLabel('Monto').fill('12,345');
   await page.getByLabel('Medio de pago').selectOption({ label: 'Otro' });

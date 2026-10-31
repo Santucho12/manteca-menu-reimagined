@@ -7,7 +7,7 @@ import {
 } from '../tests/gastos-de-prueba';
 import { borrarMenuDePrueba, sembrarCategoria, sembrarProducto } from '../tests/menu-de-prueba';
 import { borrarProveedores, sembrarProveedor } from '../tests/proveedores-de-prueba';
-import { SESIONES, esperarNoEncontrado } from './ayudas';
+import { SESIONES, esperarNoEncontrado, esperarHidratacion } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -35,6 +35,7 @@ test('el cambio de un gasto se ve con nombres y pesos, y lleva al gasto', async 
   const despues = await categoria();
   const gasto = await sembrarGasto({ categoriaId: antes.id, fecha: HOY, montoCentavos: 50000 });
   await page.goto(`/admin/gastos/${gasto.id}`);
+  await esperarHidratacion(page.getByRole('combobox', { name: 'Categoría' }));
   await page.getByRole('combobox', { name: 'Categoría' }).selectOption({ label: despues.nombre });
   await page.getByLabel('Monto').fill('600');
   await page.getByRole('button', { name: 'Guardar' }).click();
