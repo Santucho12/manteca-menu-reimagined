@@ -21,7 +21,7 @@ type Props = {
 };
 
 const FLECHA =
-  'size-9 inline-flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary active:scale-95 transition-all';
+  'size-9 pointer-coarse:size-11 inline-flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary active:scale-95 transition-all';
 const TIPOS: { tipo: TipoDeGasto | null; texto: string }[] = [
   { tipo: null, texto: 'Todos' },
   { tipo: 'fijos', texto: 'Fijos' },
@@ -39,7 +39,7 @@ function MesConFlechas({ filtros, hoy }: Pick<Props, 'filtros' | 'hoy'>) {
         {nombreDelMes(filtros.mes)}
       </span>
       {esElMesDeHoy(filtros.mes, hoy) ? (
-        <span className="size-9" aria-hidden="true" />
+        <span className="size-9 pointer-coarse:size-11" aria-hidden="true" />
       ) : (
         <Link href={ir(mesSiguiente(filtros.mes))} aria-label="Mes siguiente" className={FLECHA}>
           <ChevronRight size={16} aria-hidden="true" />
@@ -58,7 +58,7 @@ function Tipos({ filtros, hoy }: Pick<Props, 'filtros' | 'hoy'>) {
           href={enlaceDeGastos({ ...filtros, tipo, pagina: 1 }, hoy)}
           aria-current={filtros.tipo === tipo ? 'true' : undefined}
           className={cn(
-            'inline-flex h-9 items-center rounded-full px-4 text-sm font-semibold transition-all',
+            'inline-flex h-9 pointer-coarse:h-11 items-center rounded-full px-4 text-sm font-semibold transition-all',
             filtros.tipo === tipo
               ? 'bg-white text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground',

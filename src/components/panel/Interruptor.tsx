@@ -14,6 +14,7 @@ export function Interruptor({ activo, etiqueta, deshabilitado = false, alCambiar
       onClick={alCambiar}
       className={cn(
         'relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200 disabled:opacity-50',
+        "pointer-coarse:after:absolute pointer-coarse:after:-inset-x-1 pointer-coarse:after:-inset-y-2.5 pointer-coarse:after:content-['']",
         activo ? 'bg-emerald-500' : 'bg-slate-300',
       )}
     >
