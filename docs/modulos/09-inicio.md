@@ -37,7 +37,9 @@ Aparece solo si hay algo pendiente. Cada aviso lleva a la pantalla donde se resu
 Ventas, gastos, balance y ticket promedio del mes en curso.
 
 Cada uno se compara con **los mismos días del mes anterior**: el día 12 compara del 1 al 12
-de este mes contra del 1 al 12 del anterior. Muestra la variación en porcentaje.
+de este mes contra del 1 al 12 del anterior. Muestra la variación en porcentaje, en verde si
+mejora y en rojo si empeora, con una flecha que dice si subió o bajó. En gastos, bajar es
+mejorar (Santiago, 2026-10-27).
 
 Al lado de los avisos va el bloque oscuro de ventas del mes: lo vendido, los gastos y el
 balance, con una barra de avance que dice qué parte de las ventas queda como balance.

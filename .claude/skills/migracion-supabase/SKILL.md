@@ -161,3 +161,13 @@ garantiza en qué base escribe.
   pierde y cómo se vuelve atrás.
 
 Al cerrar, decí en qué base quedó aplicada y verificada: pruebas, real, o las dos.
+
+## Al pasar a un proyecto nuevo de Supabase
+
+Copiar la base trae el esquema `public`, pero no lo que vive afuera ni la configuración de
+Auth. El 2026-10-30 la base de pruebas perdió esto, y el síntoma fue que las cuentas nuevas no
+tenían perfil y las fotos no subían. Después de copiar, se comprueba y se restaura:
+
+- Los disparadores `al_crear_cuenta` y `al_actualizar_cuenta` en `auth.users`.
+- La policy de `fotos-del-menu` en `storage.objects`.
+- La confirmación de email apagada (Authentication, en el panel de Supabase).
