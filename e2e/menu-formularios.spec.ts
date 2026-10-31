@@ -6,7 +6,7 @@ import {
   sembrarCategoria,
   sembrarProducto,
 } from '../tests/menu-de-prueba';
-import { SESIONES, aviso } from './ayudas';
+import { SESIONES, aviso, esperarNoEncontrado } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -67,11 +67,14 @@ test('editar una categoria se lee simple: como se vende, con el precio al lado',
   const formas = page.getByRole('group', { name: 'Cómo se vende' });
   await expect(formas.getByText('Se vende por', { exact: true })).toBeVisible();
   await expect(formas.getByText('Precio para todos', { exact: true })).toBeVisible();
-  const nombre = await formas.getByLabel('Forma de venta 1', { exact: true }).boundingBox();
-  const precio = await formas.getByLabel('Precio de la forma de venta 1').boundingBox();
-  expect(Math.abs(nombre!.y - precio!.y)).toBeLessThan(2);
-  const titulo = await formas.getByText('Precio para todos', { exact: true }).boundingBox();
-  expect(Math.abs(titulo!.x - precio!.x)).toBeLessThan(2);
+  // La pantalla entra animada: se mide hasta que quedó quieta.
+  await expect(async () => {
+    const nombre = await formas.getByLabel('Forma de venta 1', { exact: true }).boundingBox();
+    const precio = await formas.getByLabel('Precio de la forma de venta 1').boundingBox();
+    expect(Math.abs(nombre!.y - precio!.y)).toBeLessThan(2);
+    const titulo = await formas.getByText('Precio para todos', { exact: true }).boundingBox();
+    expect(Math.abs(titulo!.x - precio!.x)).toBeLessThan(2);
+  }).toPass();
   await expect(page.getByRole('main')).not.toContainText(/presentaci|compartido/i);
 });
 
@@ -104,8 +107,8 @@ test('sacar una forma de venta avisa que productos se ocultan y, al confirmar, l
 });
 
 test('una categoria que no existe da 404', async ({ page }) => {
-  const respuesta = await page.goto(`/admin/menu/categorias/${randomUUID()}`);
-  expect(respuesta?.status()).toBe(404);
+  await page.goto(`/admin/menu/categorias/${randomUUID()}`);
+  await esperarNoEncontrado(page);
 });
 
 test('guarda una captura del formulario de categoria', async ({ page }, info) => {

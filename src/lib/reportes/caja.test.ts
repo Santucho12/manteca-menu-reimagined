@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { diferenciasDelGrafico, filasDeCaja, resumenPorEmpleado, textoDeDiferencia } from './caja';
+import { diferenciasDelGrafico, filasDeCaja, resumenPorEmpleado } from './caja';
 
 const cierre = (fecha: string, persona: string, diferenciaCentavos: number | null) => ({
   fecha,
@@ -35,11 +35,6 @@ describe('reporte de caja', () => {
       { persona: 'Ana', cierres: 2, diferenciaCentavos: -3000 },
       { persona: 'Beto', cierres: 2, diferenciaCentavos: null },
     ]);
-  });
-
-  it('dice esperando ventas mientras no hay diferencia', () => {
-    expect(textoDeDiferencia(null)).toBe('Esperando ventas');
-    expect(textoDeDiferencia(-5000)).toBe('-$50,00');
   });
 });
 

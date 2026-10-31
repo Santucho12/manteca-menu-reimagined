@@ -98,6 +98,7 @@ test('Pagado: la ventana corrige el monto y el pago pasa a Pagados', async ({ pa
   await ventana.getByRole('button', { name: 'Anotar el pago' }).click();
   await expect(page.getByText('Pago anotado')).toBeVisible();
   await expect(fila(page, 'Factura de luz')).toHaveCount(0);
+  await page.getByText('Ver los pagados').click();
   await expect(filas(page, 'Gastos').filter({ hasText: 'Factura de luz' })).toContainText(
     '$8.350,25',
   );
@@ -150,7 +151,8 @@ test('un fijo se paga antes de que venza y queda el siguiente', async ({ page })
   await expect(ventana.getByLabel('Medio de pago')).toHaveValue('transferencia');
   await ventana.getByRole('button', { name: 'Anotar el pago' }).click();
   await expect(page.getByText('Pago anotado')).toBeVisible();
-  await expect(fila(page, nombre)).not.toContainText('En 5 días');
+  // El siguiente vence en más de un mes: queda fuera del plazo que se ve por defecto.
+  await expect(fila(page, nombre).filter({ hasText: 'En 5 días' })).toHaveCount(0);
   const { data } = await clienteSecretoDePruebas()
     .from('gastos')
     .select('fecha, recurrente_id')

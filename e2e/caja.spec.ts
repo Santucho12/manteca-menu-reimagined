@@ -8,7 +8,7 @@ import {
   sembrarCierre,
 } from '../tests/cierres-de-prueba';
 import { borrarVentas, sembrarVentaConPago } from '../tests/ventas-de-prueba';
-import { SESIONES, aviso } from './ayudas';
+import { SESIONES, aviso, esperarNoEncontrado } from './ayudas';
 
 test.use({ storageState: SESIONES.caja });
 
@@ -106,8 +106,8 @@ test('no ve los cierres de otros ni entra al control', async ({ page }) => {
   const ajeno = await sembrarCierre({ fecha: dia(), cargadoPor: 'admin' });
   await page.goto('/admin/caja/mis-cierres');
   await expect(page.getByText(fechaParaMostrar(ajeno.fecha))).toHaveCount(0);
-  const respuesta = await page.goto(`/admin/caja/cierres/${ajeno.id}`);
-  expect(respuesta?.status()).toBe(404);
+  await page.goto(`/admin/caja/cierres/${ajeno.id}`);
+  await esperarNoEncontrado(page);
   await page.goto('/admin/caja/control');
   await expect(page).toHaveURL(/\/admin$/);
 });

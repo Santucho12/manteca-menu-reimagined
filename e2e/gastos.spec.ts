@@ -63,6 +63,7 @@ test('la categoría se aplica sola, sin botón ni filtro de proveedor', async ({
   await sembrarGasto({ categoriaId: id, fecha: HOY });
   await page.goto('/admin/gastos');
   await expect(page.getByRole('button', { name: 'Filtrar' })).toHaveCount(0);
+  await page.getByText('Ver los pagados').click();
   const pagados = page.getByRole('region', { name: 'Pagados' });
   await expect(pagados.getByLabel('Proveedor')).toHaveCount(0);
   await pagados.getByRole('combobox', { name: 'Categoría' }).click();
@@ -164,15 +165,16 @@ test('una tarjeta por categoria con sus gastos y su total, que filtra la lista',
   await expect(tarjetas.getByRole('listitem').filter({ hasText: otra.nombre })).toContainText(
     '1 gasto',
   );
-  await suya.locator('summary').click();
+  await suya.getByRole('button').click();
+  const ventana = page.getByRole('dialog', { name: nombre });
   await expect(
-    page.getByRole('list', { name: `Gastos de ${nombre}` }).getByRole('listitem'),
+    ventana.getByRole('list', { name: `Gastos de ${nombre}` }).getByRole('listitem'),
   ).toHaveCount(2);
-  await suya.getByRole('link', { name: 'Filtrar la lista' }).click();
+  await ventana.getByRole('link', { name: 'Filtrar la lista' }).click();
   await expect(page).toHaveURL(new RegExp(`categoria=${id}`));
   await expect(filas(page, 'Gastos')).toHaveCount(2);
   await expect(tarjetas.getByRole('listitem').filter({ hasText: otra.nombre })).toBeVisible();
-  await suya.locator('summary').click();
-  await suya.getByRole('link', { name: 'Ver todos los gastos' }).click();
+  await suya.getByRole('button').click();
+  await ventana.getByRole('link', { name: 'Ver todos los gastos' }).click();
   await expect(page).not.toHaveURL(/categoria=/);
 });

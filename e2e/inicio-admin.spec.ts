@@ -129,8 +129,8 @@ test('los avisos van en una tarjeta crema', async ({ page }) => {
 test('las leyendas de los gráficos llevan círculos', async ({ page }) => {
   await page.goto('/admin');
   for (const figura of ['Gráfico por mes', 'Ventas por día']) {
-    const iconos = page.getByRole('figure', { name: figura }).locator('.recharts-legend-icon');
-    await expect(iconos.first()).toHaveAttribute('d', /a/);
+    const iconos = page.getByRole('figure', { name: figura }).locator('.recharts-legend-item path');
+    await expect(iconos.first()).toHaveAttribute('d', /a/i);
     await expect(iconos.first()).not.toHaveAttribute('d', /h-?\d+v-?\d+h/);
   }
 });
@@ -139,9 +139,9 @@ test('los gráficos van en azul, verde y rojo', async ({ page }) => {
   await page.goto('/admin');
   const esperados = [
     ['Gráfico por mes', 'Ventas', 'fill', '#10b981'],
-    ['Gráfico por mes', 'Balance', 'fill', '#3b82f6'],
+    ['Gráfico por mes', 'Balance', 'fill', '#2563eb'],
     ['Gráfico por mes', 'Gastos', 'fill', '#f43f5e'],
-    ['Ventas por día', 'Esta semana', 'fill', '#3b82f6'],
+    ['Ventas por día', 'Esta semana', 'fill', '#2563eb'],
     ['Ventas por día', 'Semana anterior', 'fill', '#f43f5e'],
   ] as const;
   for (const [figura, serie, atributo, color] of esperados) {
@@ -174,13 +174,15 @@ test('la variación de cada tarjeta va en verde si mejora y en rojo si empeora',
   }
 });
 
-test('los gastos del mes se ven en una torta, a la par de la semana', async ({ page }) => {
+test('los gastos del mes se ven en una torta, a la par de la semana', async ({ page }, info) => {
   await page.goto('/admin');
   const torta = page.getByRole('figure', { name: 'Gastos por categoría' });
   await expect(torta).toBeVisible();
   await expect(torta.locator('.recharts-sector').first()).toBeVisible();
   const lista = page.getByRole('list', { name: 'Gastos por categoría' });
   await expect(lista.getByRole('listitem').first()).toContainText('%');
+  // En el celular van una debajo de la otra.
+  if (info.project.name !== 'computadora') return;
   const semana = await page
     .getByRole('region', { name: 'Esta semana vs la anterior' })
     .boundingBox();
@@ -220,7 +222,10 @@ test('un monto de 8 cifras entra en su tarjeta, sin desbordar la pantalla', asyn
   await page.goto('/admin');
   const valores = page.getByRole('definition');
   // El total del mes depende de lo que haya en la base: la venta sembrada se ve entre los mas vendidos.
-  await expect(page.getByRole('list', { name: 'Más vendidos' })).toContainText('$29.999.997,00');
+  // La de ayer es del mismo producto: se suma, salvo el dia 1, cuando ayer es del mes anterior.
+  await expect(page.getByRole('list', { name: 'Más vendidos' })).toContainText(
+    /\$(29\.999\.997|30\.012\.342),00/,
+  );
   const desbordados = await valores.evaluateAll(
     (todos) => todos.filter((v) => v.scrollWidth > v.clientWidth).length,
   );

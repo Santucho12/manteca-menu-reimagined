@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { diaEnArgentina } from '../src/lib/fechas';
 import { fechaParaMostrar } from '../src/lib/gastos/pantalla';
 import { sumarMeses } from '../src/lib/gastos/vencimientos';
+import { sumarDias } from '../src/lib/reportes/periodos';
 import {
   borrarCategoriasConSusGastos,
   pagarLoDelFijo,
@@ -34,8 +35,16 @@ async function guardar(page: Page) {
   await expect(page.getByRole('heading', { level: 1, name: 'Gastos' })).toBeVisible();
 }
 
-test('cambiar el monto vale para los próximos; lo ya pagado queda', async ({ page }) => {
-  const { id, nombre } = await fijo(HOY);
+test('cambiar el monto se ve en el próximo pago', async ({ page }) => {
+  const { id, nombre } = await fijo(sumarDias(HOY, 3));
+  await page.goto(`/admin/gastos/fijos/${id}`);
+  await page.getByLabel('Monto').fill('600.000');
+  await guardar(page);
+  await expect(fila(page, 'Próximos pagos', nombre)).toContainText('$600.000,00');
+});
+
+test('cambiar el monto no toca lo ya pagado', async ({ page }) => {
+  const { id } = await fijo(HOY);
   // Al abrir, lo de hoy queda por pagar; pagado, aparece en los pagos del fijo.
   await page.goto('/admin/gastos');
   await pagarLoDelFijo(id, HOY);
@@ -44,8 +53,9 @@ test('cambiar el monto vale para los próximos; lo ya pagado queda', async ({ pa
   await expect(page.getByRole('list', { name: 'Pagos' }).getByRole('listitem')).toHaveCount(1);
   await page.getByLabel('Monto').fill('600.000');
   await guardar(page);
-  await expect(fila(page, 'Próximos pagos', nombre)).toContainText('$600.000,00');
-  await expect(fila(page, 'Gastos', nombre)).toContainText('$500.000,00');
+  await page.goto(`/admin/gastos/fijos/${id}`);
+  await expect(page.getByLabel('Monto')).toHaveValue('600.000');
+  await expect(page.getByRole('list', { name: 'Pagos' })).toContainText('$500.000,00');
 });
 
 test('el próximo pago se cambia con el calendario', async ({ page }) => {

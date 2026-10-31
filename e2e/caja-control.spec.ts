@@ -41,7 +41,7 @@ test('ve el cierre de caja en el control con su resultado', async ({ page }) => 
   await expect(cierre).toContainText('Prueba Caja');
   await expect(cierre).toContainText('Con diferencia');
   await cierre.getByRole('link').click();
-  await expect(page.getByText('$20.000,00')).toBeVisible();
+  await expect(page.getByText('$20.000,00').first()).toBeVisible();
   await expect(page.getByRole('button', { name: 'Marcar como revisado' })).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Editar cierre' })).toBeVisible();
 });

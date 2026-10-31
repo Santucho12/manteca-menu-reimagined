@@ -1,4 +1,4 @@
-import type { Browser, Locator, Page } from '@playwright/test';
+import { expect, type Browser, type Locator, type Page } from '@playwright/test';
 
 /** Sesiones que guarda e2e/sesiones.setup.ts, una por rol. Git no las sigue: tienen tokens. */
 export const SESIONES = {
@@ -10,6 +10,16 @@ export const SESIONES = {
 /** El color de fondo calculado de un elemento, tal como lo pinta el navegador. */
 export function colorDeFondo(elemento: Locator): Promise<string> {
   return elemento.evaluate((nodo) => getComputedStyle(nodo).backgroundColor);
+}
+
+/**
+ * Lo que no existe o no le corresponde a quien entra. No se mira el codigo HTTP: con loading.tsx
+ * la respuesta sale antes de que la pagina decida, y arranca siempre en 200.
+ */
+export async function esperarNoEncontrado(page: Page): Promise<void> {
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'No encontramos esta página' }),
+  ).toBeVisible();
 }
 
 /** El aviso de la pantalla. Dentro de main: Next.js suma afuera un anunciador con el mismo rol. */

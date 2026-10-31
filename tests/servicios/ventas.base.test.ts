@@ -36,7 +36,7 @@ let encargo: string;
 beforeAll(async () => {
   producto = await productoParaVender();
   categoriasDelMenu.push(producto.categoriaId);
-  encargo = await idDeCanal('Encargo');
+  encargo = await idDeCanal('Mayorista');
 });
 
 afterAll(() => borrarVentas(ventas, { canales, categoriasDelMenu }));
@@ -80,7 +80,7 @@ describe('guardar y leer una venta a mano', () => {
     expect(await ventaPorId(await clienteComo('admin'), id)).toMatchObject({
       origen: 'manual',
       total_centavos: 300000,
-      canal: 'Encargo',
+      canal: 'Mayorista',
       comentario: 'Encargo de la escuela',
       renglones: [expect.objectContaining({ cantidad: 2, subtotal_centavos: 300000 })],
       pagos: [{ medio: 'transferencia', monto_centavos: 300000 }],

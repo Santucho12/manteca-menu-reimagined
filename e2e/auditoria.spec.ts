@@ -7,7 +7,7 @@ import {
 } from '../tests/gastos-de-prueba';
 import { borrarMenuDePrueba, sembrarCategoria, sembrarProducto } from '../tests/menu-de-prueba';
 import { borrarProveedores, sembrarProveedor } from '../tests/proveedores-de-prueba';
-import { SESIONES } from './ayudas';
+import { SESIONES, esperarNoEncontrado } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -35,8 +35,7 @@ test('el cambio de un gasto se ve con nombres y pesos, y lleva al gasto', async 
   const despues = await categoria();
   const gasto = await sembrarGasto({ categoriaId: antes.id, fecha: HOY, montoCentavos: 50000 });
   await page.goto(`/admin/gastos/${gasto.id}`);
-  await page.getByRole('combobox', { name: 'Categoría' }).click();
-  await page.getByRole('option', { name: despues.nombre, exact: true }).click();
+  await page.getByRole('combobox', { name: 'Categoría' }).selectOption({ label: despues.nombre });
   await page.getByLabel('Monto').fill('600');
   await page.getByRole('button', { name: 'Guardar' }).click();
   await expect(page).toHaveURL(/\/admin\/gastos$/);
@@ -90,8 +89,8 @@ test('las fichas dicen quien cargo el dato y cuando', async ({ page }) => {
 });
 
 test('un registro que no existe da 404', async ({ page }) => {
-  const respuesta = await page.goto('/admin/auditoria/abc');
-  expect(respuesta?.status()).toBe(404);
+  await page.goto('/admin/auditoria/abc');
+  await esperarNoEncontrado(page);
 });
 
 test('guarda capturas de la lista y el detalle', async ({ page }, info) => {

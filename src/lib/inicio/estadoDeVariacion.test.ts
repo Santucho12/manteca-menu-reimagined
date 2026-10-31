@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { estadoDeVariacion } from './estadoDeVariacion';
+import { estadoDeVariacion, flechaDeVariacion } from './estadoDeVariacion';
 
 const subio = { diferenciaCentavos: 500, porcentaje: 5 };
 const bajo = { diferenciaCentavos: -500, porcentaje: -5 };
@@ -28,5 +28,19 @@ describe('estadoDeVariacion', () => {
     expect(estadoDeVariacion('Ventas', { diferenciaCentavos: 900, porcentaje: null })).toBe(
       'mejora',
     );
+  });
+});
+
+describe('flechaDeVariacion', () => {
+  const con = (diferenciaCentavos: number) => ({ diferenciaCentavos, porcentaje: 1 });
+
+  it('dice si el número subió o bajó, sin importar si eso es bueno', () => {
+    expect(flechaDeVariacion(con(100))).toBe('sube');
+    expect(flechaDeVariacion(con(-100))).toBe('baja');
+  });
+
+  it('no lleva flecha si quedó igual o no hay con qué comparar', () => {
+    expect(flechaDeVariacion(con(0))).toBeNull();
+    expect(flechaDeVariacion(null)).toBeNull();
   });
 });

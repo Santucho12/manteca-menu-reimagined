@@ -15,10 +15,10 @@ test.describe('con la sesion del admin', () => {
     await expect(gastos).toHaveAttribute('aria-current', 'page');
     await page.goto('/admin/gastos');
     await expect(page.getByRole('heading', { level: 1, name: 'Gastos' })).toBeVisible();
-    await expect(page.getByText('Lo que se pagó, por categoría y proveedor.')).toBeVisible();
+    await expect(page.getByText('Lo que pagaste y lo que viene.')).toBeVisible();
   });
 
-  test('el panel usa el dorado de Manteca sobre crema', async ({ page }) => {
+  test('el panel usa el dorado de Manteca sobre crema', async ({ page }, info) => {
     await page.goto('/admin');
     const tema = await page.evaluate(() => {
       const raiz = getComputedStyle(document.documentElement);
@@ -33,7 +33,9 @@ test.describe('con la sesion del admin', () => {
       letraSobrePrincipal: '#2b1d14',
       fondo: '#f4efe5',
     });
-    // La sección activa va en marrón oscuro, con la rayita dorada al costado.
+    // La barra de abajo del celular marca la activa con el color principal.
+    if (info.project.name !== 'computadora') return;
+    // En la lateral va en marrón oscuro, con la rayita dorada al costado.
     const inicio = panel(page).getByRole('link', { name: /^Inicio/ });
     await expect(inicio).toHaveCSS('color', 'rgb(43, 29, 20)');
   });
@@ -46,14 +48,14 @@ test.describe('con la sesion del admin', () => {
     for (const nombre of [/^Proveedores/, /^Costos/, /^Reportes/, /^Auditoría/, /^Mi cuenta/]) {
       await panel(page).getByRole('link', { name: nombre }).click();
       await expect(page.getByText('Próximamente').first()).toBeVisible();
-      // El cartel es blanco, con sombra, grande y en el medio de la pantalla.
+      // El cartel es blanco, con sombra, simple (pedido 69) y en el medio de la pantalla.
       const cartel = page.getByRole('status').filter({ hasText: 'Próximamente' });
       await expect(cartel).toBeVisible();
       await expect(cartel).toHaveCSS('background-color', 'rgb(255, 255, 255)');
       await expect(cartel).not.toHaveCSS('box-shadow', 'none');
       const caja = (await cartel.boundingBox())!;
       const ventana = page.viewportSize()!;
-      expect(caja.width).toBeGreaterThan(400);
+      expect(caja.width).toBeGreaterThan(300);
       expect(Math.abs(caja.x + caja.width / 2 - ventana.width / 2)).toBeLessThan(10);
       expect(Math.abs(caja.y + caja.height / 2 - ventana.height / 2)).toBeLessThan(10);
       await expect(page).toHaveURL(/\/admin$/);

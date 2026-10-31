@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { diaEnArgentina } from '../src/lib/fechas';
 import { diaLibre } from '../tests/cierres-de-prueba';
 import {
@@ -30,6 +30,11 @@ async function venta(semilla: Parameters<typeof sembrarVenta>[0]) {
   return id;
 }
 
+async function elegirProducto(page: Page, renglon: string, texto: string) {
+  await page.getByRole('combobox', { name: renglon }).click();
+  await page.getByRole('option').filter({ hasText: texto }).click();
+}
+
 test('carga una venta con dos productos y ve su total y su detalle', async ({ page }) => {
   const producto = await productoParaVender();
   menu.push(producto.categoriaId);
@@ -38,22 +43,22 @@ test('carga una venta con dos productos y ve su total y su detalle', async ({ pa
   await page.goto('/admin/ventas');
   await page.getByRole('link', { name: 'Cargar venta' }).click();
   await expect(page.getByLabel('Fecha')).toHaveValue(HOY);
-  await page.getByLabel('Tipo de venta', { exact: true }).selectOption({ label: 'Encargo' });
+  await page.getByLabel('Tipo de venta', { exact: true }).selectOption({ label: 'Mayorista' });
   await page.getByLabel('Medio de pago').selectOption({ label: 'Transferencia' });
-  await page.getByLabel('Producto 1').selectOption({ label: producto.texto });
+  await elegirProducto(page, 'Producto 1', producto.texto);
   await expect(page.getByLabel('Precio 1')).toHaveValue('1.000');
   await page.getByLabel('Cantidad 1').fill('2');
   await page.getByRole('button', { name: 'Sumar producto' }).click();
-  await page.getByLabel('Producto 2').selectOption({ label: producto.texto });
+  await elegirProducto(page, 'Producto 2', producto.texto);
   await page.getByLabel('Cantidad 2').fill('1,5');
   await page.getByLabel('Precio 2').fill('333,33');
-  await expect(page.getByText('Total: $2.500,00')).toBeVisible();
+  await expect(page.getByText(/^Total: ?\$2\.500,00$/)).toBeVisible();
   await page.getByLabel('Comentario').fill(comentario);
   await page.getByRole('button', { name: 'Guardar venta' }).click();
   await expect(page.getByRole('heading', { level: 1, name: /^Venta del/ })).toBeVisible();
   const renglones = page.getByRole('list', { name: 'Productos' });
   await expect(renglones.getByRole('listitem')).toHaveCount(2);
-  await expect(page.getByText('Total: $2.500,00')).toBeVisible();
+  await expect(page.getByText(/^Total: ?\$2\.500,00$/)).toBeVisible();
   await expect(page.getByText(comentario)).toBeVisible();
 });
 
@@ -137,7 +142,10 @@ test('un clic en cualquier parte de la fila abre la venta', async ({ page }) => 
     .getByRole('listitem')
     .filter({ has: page.locator(`a[href="/admin/ventas/${id}"]`) });
   // El total queda a la derecha de todo: ahi no hay enlace propio, y el clic igual abre la venta.
-  await fila.getByText('$1.000,00').click();
+  // El enlace estirado queda encima del total: con el mouse, como una persona, no con .click().
+  await fila.getByText('$1.000,00').scrollIntoViewIfNeeded();
+  const total = (await fila.getByText('$1.000,00').boundingBox())!;
+  await page.mouse.click(total.x + total.width / 2, total.y + total.height / 2);
   await expect(page).toHaveURL(new RegExp(`/admin/ventas/${id}$`));
 });
 
