@@ -12,7 +12,7 @@ export function BotonSalir({ variante }: { variante: 'lateral' | 'barra' }) {
       ) : (
         <button
           aria-label="Salir"
-          className="h-9 w-9 rounded-xl text-muted-foreground flex items-center justify-center transition-all duration-300 hover:bg-rose-50 hover:text-rose-600 active:scale-95"
+          className="h-11 w-11 rounded-xl text-muted-foreground flex items-center justify-center transition-all duration-300 hover:bg-rose-50 hover:text-rose-600 active:scale-95"
         >
           <LogOut size={18} className="transition-transform duration-300 hover:translate-x-0.5" />
         </button>

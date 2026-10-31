@@ -44,10 +44,10 @@ export const ICONO_EDITAR =
   'p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 hover:scale-110 active:scale-95 transition-all duration-200';
 
 export const ICONO_BORRAR =
-  'p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:scale-110 active:scale-95 transition-all duration-200';
+  'p-3 sm:p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:scale-110 active:scale-95 transition-all duration-200';
 
 export const ATAJO =
-  'inline-flex items-center gap-1 h-9 px-3 rounded-xl text-xs font-bold bg-secondary/60 text-slate-600 hover:bg-primary/10 hover:text-primary hover:-translate-y-0.5 hover:shadow-sm active:scale-95 transition-all duration-200 whitespace-nowrap';
+  'inline-flex items-center gap-1 h-10 sm:h-9 px-3 rounded-xl text-xs font-bold bg-secondary/60 text-slate-600 hover:bg-primary/10 hover:text-primary hover:-translate-y-0.5 hover:shadow-sm active:scale-95 transition-all duration-200 whitespace-nowrap';
 
 export const TARJETA_DE_SECCION =
   'bg-card rounded-[2rem] border border-border/60 shadow-xl p-5 md:p-8 space-y-6';
@@ -84,7 +84,7 @@ export const BOTON_DE_ENCABEZADO_NEUTRO =
 
 /** Un icono de accion de una fila que no edita ni borra (subir, bajar, mostrar). */
 export const ICONO_DE_ACCION =
-  'p-1.5 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/10 transition-all duration-200 disabled:opacity-40';
+  'p-3 sm:p-1.5 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/10 transition-all duration-200 disabled:opacity-40';
 
 /** El botón de las tarjetas de Inicio (Ver reportes, Ver gastos, Ver todo el año): una sola pieza. */
 export const BOTON_DE_TARJETA =

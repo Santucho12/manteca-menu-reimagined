@@ -73,7 +73,7 @@ function FormularioDePago({ item, hoy, cerrar }: Props & { cerrar: () => void })
         error={errors.medioDePago?.message}
         {...register('medioDePago')}
       />
-      <div className="flex flex-col-reverse sm:flex-row gap-3">
+      <div className="flex flex-col-reverse gap-3 max-sm:[&>*]:flex-none sm:flex-row">
         <button type="button" onClick={cerrar} className={BOTON_CANCELAR}>
           Cancelar
         </button>

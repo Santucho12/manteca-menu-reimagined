@@ -25,7 +25,8 @@ type Props = {
   opciones: OpcionDeVenta[];
 };
 
-const COLUMNAS = 'grid grid-cols-[1fr_5.5rem_8rem_2.25rem] items-center gap-2';
+const COLUMNAS =
+  'grid grid-cols-[1fr_1fr_2.25rem] items-center gap-2 sm:grid-cols-[1fr_5.5rem_8rem_2.25rem]';
 const CAMPO =
   'h-11 w-full min-w-0 rounded-xl border border-border bg-secondary/30 px-3 text-sm font-semibold outline-hidden transition-colors focus:border-[#d8cdb6] focus:bg-white';
 const TITULO = 'px-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground';
@@ -47,6 +48,14 @@ function ErroresDeRenglon({ indice, errores }: ErroresProps) {
   );
 }
 
+const Titulos = () => (
+  <div aria-hidden="true" className={`${COLUMNAS} hidden sm:grid`}>
+    <span className={TITULO}>Producto</span>
+    <span className={TITULO}>Cantidad</span>
+    <span className={TITULO}>Precio</span>
+  </div>
+);
+
 /** Los productos de la venta, uno por línea: producto, cantidad y precio, que viene del menú. */
 export function RenglonesDeVenta({ control, register, setValue, errors, opciones }: Props) {
   const { fields, append, remove } = useFieldArray({ control, name: 'renglones' });
@@ -58,30 +67,28 @@ export function RenglonesDeVenta({ control, register, setValue, errors, opciones
   return (
     <fieldset className="space-y-3">
       <legend className="sr-only">Productos</legend>
-      <div aria-hidden="true" className={`${COLUMNAS} hidden sm:grid`}>
-        <span className={TITULO}>Producto</span>
-        <span className={TITULO}>Cantidad</span>
-        <span className={TITULO}>Precio</span>
-      </div>
+      <Titulos />
       {fields.map((renglon, i) => (
         <div key={renglon.id} className="space-y-1">
           <div className={COLUMNAS}>
-            <Controller
-              control={control}
-              name={`renglones.${i}.opcion`}
-              render={({ field }) => (
-                <SelectorDeProducto
-                  etiqueta={`Producto ${i + 1}`}
-                  opciones={opciones}
-                  valor={field.value}
-                  invalido={Boolean(error(i)?.opcion)}
-                  alElegir={(valor) => {
-                    field.onChange(valor);
-                    alElegir(i, valor);
-                  }}
-                />
-              )}
-            />
+            <div className="col-span-3 min-w-0 sm:col-span-1">
+              <Controller
+                control={control}
+                name={`renglones.${i}.opcion`}
+                render={({ field }) => (
+                  <SelectorDeProducto
+                    etiqueta={`Producto ${i + 1}`}
+                    opciones={opciones}
+                    valor={field.value}
+                    invalido={Boolean(error(i)?.opcion)}
+                    alElegir={(valor) => {
+                      field.onChange(valor);
+                      alElegir(i, valor);
+                    }}
+                  />
+                )}
+              />
+            </div>
             <input
               id={`cantidad-${i}`}
               aria-label={`Cantidad ${i + 1}`}

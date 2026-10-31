@@ -85,7 +85,7 @@ function GraficoAcumulado({ puntos }: { puntos: PuntoAcumulado[] }) {
   return (
     <figure aria-label="Ventas por día" className="h-52">
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={puntos} margin={{ left: 0, right: 8, top: 8 }}>
+        <ComposedChart data={puntos} margin={{ left: 0, right: 24, top: 8 }}>
           <defs>
             <linearGradient id="semanaActual" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor={COLORES.actual} stopOpacity={0.25} />

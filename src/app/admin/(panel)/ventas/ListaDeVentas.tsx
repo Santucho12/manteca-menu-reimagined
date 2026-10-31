@@ -66,9 +66,13 @@ function Tarjeta({ venta }: { venta: FilaDeVenta }) {
         <Fecha venta={venta} />
         <Total venta={venta} />
       </div>
-      <Origen venta={venta} />
-      <MediosDePago medios={venta.medios} />
-      <Estado venta={venta} />
+      <div className="flex items-end justify-between gap-3">
+        <div className="min-w-0 space-y-1">
+          <Origen venta={venta} />
+          <MediosDePago medios={venta.medios} />
+        </div>
+        <Estado venta={venta} />
+      </div>
     </>
   );
 }

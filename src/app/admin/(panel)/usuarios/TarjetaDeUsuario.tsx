@@ -23,7 +23,7 @@ const FRANJAS: Record<EstadoDeCuenta, string> = {
 };
 
 const TARJETA =
-  'flex min-h-[12rem] flex-col gap-4 rounded-3xl border border-l-4 border-border bg-white p-5 shadow-sm shadow-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-900/10';
+  'flex flex-col sm:min-h-[12rem] gap-4 rounded-3xl border border-l-4 border-border bg-white p-5 shadow-sm shadow-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-900/10';
 
 export function TarjetaDeUsuario({ fila, yo }: { fila: FilaDeUsuario; yo: string }) {
   const cuenta = { id: fila.id, nombre: fila.nombre, email: fila.email };

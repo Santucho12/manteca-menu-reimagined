@@ -12,7 +12,7 @@ import { useAccionDelMenu } from '@/lib/menu/useAccionDelMenu';
 import { borrarCanalDesdeElPanel, cambiarEstadoDeCanalDesdeElPanel } from '../acciones';
 
 const BASE =
-  'flex h-7 w-7 items-center justify-center rounded-full text-slate-400 transition-all duration-200 active:scale-95 disabled:opacity-40';
+  'flex h-10 w-10 sm:h-7 sm:w-7 items-center justify-center rounded-full text-slate-400 transition-all duration-200 active:scale-95 disabled:opacity-40';
 const EDITAR = `${BASE} hover:bg-[#2563eb]/10 hover:text-[#2563eb] hover:scale-110`;
 const BORRAR = `${BASE} hover:bg-rose-50 hover:text-rose-600 hover:scale-110`;
 
@@ -38,7 +38,7 @@ function VentanaDeBorrar({
           ¿Borrar {nombre}? Solo se puede si nunca se usó en una venta; si no, desactivalo.
         </p>
         {mensaje ? <AvisoDeError mensaje={mensaje} /> : null}
-        <div className="flex flex-col-reverse sm:flex-row gap-3">
+        <div className="flex flex-col-reverse gap-3 max-sm:[&>*]:flex-none sm:flex-row">
           <button type="button" onClick={alCerrar} className={BOTON_CANCELAR}>
             Cancelar
           </button>

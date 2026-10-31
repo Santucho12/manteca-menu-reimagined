@@ -12,10 +12,10 @@ import { cambiarVisibilidadEnElMenu, desactivarEnElMenu, moverEnElMenu } from '.
 
 // Las flechas van juntas en una pastilla y las otras tres, sueltas: se distingue mover de cambiar.
 const BASE =
-  'flex h-8 w-8 items-center justify-center rounded-full text-slate-500 transition-all duration-200 active:scale-95 disabled:opacity-40';
+  'flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-full text-slate-500 transition-all duration-200 active:scale-95 disabled:opacity-40';
 const ACCION = `${BASE} hover:bg-white hover:text-foreground hover:shadow-sm`;
 const EDITAR =
-  'flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:text-[#2563eb] hover:bg-[#2563eb]/10 hover:scale-110 active:scale-95 transition-all duration-200';
+  'flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-full text-slate-400 hover:text-[#2563eb] hover:bg-[#2563eb]/10 hover:scale-110 active:scale-95 transition-all duration-200';
 const BORRAR = `${BASE} hover:bg-rose-50 hover:text-rose-600`;
 const GRUPO = 'flex items-center rounded-full bg-secondary/60 p-0.5';
 
@@ -48,7 +48,7 @@ function VentanaDeDesactivar({
       <div className="space-y-5">
         <p className="text-sm">{PREGUNTA_DE_DESACTIVAR(nombre)}</p>
         {mensaje ? <AvisoDeError mensaje={mensaje} /> : null}
-        <div className="flex flex-col-reverse sm:flex-row gap-3">
+        <div className="flex flex-col-reverse gap-3 max-sm:[&>*]:flex-none sm:flex-row">
           <button type="button" onClick={acciones.alCerrar} className={BOTON_CANCELAR}>
             Cancelar
           </button>

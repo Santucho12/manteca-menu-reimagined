@@ -69,7 +69,7 @@ export function BotonDeAnular({ id, anular, titulo, ...resto }: Props) {
             value={motivo}
             onChange={(evento) => setMotivo(evento.target.value)}
           />
-          <div className="flex flex-col-reverse sm:flex-row gap-3">
+          <div className="flex flex-col-reverse gap-3 max-sm:[&>*]:flex-none sm:flex-row">
             <button type="button" onClick={() => setAbierta(false)} className={BOTON_CANCELAR}>
               Cancelar
             </button>

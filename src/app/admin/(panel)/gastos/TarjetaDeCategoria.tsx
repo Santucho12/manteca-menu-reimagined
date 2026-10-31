@@ -58,7 +58,7 @@ export function TarjetaDeCategoria({ categoria, enlace, activa }: Props) {
         <span className="block truncate text-sm font-semibold text-muted-foreground">
           {categoria.nombre}
         </span>
-        <strong className="mt-2 block font-display text-2xl font-bold tracking-tight">
+        <strong className="mt-2 block font-display text-xl font-bold tracking-tight sm:text-2xl">
           {formatearPesos(categoria.totalCentavos)}
         </strong>
         <span className="mt-1 block text-sm text-muted-foreground">
@@ -73,7 +73,11 @@ export function TarjetaDeCategoria({ categoria, enlace, activa }: Props) {
           <span className="text-sm text-muted-foreground">{cantidadDe(categoria.cantidad)}</span>
         </p>
         <GastosDeLaCategoria categoria={categoria} />
-        <Link href={enlace} className={`${ACCESO_SECUNDARIO} mt-5`}>
+        <Link
+          href={enlace}
+          onClick={() => setAbierta(false)}
+          className={`${ACCESO_SECUNDARIO} mt-5`}
+        >
           <span className={ICONO_DE_ACCESO_SUAVE}>
             <Filter size={15} aria-hidden="true" />
           </span>

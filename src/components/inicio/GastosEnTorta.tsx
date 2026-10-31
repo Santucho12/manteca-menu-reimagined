@@ -30,7 +30,7 @@ export function GastosEnTorta({ gastos }: { gastos: GastoDelDia[] }) {
       {rebanadas.length === 0 ? (
         <p className="text-sm text-muted-foreground">Todavía no hay gastos este mes.</p>
       ) : (
-        <div className="flex items-center gap-6">
+        <div className="flex flex-col items-center gap-6 sm:flex-row">
           <figure aria-label="Gastos por categoría" className="h-56 w-56 shrink-0">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -51,7 +51,7 @@ export function GastosEnTorta({ gastos }: { gastos: GastoDelDia[] }) {
               </PieChart>
             </ResponsiveContainer>
           </figure>
-          <ul aria-label="Gastos por categoría" className="flex-1 min-w-0 space-y-4">
+          <ul aria-label="Gastos por categoría" className="w-full flex-1 min-w-0 space-y-4">
             {rebanadas.map((r, i) => (
               <li key={r.clave} className="flex items-center gap-2 text-sm">
                 <span

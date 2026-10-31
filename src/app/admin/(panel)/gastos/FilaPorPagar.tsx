@@ -39,7 +39,7 @@ export function FilaPorPagar({
 }) {
   const vencido = item.fecha < hoy;
   return (
-    <li className="flex items-center gap-2.5 rounded-2xl px-3 py-2 transition-colors duration-200 hover:bg-secondary/50">
+    <li className="flex flex-wrap items-center gap-2.5 rounded-2xl px-3 py-2 transition-colors sm:flex-nowrap duration-200 hover:bg-secondary/50">
       <BaldosaDeFecha fecha={item.fecha} viene={!vencido} vencido={vencido} chica />
       <div className="flex-1 min-w-0">
         <Nombre item={item} />
@@ -47,7 +47,7 @@ export function FilaPorPagar({
         <p className="text-[10px] text-muted-foreground truncate">
           <span className={cn(vencido && 'font-bold text-rose-600')}>
             {cuandoVence(item.fecha, hoy)}
-          </span>{' '}
+          </span>
           {item.frecuencia ? null : ` · ${item.detalle}`}
         </p>
         {item.frecuencia ? (
@@ -56,7 +56,7 @@ export function FilaPorPagar({
           </Chip>
         ) : null}
       </div>
-      <div className="flex flex-col items-end gap-1 shrink-0">
+      <div className="flex w-full items-center justify-between gap-1 sm:w-auto sm:shrink-0 sm:flex-col sm:items-end">
         <span className="text-xs font-bold tabular-nums whitespace-nowrap">
           {formatearPesos(item.montoCentavos)}
         </span>

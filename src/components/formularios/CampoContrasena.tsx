@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { ErrorDeCampo, clasesDeCampo, clasesDeEtiqueta, type PropsDeCampo } from './Campo';
 
 const OJO =
-  'absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors';
+  'absolute right-2 top-1/2 -translate-y-1/2 p-3 sm:p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors';
 
 /**
  * Contraseña con el ojo de Plan Reminder Pro para verla: en vez de pedirla dos veces, se revisa lo

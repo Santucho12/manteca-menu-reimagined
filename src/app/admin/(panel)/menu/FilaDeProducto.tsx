@@ -13,8 +13,11 @@ export function FilaDeProducto({
   categoria: string;
 }) {
   return (
-    <li className="flex flex-wrap items-center justify-between gap-3 rounded-2xl px-3 py-2.5 transition-colors duration-200 hover:bg-secondary/50">
-      <Link href={`/admin/menu/productos/${producto.id}`} className="min-w-0 flex-1 space-y-1">
+    <li className="flex flex-wrap items-center justify-end gap-3 sm:justify-between rounded-2xl px-3 py-2.5 transition-colors duration-200 hover:bg-secondary/50">
+      <Link
+        href={`/admin/menu/productos/${producto.id}`}
+        className="min-w-0 basis-full space-y-1 sm:flex-1 sm:basis-0"
+      >
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm font-bold">{producto.nombre}</span>
           {producto.etiqueta ? <Chip>{TEXTOS_DE_ETIQUETA[producto.etiqueta]}</Chip> : null}

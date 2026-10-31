@@ -19,7 +19,7 @@ export function Confirmacion({ accion, nombre, enviando, alConfirmar, alCancelar
         <AlertTriangle size={18} className="shrink-0 mt-0.5" aria-hidden="true" />
         <p className="text-sm font-semibold">{preguntaDe(accion, nombre)}</p>
       </div>
-      <div className="flex flex-col-reverse sm:flex-row gap-3">
+      <div className="flex flex-col-reverse gap-3 max-sm:[&>*]:flex-none sm:flex-row">
         <button type="button" disabled={enviando} onClick={alCancelar} className={BOTON_CANCELAR}>
           Cancelar
         </button>
