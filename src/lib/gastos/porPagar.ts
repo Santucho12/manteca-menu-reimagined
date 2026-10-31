@@ -105,19 +105,7 @@ export function esElPagoPedido(item: ItemPorPagar, pagar: string | undefined): b
   return pagar !== undefined && pagar === `${item.fijoId}|${item.vencimiento}`;
 }
 
-/** Cuantos dias hacia adelante muestra Proximos pagos: 15, 30 (lo de siempre), un año o todos (null). */
-export const OPCIONES_DE_ADELANTO = [
-  { valor: '15', texto: '15 días', dias: 15 },
-  { valor: '30', texto: '30 días', dias: 30 },
-  { valor: '365', texto: '1 año', dias: 365 },
-  { valor: 'todos', texto: 'Todos', dias: null },
-] as const;
 const DIAS_DE_ADELANTO = 30;
-
-export function diasDeAdelanto(valor: string | undefined): number | null {
-  const opcion = OPCIONES_DE_ADELANTO.find((o) => o.valor === valor);
-  return opcion ? opcion.dias : DIAS_DE_ADELANTO;
-}
 
 /** Lo vencido y lo que vence de hoy a tantos dias; con null, todo lo que viene. */
 export function dentroDeLosProximos<T extends { fecha: string }>(

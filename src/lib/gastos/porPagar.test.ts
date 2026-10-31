@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import type { ProximoPago } from './fijos';
 import {
   dentroDeLosProximos,
-  diasDeAdelanto,
   esElPagoPedido,
   itemsPorPagar,
   pagoInicial,
@@ -160,15 +159,5 @@ describe('dentroDeLosProximos', () => {
   it('con null deja todo, y sin pedir nada son 30 dias', () => {
     expect(fechas(null)).toHaveLength(6);
     expect(dentroDeLosProximos(items, '2026-10-28')).toHaveLength(4);
-  });
-});
-
-describe('diasDeAdelanto', () => {
-  it('lee 15, 30, 365 o todos de la URL; cualquier otra cosa, 30', () => {
-    expect(diasDeAdelanto('15')).toBe(15);
-    expect(diasDeAdelanto('365')).toBe(365);
-    expect(diasDeAdelanto('todos')).toBeNull();
-    expect(diasDeAdelanto(undefined)).toBe(30);
-    expect(diasDeAdelanto('7')).toBe(30);
   });
 });
