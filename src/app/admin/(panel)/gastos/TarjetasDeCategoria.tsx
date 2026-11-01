@@ -10,7 +10,7 @@ export function TarjetasDeCategoria({ resumen, filtros, hoy }: Props) {
   return (
     <ul
       aria-label="Categorías del mes"
-      className="grid grid-cols-2 items-start gap-3 md:grid-cols-3"
+      className="grid grid-cols-2 items-start gap-4 sm:gap-3 md:grid-cols-3"
     >
       {resumen.map((categoria) => {
         const activa = filtros.categoriaId === categoria.categoriaId;

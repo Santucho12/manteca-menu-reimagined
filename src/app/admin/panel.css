@@ -172,6 +172,13 @@
     zoom: 0.95;
   }
 
+  /* En el celular, un poco más chico todavía y con más aire (Santiago, 2026-11-01, pedido 78). */
+  @media (max-width: 639px) {
+    html {
+      zoom: 0.9;
+    }
+  }
+
   /* La letra base es de 14 px (html sigue en 16: los rem no cambian). */
   body {
     background-color: var(--color-background);

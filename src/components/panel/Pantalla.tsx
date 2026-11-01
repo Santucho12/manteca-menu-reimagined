@@ -20,7 +20,7 @@ export function Pantalla({
   subtitulo,
   acciones,
   ayuda,
-  espacio = 'space-y-6',
+  espacio = 'space-y-8 sm:space-y-6',
   children,
 }: Props) {
   return (
