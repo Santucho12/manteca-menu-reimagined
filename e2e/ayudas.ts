@@ -22,6 +22,16 @@ export async function esperarNoEncontrado(page: Page): Promise<void> {
   ).toBeVisible();
 }
 
+/**
+ * Espera a que React tome el control del elemento. Lo que se elige antes se pierde al hidratar la
+ * página, y la prueba toca más rápido que una persona.
+ */
+export async function esperarHidratacion(elemento: Locator): Promise<void> {
+  await expect
+    .poll(() => elemento.evaluate((n) => Object.keys(n).some((k) => k.startsWith('__reactFiber'))))
+    .toBe(true);
+}
+
 /** El aviso de la pantalla. Dentro de main: Next.js suma afuera un anunciador con el mismo rol. */
 export function aviso(page: Page): Locator {
   return page.getByRole('main').getByRole('alert');

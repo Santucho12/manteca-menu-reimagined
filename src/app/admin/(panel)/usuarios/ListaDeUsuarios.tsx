@@ -7,7 +7,7 @@ export function ListaDeUsuarios({ filas, yo }: { filas: FilaDeUsuario[]; yo: str
     return <SinResultados titulo="Sin cuentas" texto="No hay cuentas con esos filtros." />;
   }
   return (
-    <ul aria-label="Cuentas" className="grid grid-cols-1 gap-5 xl:grid-cols-3">
+    <ul aria-label="Cuentas" className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
       {filas.map((fila) => (
         <TarjetaDeUsuario key={fila.id} fila={fila} yo={yo} />
       ))}

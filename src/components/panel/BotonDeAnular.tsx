@@ -26,7 +26,7 @@ type Props = {
 };
 
 const ICONO_ANULAR =
-  'p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:scale-110 active:scale-95 transition-all duration-200';
+  'p-1.5 pointer-coarse:p-3.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:scale-110 active:scale-95 transition-all duration-200';
 
 /** Nada se borra: se anula con motivo, deja de contar y queda en el historial. */
 export function BotonDeAnular({ id, anular, titulo, ...resto }: Props) {

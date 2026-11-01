@@ -12,7 +12,7 @@ import { useAccionDelMenu } from '@/lib/menu/useAccionDelMenu';
 import { borrarCanalDesdeElPanel, cambiarEstadoDeCanalDesdeElPanel } from '../acciones';
 
 const BASE =
-  'flex h-10 w-10 sm:h-7 sm:w-7 items-center justify-center rounded-full text-slate-400 transition-all duration-200 active:scale-95 disabled:opacity-40';
+  'flex h-7 w-7 pointer-coarse:h-11 pointer-coarse:w-11 items-center justify-center rounded-full text-slate-400 transition-all duration-200 active:scale-95 disabled:opacity-40';
 const EDITAR = `${BASE} hover:bg-[#2563eb]/10 hover:text-[#2563eb] hover:scale-110`;
 const BORRAR = `${BASE} hover:bg-rose-50 hover:text-rose-600 hover:scale-110`;
 

@@ -22,7 +22,7 @@ export function BotonDeAyuda({ ayuda }: { ayuda: Ayuda }) {
         aria-label="Cómo funciona esta pantalla"
         title="Cómo funciona esta pantalla"
         onClick={() => setAbierta(true)}
-        className="shrink-0 p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-secondary transition-colors"
+        className="shrink-0 p-2 pointer-coarse:p-3 rounded-full text-slate-400 hover:text-slate-600 hover:bg-secondary transition-colors"
       >
         <Info size={22} />
       </button>

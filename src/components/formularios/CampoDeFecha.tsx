@@ -82,7 +82,7 @@ export function CampoDeFecha({ id, etiqueta, valor, alCambiar, desde, hasta, ...
             type="button"
             disabled={deshabilitado}
             onClick={() => alCambiar(atajo.fecha)}
-            className={cn(ATAJO, 'h-12 disabled:opacity-50')}
+            className={cn(ATAJO, 'h-12 pointer-coarse:h-12 disabled:opacity-50')}
           >
             {atajo.texto}
           </button>

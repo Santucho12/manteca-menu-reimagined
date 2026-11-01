@@ -97,7 +97,10 @@ export function BotonDePago({ item, hoy, abierta: alInicio = false }: PropsDelBo
       <button
         type="button"
         onClick={() => setAbierta(true)}
-        className={cn(BOTON_DE_FILA_SUAVE, 'h-8 whitespace-nowrap px-3 text-[11px]')}
+        className={cn(
+          BOTON_DE_FILA_SUAVE,
+          'h-8 pointer-coarse:h-11 whitespace-nowrap px-3 text-[11px]',
+        )}
       >
         <Check size={13} aria-hidden="true" />
         Marcar como pago

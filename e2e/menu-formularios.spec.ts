@@ -6,7 +6,7 @@ import {
   sembrarCategoria,
   sembrarProducto,
 } from '../tests/menu-de-prueba';
-import { SESIONES, aviso, esperarNoEncontrado } from './ayudas';
+import { SESIONES, aviso, esperarNoEncontrado, esperarHidratacion } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -122,6 +122,7 @@ test('guarda una captura del formulario de categoria', async ({ page }, info) =>
 
 async function completarProducto(page: Page, categoria: string, nombre: string) {
   await page.goto('/admin/menu/productos/nuevo');
+  await esperarHidratacion(page.getByLabel('Categoría'));
   await page.getByLabel('Categoría').selectOption({ label: categoria });
   await page.getByLabel('Nombre', { exact: true }).fill(nombre);
   await page.getByLabel('Descripción').fill('Hecho con manteca.');
@@ -180,6 +181,7 @@ test('cambiar de categoria cambia los precios que se piden', async ({ page }) =>
   const cafe = await sembrarCategoria({ presentaciones: ['Mediano', 'Grande'] });
   categorias.push(facturas.id, cafe.id);
   await page.goto('/admin/menu/productos/nuevo');
+  await esperarHidratacion(page.getByLabel('Categoría'));
   await page.getByLabel('Categoría').selectOption({ label: facturas.nombre });
   await expect(page.getByText(`Vacío usa el de ${facturas.nombre}: $20.000.`)).toBeVisible();
   await page.getByLabel('Categoría').selectOption({ label: cafe.nombre });

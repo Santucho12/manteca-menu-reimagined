@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { clienteSecretoDePruebas } from '../tests/clientes';
 import { borrarMenuDePrueba, sembrarCategoria, sembrarProducto } from '../tests/menu-de-prueba';
-import { SESIONES, aviso } from './ayudas';
+import { SESIONES, aviso, esperarHidratacion } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -13,6 +13,7 @@ test.afterEach(async () => {
 
 async function prepararAumento(page: Page, categoria: string, porcentaje: string) {
   await page.goto('/admin/menu/aumento');
+  await esperarHidratacion(page.getByLabel('Alcance'));
   await page.getByLabel('Alcance').selectOption({ label: categoria });
   await page.getByLabel('Porcentaje').fill(porcentaje);
   await page.getByRole('button', { name: 'Ver cambios' }).click();

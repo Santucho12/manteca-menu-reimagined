@@ -2,7 +2,7 @@
 
 import Form from 'next/form';
 import type { ReactNode } from 'react';
-import { BARRA_DE_FILTROS } from './estilos';
+import { BARRA_AUTOMATICA } from './estilos';
 
 /** La barra de filtros sin botón: cada cambio vuelve a pedir la lista, sin recargar la página. */
 export function BarraAutomatica({ accion, children }: { accion: string; children: ReactNode }) {
@@ -10,7 +10,7 @@ export function BarraAutomatica({ accion, children }: { accion: string; children
     <Form
       action={accion}
       role="search"
-      className={BARRA_DE_FILTROS}
+      className={BARRA_AUTOMATICA}
       onChange={(evento) => evento.currentTarget.requestSubmit()}
     >
       {children}
