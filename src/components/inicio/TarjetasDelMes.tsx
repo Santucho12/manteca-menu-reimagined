@@ -71,7 +71,7 @@ export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
       variants={GRILLA}
       initial="hidden"
       animate="show"
-      className="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4"
+      className="grid grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-3 md:gap-4"
     >
       {items.map((item) => {
         const { icono: Icono, tono } = ICONOS[item.etiqueta]!;

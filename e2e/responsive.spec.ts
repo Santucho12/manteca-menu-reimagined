@@ -1,4 +1,6 @@
 import { expect, test, type Locator } from '@playwright/test';
+import { diaLibre } from '../tests/cierres-de-prueba';
+import { borrarVentas, sembrarVentasParaPaginar } from '../tests/ventas-de-prueba';
 import { SESIONES } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
@@ -80,9 +82,16 @@ test('los atajos de Reportes y la paginación se tocan sin errarle', async ({ pa
   await page.goto('/admin/reportes/ventas');
   const atajo = page.getByRole('link', { name: 'Este mes' });
   expect(await atajo.evaluate((n) => (n as HTMLElement).offsetHeight)).toBeGreaterThanOrEqual(40);
-  await page.goto('/admin/ventas');
-  const salto = page.getByLabel('Ir a la página');
-  expect(await salto.evaluate((n) => (n as HTMLElement).offsetHeight)).toBeGreaterThanOrEqual(40);
+  // Dos páginas de ventas de un día propio: no depende de lo que tenga el mes en curso.
+  const fecha = diaLibre();
+  const ventas = await sembrarVentasParaPaginar(fecha);
+  try {
+    await page.goto(`/admin/ventas?desde=${fecha}&hasta=${fecha}`);
+    const salto = page.getByLabel('Ir a la página');
+    expect(await salto.evaluate((n) => (n as HTMLElement).offsetHeight)).toBeGreaterThanOrEqual(40);
+  } finally {
+    await borrarVentas(ventas);
+  }
 });
 
 test('los botones de una ventana mantienen su alto', async ({ page }) => {
@@ -109,6 +118,30 @@ test('las flechas de las formas de venta se tocan sin errarle', async ({ page })
   await page.goto('/admin/menu/categorias/nueva');
   const quitar = page.getByRole('button', { name: 'Quitar la forma de venta 1' });
   expect(await altoSinEscala(quitar)).toBeGreaterThanOrEqual(40);
+});
+
+test('en el celular todo se ve un poco más chico y con más aire', async ({ page }) => {
+  await page.goto('/admin/ventas');
+  const medidas = await page.evaluate(() => {
+    const principal = document.querySelector('main')!;
+    const encabezado = principal.querySelector('header')!;
+    const bloques = encabezado.nextElementSibling!;
+    const tarjetas = principal.querySelector('.grid.grid-cols-2')!;
+    return {
+      zoom: getComputedStyle(document.documentElement).zoom,
+      costado: getComputedStyle(principal).paddingLeft,
+      bajoElTitulo: getComputedStyle(encabezado).marginBottom,
+      entreBloques: getComputedStyle(bloques.firstElementChild!).marginBottom,
+      entreTarjetas: getComputedStyle(tarjetas).columnGap,
+    };
+  });
+  expect(medidas).toEqual({
+    zoom: '0.9',
+    costado: '20px',
+    bajoElTitulo: '36px',
+    entreBloques: '32px',
+    entreTarjetas: '16px',
+  });
 });
 
 test('los botones de arriba bajan de renglón en vez de cortarse', async ({ page }) => {

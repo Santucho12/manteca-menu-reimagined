@@ -1,11 +1,13 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { diaEnArgentina } from '../src/lib/fechas';
 import { sumarDias } from '../src/lib/reportes/periodos';
+import { diaLibre } from '../tests/cierres-de-prueba';
 import {
   borrarCategoriasConSusGastos,
   sembrarCategoriaDeGasto,
   sembrarPorPagar,
 } from '../tests/gastos-de-prueba';
+import { borrarVentas, sembrarVentasParaPaginar } from '../tests/ventas-de-prueba';
 import { SESIONES } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
@@ -17,6 +19,29 @@ test.beforeEach(({}, info) => {
 
 const alto = (elemento: Locator) => elemento.evaluate((n) => (n as HTMLElement).offsetHeight);
 const arriba = async (elemento: Locator) => (await elemento.boundingBox())?.y ?? -1;
+
+// El achique del panel y los espacios que lo rodean, como los calcula el navegador.
+const medidasDelPanel = (page: Page) =>
+  page.evaluate(() => {
+    const principal = document.querySelector('main')!;
+    return {
+      zoom: getComputedStyle(document.documentElement).zoom,
+      costado: getComputedStyle(principal).paddingLeft,
+      bajoElTitulo: getComputedStyle(principal.querySelector('header')!).marginBottom,
+    };
+  });
+
+// La lista de ventas con dos páginas, de un día propio: no depende de lo que tenga el mes en curso.
+async function verVentasConPaginas(page: Page, mirar: () => Promise<void>) {
+  const fecha = diaLibre();
+  const ventas = await sembrarVentasParaPaginar(fecha);
+  try {
+    await page.goto(`/admin/ventas?desde=${fecha}&hasta=${fecha}`);
+    await mirar();
+  } finally {
+    await borrarVentas(ventas);
+  }
+}
 
 // La pantalla entra animada: se mide hasta que quedó quieta.
 async function mismaFila(page: Page, ruta: string, campos: [Locator, Locator][]) {
@@ -31,6 +56,15 @@ async function mismaFila(page: Page, ruta: string, campos: [Locator, Locator][])
 test.describe('en una tablet, con el dedo', () => {
   test.use({ viewport: { width: 768, height: 1024 }, hasTouch: true, isMobile: true });
 
+  test('conserva el tamaño y los espacios de siempre', async ({ page }) => {
+    await page.goto('/admin/ventas');
+    expect(await medidasDelPanel(page)).toEqual({
+      zoom: '0.95',
+      costado: '32px',
+      bajoElTitulo: '44px',
+    });
+  });
+
   test('la ayuda de cada pantalla se toca sin errarle', async ({ page }) => {
     await page.goto('/admin/gastos');
     const ayuda = page.getByRole('button', { name: 'Cómo funciona esta pantalla' });
@@ -40,9 +74,10 @@ test.describe('en una tablet, con el dedo', () => {
   test('los atajos de Reportes y la paginación se tocan sin errarle', async ({ page }) => {
     await page.goto('/admin/reportes/ventas');
     expect(await alto(page.getByRole('link', { name: 'Este mes' }))).toBeGreaterThanOrEqual(44);
-    await page.goto('/admin/ventas');
-    expect(await alto(page.getByRole('link', { name: 'Siguiente' }))).toBeGreaterThanOrEqual(44);
-    expect(await alto(page.getByLabel('Ir a la página'))).toBeGreaterThanOrEqual(44);
+    await verVentasConPaginas(page, async () => {
+      expect(await alto(page.getByRole('link', { name: 'Siguiente' }))).toBeGreaterThanOrEqual(44);
+      expect(await alto(page.getByLabel('Ir a la página'))).toBeGreaterThanOrEqual(44);
+    });
   });
 
   test('el mes y el tipo de gasto de Pagados se tocan sin errarle', async ({ page }) => {
@@ -118,9 +153,10 @@ test.describe('en una tablet, con el dedo', () => {
     expect(await alto(page.getByRole('link', { name: 'Aumentar precios' }))).toBeGreaterThanOrEqual(
       44,
     );
-    await page.goto('/admin/ventas');
-    const ir = page.getByRole('button', { name: 'Ir', exact: true });
-    expect(await ir.evaluate((n) => (n as HTMLElement).offsetWidth)).toBeGreaterThanOrEqual(44);
+    await verVentasConPaginas(page, async () => {
+      const ir = page.getByRole('button', { name: 'Ir', exact: true });
+      expect(await ir.evaluate((n) => (n as HTMLElement).offsetWidth)).toBeGreaterThanOrEqual(44);
+    });
   });
 
   test('un interruptor responde aunque el dedo caiga apenas afuera', async ({ page }) => {
@@ -150,6 +186,15 @@ test.describe('en una tablet, con el dedo', () => {
 });
 
 test.describe('en la computadora, con mouse', () => {
+  test('conserva el tamaño y los espacios de siempre', async ({ page }) => {
+    await page.goto('/admin/ventas');
+    expect(await medidasDelPanel(page)).toEqual({
+      zoom: '0.95',
+      costado: '40px',
+      bajoElTitulo: '44px',
+    });
+  });
+
   test('los atajos de Reportes conservan su tamaño', async ({ page }) => {
     await page.goto('/admin/reportes/ventas');
     expect(await alto(page.getByRole('link', { name: 'Este mes' }))).toBeLessThanOrEqual(36);

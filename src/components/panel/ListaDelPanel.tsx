@@ -24,7 +24,7 @@ function Tarjetas<T>({ etiqueta, total, filas, clave, tarjeta }: Props<T>) {
   return (
     <div className="xl:hidden space-y-3">
       <p className={cn('px-1', CANTIDAD_DE_RESULTADOS)}>{cantidadDeResultados(total)}</p>
-      <ul aria-label={etiqueta} className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <ul aria-label={etiqueta} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-3">
         {filas.map((fila) => (
           <li
             key={clave(fila)}
