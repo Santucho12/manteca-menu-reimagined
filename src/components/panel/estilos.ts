@@ -65,8 +65,9 @@ export const CERRAR_VENTANA = 'p-2 rounded-full hover:bg-secondary transition-co
 export const LUGAR_DE_ABAJO =
   'flex-1 min-w-0 h-16 flex flex-col items-center justify-center gap-1 text-[9px] font-bold transition-colors';
 
+// En el celular, más justo: con cuatro columnas de millones la tabla no entraba.
 export const TITULO_DE_COLUMNA =
-  'py-3 px-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest';
+  'py-3 px-2 sm:px-3 text-[10px] font-bold text-muted-foreground uppercase tracking-wider sm:tracking-widest';
 
 export const CANTIDAD_DE_RESULTADOS =
   'text-xs font-semibold tracking-widest text-muted-foreground uppercase';
