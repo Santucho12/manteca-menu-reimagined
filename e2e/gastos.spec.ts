@@ -32,11 +32,13 @@ const filas = (page: Page, lista: string) =>
 
 test('el mes va con flechas y no pasa al que no llegó', async ({ page }) => {
   await page.goto('/admin/gastos');
-  await expect(page.getByText(nombreDelMes(MES), { exact: true })).toBeVisible();
+  // En Pagados: Próximos pagos también nombra el mes en curso cuando hay algo que vence en él.
+  const pagados = page.getByRole('region', { name: 'Pagados' });
+  await expect(pagados.getByText(nombreDelMes(MES), { exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Mes siguiente' })).toHaveCount(0);
   await page.getByRole('link', { name: 'Mes anterior' }).click();
   await expect(page).toHaveURL(new RegExp(`mes=${mesAnterior(MES)}`));
-  await expect(page.getByText(nombreDelMes(mesAnterior(MES)), { exact: true })).toBeVisible();
+  await expect(pagados.getByText(nombreDelMes(mesAnterior(MES)), { exact: true })).toBeVisible();
   await page.getByRole('link', { name: 'Mes siguiente' }).click();
   await expect(page).toHaveURL(/\/admin\/gastos$/);
 });

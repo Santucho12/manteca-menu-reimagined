@@ -1,8 +1,15 @@
 import { expect, test } from '@playwright/test';
 import { diaEnArgentina } from '../src/lib/fechas';
+import { sumarMeses } from '../src/lib/gastos/vencimientos';
 import { sumarDias } from '../src/lib/reportes/periodos';
 import { borrarCierres, sembrarCierreConSalidas } from '../tests/cierres-de-prueba';
-import { borrarGastos, sembrarRecurrente } from '../tests/gastos-de-prueba';
+import {
+  borrarCategoriasConSusGastos,
+  borrarGastos,
+  sembrarCategoriaDeGasto,
+  sembrarGasto,
+  sembrarRecurrente,
+} from '../tests/gastos-de-prueba';
 import { sembrarVentaConRenglones } from '../tests/reportes-de-prueba';
 import { borrarVentas, productoParaVender, type ParaVender } from '../tests/ventas-de-prueba';
 import { SESIONES } from './ayudas';
@@ -17,6 +24,30 @@ let producto: ParaVender;
 let venta: string;
 let ventaDeAyer: string;
 let recurrente: string;
+// El primer día del mes anterior cae siempre dentro de lo que se compara con el mes en curso.
+const PRIMERO_DEL_MES_ANTERIOR = sumarMeses(`${HOY.slice(0, 8)}01`, -1);
+const otrosProductos: ParaVender[] = [];
+const otrasVentas: string[] = [];
+let categoriaDeGasto: string | undefined;
+
+// Lo que el mes necesita aunque la base no tenga nada del mes en curso (el día 1, por ejemplo):
+// gastos de hoy y del mes anterior, una venta del mes anterior y cuatro productos para las medallas.
+async function sembrarElMes() {
+  categoriaDeGasto = (await sembrarCategoriaDeGasto()).id;
+  await sembrarGasto({ categoriaId: categoriaDeGasto, fecha: HOY, montoCentavos: 1_500_000 });
+  const anterior = { categoriaId: categoriaDeGasto, fecha: PRIMERO_DEL_MES_ANTERIOR };
+  await sembrarGasto({ ...anterior, montoCentavos: 1_000_000 });
+  for (const precioCentavos of [5_000_000, 4_000_000, 3_000_000]) {
+    const otro = await productoParaVender();
+    otrosProductos.push(otro);
+    const renglones = [{ producto: otro, cantidad: 1, precioCentavos }];
+    otrasVentas.push(await sembrarVentaConRenglones({ fecha: HOY, renglones }));
+  }
+  const delMesAnterior = [{ producto, cantidad: 1, precioCentavos: 1_000_000 }];
+  otrasVentas.push(
+    await sembrarVentaConRenglones({ fecha: PRIMERO_DEL_MES_ANTERIOR, renglones: delMesAnterior }),
+  );
+}
 
 test.beforeAll(async () => {
   // El cierre deja un gasto de caja en "Sin clasificar": el aviso tiene que aparecer.
@@ -35,12 +66,18 @@ test.beforeAll(async () => {
   recurrente = (
     await sembrarRecurrente({ primerVencimiento: sumarDias(HOY, 2), montoCentavos: 432_100 })
   ).id;
+  await sembrarElMes();
 });
 
+// Si la siembra se cortó a mitad, se borra lo que alcanzó a crear.
 test.afterAll(async () => {
-  await borrarGastos({ recurrentes: [recurrente] });
-  await borrarVentas([venta, ventaDeAyer], { categoriasDelMenu: [producto.categoriaId] });
-  await borrarCierres([cierre]);
+  if (recurrente) await borrarGastos({ recurrentes: [recurrente] });
+  const productos = [producto, ...otrosProductos].filter(Boolean);
+  await borrarVentas([venta, ventaDeAyer, ...otrasVentas].filter(Boolean), {
+    categoriasDelMenu: productos.map((p) => p.categoriaId),
+  });
+  if (categoriaDeGasto) await borrarCategoriasConSusGastos([categoriaDeGasto]);
+  if (cierre) await borrarCierres([cierre]);
 });
 
 const grafico = (page: import('@playwright/test').Page) =>
