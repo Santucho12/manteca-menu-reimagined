@@ -152,6 +152,7 @@ test('editar el precio cambia el menu publico', async ({ page }) => {
   categorias.push(categoria.id);
   const producto = await sembrarProducto(categoria, { precios: [100000] });
   await page.goto(`/admin/menu/productos/${producto.id}`);
+  await esperarHidratacion(page.getByLabel('Precio de Unidad'));
   await page.getByLabel('Precio de Unidad').fill('1300');
   await page.getByRole('button', { name: 'Guardar' }).click();
   await expect(page).toHaveURL(/\/admin\/menu$/);
