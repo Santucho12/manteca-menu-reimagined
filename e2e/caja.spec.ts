@@ -8,7 +8,7 @@ import {
   sembrarCierre,
 } from '../tests/cierres-de-prueba';
 import { borrarVentas, sembrarVentaConPago } from '../tests/ventas-de-prueba';
-import { SESIONES, aviso, esperarNoEncontrado } from './ayudas';
+import { SESIONES, aviso, esperarHidratacion, esperarNoEncontrado } from './ayudas';
 
 test.use({ storageState: SESIONES.caja });
 
@@ -30,6 +30,7 @@ function dia(): string {
 
 async function completar(page: Page, fecha: string) {
   await page.goto('/admin/caja');
+  await esperarHidratacion(page.getByLabel('Fecha'));
   await page.getByLabel('Fecha').fill(fecha);
   await page.getByLabel('Fondo inicial').fill('10.000');
   await page.getByLabel('Efectivo contado').fill('25.000,50');
