@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type { Json } from '../src/lib/supabase/tipos';
+import { POR_PAGINA } from '../src/lib/usuarios/presentacion';
 import { clienteSecretoDePruebas } from './clientes';
 import { asegurarLocalB, idDelLocalPrincipal } from './locales';
 import { borrarMenuDePrueba, sembrarCategoria, sembrarProducto } from './menu-de-prueba';
@@ -102,6 +103,15 @@ export async function sembrarVenta(semilla: SemillaDeVenta = {}): Promise<{ id: 
     .single();
   if (error) throw new Error(`No pude sembrar la venta: ${error.message}`);
   return data;
+}
+
+/** Una venta más de las que entran en una página, todas del mismo día: la lista se pagina. */
+export async function sembrarVentasParaPaginar(fecha: string): Promise<string[]> {
+  const fila = await filaDeVenta({ fecha });
+  const filas = Array.from({ length: POR_PAGINA + 1 }, () => ({ ...fila }));
+  const { data, error } = await clienteSecretoDePruebas().from('ventas').insert(filas).select('id');
+  if (error) throw new Error(`No pude sembrar las ventas: ${error.message}`);
+  return data.map((venta) => venta.id);
 }
 
 export async function ventaDe(id: string) {
