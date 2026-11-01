@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { clienteSecretoDePruebas } from '../clientes';
 import { clienteComo } from '../sesiones';
 import { borrarVentas } from '../ventas-de-prueba';
@@ -12,13 +12,18 @@ import {
 
 const EXCEL = 'e2e/archivos/reporte-ventas-fudo.xlsx';
 
-afterAll(async () => {
+async function borrarLoSubido() {
   const { data } = await clienteSecretoDePruebas()
     .from('ventas')
     .select('id')
     .like('fudo_id', 'excel:2020-03-%');
   await borrarVentas((data ?? []).map((v) => v.id));
-});
+}
+
+// Una corrida cortada puede haber dejado lo subido: se limpia antes y después. Borrar las ventas
+// con sus renglones y su auditoría puede llevar más que los 10 s que Vitest da por defecto.
+beforeAll(borrarLoSubido, 60_000);
+afterAll(borrarLoSubido, 60_000);
 
 describe('la vista previa de la subida', () => {
   it('cuenta los dias, las ventas y el total, sin guardar nada', async () => {
