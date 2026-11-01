@@ -127,12 +127,23 @@ export async function ventaDe(id: string) {
   };
 }
 
-/** Borra ventas de prueba con sus renglones, pagos, canales, menu y auditoria. */
+// La auditoria de un renglon o de un pago lleva su propio id, no el de la venta.
+async function idsDeRenglonesYPagos(ventas: string[]): Promise<string[]> {
+  const secreto = clienteSecretoDePruebas();
+  const [renglones, pagos] = await Promise.all([
+    secreto.from('renglones_de_venta').select('id').in('venta_id', ventas),
+    secreto.from('pagos_de_venta').select('id').in('venta_id', ventas),
+  ]);
+  return [...(renglones.data ?? []), ...(pagos.data ?? [])].map((fila) => String(fila.id));
+}
+
+/** Borra ventas de prueba con sus renglones, pagos, canales, menu y la auditoria de todo eso. */
 export async function borrarVentas(
   ventas: string[],
   extras: { canales?: string[]; categoriasDelMenu?: string[] } = {},
 ) {
   const secreto = clienteSecretoDePruebas();
+  const hijos = await idsDeRenglonesYPagos(ventas);
   await secreto.from('renglones_de_venta').delete().in('venta_id', ventas);
   await secreto.from('pagos_de_venta').delete().in('venta_id', ventas);
   await secreto.from('ventas').delete().in('id', ventas);
@@ -143,7 +154,7 @@ export async function borrarVentas(
   await secreto
     .from('auditoria')
     .delete()
-    .in('registro_id', [...ventas, ...(extras.canales ?? [])]);
+    .in('registro_id', [...ventas, ...hijos, ...(extras.canales ?? [])]);
   await borrarMenuDePrueba(extras.categoriasDelMenu ?? []);
 }
 
