@@ -111,6 +111,30 @@ test('las flechas de las formas de venta se tocan sin errarle', async ({ page })
   expect(await altoSinEscala(quitar)).toBeGreaterThanOrEqual(40);
 });
 
+test('en el celular todo se ve un poco más chico y con más aire', async ({ page }) => {
+  await page.goto('/admin/ventas');
+  const medidas = await page.evaluate(() => {
+    const principal = document.querySelector('main')!;
+    const encabezado = principal.querySelector('header')!;
+    const bloques = encabezado.nextElementSibling!;
+    const tarjetas = principal.querySelector('.grid.grid-cols-2')!;
+    return {
+      zoom: getComputedStyle(document.documentElement).zoom,
+      costado: getComputedStyle(principal).paddingLeft,
+      bajoElTitulo: getComputedStyle(encabezado).marginBottom,
+      entreBloques: getComputedStyle(bloques.firstElementChild!).marginBottom,
+      entreTarjetas: getComputedStyle(tarjetas).columnGap,
+    };
+  });
+  expect(medidas).toEqual({
+    zoom: '0.9',
+    costado: '20px',
+    bajoElTitulo: '36px',
+    entreBloques: '32px',
+    entreTarjetas: '16px',
+  });
+});
+
 test('los botones de arriba bajan de renglón en vez de cortarse', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 780 });
   await page.goto('/admin/ventas');

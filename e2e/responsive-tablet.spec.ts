@@ -18,6 +18,17 @@ test.beforeEach(({}, info) => {
 const alto = (elemento: Locator) => elemento.evaluate((n) => (n as HTMLElement).offsetHeight);
 const arriba = async (elemento: Locator) => (await elemento.boundingBox())?.y ?? -1;
 
+// El achique del panel y los espacios que lo rodean, como los calcula el navegador.
+const medidasDelPanel = (page: Page) =>
+  page.evaluate(() => {
+    const principal = document.querySelector('main')!;
+    return {
+      zoom: getComputedStyle(document.documentElement).zoom,
+      costado: getComputedStyle(principal).paddingLeft,
+      bajoElTitulo: getComputedStyle(principal.querySelector('header')!).marginBottom,
+    };
+  });
+
 // La pantalla entra animada: se mide hasta que quedó quieta.
 async function mismaFila(page: Page, ruta: string, campos: [Locator, Locator][]) {
   await page.goto(ruta);
@@ -30,6 +41,15 @@ async function mismaFila(page: Page, ruta: string, campos: [Locator, Locator][])
 
 test.describe('en una tablet, con el dedo', () => {
   test.use({ viewport: { width: 768, height: 1024 }, hasTouch: true, isMobile: true });
+
+  test('conserva el tamaño y los espacios de siempre', async ({ page }) => {
+    await page.goto('/admin/ventas');
+    expect(await medidasDelPanel(page)).toEqual({
+      zoom: '0.95',
+      costado: '32px',
+      bajoElTitulo: '44px',
+    });
+  });
 
   test('la ayuda de cada pantalla se toca sin errarle', async ({ page }) => {
     await page.goto('/admin/gastos');
@@ -150,6 +170,15 @@ test.describe('en una tablet, con el dedo', () => {
 });
 
 test.describe('en la computadora, con mouse', () => {
+  test('conserva el tamaño y los espacios de siempre', async ({ page }) => {
+    await page.goto('/admin/ventas');
+    expect(await medidasDelPanel(page)).toEqual({
+      zoom: '0.95',
+      costado: '40px',
+      bajoElTitulo: '44px',
+    });
+  });
+
   test('los atajos de Reportes conservan su tamaño', async ({ page }) => {
     await page.goto('/admin/reportes/ventas');
     expect(await alto(page.getByRole('link', { name: 'Este mes' }))).toBeLessThanOrEqual(36);
