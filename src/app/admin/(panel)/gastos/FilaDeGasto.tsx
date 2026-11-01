@@ -12,14 +12,17 @@ export function FilaDeGasto({ gasto }: { gasto: Gasto }) {
   return (
     <li className="flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors duration-200 hover:bg-secondary/50">
       <BaldosaDeFecha fecha={gasto.fecha} />
+      {/* Lo largo baja de renglón: en el celular, con puntos suspensivos no se leía. */}
       <div className="flex-1 min-w-0 space-y-1">
         <Link
           href={`/admin/gastos/${gasto.id}`}
-          className="block text-sm font-semibold truncate hover:text-primary transition-colors"
+          className="block text-sm font-semibold wrap-break-word hover:text-primary transition-colors"
         >
           {nombreDelGasto(gasto)}
         </Link>
-        <p className="text-[11px] text-muted-foreground truncate">{detalleDelGasto(gasto)}</p>
+        <p className="text-[11px] text-muted-foreground wrap-break-word">
+          {detalleDelGasto(gasto)}
+        </p>
         {marcas.length > 0 ? (
           <span className="flex flex-wrap gap-1">
             {marcas.map((marca) => (

@@ -43,7 +43,8 @@ export function TarjetaDeUsuario({ fila, yo }: { fila: FilaDeUsuario; yo: string
               </span>
             ) : null}
           </div>
-          <p className="truncate text-xs text-neutral-500">{fila.email}</p>
+          {/* Un email no tiene espacios: se parte donde haga falta para leerse entero. */}
+          <p className="wrap-anywhere text-xs text-neutral-500">{fila.email}</p>
         </div>
         <InsigniaDeEstado tono={TONOS[estado]}>{estado}</InsigniaDeEstado>
       </div>
