@@ -17,6 +17,7 @@ export type SemillaDeProducto = {
   // Un monto propio por presentacion, en centavos; null es heredar.
   precios?: (number | null)[];
   etiqueta?: 'mas_vendido' | 'artesanal' | 'nuevo' | null;
+  nombre?: string;
 };
 export type CategoriaSembrada = {
   id: string;
@@ -132,7 +133,7 @@ async function filaDeProducto(
   return {
     local_id: categoria.localId,
     categoria_id: categoria.id,
-    nombre: nombreDePrueba('Producto'),
+    nombre: semilla.nombre ?? nombreDePrueba('Producto'),
     etiqueta: semilla.etiqueta ?? null,
     orden: await siguienteOrden(secreto, 'productos', { categoria_id: categoria.id }),
     visible: semilla.visible ?? true,

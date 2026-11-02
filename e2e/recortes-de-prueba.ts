@@ -1,12 +1,26 @@
-import { borrarCierres, sembrarCierre } from '../tests/cierres-de-prueba';
+import { randomUUID } from 'node:crypto';
+import { diaEnArgentina } from '../src/lib/fechas';
+import { sumarDias } from '../src/lib/reportes/periodos';
+import {
+  borrarCierres,
+  diaLibre,
+  sembrarCierre,
+  sembrarCierreConSalidas,
+} from '../tests/cierres-de-prueba';
 import {
   borrarCategoriasConSusGastos,
   sembrarCategoriaDeGasto,
   sembrarGasto,
+  sembrarPorPagar,
 } from '../tests/gastos-de-prueba';
 import { borrarProveedores, sembrarProveedor } from '../tests/proveedores-de-prueba';
 import { sembrarVentaConRenglones } from '../tests/reportes-de-prueba';
-import { borrarVentas, productoParaVender, sembrarVentaConPago } from '../tests/ventas-de-prueba';
+import {
+  borrarVentas,
+  productoParaVender,
+  sembrarCanal,
+  sembrarVentaConPago,
+} from '../tests/ventas-de-prueba';
 
 /** Mayo de 2015: un periodo que no siembra ningun otro test; abril queda para comparar. */
 export const MAYO_2015 = { desde: '2015-05-01', hasta: '2015-05-31' };
@@ -90,4 +104,76 @@ export async function borrarNombresLargos(s: SiembraDeNombresLargos) {
   // Primero el gasto: apunta al proveedor.
   await borrarCategoriasConSusGastos([s.categoria.id]);
   await borrarProveedores([s.proveedor.id]);
+}
+
+// Un sufijo corto: los nombres de categorias, proveedores y canales no se repiten en el local.
+const conSufijo = (texto: string) => `${texto} ${randomUUID().slice(0, 4)}`;
+
+export const TEXTOS_LARGOS = {
+  producto: conSufijo('Medialuna de manteca rellena de dulce de leche y crema'),
+  categoria: conSufijo('Mantenimiento de la cámara de frío y las heladeras'),
+  porPagar: 'Reparación completa de la cámara de frío del depósito del fondo',
+  proveedor: conSufijo('Distribuidora de Lácteos y Quesos del Valle Calchaquí'),
+  queCompra: 'Manteca, crema de leche, quesos duros y ricota para los rellenos',
+  canal: conSufijo('Pedidos por WhatsApp para eventos y empresas'),
+  paraClasificar: 'Bolsas de hielo, servilletas y vasos descartables para el mostrador',
+};
+
+export type SiembraDeTextosLargos = {
+  venta: string;
+  categoriaDelMenu: string;
+  categoriaDeGasto: string;
+  cierre: string;
+  proveedor: string;
+  canal: string;
+};
+
+/** Hoy: una venta grande, un gasto y algo por pagar, con textos largos. */
+async function sembrarDeHoy(
+  producto: Awaited<ReturnType<typeof productoParaVender>>,
+  categoriaId: string,
+) {
+  const hoy = diaEnArgentina(new Date());
+  return Promise.all([
+    sembrarVentaConRenglones({
+      fecha: hoy,
+      renglones: [{ producto, cantidad: 3, precioCentavos: 990000000 }],
+    }),
+    sembrarGasto({ categoriaId, fecha: hoy, montoCentavos: 250000000 }),
+    sembrarPorPagar({
+      categoriaId,
+      descripcion: TEXTOS_LARGOS.porPagar,
+      vencimiento: sumarDias(hoy, 3),
+    }),
+  ]);
+}
+
+/** Nombres y descripciones largas en cada lista que antes los cortaba con puntos suspensivos. */
+export async function sembrarTextosLargos(): Promise<SiembraDeTextosLargos> {
+  const [producto, categoria, proveedor, canal, cierre] = await Promise.all([
+    productoParaVender(true, TEXTOS_LARGOS.producto),
+    sembrarCategoriaDeGasto({ nombre: TEXTOS_LARGOS.categoria }),
+    sembrarProveedor({ nombre: TEXTOS_LARGOS.proveedor, queCompra: TEXTOS_LARGOS.queCompra }),
+    sembrarCanal(true, TEXTOS_LARGOS.canal),
+    // Un gasto pagado con la caja queda "para clasificar": la base no deja cargarlo de otra forma.
+    sembrarCierreConSalidas(diaLibre(), TEXTOS_LARGOS.paraClasificar),
+  ]);
+  const [venta] = await sembrarDeHoy(producto, categoria.id);
+  return {
+    venta,
+    categoriaDelMenu: producto.categoriaId,
+    categoriaDeGasto: categoria.id,
+    cierre,
+    proveedor: proveedor.id,
+    canal: canal.id,
+  };
+}
+
+export async function borrarTextosLargos(s: SiembraDeTextosLargos) {
+  await Promise.all([
+    borrarVentas([s.venta], { canales: [s.canal], categoriasDelMenu: [s.categoriaDelMenu] }),
+    borrarCategoriasConSusGastos([s.categoriaDeGasto]),
+    borrarCierres([s.cierre]),
+    borrarProveedores([s.proveedor]),
+  ]);
 }

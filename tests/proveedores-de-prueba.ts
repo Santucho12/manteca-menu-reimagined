@@ -7,6 +7,7 @@ export type SemillaDeProveedor = {
   activo?: boolean;
   nombre?: string;
   telefono?: string | null;
+  queCompra?: string | null;
 };
 export type ProveedorSembrado = { id: string; nombre: string };
 
@@ -24,6 +25,7 @@ export async function sembrarProveedor(
     local_id: await local(secreto),
     nombre: semilla.nombre ?? nombreDeProveedor(),
     telefono: semilla.telefono ?? null,
+    que_compra: semilla.queCompra ?? null,
     activo: semilla.activo ?? true,
   };
   const { data, error } = await secreto

@@ -124,19 +124,29 @@ async function sinClasificarDe(local: string): Promise<string> {
   return data.id;
 }
 
-/** Un cierre de Caja con un retiro y un gasto de caja ('Hielo'), como los deja la pantalla. */
-export async function sembrarCierreConSalidas(fecha: string): Promise<string> {
-  const secreto = clienteSecretoDePruebas();
-  const { id } = await sembrarCierre({ fecha });
-  const base = { local_id: await idDelLocalPrincipal(secreto), cierre_id: id };
-  const gasto = {
+type BaseDeSalida = { local_id: string; cierre_id: string };
+
+// Lo que se paga con la caja entra sin clasificar: lo clasifica el admin despues.
+async function gastoDeCaja(base: BaseDeSalida, fecha: string, descripcion: string) {
+  return {
     ...base,
     fecha,
     categoria_id: await sinClasificarDe(base.local_id),
     monto_centavos: 120000,
-    descripcion: 'Hielo',
+    descripcion,
     medio_de_pago: 'efectivo_caja' as const,
   };
+}
+
+/** Un cierre de Caja con un retiro y un gasto de caja ('Hielo'), como los deja la pantalla. */
+export async function sembrarCierreConSalidas(
+  fecha: string,
+  descripcion = 'Hielo',
+): Promise<string> {
+  const secreto = clienteSecretoDePruebas();
+  const { id } = await sembrarCierre({ fecha });
+  const base = { local_id: await idDelLocalPrincipal(secreto), cierre_id: id };
+  const gasto = await gastoDeCaja(base, fecha, descripcion);
   const salidas = await Promise.all([
     secreto.from('retiros_de_caja').insert({ ...base, monto_centavos: 500000, quien: 'Dueño' }),
     secreto.from('gastos').insert(gasto),
