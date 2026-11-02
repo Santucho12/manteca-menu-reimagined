@@ -29,14 +29,19 @@ describe('variacion', () => {
 
   it('lo muestra con signo, en pesos y en porcentaje', () => {
     expect(textoDeVariacion({ diferenciaCentavos: 30000, porcentaje: 25 })).toBe(
-      '+$300,00 (+25 %)',
+      '+$300,00 (+25 %)',
     );
     expect(textoDeVariacion({ diferenciaCentavos: -200000, porcentaje: -66.7 })).toBe(
-      '-$2.000,00 (-66,7 %)',
+      '-$2.000,00 (-66,7 %)',
     );
-    expect(textoDeVariacion({ diferenciaCentavos: 0, porcentaje: 0 })).toBe('$0,00 (0 %)');
+    expect(textoDeVariacion({ diferenciaCentavos: 0, porcentaje: 0 })).toBe('$0,00 (0 %)');
     expect(textoDeVariacion({ diferenciaCentavos: 5000, porcentaje: null })).toBe('+$50,00');
     expect(textoDeVariacion(null)).toBe('Sin datos para comparar');
+  });
+
+  it('el porcentaje no se parte en dos renglones: solo se corta antes del paréntesis', () => {
+    const texto = textoDeVariacion({ diferenciaCentavos: -213800, porcentaje: -100 });
+    expect(texto.split(' ')).toEqual(['-$2.138,00', '(-100 %)']);
   });
 });
 
@@ -74,5 +79,5 @@ describe('textoDeVariacion con otro formato', () => {
         { diferenciaCentavos: -42375062, porcentaje: -15.8 },
         formatearPesosRedondeados,
       ),
-    ).toBe('-$423.751 (-15,8 %)'));
+    ).toBe('-$423.751 (-15,8 %)'));
 });

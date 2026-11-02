@@ -26,7 +26,9 @@ export function compararFilas<T>(
 }
 
 const signo = (numero: number) => (numero > 0 ? '+' : numero < 0 ? '-' : '');
-const porciento = (p: number) => `${signo(p)}${String(Math.abs(p)).replace('.', ',')} %`;
+// El % va pegado a su número con un espacio que no corta: en un renglón angosto el texto se parte
+// antes del paréntesis y nunca queda "(-100" arriba y "%)" abajo.
+const porciento = (p: number) => `${signo(p)}${String(Math.abs(p)).replace('.', ',')} %`;
 
 export function textoDeVariacion(v: Variacion, formato = formatearPesos): string {
   if (!v) return 'Sin datos para comparar';

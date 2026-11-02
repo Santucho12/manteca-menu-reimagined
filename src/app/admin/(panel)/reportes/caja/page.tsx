@@ -80,7 +80,15 @@ function Diferencias({ datos }: { datos: ReturnType<typeof diferenciasDelGrafico
   if (datos.length === 0) {
     return <p className="text-xs text-muted-foreground">Todavía no hay cierres en este período.</p>;
   }
-  return <GraficoDeBarras datos={datos} />;
+  // Un renglón por cierre, todos: el gráfico cuenta el período entero, no los diez primeros días.
+  return (
+    <GraficoDeBarras
+      datos={datos}
+      etiqueta="Gráfico de la diferencia de cada cierre"
+      limite={datos.length}
+      altoDeBarra={24}
+    />
+  );
 }
 
 export default async function ReporteDeCaja({

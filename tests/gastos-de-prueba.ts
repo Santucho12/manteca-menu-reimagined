@@ -12,6 +12,7 @@ export type SemillaDeGasto = {
   fecha?: string;
   proveedorId?: string | null;
   anulado?: boolean;
+  descripcion?: string | null;
 };
 export type SemillaDeRecurrente = {
   categoria?: string;
@@ -74,6 +75,7 @@ async function filaDeGasto(secreto: Cliente, semilla: SemillaDeGasto) {
     categoria_id: categoria,
     monto_centavos: semilla.montoCentavos ?? 1234550,
     proveedor_id: semilla.proveedorId ?? null,
+    descripcion: semilla.descripcion ?? null,
     medio_de_pago: 'transferencia' as const,
     anulado: semilla.anulado ?? false,
     motivo_anulacion: semilla.anulado ? 'Cargado de mas' : null,

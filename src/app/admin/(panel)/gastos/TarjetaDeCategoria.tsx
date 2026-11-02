@@ -30,7 +30,7 @@ function GastosDeLaCategoria({ categoria }: { categoria: ResumenDeCategoria }) {
           <span className="w-12 shrink-0 rounded-xl bg-white py-1 text-center text-xs font-bold text-muted-foreground shadow-xs">
             {fechaParaMostrar(gasto.fecha).slice(0, 5)}
           </span>
-          <span className="min-w-0 flex-1 truncate font-medium">
+          <span className="min-w-0 flex-1 wrap-break-word font-medium">
             {gasto.descripcion ?? 'Sin descripción'}
           </span>
           <span className="shrink-0 font-display text-base font-bold tabular-nums">
@@ -55,7 +55,8 @@ export function TarjetaDeCategoria({ categoria, enlace, activa }: Props) {
           activa ? 'border-foreground/30 ring-2 ring-foreground/10' : 'border-border',
         )}
       >
-        <span className="block truncate text-sm font-semibold text-muted-foreground">
+        {/* El nombre largo baja de renglón: en dos columnas de celular no entraba. */}
+        <span className="block wrap-break-word text-sm font-semibold text-muted-foreground">
           {categoria.nombre}
         </span>
         <strong className="mt-2 block font-display text-xl font-bold tracking-tight sm:text-2xl">

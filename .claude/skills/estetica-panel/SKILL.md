@@ -139,6 +139,14 @@ Y lo que cambia por ser Next y no una sola página:
   etiquetas, las insignias y los títulos de columna, 20 en la X de las ventanas, 22 en el ⓘ.
 - **Sin modo oscuro** (las clases `dark:` de PRP no se copian) y **sin esqueletos de carga**.
 - **Textos**: español rioplatense con voseo, como PRP ("Buscá, filtrá y organizá").
+- **Nada se corta en el celular** (Santiago, 2026-11-01, pedido 79). El texto de contenido
+  (nombres, descripciones, detalles, emails) baja de renglón con `wrap-break-word` (un email,
+  con `wrap-anywhere`) en lugar del `truncate` de las recetas de PRP. Siguen con `truncate` solo
+  los rótulos de controles y barras: un desplegable, el nombre de un archivo, quien entró. Las
+  tablas de los reportes entran justas en 360 px y, si un monto no entra, se deslizan dentro de su
+  tarjeta. Los ejes de los gráficos llevan montos cortos (`pesosCortos`: $12 M) y lugar a la
+  derecha para el último número; el monto exacto va en la ventanita. Lo prueba
+  `e2e/recortes.spec.ts`.
 
 Las reglas de `CLAUDE.md` siguen valiendo: las recetas son JSX de muestra y en Manteca se parten
 en componentes de hasta 80 líneas, con la lógica en `.ts` y nombres en español.

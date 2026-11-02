@@ -16,8 +16,9 @@ import { crearCanalDesdeElPanel, editarCanalDesdeElPanel } from '../acciones';
 
 type Datos = z.infer<typeof esquemaCanal>;
 
-// El botón vive dentro del campo, a la derecha: escribir y sumar es un solo gesto.
-const BOTON = `${ACCESO_SECUNDARIO} absolute right-1 top-1 h-9! flex-none pl-1.5`;
+// Desde la tablet, el botón vive dentro del campo, a la derecha: escribir y sumar es un solo
+// gesto. En el celular va abajo y a lo ancho: adentro tapaba el ejemplo del campo.
+const BOTON = `${ACCESO_SECUNDARIO} mt-3 w-full flex-none pl-1.5 sm:absolute sm:right-1 sm:top-1 sm:mt-0 sm:w-auto sm:h-9!`;
 
 function BotonSumar({ enviando }: { enviando: boolean }) {
   return (
