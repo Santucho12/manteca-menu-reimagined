@@ -15,7 +15,7 @@ import {
 import { formatearPesos } from '@/lib/plata';
 import { FilaPorPagar } from './FilaPorPagar';
 
-const NOMBRE = 'block text-sm font-semibold truncate hover:text-primary transition-colors';
+const NOMBRE = 'block text-sm font-semibold wrap-break-word hover:text-primary transition-colors';
 
 function Pausados({ pausados }: { pausados: FilaDeRecurrente[] }) {
   return (
