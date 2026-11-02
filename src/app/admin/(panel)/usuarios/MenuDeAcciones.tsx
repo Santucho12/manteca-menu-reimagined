@@ -19,7 +19,7 @@ export function MenuDeAcciones({ acciones, deshabilitado, alElegir }: Props) {
       <DropdownMenu.Trigger
         aria-label="Más acciones"
         disabled={deshabilitado}
-        className="flex size-9 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:opacity-50"
+        className="flex size-9 shrink-0 pointer-coarse:size-11 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:opacity-50"
       >
         <MoreVertical size={18} aria-hidden="true" />
       </DropdownMenu.Trigger>
