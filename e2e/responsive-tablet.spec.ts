@@ -159,6 +159,17 @@ test.describe('en una tablet, con el dedo', () => {
     });
   });
 
+  test('el menú de cada cuenta y Sumar de Tipos de venta se tocan sin errarle', async ({
+    page,
+  }) => {
+    await page.goto('/admin/usuarios');
+    const menu = page.getByRole('button', { name: 'Más acciones' }).first();
+    expect(await alto(menu)).toBeGreaterThanOrEqual(44);
+    expect(await menu.evaluate((n) => (n as HTMLElement).offsetWidth)).toBeGreaterThanOrEqual(44);
+    await page.goto('/admin/ventas/canales');
+    expect(await alto(page.getByRole('button', { name: 'Sumar' }))).toBeGreaterThanOrEqual(44);
+  });
+
   test('un interruptor responde aunque el dedo caiga apenas afuera', async ({ page }) => {
     await page.goto('/admin/ventas/canales');
     const caja = (await page.getByRole('switch').first().boundingBox())!;
