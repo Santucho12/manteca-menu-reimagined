@@ -139,6 +139,7 @@ describe('ayudas', () => {
       [
         'Cómo se vende',
         'Mismo precio para todos los productos',
+        'pisarlo',
         'Más vendido',
         'Artesanal',
         'Nuevo',
