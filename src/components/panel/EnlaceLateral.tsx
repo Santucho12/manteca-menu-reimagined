@@ -43,7 +43,9 @@ export function EnlaceLateral({
       aria-current={activo ? 'page' : undefined}
       className={cn(
         'relative group w-full flex items-center font-semibold transition-all duration-300 rounded-2xl',
-        compacto ? 'gap-2.5 px-3.5 py-2 text-[13px] rounded-xl' : 'gap-3 px-4 py-3.5 text-sm',
+        compacto
+          ? 'gap-2.5 px-3.5 py-2 [@media(max-height:760px)]:py-1.5 text-[13px] rounded-xl'
+          : 'gap-3 px-4 py-3.5 text-sm',
         activo
           ? 'text-foreground font-bold bg-secondary/70'
           : 'border border-transparent text-muted-foreground hover:text-foreground hover:bg-white hover:border-border hover:shadow-md hover:shadow-slate-900/5',
