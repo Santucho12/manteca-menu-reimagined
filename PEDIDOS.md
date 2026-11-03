@@ -150,6 +150,9 @@ Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, 
 
 **Excepción (Santiago, 2026-10-21):** los colores del panel son los exactos de Plan Reminder Pro aunque no pasen el contraste AA que pide el pedido 21 (letra blanca sobre el verde, 2,6 a 1; el rojo de error, 3,6; el anillo de foco, 2,5; los grises chicos, 2,6). Las pruebas de contraste (`tests/contraste.test.ts`) siguen mirando solo la carta pública; no se extienden al panel. El panel no bloquea el zoom en el celular, a diferencia de Plan Reminder Pro (Santiago, 2026-10-22).
 
+### 83. Barra lateral sin desplazamiento
+En la computadora, la barra lateral no se tiene que poder desplazar (Santiago, 2026-11-02). En una pantalla baja, los grupos y los enlaces se juntan para entrar.
+
 ### 82. Menú: avisar antes de que un producto pise el precio de su categoría
 Al cargar o cambiar el precio de un producto, si ese precio reemplaza el que la categoría tiene para todos sus productos, avisar que el producto hoy toma el precio de esa categoría y pedir confirmación antes de guardar (Santiago, 2026-11-02).
 
@@ -307,6 +310,7 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 83 | Barra lateral sin desplazamiento | **Excepción (Santiago, 2026-11-02):** hecho rápido, sin test ni verificación, porque él lo pidió así. Falta: su prueba de Playwright, `npm run verificar`, `npm run e2e` y mirar que en una pantalla baja (por ejemplo 1366×768) entren todos los enlaces |
 | 75 | Bases de Supabase y funciones de Vercel en São Paulo | Postergado por Santiago (2026-10-29): se hace otro día. Ya relevado: Supabase no cambia la región de un proyecto existente; se crea uno nuevo eligiendo la región específica «South America (São Paulo)», no la general «Americas», que deja elegir a Supabase. Hay que respetar el límite de dos proyectos gratis: copia completa de las dos bases con `pg_dump` (instalado en la máquina), pausar la real vieja, crear y restaurar primero la de pruebas, y después la real. Ninguna base tiene fotos en Storage; la real tiene el menú (6 categorías y 35 productos), 1 usuario y la auditoría. El 2026-10-30 las dos bases ya estaban en proyectos nuevos (`dfyresrfvawslsferjgg` y `jmtwopfgbvgmutinftcb`; no se comprobó la región): al pasarlas faltaron los disparadores de `auth.users`, la policy de fotos y la confirmación de email apagada, y se restauraron (pedido 76) |
 | 72 | Inicio: cartelito de la semana y aviso nuevo | Todo |
 | 71 | Menú: filas que abren el detalle, iconos nuevos y «Aumentar precios» | Todo |
