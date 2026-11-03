@@ -55,6 +55,11 @@ El precio puede estar en dos lugares.
 
 La pantalla dice siempre de dónde sale el precio que se está viendo.
 
+Si al cargar o editar un producto se le pone un precio propio donde la categoría tiene uno
+para todos, antes de guardar la pantalla avisa que el producto está tomando el precio de la
+categoría ("Docena: $22.000 en lugar de $20.000") y pregunta si se quiere pisarlo. Cambiar un
+precio que ya era propio no pregunta (Santiago, 2026-11-02, pedido 82).
+
 En la pantalla no se usan esas palabras, porque no se entendían (Santiago, 2026-10-27, pedido 55):
 las presentaciones son "Cómo se vende", con una columna "Se vende por" para el nombre, y el
 precio compartido es la casilla "Mismo precio para todos los productos", con el "Precio para

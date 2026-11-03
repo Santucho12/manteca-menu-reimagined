@@ -59,7 +59,7 @@ export function GastosEnTorta({ gastos }: { gastos: GastoDelDia[] }) {
                   className="h-3 w-3 shrink-0 rounded-sm"
                   style={{ background: COLORES[i % COLORES.length] }}
                 />
-                <span className="flex-1 truncate font-semibold">{r.nombre}</span>
+                <span className="flex-1 min-w-0 wrap-break-word font-semibold">{r.nombre}</span>
                 <span className="font-bold tabular-nums">
                   {String(r.porcentaje).replace('.', ',')} %
                 </span>

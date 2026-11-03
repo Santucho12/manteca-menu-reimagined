@@ -47,12 +47,12 @@ export async function idDeCategoria(nombre: string, otroLocal = false): Promise<
 
 /** Una categoria de prueba con nombre unico. */
 export async function sembrarCategoriaDeGasto(
-  semilla: { otroLocal?: boolean; activo?: boolean; pideProveedor?: boolean } = {},
+  semilla: { otroLocal?: boolean; activo?: boolean; pideProveedor?: boolean; nombre?: string } = {},
 ): Promise<{ id: string; nombre: string }> {
   const secreto = clienteSecretoDePruebas();
   const fila = {
     local_id: await localDe(secreto, semilla.otroLocal),
-    nombre: `Categoria ${randomUUID().slice(0, 8)}`,
+    nombre: semilla.nombre ?? `Categoria ${randomUUID().slice(0, 8)}`,
     pide_proveedor: semilla.pideProveedor ?? false,
     activo: semilla.activo ?? true,
   };

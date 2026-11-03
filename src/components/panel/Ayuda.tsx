@@ -59,7 +59,7 @@ function VentanaDeAyuda({ ayuda, abierta, cerrar }: PropsDeLaVentana) {
                 <div className="w-10 h-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                   <Info size={20} />
                 </div>
-                <h2 className="text-lg font-bold tracking-tight truncate">{ayuda.titulo}</h2>
+                <h2 className="text-lg font-bold tracking-tight wrap-break-word">{ayuda.titulo}</h2>
               </div>
               <button
                 type="button"

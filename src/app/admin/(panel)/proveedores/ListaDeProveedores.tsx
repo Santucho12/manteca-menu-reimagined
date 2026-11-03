@@ -103,11 +103,11 @@ function Tarjeta({ fila }: { fila: FilaConPagado }) {
           <div className="min-w-0">
             <Link
               href={`/admin/proveedores/${fila.id}`}
-              className="block max-w-full text-sm font-bold truncate"
+              className="block max-w-full text-sm font-bold wrap-break-word"
             >
               {fila.nombre}
             </Link>
-            <p className="text-xs text-muted-foreground truncate">
+            <p className="text-xs text-muted-foreground wrap-break-word">
               <span className="sr-only">Qué le comprás: </span>
               {fila.que_compra ?? 'Sin cargar'}
             </p>

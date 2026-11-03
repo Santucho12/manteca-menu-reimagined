@@ -11,6 +11,7 @@ import { Casilla } from '@/components/formularios/Casilla';
 import { PieDelFormulario } from '@/components/formularios/PieDelFormulario';
 import { conValorInicial } from '@/lib/formularios/valorInicial';
 import { esquemaProducto, type DatosDeProducto } from '@/lib/menu/esquemas';
+import { useAvisoDePisar } from '@/lib/menu/useAvisoDePisar';
 import { useGuardado } from '@/lib/menu/useGuardado';
 import {
   usePreciosSegunCategoria,
@@ -18,6 +19,7 @@ import {
 } from '@/lib/menu/usePreciosSegunCategoria';
 import { guardarProductoDelMenu } from '../acciones';
 import { ConfirmacionDeOcultar } from '../ConfirmacionDeOcultar';
+import { ConfirmacionDePisar } from './ConfirmacionDePisar';
 import { PreciosDelFormulario } from './PreciosDelFormulario';
 
 const ETIQUETAS = [
@@ -41,6 +43,8 @@ export function FormularioDeProducto({ inicial, opciones }: Props) {
     defaultValues: inicial,
   });
   const guardado = useGuardado(guardarProductoDelMenu, () => router.push('/admin/menu'));
+  // Si un precio nuevo pisa el de la categoria, primero se pregunta (pedido 82).
+  const aviso = useAvisoDePisar(opciones, guardado.enviar);
   const {
     register,
     handleSubmit,
@@ -53,7 +57,7 @@ export function FormularioDeProducto({ inicial, opciones }: Props) {
   ];
   return (
     <FormProvider {...formulario}>
-      <form onSubmit={handleSubmit(guardado.enviar)} noValidate className="space-y-5">
+      <form onSubmit={handleSubmit(aviso.revisar)} noValidate className="space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <CampoDeSeleccion
             id="categoria"
@@ -84,7 +88,15 @@ export function FormularioDeProducto({ inicial, opciones }: Props) {
         <CamposDelProducto opciones={opciones} />
         <Casilla id="visible" etiqueta="Se muestra en el menú" {...registro('visible')} />
         {guardado.mensaje ? <AvisoDeError mensaje={guardado.mensaje} /> : null}
-        {guardado.pendiente ? (
+        {aviso.pendiente ? (
+          <ConfirmacionDePisar
+            categoria={aviso.pendiente.categoria}
+            precios={aviso.pendiente.precios}
+            enviando={guardado.enviando}
+            alConfirmar={aviso.confirmar}
+            alVolver={aviso.volver}
+          />
+        ) : guardado.pendiente ? (
           <ConfirmacionDeOcultar
             productos={guardado.pendiente}
             enviando={guardado.enviando}

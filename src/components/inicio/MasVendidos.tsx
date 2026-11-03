@@ -34,8 +34,8 @@ export function MasVendidos({ productos }: { productos: ProductoDelReporte[] }) 
             <li key={producto.clave} className="flex-1 py-3 flex items-center gap-3">
               <Puesto posicion={posicion} />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold truncate">{producto.nombre}</p>
-                <p className="text-[11px] text-muted-foreground truncate">
+                <p className="text-sm font-semibold wrap-break-word">{producto.nombre}</p>
+                <p className="text-[11px] text-muted-foreground wrap-break-word">
                   {textoDePresentaciones(producto)}
                 </p>
               </div>

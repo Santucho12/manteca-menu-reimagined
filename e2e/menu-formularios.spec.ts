@@ -190,6 +190,50 @@ test('cambiar de categoria cambia los precios que se piden', async ({ page }) =>
   await expect(page.getByLabel('Precio de Docena')).toHaveCount(0);
 });
 
+test('un precio que pisa el de la categoria pide confirmar antes de guardarse', async ({
+  page,
+}) => {
+  const categoria = await sembrarCategoria({
+    presentaciones: ['Docena', 'Unidad'],
+    compartidos: [2000000, null],
+  });
+  categorias.push(categoria.id);
+  const nombre = nombreNuevo();
+  await completarProducto(page, categoria.nombre, nombre);
+  await page.getByLabel('Precio de Docena').fill('22000');
+  await page.getByRole('button', { name: 'Guardar' }).click();
+  const aviso = page.getByRole('alertdialog');
+  await expect(aviso).toContainText(`Este producto está tomando el precio de ${categoria.nombre}`);
+  await expect(aviso).toContainText('Docena: $22.000 en lugar de $20.000');
+  await expect(aviso).toContainText('¿Seguro que querés pisarlo?');
+  await aviso.getByRole('button', { name: 'Volver' }).click();
+  await expect(page.getByRole('alertdialog')).toHaveCount(0);
+  await expect(page).toHaveURL(/\/productos\/nuevo$/);
+  await page.getByRole('button', { name: 'Guardar' }).click();
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Confirmar' }).click();
+  await expect(page).toHaveURL(/\/admin\/menu$/);
+  await expect(page.getByRole('listitem').filter({ hasText: nombre })).toContainText(
+    'Docena $22.000 (propio)',
+  );
+});
+
+test('cambiar un precio que ya era propio se guarda sin preguntar', async ({ page }) => {
+  const categoria = await sembrarCategoria({
+    presentaciones: ['Docena'],
+    compartidos: [2000000],
+  });
+  categorias.push(categoria.id);
+  const producto = await sembrarProducto(categoria, { precios: [2200000] });
+  await page.goto(`/admin/menu/productos/${producto.id}`);
+  await esperarHidratacion(page.getByLabel('Precio de Docena'));
+  await page.getByLabel('Precio de Docena').fill('23000');
+  await page.getByRole('button', { name: 'Guardar' }).click();
+  await expect(page).toHaveURL(/\/admin\/menu$/);
+  await expect(page.getByRole('listitem').filter({ hasText: producto.nombre })).toContainText(
+    'Docena $23.000 (propio)',
+  );
+});
+
 test('un precio con puntos se explica', async ({ page }) => {
   const categoria = await sembrarCategoria();
   categorias.push(categoria.id);

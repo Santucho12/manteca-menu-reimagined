@@ -36,7 +36,7 @@ export function TarjetasDeCanales({ canales }: { canales: Canal[] }) {
             <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
               <Link
                 href={`/admin/ventas/canales/${canal.id}`}
-                className="truncate text-sm font-bold text-foreground"
+                className="min-w-0 wrap-break-word text-sm font-bold text-foreground"
               >
                 {canal.nombre}
               </Link>

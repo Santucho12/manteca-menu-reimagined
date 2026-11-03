@@ -43,8 +43,8 @@ export function FilaPorPagar({
       <BaldosaDeFecha fecha={item.fecha} viene={!vencido} vencido={vencido} chica />
       <div className="flex-1 min-w-0">
         <Nombre item={item} />
-        {/* Primero cuándo vence: si no entra, lo que se corta es el detalle. */}
-        <p className="text-[10px] text-muted-foreground truncate">
+        {/* Primero cuándo vence: si no entra, el detalle baja de renglón. */}
+        <p className="text-[10px] text-muted-foreground wrap-break-word">
           <span className={cn(vencido && 'font-bold text-rose-600')}>
             {cuandoVence(item.fecha, hoy)}
           </span>

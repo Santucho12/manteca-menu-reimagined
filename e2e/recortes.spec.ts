@@ -3,9 +3,12 @@ import { SESIONES } from './ayudas';
 import {
   borrarNombresLargos,
   borrarReportesDeMillones,
+  borrarTextosLargos,
   MAYO_2015,
   sembrarNombresLargos,
   sembrarReportesDeMillones,
+  sembrarTextosLargos,
+  TEXTOS_LARGOS,
 } from './recortes-de-prueba';
 
 test.use({ storageState: SESIONES.admin });
@@ -127,6 +130,34 @@ test.describe('en un celular angosto', () => {
     const boton = page.getByRole('button', { name: 'Sumar' });
     expect(seEncima((await campo.boundingBox())!, (await boton.boundingBox())!)).toBe(false);
     expect(await ejemploEntero(campo)).toBe(true);
+  });
+
+  test('Inicio, Gastos, Proveedores y Tipos de venta muestran enteros los nombres largos', async ({
+    page,
+  }) => {
+    const siembra = await sembrarTextosLargos();
+    const pantallas = [
+      ['/admin', TEXTOS_LARGOS.producto],
+      ['/admin/gastos', TEXTOS_LARGOS.paraClasificar],
+      ['/admin/proveedores', TEXTOS_LARGOS.proveedor],
+      ['/admin/ventas/canales', TEXTOS_LARGOS.canal],
+    ];
+    try {
+      for (const [ruta, texto] of pantallas) {
+        await page.goto(ruta!);
+        await expect(page.getByText(texto!).first()).toBeVisible();
+        expect(await cortados(page), ruta).toEqual([]);
+      }
+    } finally {
+      await borrarTextosLargos(siembra);
+    }
+  });
+
+  test('la ayuda con el título más largo se lee entera', async ({ page }) => {
+    await page.goto('/admin/caja/control');
+    await page.getByRole('button', { name: 'Cómo funciona esta pantalla' }).click();
+    await expect(page.getByRole('dialog')).toContainText('Cómo funciona el control de cierres');
+    expect(await cortados(page)).toEqual([]);
   });
 });
 

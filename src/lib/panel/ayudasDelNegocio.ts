@@ -169,6 +169,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         puntos: [
           'Cada producto tiene nombre, descripción, categoría, precios y una etiqueta opcional: Más vendido, Artesanal o Nuevo.',
           'Carga el precio de cada forma de venta que ofrece: un café puede tener solo Grande. La pantalla dice de dónde sale el precio que ves.',
+          'Si le ponés un precio propio donde la categoría tiene uno para todos, antes de guardar te avisa que el producto está tomando el de la categoría y te pregunta si querés pisarlo.',
           'Un producto que se vende en Fudo pero no va en la carta (una botella de agua) se carga igual, sin marcar que se muestre.',
           'Si lo pasás a una categoría que se vende de otra forma, queda sin precio y se oculta hasta que le cargues uno.',
         ],

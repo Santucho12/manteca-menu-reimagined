@@ -14,9 +14,9 @@ export type ParaVender = {
 };
 
 /** Un producto del menu con precio, listo para venderse. Se limpia con borrarMenuDePrueba. */
-export async function productoParaVender(activo = true): Promise<ParaVender> {
+export async function productoParaVender(activo = true, nombre?: string): Promise<ParaVender> {
   const categoria = await sembrarCategoria();
-  const producto = await sembrarProducto(categoria, { activo });
+  const producto = await sembrarProducto(categoria, { activo, nombre });
   return {
     productoId: producto.id,
     presentacionId: categoria.presentaciones[0]!.id,
@@ -38,11 +38,14 @@ export async function idDeCanal(nombre: string, otroLocal = false): Promise<stri
   return data.id;
 }
 
-export async function sembrarCanal(activo = true): Promise<{ id: string; nombre: string }> {
+export async function sembrarCanal(
+  activo = true,
+  nombre = `Canal ${randomUUID().slice(0, 8)}`,
+): Promise<{ id: string; nombre: string }> {
   const secreto = clienteSecretoDePruebas();
   const fila = {
     local_id: await idDelLocalPrincipal(secreto),
-    nombre: `Canal ${randomUUID().slice(0, 8)}`,
+    nombre,
     activo,
   };
   const { data, error } = await secreto
