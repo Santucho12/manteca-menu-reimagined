@@ -131,7 +131,6 @@ Si los pagos de una venta suman menos que su total, la parte sin pago se muestra
 
 ## Fuera de alcance
 
-- Subir un Excel de Fudo.
 - Cobrar, facturar o modificar algo en Fudo.
 - Descontar stock.
 - Costo y ganancia de cada venta.
