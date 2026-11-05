@@ -26,7 +26,11 @@ alter table public.cierres_de_caja
   add column if not exists comentario_revision text
     check (comentario_revision is null or char_length(comentario_revision) <= 500);
 
+-- Las reglas rechazan cambiar un cierre anulado (PC303) y la auditoria anotaria un cambio que
+-- no hizo nadie: se apagan solo para devolverles su estado.
+alter table public.cierres_de_caja disable trigger reglas, disable trigger auditar;
 update public.cierres_de_caja set estado = 'anulado' where anulado;
+alter table public.cierres_de_caja enable trigger reglas, enable trigger auditar;
 
 create or replace function public.reglas_de_cierres()
 returns trigger
