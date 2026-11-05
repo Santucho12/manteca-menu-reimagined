@@ -1,5 +1,5 @@
 -- Esquema completo de la base del Sistema Manteca, al dia con la ultima migracion
--- (20261012120000_revision_fase_1). Se actualiza en el mismo cambio que cada
+-- (20261028200000_gastos_efectivo_y_cheque). Se actualiza en el mismo cambio que cada
 -- migracion.
 
 -- Tipos
@@ -3216,3 +3216,393 @@ revoke all on function public.generar_por_pagar(date, uuid) from public, anon, a
 grant execute on function public.generar_por_pagar(date, uuid) to service_role;
 revoke all on function public.generar_gastos_recurrentes(date) from public, anon, authenticated;
 grant execute on function public.generar_gastos_recurrentes(date) to service_role;
+
+-- 20261028120000_ventas_excel_de_fudo
+
+-- Subir el Excel de Fudo: la funcion que guarda lo que dice la hoja "Medios de pago", un dia y
+-- un medio por lote, como tantas ventas de origen Fudo como diga el Excel, sin productos.
+-- Subir otra vez el mismo dia y medio actualiza lo que cambio y anula las que sobren, sin
+-- borrar nada. Una venta de Fudo sigue sin anularse a mano; solo la subida anula las suyas.
+
+create or replace function public.ventas_validar_excel(lotes jsonb)
+returns void
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+begin
+  if not public.es_admin_activo() then
+    raise exception 'No tenes permiso para subir ventas' using errcode = '42501';
+  end if;
+  if jsonb_typeof(lotes) is distinct from 'array' or jsonb_array_length(lotes) not between 1 and 2000 then
+    raise exception 'La subida no tiene lotes validos' using errcode = 'PV308';
+  end if;
+  if exists (select 1 from jsonb_array_elements(lotes) l
+             where jsonb_typeof(l -> 'montos') is distinct from 'array'
+                or jsonb_array_length(l -> 'montos') not between 1 and 5000
+                or coalesce((l ->> 'fecha') !~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$', true)
+                or (l ->> 'medio') is null
+                or not ((l ->> 'medio') = any (enum_range(null::public.medio_de_caja)::text[]))
+                or exists (select 1 from jsonb_array_elements(l -> 'montos') m
+                            where jsonb_typeof(m) is distinct from 'number' or (m #>> '{}') !~ '^[0-9]+$')) then
+    raise exception 'Un lote de la subida no es valido' using errcode = 'PV308';
+  end if;
+  if (select count(distinct (l ->> 'fecha') || '|' || (l ->> 'medio')) <> count(*)
+        from jsonb_array_elements(lotes) l) then
+    raise exception 'La subida repite un dia y un medio' using errcode = 'PV308';
+  end if;
+  if exists (select 1 from jsonb_array_elements(lotes) l
+             where (l ->> 'fecha')::date > (now() at time zone 'America/Argentina/Buenos_Aires')::date) then
+    raise exception 'No se carga una venta de un dia que no llego' using errcode = 'PV301';
+  end if;
+end
+$$;
+
+-- Un dia y un medio: devuelve cuantas ventas se crearon, se actualizaron, quedaron iguales y
+-- se anularon. Las ventas del lote se emparejan con las que ya habia por orden de carga.
+create or replace function public.ventas_aplicar_lote(el_local uuid, lote jsonb)
+returns int[]
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  la_fecha date := (lote ->> 'fecha')::date;
+  el_medio public.medio_de_caja := (lote ->> 'medio')::public.medio_de_caja;
+  montos bigint[] := array(select (m #>> '{}')::bigint
+                             from jsonb_array_elements(lote -> 'montos') with ordinality t(m, n) order by n);
+  vigentes uuid[] := array(select v.id from public.ventas v
+                            where v.local_id = el_local and v.origen = 'fudo' and not v.anulado
+                              and v.fudo_id like 'excel:' || la_fecha || ':' || el_medio || ':%'
+                            order by v.fecha_creacion, v.id);
+  cantidad_vigentes int := coalesce(cardinality(vigentes), 0);
+  resultado int[] := array[0, 0, 0, 0];
+  i int;
+  cambio int;
+begin
+  for i in 1..cardinality(montos) loop
+    if i > cantidad_vigentes then
+      perform public.ventas_crear_del_excel(el_local, la_fecha, el_medio, montos[i]);
+      resultado[1] := resultado[1] + 1;
+    else
+      update public.ventas set total_centavos = montos[i] where id = vigentes[i] and total_centavos <> montos[i];
+      get diagnostics cambio = row_count;
+      update public.pagos_de_venta set monto_centavos = montos[i] where venta_id = vigentes[i] and monto_centavos <> montos[i];
+      resultado[2 + (1 - cambio)] := resultado[2 + (1 - cambio)] + 1;
+    end if;
+  end loop;
+  perform set_config('manteca.reemplazando_excel', 'si', true);
+  update public.ventas
+     set anulado = true, motivo_anulacion = 'Reemplazada por una nueva subida del Excel de Fudo'
+   where id = any (vigentes[cardinality(montos) + 1:cantidad_vigentes]);
+  get diagnostics cambio = row_count;
+  perform set_config('manteca.reemplazando_excel', '', true);
+  resultado[4] := cambio;
+  return resultado;
+end
+$$;
+
+create or replace function public.ventas_crear_del_excel(el_local uuid, la_fecha date, el_medio public.medio_de_caja, el_monto bigint)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  nueva uuid;
+begin
+  -- El Excel solo trae el dia: la hora de cierre queda sin dato, no se inventa una.
+  insert into public.ventas (local_id, origen, fudo_id, fecha, cerrada_en, estado, total_centavos, fecha_creacion)
+  values (el_local, 'fudo', 'excel:' || la_fecha || ':' || el_medio || ':' || gen_random_uuid(), la_fecha,
+          null, 'cerrada', el_monto, clock_timestamp())
+  returning id into nueva;
+  insert into public.pagos_de_venta (local_id, venta_id, medio, monto_centavos)
+  values (el_local, nueva, el_medio, el_monto);
+end
+$$;
+
+create or replace function public.ventas_importar_excel(lotes jsonb)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  el_local uuid := public.local_del_usuario();
+  lote jsonb;
+  parcial int[];
+  suma int[] := array[0, 0, 0, 0];
+begin
+  perform public.ventas_validar_excel(lotes);
+  for lote in select l from jsonb_array_elements(lotes) l loop
+    parcial := public.ventas_aplicar_lote(el_local, lote);
+    suma := array[suma[1] + parcial[1], suma[2] + parcial[2], suma[3] + parcial[3], suma[4] + parcial[4]];
+  end loop;
+  return jsonb_build_object('nuevas', suma[1], 'actualizadas', suma[2], 'iguales', suma[3], 'anuladas', suma[4]);
+end
+$$;
+
+-- La unica anulacion de una venta de Fudo que se permite es la de la propia subida del Excel.
+create or replace function public.reglas_de_ventas()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if old.anulado then
+    raise exception 'Una venta anulada no se cambia' using errcode = 'PV305';
+  end if;
+  if new.anulado then
+    if old.origen = 'fudo'
+       and not (coalesce(current_setting('manteca.reemplazando_excel', true), '') = 'si'
+                and old.fudo_id like 'excel:%') then
+      raise exception 'Una venta de Fudo se corrige en Fudo' using errcode = 'PV307';
+    end if;
+    if coalesce(trim(new.motivo_anulacion), '') = '' then
+      raise exception 'Escribi el motivo de la anulacion' using errcode = 'PV306';
+    end if;
+    new.anulado_por := (select auth.uid());
+    new.fecha_anulacion := now();
+  end if;
+  return new;
+end
+$$;
+
+revoke all on function
+  public.ventas_validar_excel(jsonb),
+  public.ventas_aplicar_lote(uuid, jsonb),
+  public.ventas_crear_del_excel(uuid, date, public.medio_de_caja, bigint)
+  from public, anon, authenticated;
+revoke all on function public.ventas_importar_excel(jsonb) from public, anon;
+grant execute on function public.ventas_importar_excel(jsonb) to authenticated;
+
+-- 20261028130000_ventas_borrar_canal
+
+-- Borrar un canal de venta, solo si nunca se uso (excepcion de Santiago a "nada se borra", pedido
+-- 60): uno con ventas se desactiva. La baja queda en la auditoria con el canal tal como estaba,
+-- y por eso la auditoria admite la accion 'baja'.
+
+alter table public.auditoria drop constraint if exists auditoria_accion_check;
+alter table public.auditoria add constraint auditoria_accion_check check (accion in (
+  'alta', 'cambio', 'anulacion', 'desactivacion', 'reactivacion', 'baja',
+  'reseteo_de_contrasena', 'cambio_de_contrasena'
+));
+
+create or replace function public.ventas_borrar_canal(el_canal uuid)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  el_local uuid := public.local_del_usuario();
+  el_borrado public.canales_de_venta;
+begin
+  if not public.es_admin_activo() then
+    raise exception 'No tenes permiso para borrar canales' using errcode = '42501';
+  end if;
+  select * into el_borrado from public.canales_de_venta c
+   where c.id = el_canal and c.local_id = el_local;
+  if not found then
+    raise exception 'Ese canal no esta disponible' using errcode = 'PV303';
+  end if;
+  if exists (select 1 from public.ventas v where v.canal_id = el_canal) then
+    raise exception 'Ese canal ya tiene ventas: se desactiva, no se borra' using errcode = 'PV309';
+  end if;
+  delete from public.canales_de_venta where id = el_canal;
+  insert into public.auditoria (local_id, usuario_id, tabla, registro_id, accion, antes)
+  values (el_local, (select auth.uid()), 'canales_de_venta', el_canal::text, 'baja', to_jsonb(el_borrado));
+end
+$$;
+
+revoke all on function public.ventas_borrar_canal(uuid) from public, anon;
+grant execute on function public.ventas_borrar_canal(uuid) to authenticated;
+
+-- 20261028140000_cierres_fecha_del_fondo
+
+-- Dice de que dia es el cierre del que sale el fondo sugerido (el ultimo sin anular antes de la
+-- fecha), para avisar en la carga cuando no es el de ayer. Solo lee: no cambia datos.
+create or replace function public.cierres_fecha_del_fondo(la_fecha date)
+returns date
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+begin
+  perform public.cierres_exigir_quien_carga();
+  return (select c.fecha from public.cierres_de_caja c
+           where c.local_id = public.local_del_usuario() and not c.anulado and c.fecha < la_fecha
+           order by c.fecha desc limit 1);
+end
+$$;
+
+revoke all on function public.cierres_fecha_del_fondo(date) from public, anon;
+grant execute on function public.cierres_fecha_del_fondo(date) to authenticated;
+
+-- 20261028190000_cierres_rediseno
+
+-- Cierres de caja rediseñados (pedido 66): lo esperado se calcula al mostrar con las ventas del
+-- dia, asi que se sacan el estado y los esperados guardados y todo lo de revisar. El cierre se
+-- puede editar con cierres_editar.
+
+alter table public.cierres_de_caja
+  drop column if exists estado,
+  drop column if exists esperado_efectivo_centavos,
+  drop column if exists esperado_credito_centavos,
+  drop column if exists esperado_debito_centavos,
+  drop column if exists esperado_qr_centavos,
+  drop column if exists esperado_transferencia_centavos,
+  drop column if exists revisado,
+  drop column if exists revisado_por,
+  drop column if exists fecha_revision,
+  drop column if exists comentario_revision;
+
+drop type if exists public.estado_de_cierre;
+
+-- Un cierre guardado solo se anula (con motivo); editar pasa por cierres_editar.
+create or replace function public.reglas_de_cierres()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if old.anulado then
+    raise exception 'Un cierre anulado no se cambia' using errcode = 'PC303';
+  end if;
+  if new.anulado then
+    if coalesce(trim(new.motivo_anulacion), '') = '' then
+      raise exception 'Escribi el motivo de la anulacion' using errcode = 'PC304';
+    end if;
+    new.anulado_por := (select auth.uid());
+    new.fecha_anulacion := now();
+  end if;
+  return new;
+end
+$$;
+
+drop trigger if exists auditar on public.cierres_de_caja;
+create trigger auditar after insert or update on public.cierres_de_caja
+  for each row execute function public.auditar('anulado_por', 'fecha_anulacion');
+
+revoke update on table public.cierres_de_caja from authenticated;
+grant update (anulado, motivo_anulacion) on table public.cierres_de_caja to authenticated;
+
+-- Los cierres del rango con lo declarado y lo vendido ese dia por medio: la cuenta la hace
+-- resultadoDelCierre. Caja recibe solo los suyos y no necesita leer las ventas.
+create or replace function public.cierres_con_resultado(desde date, hasta date, persona uuid default null)
+returns table (
+  id uuid, fecha date, cargado_por uuid, persona_nombre text, anulado boolean,
+  motivo_anulacion text, comentario text,
+  fondo_inicial_centavos bigint, efectivo_centavos bigint, credito_centavos bigint,
+  debito_centavos bigint, qr_centavos bigint, transferencia_centavos bigint,
+  queda_en_caja_centavos bigint, retiros_centavos bigint, gastos_centavos bigint,
+  ventas_efectivo_centavos bigint, ventas_credito_centavos bigint, ventas_debito_centavos bigint,
+  ventas_qr_centavos bigint, ventas_transferencia_centavos bigint, tolerancia_centavos bigint
+)
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+begin
+  perform public.cierres_exigir_quien_carga();
+  return query
+  select c.id, c.fecha, c.cargado_por, p.nombre, c.anulado, c.motivo_anulacion, c.comentario,
+    c.fondo_inicial_centavos, c.efectivo_centavos, c.credito_centavos, c.debito_centavos,
+    c.qr_centavos, c.transferencia_centavos, c.queda_en_caja_centavos,
+    coalesce((select sum(r.monto_centavos) from public.retiros_de_caja r where r.cierre_id = c.id), 0)::bigint,
+    coalesce((select sum(g.monto_centavos) from public.gastos g where g.cierre_id = c.id and not g.anulado), 0)::bigint,
+    coalesce(v.efectivo, 0)::bigint, coalesce(v.credito, 0)::bigint, coalesce(v.debito, 0)::bigint,
+    coalesce(v.qr, 0)::bigint, coalesce(v.transferencia, 0)::bigint,
+    coalesce((select k.tolerancia_centavos from public.configuracion_de_caja k where k.local_id = c.local_id), 50000)
+  from public.cierres_de_caja c
+  join public.perfiles p on p.id = c.cargado_por
+  left join lateral (
+    select sum(pv.monto_centavos) filter (where pv.medio = 'efectivo') as efectivo,
+           sum(pv.monto_centavos) filter (where pv.medio = 'credito') as credito,
+           sum(pv.monto_centavos) filter (where pv.medio = 'debito') as debito,
+           sum(pv.monto_centavos) filter (where pv.medio = 'qr') as qr,
+           sum(pv.monto_centavos) filter (where pv.medio = 'transferencia') as transferencia
+      from public.ventas ve
+      join public.pagos_de_venta pv on pv.venta_id = ve.id
+     where ve.local_id = c.local_id and ve.fecha = c.fecha and ve.estado = 'cerrada' and not ve.anulado
+  ) v on true
+  where c.fecha between desde and hasta
+    and (persona is null or c.cargado_por = persona)
+    and ((public.es_admin_activo() and c.local_id = public.local_del_usuario())
+         or (c.cargado_por = (select auth.uid()) and public.es_caja_activa()))
+  order by c.fecha desc, c.fecha_creacion desc;
+end
+$$;
+
+-- Editar un cierre: cambia lo declarado y reemplaza sus retiros y sus gastos de caja. Los
+-- gastos viejos se anulan con motivo (un gasto de caja no se edita suelto) y los retiros viejos
+-- quedan dichos en la auditoria del cierre.
+create or replace function public.cierres_editar(el_id uuid, datos jsonb)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  el_cierre public.cierres_de_caja;
+  retiros_viejos jsonb;
+  retiros_nuevos jsonb := coalesce(datos -> 'retiros', '[]');
+begin
+  perform public.cierres_exigir_quien_carga();
+  select * into el_cierre from public.cierres_de_caja where id = el_id;
+  if not found or not ((public.es_admin_activo() and el_cierre.local_id = public.local_del_usuario())
+                       or (el_cierre.cargado_por = (select auth.uid()) and public.es_caja_activa())) then
+    raise exception 'No tenes permiso para editar este cierre' using errcode = '42501';
+  end if;
+  if el_cierre.anulado then
+    raise exception 'Un cierre anulado no se cambia' using errcode = 'PC303';
+  end if;
+  update public.cierres_de_caja set
+    fondo_inicial_centavos = (datos ->> 'fondo_inicial_centavos')::bigint,
+    efectivo_centavos = (datos ->> 'efectivo_centavos')::bigint,
+    credito_centavos = coalesce((datos ->> 'credito_centavos')::bigint, 0),
+    debito_centavos = coalesce((datos ->> 'debito_centavos')::bigint, 0),
+    qr_centavos = coalesce((datos ->> 'qr_centavos')::bigint, 0),
+    transferencia_centavos = coalesce((datos ->> 'transferencia_centavos')::bigint, 0),
+    queda_en_caja_centavos = (datos ->> 'queda_en_caja_centavos')::bigint,
+    comentario = nullif(trim(datos ->> 'comentario'), '')
+  where id = el_id;
+  select coalesce(jsonb_agg(jsonb_build_object('monto_centavos', monto_centavos, 'quien', quien)), '[]')
+    into retiros_viejos from public.retiros_de_caja where cierre_id = el_id;
+  delete from public.retiros_de_caja where cierre_id = el_id;
+  insert into public.retiros_de_caja (local_id, cierre_id, monto_centavos, quien)
+  select el_cierre.local_id, el_id, (r ->> 'monto_centavos')::bigint, trim(r ->> 'quien')
+    from jsonb_array_elements(retiros_nuevos) r;
+  if retiros_viejos is distinct from retiros_nuevos then
+    insert into public.auditoria (local_id, usuario_id, tabla, registro_id, accion, antes, despues)
+    values (el_cierre.local_id, (select auth.uid()), 'cierres_de_caja', el_id::text, 'cambio',
+            jsonb_build_object('retiros', retiros_viejos), jsonb_build_object('retiros', retiros_nuevos));
+  end if;
+  perform set_config('manteca.anulando_cierre', 'si', true);
+  update public.gastos set anulado = true, motivo_anulacion = 'Se edito el cierre de caja'
+   where cierre_id = el_id and not anulado;
+  perform set_config('manteca.anulando_cierre', '', true);
+  insert into public.gastos (local_id, fecha, categoria_id, monto_centavos, descripcion, medio_de_pago, cierre_id)
+  select el_cierre.local_id, el_cierre.fecha, c.id, (g ->> 'monto_centavos')::bigint, trim(g ->> 'descripcion'),
+         'efectivo_caja', el_id
+    from jsonb_array_elements(coalesce(datos -> 'gastos', '[]')) g
+   cross join public.categorias_de_gasto c
+   where c.local_id = el_cierre.local_id and c.de_sistema;
+end
+$$;
+
+revoke all on function public.cierres_con_resultado(date, date, uuid) from public, anon;
+revoke all on function public.cierres_editar(uuid, jsonb) from public, anon;
+grant execute on function public.cierres_con_resultado(date, date, uuid) to authenticated;
+grant execute on function public.cierres_editar(uuid, jsonb) to authenticated;
+
+-- 20261028200000_gastos_efectivo_y_cheque
+
+-- Dos medios de pago mas para un gasto: efectivo (el que no sale de la caja) y cheque.
+alter type public.medio_de_pago add value if not exists 'efectivo';
+alter type public.medio_de_pago add value if not exists 'cheque';
