@@ -24,9 +24,10 @@ auditoría. El mapa de rutas, los recortes de cada módulo y el orden están en
   construirlo. Donde ese archivo y `PROPUESTA.md` digan cosas distintas, vale el archivo.
 - Menú y Ventas usan un catálogo mínimo de productos: nombre, variantes y precio, sin
   composición ni costo.
-- Las ventas de Fudo entran solas por su API; no se construye la subida de Excel. Donde una
-  skill habla de "importar el Excel" o de "subir dos veces el mismo período", vale para la
-  sincronización: traer dos veces la misma venta no la duplica.
+- Las ventas de Fudo van a entrar solas por su API, pero esa sincronización está postergada
+  (Santiago, 2026-11-05). Mientras tanto se sube el Excel "Reporte-Ventas" de Fudo (pedido 59).
+  Subir dos veces el mismo período no duplica ventas, y con la API valdrá lo mismo: traer dos
+  veces la misma venta no la duplica.
 - La compra de mercadería se carga como un gasto, con su proveedor. La regla de
   `PROPUESTA.md` de que las compras no son gastos vale desde que exista el módulo Compras.
 - Lo de la segunda fase (materia prima, composición y costos, compras, producción, stock,
@@ -182,9 +183,9 @@ El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
   consulta ni se mantiene.
 - El panel (`/admin`) se rehace desde cero (pedido 43), sin tomar como referencia el diseño
   anterior, con la estética de Plan Reminder Pro: letras, piezas y movimiento (Santiago,
-  2026-10-21). Está entera en la skill `estetica-panel`. Los colores son los de PRP con el azul
-  marino `#1e3a8a` en lugar de su verde de marca, con letra blanca encima (Santiago, 2026-10-25,
-  pedido 45).
+  2026-10-21). Está entera en la skill `estetica-panel`. Los colores son los de PRP con el dorado
+  de Manteca `#bfa042` en lugar de su verde de marca, con letra marrón oscuro encima y fondos
+  crema (Santiago, pedido 45).
 - La carta pública (`/`) usa los colores y las tipografías de Manteca de `src/app/globals.css`.
 
 ## Stack

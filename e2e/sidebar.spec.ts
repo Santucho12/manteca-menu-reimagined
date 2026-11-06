@@ -66,6 +66,19 @@ test.describe('con la sesion del admin', () => {
     await expect(page).toHaveURL(/\/admin\/ventas/);
   });
 
+  test('en una pantalla baja entran todos los enlaces sin desplazarse', async ({ page }, info) => {
+    test.skip(info.project.name !== 'computadora', 'solo en la computadora');
+    // 1366x768 con la barra del navegador deja unos 680 px de alto.
+    await page.setViewportSize({ width: 1366, height: 680 });
+    await page.goto('/admin');
+    const enlaces = panel(page).getByRole('link');
+    await expect(enlaces.first()).toBeVisible();
+    for (const enlace of await enlaces.all()) await expect(enlace).toBeInViewport({ ratio: 1 });
+    const lista = panel(page).locator('> div').first();
+    const sobra = await lista.evaluate((d) => d.scrollHeight - d.clientHeight);
+    expect(sobra).toBeLessThanOrEqual(0);
+  });
+
   test('en la computadora, Usuarios dice cuantos esperan un rol', async ({ page }, info) => {
     test.skip(info.project.name !== 'computadora', 'solo en la computadora');
     // Las cuentas de prueba siempre dejan alguna pendiente: el invitado espera un rol.

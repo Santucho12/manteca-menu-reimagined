@@ -18,21 +18,21 @@ PRP es la app "FiestaCobra", en
 React 18, Tailwind 3). Esta skill ya trae todo pasado a Manteca: el código de PRP se consulta
 solo para algo que acá no esté. No se entra a su base real: tiene datos de sus clientes.
 
-**Azul marino en vez del verde de PRP (Santiago, 2026-10-25, pedido 45).** El verde de marca
-(`primary`, `accent`, `ring`) pasa a ser `#1e3a8a`, con letra blanca encima; fondos, bordes y
-grises siguen siendo los de PRP. En los gráficos, ventas va en `#1e3a8a` y resultado en ámbar
-(`#f59e0b`), para no confundirse. Donde esta skill o `piezas.md` digan "verde" de la marca, se
-lee "azul marino"; `emerald` sigue con su significado (confirma plata o exporta).
+**El dorado de Manteca en vez del verde de PRP (Santiago, pedido 45).** El verde de marca
+(`primary`, `accent`, `ring`) pasa a ser el dorado `#bfa042`, con letra marrón oscuro
+`#2b1d14` encima (el blanco sobre el dorado no se lee). Los fondos son crema (`#f4efe5`) y los
+grises de `slate` van en tonos cálidos: todo está en `panel.css`. Donde esta skill o `piezas.md`
+digan "verde" de la marca, se lee "dorado"; `emerald` sigue con su significado (confirma plata o
+exporta). El azul marino `#1e3a8a` de antes quedó descartado.
 
 Decisiones de Santiago (2026-10-21):
 
 - **Los rojos y grises de PRP**, aunque no pasen el contraste AA (el rojo de error, 3,6; los grises
-  chicos, 2,6). El azul marino sí lo pasa. Es una excepción anotada en `PEDIDOS.md` (pedido 43): `tests/contraste.test.ts`
+  chicos, 2,6). El dorado con su letra marrón sí lo pasa. Es una excepción anotada en `PEDIDOS.md` (pedido 43): `tests/contraste.test.ts`
   mira solo la carta y no se extiende al panel.
 - **Las tres librerías de PRP, con su versión exacta**: `framer-motion` 12.36.0, `sonner` 1.7.4 y
   `lenis` 1.1.20.
-- **Marca**: cuadrado azul marino (antes verde) con la medialuna de lucide (`Croissant`), "Manteca" en la letra de los
-  títulos y "SISTEMA DE GESTIÓN" debajo.
+- **Marca**: el logo de Manteca (pedido 45), en lugar del cuadrado con la medialuna de PRP.
 - **Zoom**: PRP bloquea el zoom en el celular; Manteca no (Santiago, 2026-10-22).
 
 ## Archivos
@@ -129,7 +129,7 @@ Y lo que cambia por ser Next y no una sola página:
 - **Colores**: los del tema (`primary`, `secondary`, `muted`, `border`…) y solo estas familias de
   la paleta: `slate`, `emerald`, `rose`, `amber`, `violet`, `blue` y `sky`. Más `#25D366` para
   WhatsApp y `#0F172A` para el bloque oscuro. Ninguno más.
-- **Qué color dice qué**: azul marino (`primary`) la marca, lo activo y la acción principal;
+- **Qué color dice qué**: dorado (`primary`) la marca, lo activo y la acción principal;
   `emerald-600` lo que confirma plata o exporta; `rose` lo urgente y lo que se borra o anula;
   `amber` lo que viene y las advertencias; `slate` lo vencido, neutro o apagado; `violet` lo
   secundario (grupos, seguimiento); `blue` solo en el hover de editar.
@@ -158,7 +158,7 @@ en componentes de hasta 80 líneas, con la lógica en `.ts` y nombres en españo
   el verde, los radios, las sombras, los espacios y las mayúsculas de las etiquetas.
 - En la consola del navegador: `getComputedStyle(document.querySelector('h1')).fontFamily`
   empieza con la Outfit de next/font; el `body` mide `14px`; un botón principal tiene fondo
-  `rgb(30, 58, 138)` y letra blanca.
+  `rgb(191, 160, 66)` y letra `rgb(43, 29, 20)`.
 - Una pieza que no está en las capturas se compara contra su archivo de PRP, citado en
   `piezas.md`.
 
