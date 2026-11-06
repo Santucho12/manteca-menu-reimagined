@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { titularDelCierre } from './titular';
+import { explicacionDelCierre, titularDelCierre } from './titular';
 
 describe('titularDelCierre', () => {
   it('un cierre sin diferencia dice que cierra', () => {
@@ -25,5 +25,18 @@ describe('titularDelCierre', () => {
     expect(titularDelCierre({ estado: 'con_diferencia', anulado: true }, -5)).toBe(
       'Cierre anulado',
     );
+  });
+});
+
+describe('explicacionDelCierre', () => {
+  it('a un cierre que espera las ventas le dice cuando va a tener resultado', () => {
+    expect(explicacionDelCierre({ estado: 'esperando_ventas', anulado: false })).toBe(
+      'Guardado. El resultado va a estar cuando se carguen las ventas del día.',
+    );
+  });
+
+  it('a los demas no les agrega nada', () => {
+    expect(explicacionDelCierre({ estado: 'cierra', anulado: false })).toBeNull();
+    expect(explicacionDelCierre({ estado: 'esperando_ventas', anulado: true })).toBeNull();
   });
 });

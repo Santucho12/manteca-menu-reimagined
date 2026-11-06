@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  diferenciaParaMostrar,
   enlaceDeControl,
   filtrosDeControl,
   opcionesDeEstado,
@@ -92,5 +93,19 @@ describe('tonoDelCierre', () => {
     [{ estado: 'cierra', anulado: true }, 'pizarra'],
   ] as const)('%j se pinta %s', (cierre, tono) => {
     expect(tonoDelCierre(cierre)).toBe(tono);
+  });
+});
+
+describe('diferenciaParaMostrar', () => {
+  it('es la diferencia total del cierre', () => {
+    expect(diferenciaParaMostrar({ estado: 'con_diferencia', diferenciaTotalCentavos: -5 })).toBe(
+      -5,
+    );
+  });
+
+  it('es null mientras el cierre espera las ventas', () => {
+    expect(
+      diferenciaParaMostrar({ estado: 'esperando_ventas', diferenciaTotalCentavos: 0 }),
+    ).toBeNull();
   });
 });

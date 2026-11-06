@@ -75,7 +75,7 @@ export function DetalleDelCierre({ cierre, fondoAnterior }: Props) {
   return (
     <>
       <Seccion titulo="Por medio de pago" forma="lista">
-        <MediosDelCierre medios={cierre.medios} />
+        <MediosDelCierre medios={cierre.medios} esperando={cierre.estado === 'esperando_ventas'} />
         <ComoSeCalcula />
       </Seccion>
       <Efectivo cierre={cierre} anterior={fondoAnterior} />

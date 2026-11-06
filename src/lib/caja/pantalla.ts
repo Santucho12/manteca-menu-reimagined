@@ -89,3 +89,9 @@ const TONOS: Record<EstadoDeCierre, Tono> = {
 /** El color de la insignia de un cierre; uno anulado se ve apagado. */
 export const tonoDelCierre = (cierre: { estado: EstadoDeCierre; anulado: boolean }): Tono =>
   cierre.anulado ? 'pizarra' : TONOS[cierre.estado];
+
+/** La diferencia de un cierre para la lista; null mientras espera las ventas del dia. */
+export const diferenciaParaMostrar = (cierre: {
+  estado: EstadoDeCierre;
+  diferenciaTotalCentavos: number;
+}): number | null => (cierre.estado === 'esperando_ventas' ? null : cierre.diferenciaTotalCentavos);

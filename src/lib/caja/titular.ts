@@ -10,3 +10,12 @@ export function titularDelCierre(
   if (cierre.estado === 'cierra') return 'La caja cierra';
   return `${textoDeDiferencia(diferenciaTotalCentavos)} en total`;
 }
+
+/** Lo que se le explica a quien mira un cierre que todavia no tiene contra que compararse. */
+export const explicacionDelCierre = (cierre: {
+  estado: EstadoDeCierre;
+  anulado: boolean;
+}): string | null =>
+  !cierre.anulado && cierre.estado === 'esperando_ventas'
+    ? 'Guardado. El resultado va a estar cuando se carguen las ventas del día.'
+    : null;

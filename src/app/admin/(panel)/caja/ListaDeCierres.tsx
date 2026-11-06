@@ -7,7 +7,12 @@ import { SinResultados } from '@/components/panel/SinResultados';
 import type { FilaDeCierre } from '@/lib/caja/consultas';
 import { diaDeLaSemana } from '@/lib/caja/diaDeLaSemana';
 import { diferenciaDeFondo } from '@/lib/caja/fondo';
-import { nombreDeEstado, textoDeDiferencia, tonoDelCierre } from '@/lib/caja/pantalla';
+import {
+  diferenciaParaMostrar,
+  nombreDeEstado,
+  textoDeDiferencia,
+  tonoDelCierre,
+} from '@/lib/caja/pantalla';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import { formatearPesos } from '@/lib/plata';
 import { cn } from '@/lib/utils';
@@ -31,14 +36,16 @@ const EstadoConFlecha = ({ cierre }: { cierre: FilaDeCierre }) => (
   </span>
 );
 
-const tonoDeDiferencia = (centavos: number) =>
-  centavos === 0
-    ? 'text-emerald-700'
-    : centavos < 0
-      ? 'text-rose-600 font-bold'
-      : 'text-amber-700 font-bold';
+const tonoDeDiferencia = (centavos: number | null) =>
+  centavos === null
+    ? 'text-muted-foreground'
+    : centavos === 0
+      ? 'text-emerald-700'
+      : centavos < 0
+        ? 'text-rose-600 font-bold'
+        : 'text-amber-700 font-bold';
 
-const Diferencia = ({ centavos }: { centavos: number }) => (
+const Diferencia = ({ centavos }: { centavos: number | null }) => (
   <span className={cn('text-sm font-semibold', tonoDeDiferencia(centavos))}>
     {textoDeDiferencia(centavos)}
   </span>
@@ -108,7 +115,7 @@ function columnas(conPersona: boolean, fondos?: Map<string, number | null>) {
     {
       titulo: 'Diferencia',
       alinear: 'centro',
-      celda: (c) => <Diferencia centavos={c.diferenciaTotalCentavos} />,
+      celda: (c) => <Diferencia centavos={diferenciaParaMostrar(c)} />,
     },
     { titulo: 'Estado', alinear: 'der', celda: (c) => <EstadoConFlecha cierre={c} /> },
   ] satisfies Columna<FilaDeCierre>[];
@@ -133,7 +140,7 @@ function Tarjeta({
         </div>
         <Estado cierre={cierre} />
       </div>
-      <Diferencia centavos={cierre.diferenciaTotalCentavos} />
+      <Diferencia centavos={diferenciaParaMostrar(cierre)} />
     </>
   );
 }
