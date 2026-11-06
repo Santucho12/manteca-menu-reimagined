@@ -15,8 +15,8 @@ describe('titularDelCierre', () => {
     );
   });
 
-  it('un cierre pendiente espera las ventas', () => {
-    expect(titularDelCierre({ estado: 'pendiente', anulado: false }, 0)).toBe(
+  it('un cierre sin las ventas del dia cargadas las espera', () => {
+    expect(titularDelCierre({ estado: 'esperando_ventas', anulado: false }, 0)).toBe(
       'Esperando las ventas del día',
     );
   });

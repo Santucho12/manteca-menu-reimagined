@@ -1,4 +1,4 @@
-import { resultadoDeFila, type FilaConVentas } from '../caja/resultadoDeFila';
+import { diferenciaConocida, type FilaConVentas } from '../caja/resultadoDeFila';
 import type { Cliente } from '../supabase/cliente';
 import type { CierreDelReporte } from './caja';
 import type { GastoDelDia } from './gastos';
@@ -60,7 +60,8 @@ function aCierre(c: CierreLeido): CierreDelReporte {
     fecha: c.fecha,
     persona: c.persona_nombre,
     declaradoCentavos,
-    diferenciaCentavos: resultadoDeFila(c).diferenciaTotalCentavos,
+    // Un cierre que espera las ventas no tiene diferencia todavia: no suma por empleado.
+    diferenciaCentavos: diferenciaConocida(c),
   };
 }
 

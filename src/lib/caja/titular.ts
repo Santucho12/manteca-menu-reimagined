@@ -6,7 +6,7 @@ export function titularDelCierre(
   diferenciaTotalCentavos: number,
 ): string {
   if (cierre.anulado) return 'Cierre anulado';
-  if (cierre.estado === 'pendiente') return 'Esperando las ventas del día';
+  if (cierre.estado === 'esperando_ventas') return 'Esperando las ventas del día';
   if (cierre.estado === 'cierra') return 'La caja cierra';
   return `${textoDeDiferencia(diferenciaTotalCentavos)} en total`;
 }
