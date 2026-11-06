@@ -1330,6 +1330,7 @@ export type Database = {
           retiros_centavos: number
           tolerancia_centavos: number
           transferencia_centavos: number
+          ventas_cargadas: boolean
           ventas_credito_centavos: number
           ventas_debito_centavos: number
           ventas_efectivo_centavos: number
@@ -1517,6 +1518,13 @@ export type Database = {
           ventas: number
         }[]
       }
+      reporte_ventas_sin_detalle: {
+        Args: { desde: string; hasta: string }
+        Returns: {
+          monto_centavos: number
+          ventas: number
+        }[]
+      }
       reporte_ventas_por_dia: {
         Args: { desde: string; hasta: string }
         Returns: {
@@ -1561,6 +1569,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      ventas_fudo_cargadas_hasta: { Args: never; Returns: string }
       ventas_guardar_manual: { Args: { datos: Json }; Returns: string }
       ventas_importar_excel: { Args: { lotes: Json }; Returns: Json }
       ventas_totales: {
