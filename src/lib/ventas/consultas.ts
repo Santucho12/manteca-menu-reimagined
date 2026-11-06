@@ -164,3 +164,10 @@ export async function canalesDeVenta(
     .order('nombre');
   return comprobar(respuesta, 'los tipos de venta');
 }
+
+/** El ultimo dia con ventas de Fudo sin anular, o null si todavia no se subio ninguna. */
+export async function ventasFudoCargadasHasta(cliente: Cliente): Promise<string | null> {
+  const { data, error } = await cliente.rpc('ventas_fudo_cargadas_hasta');
+  if (error) throw new Error(`No pudimos leer hasta cuando hay ventas: ${error.message}`);
+  return data ?? null;
+}

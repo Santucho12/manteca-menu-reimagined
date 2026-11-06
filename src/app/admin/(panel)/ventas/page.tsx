@@ -1,3 +1,4 @@
+import { VentasCargadasHasta } from '@/components/panel/VentasCargadasHasta';
 import { FileSpreadsheet, Plus, Store } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -69,6 +70,7 @@ export default async function PaginaDeVentas({
           junto con las cargadas a mano.
         </p>
       </FranjaDeAviso>
+      <VentasCargadasHasta />
       <FiltrosDeVentas filtros={filtros} />
       <TarjetasDeVentas totales={lista.totales} />
       <ListaDeVentas filas={lista.filas} total={lista.total} />
