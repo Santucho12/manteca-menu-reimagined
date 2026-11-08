@@ -1,3 +1,14 @@
+import {
+  ventasPorCategoria,
+  ventasPorDia,
+  ventasPorProducto,
+  ventasSinDetalle,
+} from '../../src/lib/reportes/consultas';
+import {
+  categoriasDelReporte,
+  productosDelReporte,
+  totalesDeVentas,
+} from '../../src/lib/reportes/ventas';
 import { afterAll, afterEach, describe, expect, it } from 'vitest';
 import { clienteSecretoDePruebas } from '../clientes';
 import { borrarCierres, sembrarCierre } from '../cierres-de-prueba';
@@ -204,4 +215,31 @@ describe('quien puede leer lo nuevo', () => {
       expect(sinDetalle.error?.code).toBe('42501');
     });
   }
+});
+
+describe('los reportes por producto y por categoria cierran con el total', () => {
+  it('con ventas del Excel y a mano suman lo mismo que por periodo', async () => {
+    const dia = '2018-07-03';
+    const p = { desde: dia, hasta: dia };
+    ventas.push(
+      await sembrarVentaConPago({ fecha: dia, medio: 'qr', centavos: 150000 }),
+      await sembrarVentaConRenglones({
+        fecha: dia,
+        renglones: [{ producto: null, cantidad: 2, precioCentavos: 2500, descripcion: 'Agua' }],
+      }),
+    );
+    const admin = await clienteComo('admin');
+    const [porDia, renglones, categorias, sinDetalle] = await Promise.all([
+      ventasPorDia(admin, p),
+      ventasPorProducto(admin, p),
+      ventasPorCategoria(admin, p),
+      ventasSinDetalle(admin, p),
+    ]);
+    const total = totalesDeVentas(porDia).montoCentavos;
+    const sumar = (filas: { montoCentavos: number }[]) =>
+      filas.reduce((s, f) => s + f.montoCentavos, 0);
+    expect(total).toBe(155000);
+    expect(sumar(productosDelReporte(renglones, sinDetalle))).toBe(total);
+    expect(sumar(categoriasDelReporte(categorias, sinDetalle))).toBe(total);
+  });
 });
