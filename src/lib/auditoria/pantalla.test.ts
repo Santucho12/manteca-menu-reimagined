@@ -66,4 +66,9 @@ describe('opciones de los filtros', () => {
       texto: 'Reseteo de contraseña',
     });
   });
+
+  it('el filtro de accion ofrece la subida del Excel, y la URL la acepta', () => {
+    expect(opcionesDeAccion()).toContainEqual({ valor: 'importacion', texto: 'Subida del Excel' });
+    expect(filtrosDeAuditoria({ accion: 'importacion' }, HOY).accion).toBe('importacion');
+  });
 });
