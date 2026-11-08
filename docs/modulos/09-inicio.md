@@ -75,10 +75,15 @@ porcentaje de cada una.
 3. El balance es ventas menos gastos. En pantalla se dice "balance", no "resultado" ni
    "margen" (Santiago, 2026-10-27).
 4. Los datos llegan hasta la última sincronización con Fudo, y se muestra de cuándo es.
+   Mientras las ventas entren por el Excel, junto al bloque del mes dice "Ventas de Fudo
+   cargadas hasta el 28/10" (o "Todavía no se subieron ventas de Fudo"), en ámbar si esa fecha
+   es anterior a ayer (pedido 84).
 5. Los avisos no se guardan ni se marcan como vistos: se calculan al abrir la pantalla y
    desaparecen solos cuando se resuelve lo que los causa.
 6. Las ventas de productos sin vincular cuentan en los números del mes y no aparecen entre
-   los más vendidos.
+   los más vendidos. Tampoco las ventas sin detalle de productos del Excel de Fudo.
+7. Un cierre que espera las ventas del día (`esperando_ventas`, ver `06-cierres-de-caja.md`)
+   no entra en "Cierres con diferencia de la última semana" (pedido 84).
 
 ## Casos de borde
 

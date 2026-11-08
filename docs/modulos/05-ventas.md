@@ -65,6 +65,27 @@ su medio y su monto.
 Si los pagos de una venta suman menos que su total, la parte sin pago se muestra aparte como
 "sin medio de pago". No suma a lo esperado de ningún medio.
 
+## Mientras no esté la API: el Excel
+
+La sincronización está postergada (Santiago, 2026-11-05). Mientras tanto el admin sube el
+Excel "Reporte-Ventas" de Fudo en `/admin/ventas/subir` (pedido 59). Trae totales por día y
+por medio de pago, sin productos. Subir dos veces el mismo período no duplica ventas: cada una
+se reconoce por su día y su medio, y la que cambió se actualiza.
+
+Cómo se lleva el resto del sistema con el Excel (pedido 84):
+
+- **Hasta qué día hay ventas.** El último día con ventas de Fudo sin anular se muestra como
+  "Ventas de Fudo cargadas hasta el 28/10" en Ventas (junto a "Subir Excel de Fudo"), en Inicio
+  y en cada reporte. Sin ninguna: "Todavía no se subieron ventas de Fudo". Si esa fecha es
+  anterior a ayer, el texto va en ámbar. Las ventas cargadas a mano no cuentan.
+- **Cierres que esperan.** Un cierre de un día posterior a ese último día queda "Esperando
+  ventas" hasta que se suba el Excel que lo cubre (ver `06-cierres-de-caja.md`).
+- **Sin detalle de productos.** Las ventas del Excel no tienen productos: en los reportes por
+  producto y por categoría van en una fila "Sin detalle de productos (Excel de Fudo)", para que
+  sumen lo mismo que Ventas por período.
+- **Un registro por subida.** La subida no deja un registro de auditoría por cada venta y cada
+  pago: deja uno solo, con el período y el resumen (ver "Qué queda en la auditoría").
+
 ## Ventas cargadas a mano
 
 | Dato | Detalle |
@@ -125,6 +146,9 @@ Si los pagos de una venta suman menos que su total, la parte sin pago se muestra
 ## Qué queda en la auditoría
 
 - Cada venta a mano: alta y anulación, con el motivo.
+- Cada subida del Excel de Fudo, en un solo registro "Subida del Excel": quién la hizo, el
+  período (desde y hasta), los días, cuántas ventas fueron nuevas, actualizadas, iguales y
+  anuladas, y el total. Lleva a Ventas filtrada por ese período.
 - Cada vinculación y cada cambio de vinculación.
 - Cada sincronización: cuándo corrió, cuántas ventas trajo y si falló. Figura como hecha por
   el sistema, o por el admin si usó el botón.

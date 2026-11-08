@@ -54,10 +54,25 @@ guarda**: se calcula siempre al mostrar, contra las ventas del día en ese momen
 |---|---|
 | Cierra | La diferencia de cada medio con las ventas del día está dentro de la tolerancia |
 | Con diferencia | Algún medio supera la tolerancia (sin ventas ese día, lo esperado es $0) |
+| Esperando ventas | Las ventas de Fudo de ese día todavía no se subieron (pedido 84) |
 | Pendiente | El día todavía no tiene cierre cargado |
 
 Un cierre anulado no es un estado: sigue en el historial con su motivo y se ve con «Ver anulados».
-Ya no existen «Esperando ventas» ni «Revisado».
+«Revisado» ya no existe.
+
+**Esperando ventas** (pedido 84, por el Excel de Fudo): un cierre de un día posterior al último
+día con ventas de Fudo sin anular espera; si no hay ninguna venta de Fudo, todos esperan. Las
+ventas cargadas a mano no cuentan para decidirlo. Un cierre que espera no tiene diferencia: no
+entra en el aviso de Inicio, ni en el filtro «Con diferencia» del control, ni en la diferencia
+por día y por empleado del reporte de Caja.
+
+- Caja, al guardar y en Mis cierres, ve «Guardado. El resultado va a estar cuando se carguen
+  las ventas del día», sin faltantes ni sobrantes.
+- El detalle del cierre (admin) muestra lo declarado, sin esperado ni diferencia.
+- El control filtra también por «Esperando ventas»; su pastilla va en ámbar.
+- Cuando se sube el Excel que cubre ese día, el cierre se calcula solo: el estado se calcula
+  al mostrar y no hay nada que guardar.
+- Un día cubierto por el Excel y sin ventas no espera: lo esperado es $0.
 
 ## Pantallas
 
@@ -185,3 +200,12 @@ Queda para el módulo de Ventas: traer las ventas del día al guardar, completar
 pasar el cierre a "Cierra" o "Con diferencia", recalcular cuando cambian las ventas (reglas
 6 y 9, y "hubo ventas después del cierre") y pedir el comentario si hay diferencia. El aviso
 de días sin cierre en Inicio entra con Inicio.
+
+**Esperando ventas (pedido 84, 2026-11-08).** Migración
+`20261105120000_excel_de_fudo_en_el_sistema`: `cierres_con_resultado` devuelve además
+`ventas_cargadas` (hay una venta `origen = 'fudo'` sin anular, del mismo local, con fecha mayor
+o igual a la del cierre). Es solo un sí o un no: Caja lo recibe sin ningún monto de ventas.
+`resultadoDeFila` (`src/lib/caja/`) da `esperando_ventas` cuando es falso, con lo declarado y
+esperado y diferencia en 0; el reporte de Caja recibe `diferenciaCentavos: null` para esos
+cierres. Pruebas: `tests/servicios/excel-en-el-sistema.base.test.ts`, los puros de
+`src/lib/caja` y `src/lib/reportes`, `e2e/caja.spec.ts` y `e2e/caja-control.spec.ts`.

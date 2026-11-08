@@ -45,9 +45,14 @@ Solo Admin.
 3. "El día" es el día calendario en Argentina.
 4. Las ventas incluyen las de Fudo y las cargadas a mano.
 5. En los reportes por producto y por categoría, las ventas de productos de Fudo sin
-   vincular van en una fila "sin vincular".
+   vincular van en una fila "sin vincular". Las ventas sin ningún producto (las del Excel de
+   Fudo) van al final, después de "Sin vincular", en una fila "Sin detalle de productos (Excel
+   de Fudo)" con su monto y su cantidad de ventas. Así el total por producto y por categoría es
+   igual al de Ventas por período. Sin esas ventas, la fila no aparece (pedido 84).
 6. El resultado es ventas menos gastos. No se usa la palabra "margen".
-7. Cada reporte dice hasta cuándo están sincronizadas las ventas.
+7. Cada reporte dice hasta cuándo están sincronizadas las ventas. Mientras entren por el Excel,
+   dice "Ventas de Fudo cargadas hasta el 28/10", debajo del filtro de fechas, en ámbar si esa
+   fecha es anterior a ayer (pedido 84).
 8. Las tablas largas están paginadas.
 
 ## Casos de borde
@@ -88,7 +93,8 @@ Construido el 2026-10-11 (pedido 31). Diseño en `docs/superpowers/specs/2026-10
 - Caja se construye antes que la sincronización con Fudo: muestra lo declarado, los días sin
   cierre (desde el primer cierre hasta ayer) y la diferencia de cada uno. No tiene comparación
   con otro período.
-- "Hasta cuándo están sincronizadas las ventas" (regla 7) entra con la parte de Fudo.
+- "Hasta cuándo están sincronizadas las ventas" (regla 7): mientras no esté la API, se muestra
+  hasta qué día hay ventas del Excel (pedido 84). Con la API, pasa a la última sincronización.
 - Por producto: una fila por producto con su monto y, debajo, la cantidad de cada presentación.
   Lo no vinculado va junto en "Sin vincular", siempre al final.
 - La comparación se hace sobre el total y sobre las filas que existen en los dos períodos. Los
@@ -108,6 +114,13 @@ leer sus cierres y los gastos de su cierre.
 | `reporte_ventas_por_producto(desde, hasta)` | Producto, categoría de hoy, presentación, cantidad y monto; sin producto, la descripción del renglón |
 | `reporte_ventas_por_categoria(desde, hasta)` | Categoría de hoy (o "Sin vincular"), ventas distintas y monto |
 | `reporte_gastos(desde, hasta)` | Día, categoría y monto de los gastos sin anular |
+| `reporte_ventas_sin_detalle(desde, hasta)` | Cantidad y monto de las ventas cerradas y sin anular que no tienen renglones (pedido 84) |
+
+Del pedido 84 (migración `20261105120000_excel_de_fudo_en_el_sistema`), además,
+`ventas_fudo_cargadas_hasta()`: el último día con ventas de Fudo sin anular, o null; solo
+admin activo. La fila "Sin detalle" la agregan `productosDelReporte` y `categoriasDelReporte`
+(`src/lib/reportes/ventas.ts`) con lo que devuelve `ventasSinDetalle`, leída en la misma tanda
+que el resto del reporte.
 
 ### Código
 
