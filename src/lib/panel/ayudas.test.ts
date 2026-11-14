@@ -20,7 +20,10 @@ describe('ayudas', () => {
     const texto = AYUDAS.inicio.temas.flatMap((t) => [t.titulo, ...t.puntos]).join(' ');
     for (const parte of [
       'ayer sin cierre',
-      'pagos que vencen',
+      'pagos vencidos',
+      'No abrió',
+      'en pesos',
+      'Excel de Fudo',
       'barra de avance',
       'Ventas:',
       'Gastos:',
@@ -117,7 +120,7 @@ describe('ayudas', () => {
         'Sin clasificar',
         'un cierre por día',
         'día anterior',
-        'Editar',
+        'Avisale a un administrador',
         'Mis cierres',
       ],
     ],
@@ -132,6 +135,10 @@ describe('ayudas', () => {
         'pendientes',
         'anula',
         'gastos',
+        'No abrió',
+        'Deshacer',
+        'cada medio por separado',
+        'Editar',
       ],
     ],
     [
@@ -210,6 +217,13 @@ describe('ayudas', () => {
       ' ',
     );
     for (const parte of partes) expect(texto).toContain(parte);
+  });
+
+  it('Inicio ya no ata el aviso de ayer a las ventas, y Caja no edita', () => {
+    const inicio = AYUDAS.inicio.temas.flatMap((t) => t.puntos).join(' ');
+    expect(inicio).not.toContain('no hubo ventas');
+    const caja = AYUDAS.caja.temas.flatMap((t) => t.puntos).join(' ');
+    expect(caja).not.toContain('tocá Editar');
   });
 
   it('Reportes no ofrece atajos que la pantalla no tiene', () => {
