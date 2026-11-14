@@ -48,3 +48,30 @@ export async function recurrentesActivosDelProveedor(cliente: Cliente, proveedor
   if (error) throw new Error(`No pudimos revisar los recurrentes: ${error.message}`);
   return count ?? 0;
 }
+
+type FilaPorPagar = {
+  proveedor_id: string | null;
+  monto_centavos: number;
+  gastos: { anulado: boolean }[];
+};
+
+// Con un pago vigente ya no se debe; si el pago se anuló, vuelve a deberse.
+function sumarPendientes(filas: FilaPorPagar[]): Map<string, number> {
+  const totales = new Map<string, number>();
+  for (const fila of filas) {
+    if (!fila.proveedor_id || fila.gastos.some((g) => !g.anulado)) continue;
+    totales.set(fila.proveedor_id, (totales.get(fila.proveedor_id) ?? 0) + fila.monto_centavos);
+  }
+  return totales;
+}
+
+/** Lo por pagar de cada proveedor: lo anotado, sin anular y sin un pago vigente. */
+export async function porPagarPorProveedor(cliente: Cliente): Promise<Map<string, number>> {
+  const { data, error } = await cliente
+    .from('gastos_por_pagar')
+    .select('proveedor_id, monto_centavos, gastos(anulado)')
+    .eq('anulado', false)
+    .not('proveedor_id', 'is', null);
+  if (error) throw new Error(`No pudimos sumar lo por pagar: ${error.message}`);
+  return sumarPendientes(data);
+}
