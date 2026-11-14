@@ -73,12 +73,17 @@ export const quedaPorPagar = (datos: { seRepite: string; yaPagado: string }) =>
  * Cargar: un gasto pagado, con fecha hasta hoy; algo por pagar, que vence cuando sea y elige
  * el medio al pagarse; o un fijo, que puede empezar más adelante.
  */
+/** Lo dice el servidor; el formulario lo reconoce para ofrecer Cargar igual. */
+export const MENSAJE_DE_REPETIDO = 'Ya hay un gasto igual: mismo proveedor, monto y día.';
+
 export const esquemaCarga = (hoy: string) =>
   esquemaGasto
     .extend({
       seRepite: z.enum(REPETICIONES, 'Elegí si se repite.'),
       yaPagado: z.enum(YA_PAGADO, 'Elegí si ya lo pagaste.'),
       medioDePago: z.union([z.literal(''), z.enum(MEDIOS_DE_PAGO)], SIN_MEDIO),
+      // La persona vio el aviso de posible repetido y lo carga igual.
+      cargarIgual: z.boolean().optional(),
     })
     .refine((datos) => datos.seRepite !== 'no' || quedaPorPagar(datos) || hastaHoy(hoy)(datos), {
       path: ['fecha'],

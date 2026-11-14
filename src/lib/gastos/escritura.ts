@@ -4,6 +4,7 @@ import { recurrentePorId } from './consultas';
 import {
   fijoParaLaBase,
   gastoParaLaBase,
+  MENSAJE_DE_REPETIDO,
   porPagarParaLaBase,
   quedaPorPagar,
   recurrenteParaLaBase,
@@ -36,6 +37,7 @@ export const MENSAJES_DE_GASTOS = {
   yaNoPorPagar: 'Eso ya no está por pagar. Recargá la página.',
   yaEstaPagado: 'Ya está pagado: si no corresponde, anulá el pago desde Pagados.',
   noEsDelFijo: 'Esa fecha no es un próximo pago del fijo.',
+  posibleRepetido: MENSAJE_DE_REPETIDO,
   generico: 'No pudimos guardarlo. Revisá los datos e intentá de nuevo.',
 } as const;
 
@@ -154,12 +156,35 @@ const CARGAR: Record<TipoDeCarga, typeof crearRecurrente> = {
     crearGasto(cliente, { ...datos, medioDePago: datos.medioDePago as MedioDePago }),
 };
 
+/**
+ * Otro gasto vigente del mismo proveedor, monto y día. El de la misma clave no cuenta: es el
+ * mismo formulario mandado dos veces, y crearGasto devuelve ese gasto.
+ */
+async function hayOtroIgual(cliente: Cliente, datos: DatosDeCarga): Promise<boolean> {
+  const fila = gastoParaLaBase({ ...datos, medioDePago: datos.medioDePago as MedioDePago });
+  if (!fila.proveedor_id) return false;
+  const consulta = cliente
+    .from('gastos')
+    .select('id', { count: 'exact', head: true })
+    .eq('proveedor_id', fila.proveedor_id)
+    .eq('monto_centavos', fila.monto_centavos)
+    .eq('fecha', fila.fecha)
+    .eq('anulado', false);
+  const { count } = await (datos.clave
+    ? consulta.or(`clave.is.null,clave.neq.${datos.clave}`)
+    : consulta);
+  return (count ?? 0) > 0;
+}
+
 /** Cargar gasto: pagado, por pagar, o un fijo que deja cada pago por pagar en su fecha. */
 export async function cargarGasto(
   cliente: Cliente,
   datos: DatosDeCarga,
 ): Promise<Resultado<{ id: string; tipo: TipoDeCarga }>> {
   const tipo = tipoDeCarga(datos);
+  if (tipo === 'gasto' && !datos.cargarIgual && (await hayOtroIgual(cliente, datos))) {
+    return fallo(MENSAJES_DE_GASTOS.posibleRepetido);
+  }
   const resultado = await CARGAR[tipo](cliente, datos);
   return resultado.ok ? exito({ id: resultado.datos.id, tipo }) : resultado;
 }
