@@ -1,4 +1,5 @@
 import { afterAll, describe, expect, it } from 'vitest';
+import { anularGasto } from '../../src/lib/gastos/escritura';
 import { porPagarPorProveedor } from '../../src/lib/gastos/proveedores';
 import { borrarGastos, pagarComoAdmin, sembrarPorPagar } from '../gastos-de-prueba';
 import { borrarProveedores, sembrarProveedor } from '../proveedores-de-prueba';
@@ -33,6 +34,16 @@ describe('porPagarPorProveedor', () => {
     gastos.push(pagado.data!.id);
     const totales = await porPagarPorProveedor(await clienteComo('admin'));
     expect(totales.get(id)).toBe(1300000);
+  });
+
+  it('si el pago se anula, vuelve a deberse', async () => {
+    const id = await proveedor();
+    const pagado = await pagarComoAdmin(await pendiente(id, 400000));
+    gastos.push(pagado.data!.id);
+    const admin = await clienteComo('admin');
+    expect((await porPagarPorProveedor(admin)).has(id)).toBe(false);
+    expect((await anularGasto(admin, pagado.data!.id, 'Pago mal anotado')).ok).toBe(true);
+    expect((await porPagarPorProveedor(admin)).get(id)).toBe(400000);
   });
 
   it('un proveedor sin nada por pagar no figura', async () => {
