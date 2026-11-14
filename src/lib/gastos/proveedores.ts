@@ -49,29 +49,30 @@ export async function recurrentesActivosDelProveedor(cliente: Cliente, proveedor
   return count ?? 0;
 }
 
-type FilaPorPagar = {
-  proveedor_id: string | null;
-  monto_centavos: number;
-  gastos: { anulado: boolean }[];
-};
+type FilaPorPagar = { proveedor_id: string | null; monto_centavos: number };
 
-// Con un pago vigente ya no se debe; si el pago se anuló, vuelve a deberse.
-function sumarPendientes(filas: FilaPorPagar[]): Map<string, number> {
+function sumarPorProveedor(filas: FilaPorPagar[]): Map<string, number> {
   const totales = new Map<string, number>();
   for (const fila of filas) {
-    if (!fila.proveedor_id || fila.gastos.some((g) => !g.anulado)) continue;
+    if (!fila.proveedor_id) continue;
     totales.set(fila.proveedor_id, (totales.get(fila.proveedor_id) ?? 0) + fila.monto_centavos);
   }
   return totales;
 }
 
-/** Lo por pagar de cada proveedor: lo anotado, sin anular y sin un pago vigente. */
+/**
+ * Lo por pagar de cada proveedor: lo anotado, sin anular y sin un pago vigente (un pago anulado
+ * no cuenta como pago). Lo ya pagado lo descarta la base: traer el historial entero pasaria, con
+ * los años, el tope de filas de una consulta y la suma quedaria corta sin avisar.
+ */
 export async function porPagarPorProveedor(cliente: Cliente): Promise<Map<string, number>> {
   const { data, error } = await cliente
     .from('gastos_por_pagar')
-    .select('proveedor_id, monto_centavos, gastos(anulado)')
+    .select('proveedor_id, monto_centavos, gastos!left(id)')
     .eq('anulado', false)
-    .not('proveedor_id', 'is', null);
+    .not('proveedor_id', 'is', null)
+    .eq('gastos.anulado', false)
+    .is('gastos', null);
   if (error) throw new Error(`No pudimos sumar lo por pagar: ${error.message}`);
-  return sumarPendientes(data);
+  return sumarPorProveedor(data);
 }
