@@ -53,6 +53,7 @@ describe('ayudas', () => {
         'mismo nombre',
         'gastos fijos',
         'Observaciones',
+        'Por pagar',
       ],
     ],
     [
@@ -81,6 +82,8 @@ describe('ayudas', () => {
         'Efectivo de la caja',
         'monto, la fecha ni el medio',
         '12.345,50',
+        'Cargar igual',
+        'fuera de la caja',
       ],
     ],
     [
