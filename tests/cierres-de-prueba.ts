@@ -156,6 +156,42 @@ export async function sembrarCierreConSalidas(
   return id;
 }
 
+type SemillaDeDiaSinAbrir = { fecha: string; otroLocal?: boolean };
+
+/** Un dia marcado como que el local no abrio, escrito sin la funcion de marcar. */
+export async function sembrarDiaSinAbrir(semilla: SemillaDeDiaSinAbrir): Promise<void> {
+  const secreto = clienteSecretoDePruebas();
+  const local = semilla.otroLocal ? asegurarLocalB : idDelLocalPrincipal;
+  const { error } = await secreto.from('dias_sin_abrir').insert({
+    local_id: await local(secreto),
+    fecha: semilla.fecha,
+    marcado_por: await idDeCuentaDePrueba(semilla.otroLocal ? 'adminOtroLocal' : 'admin'),
+  });
+  if (error) throw new Error(`No pude sembrar el dia sin abrir: ${error.message}`);
+}
+
+/** La marca de ese dia en el local principal (o en el B), o null si no hay. */
+export async function diaSinAbrirDe(fecha: string, otroLocal = false) {
+  const secreto = clienteSecretoDePruebas();
+  const local = otroLocal ? asegurarLocalB : idDelLocalPrincipal;
+  const { data } = await secreto
+    .from('dias_sin_abrir')
+    .select('id, activo, marcado_por')
+    .eq('local_id', await local(secreto))
+    .eq('fecha', fecha)
+    .maybeSingle();
+  return data;
+}
+
+/** Borra las marcas de esos dias, de cualquier local, con su auditoria. */
+export async function borrarDiasSinAbrir(fechas: string[]): Promise<void> {
+  const secreto = clienteSecretoDePruebas();
+  const { data } = await secreto.from('dias_sin_abrir').select('id').in('fecha', fechas);
+  await secreto.from('dias_sin_abrir').delete().in('fecha', fechas);
+  const ids = (data ?? []).map((dia) => dia.id);
+  await secreto.from('auditoria').delete().in('registro_id', ids);
+}
+
 /** Vuelve la tolerancia del local principal a los $500 de arranque. */
 export async function restaurarTolerancia(): Promise<void> {
   const secreto = clienteSecretoDePruebas();
