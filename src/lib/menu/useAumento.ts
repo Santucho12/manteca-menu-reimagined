@@ -8,9 +8,15 @@ type Acciones = {
   aplicar: (datos: DatosDeAplicarAumento) => Promise<Resultado<{ cantidad: number }>>;
 };
 type Vista = { datos: DatosDeAumento; cambios: CambioDePrecio[] };
-type Estado = { vista: Vista | null; mensaje: string | null; listo: string | null };
+// aplicados: lo que se aumentó, para pasarlo a mano a Fudo, que no se entera.
+type Estado = {
+  vista: Vista | null;
+  mensaje: string | null;
+  listo: string | null;
+  aplicados: CambioDePrecio[] | null;
+};
 
-const VACIO: Estado = { vista: null, mensaje: null, listo: null };
+const VACIO: Estado = { vista: null, mensaje: null, listo: null, aplicados: null };
 
 // Lo que se aplica es exactamente lo que se vio: los precios de antes salen de la vista previa.
 function aplicacionDe({ datos, cambios }: Vista): DatosDeAplicarAumento {
@@ -18,8 +24,9 @@ function aplicacionDe({ datos, cambios }: Vista): DatosDeAplicarAumento {
 }
 
 function despuesDeAplicar(resultado: Resultado<{ cantidad: number }>, vista: Vista): Estado {
-  if (!resultado.ok) return { vista, mensaje: resultado.mensaje, listo: null };
-  return { ...VACIO, listo: `Listo: se actualizaron ${resultado.datos.cantidad} precios.` };
+  if (!resultado.ok) return { ...VACIO, vista, mensaje: resultado.mensaje };
+  const listo = `Listo: se actualizaron ${resultado.datos.cantidad} precios.`;
+  return { ...VACIO, listo, aplicados: vista.cambios };
 }
 
 /** La vista previa del aumento y su aplicacion. */
