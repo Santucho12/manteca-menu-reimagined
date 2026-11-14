@@ -83,10 +83,15 @@ Cómo se lleva el resto del sistema con el Excel (pedido 84):
 - **Sin detalle de productos.** Las ventas del Excel no tienen productos: en los reportes por
   producto y por categoría van en una fila "Sin detalle de productos (Excel de Fudo)", para que
   sumen lo mismo que Ventas por período.
+- **Medio de pago que no conocemos.** Si una fila trae otro medio, la subida se rechaza con la
+  fila y los medios que entran: efectivo, tarjeta de crédito, tarjeta de débito, QR y
+  transferencia (pedido 86).
 - **Un registro por subida.** La subida no deja un registro de auditoría por cada venta y cada
   pago: deja uno solo, con el período y el resumen (ver "Qué queda en la auditoría").
 
 ## Ventas cargadas a mano
+
+Son solo para lo que no pasó por Fudo: Cheaf, encargos, ventas a comercios (pedido 86).
 
 | Dato | Detalle |
 |---|---|

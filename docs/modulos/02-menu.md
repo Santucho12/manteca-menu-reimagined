@@ -98,6 +98,10 @@ a mano. "Más vendido" reemplaza a la etiqueta "Popular" de la página actual.
 - Pide un porcentaje, que puede ser negativo.
 - Pide el redondeo: a $10, $50, $100 o $500, al más cercano. Viene marcado $100.
 - Antes de aplicar muestra la lista con el precio actual y el nuevo de cada uno.
+- Después de aplicar queda la lista "Pasalos a Fudo", con el precio anterior y el nuevo de
+  cada uno, para cambiarlos a mano en Fudo. No se guarda (pedido 86).
+- El aviso del Menú dice "Los precios de acá no cambian los de Fudo: cambialos también
+  allá", sin prometer una integración (pedido 86).
 - Se aplica recién al confirmar. No tiene "deshacer": un error se corrige con otro cambio.
 
 ## Reglas

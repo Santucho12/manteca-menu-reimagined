@@ -27,7 +27,7 @@ Solo Admin. Caja no entra a este módulo.
 
 ### Proveedores (`/admin/proveedores`)
 
-- Lista con nombre, qué se le compra, teléfono y lo pagado en el mes.
+- Lista con nombre, qué se le compra, teléfono, lo pagado en el mes y lo por pagar (pedido 86).
 - Se puede buscar por nombre. La lista está paginada.
 - Cada fila tiene el botón de WhatsApp, que abre el chat con ese proveedor. No arma ningún
   pedido. Si el proveedor no tiene teléfono, el botón no aparece.
@@ -37,7 +37,8 @@ Solo Admin. Caja no entra a este módulo.
 
 - Los datos de contacto, con el botón de WhatsApp.
 - Los gastos cargados a ese proveedor, del más nuevo al más viejo.
-- El total pagado en el mes y en el año.
+- El total pagado en el mes y en el año, y lo por pagar: lo anotado a ese proveedor, sin anular
+  y sin un pago vigente (pedido 86).
 - Acciones: editar, desactivar y reactivar.
 
 ## Reglas
@@ -46,6 +47,8 @@ Solo Admin. Caja no entra a este módulo.
 2. Un proveedor desactivado no aparece para elegir en un gasto nuevo.
 3. Al crear uno con un nombre que ya existe, el sistema avisa y deja seguir.
 4. Los totales de la ficha no cuentan los gastos anulados.
+5. Si tiene algo por pagar, la ficha avisa "Tiene $X por pagar": desactivarlo no lo cancela y
+   sigue en Próximos pagos (pedido 86).
 
 ## Casos de borde
 
