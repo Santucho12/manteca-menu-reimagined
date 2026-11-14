@@ -7,7 +7,7 @@ import { Paginas } from '@/components/panel/Paginas';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
-import { pagadoPorProveedor } from '@/lib/gastos/proveedores';
+import { pagadoPorProveedor, porPagarPorProveedor } from '@/lib/gastos/proveedores';
 import { listarProveedores } from '@/lib/proveedores/consultas';
 import {
   enlaceDeProveedores,
@@ -28,9 +28,13 @@ export default async function PaginaDeProveedores({
   const filtros = filtrosDeProveedores(await searchParams);
   const hoy = diaEnArgentina(new Date());
   const { datos } = await exigirPaginaYLeer('admin', (cliente) =>
-    Promise.all([listarProveedores(cliente, filtros), pagadoPorProveedor(cliente, hoy)]),
+    Promise.all([
+      listarProveedores(cliente, filtros),
+      pagadoPorProveedor(cliente, hoy),
+      porPagarPorProveedor(cliente),
+    ]),
   );
-  const [lista, pagado] = datos;
+  const [lista, pagado, porPagar] = datos;
   const otroEstado = enlaceDeProveedores({
     ...filtros,
     desactivados: !filtros.desactivados,
@@ -44,7 +48,7 @@ export default async function PaginaDeProveedores({
   return (
     <Pantalla
       titulo={filtros.desactivados ? 'Proveedores desactivados' : 'Proveedores'}
-      subtitulo="A quién le comprás, cómo contactarlo y cuánto le pagaste."
+      subtitulo="A quién le comprás, cómo contactarlo, cuánto le pagaste y cuánto le debés."
       acciones={nuevo}
       ayuda="proveedores"
     >
@@ -60,7 +64,7 @@ export default async function PaginaDeProveedores({
         </div>
       </BarraDeFiltros>
       <ListaDeProveedores
-        filas={filasConPagado(lista.filas, pagado)}
+        filas={filasConPagado(lista.filas, pagado, porPagar)}
         total={lista.total}
         filtros={filtros}
       />
