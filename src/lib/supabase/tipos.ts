@@ -411,6 +411,51 @@ export type Database = {
           },
         ]
       }
+      dias_sin_abrir: {
+        Row: {
+          activo: boolean
+          fecha: string
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          local_id: string
+          marcado_por: string
+        }
+        Insert: {
+          activo?: boolean
+          fecha: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          marcado_por?: string
+        }
+        Update: {
+          activo?: boolean
+          fecha?: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          marcado_por?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dias_sin_abrir_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dias_sin_abrir_marcado_por_fkey"
+            columns: ["marcado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gastos: {
         Row: {
           anulado: boolean
@@ -1356,6 +1401,10 @@ export type Database = {
       cierres_insertar: {
         Args: { datos: Json; el_local: string }
         Returns: string
+      }
+      cierres_marcar_sin_abrir: {
+        Args: { la_fecha: string; marcar: boolean }
+        Returns: undefined
       }
       es_admin_activo: { Args: never; Returns: boolean }
       es_caja_activa: { Args: never; Returns: boolean }
