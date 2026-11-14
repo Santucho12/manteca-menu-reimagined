@@ -34,7 +34,10 @@ test('el panel avisa de Fudo y muestra los precios con su origen', async ({ page
   const hereda = await sembrarProducto(categoria, { precios: [null] });
   const propio = await sembrarProducto(categoria, { precios: [350000] });
   await page.goto('/admin/menu');
-  await expect(page.getByText('Cambiar un precio acá no lo cambia en Fudo')).toBeVisible();
+  await expect(
+    page.getByText('Los precios de acá no cambian los de Fudo: cambialos también allá.'),
+  ).toBeVisible();
+  await expect(page.getByText('integrados')).toHaveCount(0);
   await expect(fila(page, hereda.nombre)).toContainText(`Unidad $3.000 (de ${categoria.nombre})`);
   await expect(fila(page, propio.nombre)).toContainText('Unidad $3.500 (propio)');
 });

@@ -107,6 +107,7 @@ describe('ayudas', () => {
         'efectivo',
         'motivo',
         'futuro',
+        'solo para lo que no pasó por Fudo',
       ],
     ],
     ['canales', ['Cheaf', 'Encargo', 'Venta a comercios', 'desactivado']],
@@ -224,6 +225,12 @@ describe('ayudas', () => {
     expect(inicio).not.toContain('no hubo ventas');
     const caja = AYUDAS.caja.temas.flatMap((t) => t.puntos).join(' ');
     expect(caja).not.toContain('tocá Editar');
+  });
+
+  it('el Menú no promete integrarse con Fudo', () => {
+    const texto = AYUDAS.menu.temas.flatMap((t) => t.puntos).join(' ');
+    expect(texto).not.toContain('integrados');
+    expect(texto).toContain('Pasalos a Fudo');
   });
 
   it('Reportes no ofrece atajos que la pantalla no tiene', () => {

@@ -94,7 +94,8 @@ describe('leerMediosDePago', () => {
     const lectura = leerMediosDePago([TITULOS, fila(46270, 'Cheque', 100, 1)]);
     expect(lectura).toEqual({
       ok: false,
-      mensaje: 'Fila 2: no conocemos el medio de pago "Cheque".',
+      mensaje:
+        'Fila 2: no conocemos el medio de pago "Cheque". Los que entran son: efectivo, tarjeta de crédito, tarjeta de débito, QR y transferencia.',
     });
     expect(leerMediosDePago([TITULOS, fila('ayer', 'QR', 100, 1)])).toEqual({
       ok: false,

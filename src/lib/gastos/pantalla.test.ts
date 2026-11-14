@@ -106,7 +106,7 @@ describe('fechaParaMostrar', () => {
 describe('opcionesDeMedio y opcionesDeFrecuencia', () => {
   it('con efectivo y cheque, pero sin el efectivo de la caja, que sale por el cierre', () => {
     expect(opcionesDeMedio().map((o) => o.texto)).toEqual([
-      'Efectivo',
+      'Efectivo (fuera de la caja)',
       'Transferencia',
       'Tarjeta',
       'Cheque',
