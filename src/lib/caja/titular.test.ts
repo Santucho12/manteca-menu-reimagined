@@ -1,28 +1,52 @@
 import { describe, expect, it } from 'vitest';
+import type { ResultadoDeMedio } from './resultado';
 import { explicacionDelCierre, titularDelCierre } from './titular';
+
+const medio = (
+  nombre: ResultadoDeMedio['medio'],
+  diferencia: number,
+  fuera = diferencia !== 0,
+): ResultadoDeMedio => ({
+  medio: nombre,
+  declaradoCentavos: 0,
+  esperadoCentavos: 0,
+  diferenciaCentavos: diferencia,
+  fuera,
+});
+
+const cierra = { estado: 'cierra', anulado: false } as const;
+const conDiferencia = { estado: 'con_diferencia', anulado: false } as const;
 
 describe('titularDelCierre', () => {
   it('un cierre sin diferencia dice que cierra', () => {
-    expect(titularDelCierre({ estado: 'cierra', anulado: false }, 0)).toBe('La caja cierra');
+    expect(titularDelCierre(cierra, [medio('efectivo', 0)])).toBe('La caja cierra');
   });
 
-  it('con diferencia dice cuanto falta o sobra en total', () => {
-    expect(titularDelCierre({ estado: 'con_diferencia', anulado: false }, -100000)).toBe(
-      'Faltan $1.000,00 en total',
+  it('con un solo medio fuera de la tolerancia, dice cuanto falta o sobra y en cual', () => {
+    expect(titularDelCierre(conDiferencia, [medio('efectivo', -100000)])).toBe(
+      'Faltan $1.000,00 en efectivo',
     );
-    expect(titularDelCierre({ estado: 'con_diferencia', anulado: false }, 250000)).toBe(
-      'Sobran $2.500,00 en total',
+    expect(
+      titularDelCierre(conDiferencia, [medio('qr', 250000), medio('efectivo', 10, false)]),
+    ).toBe('Sobran $2.500,00 en QR');
+    expect(titularDelCierre(conDiferencia, [medio('credito', -300000)])).toBe(
+      'Faltan $3.000,00 en tarjeta de crédito',
     );
+  });
+
+  it('con varios medios fuera, no suma: dice en cuantos no cierra', () => {
+    const medios = [medio('efectivo', -500000), medio('credito', 500000)];
+    expect(titularDelCierre(conDiferencia, medios)).toBe('No cierra en 2 medios de pago');
   });
 
   it('un cierre sin las ventas del dia cargadas las espera', () => {
-    expect(titularDelCierre({ estado: 'esperando_ventas', anulado: false }, 0)).toBe(
+    expect(titularDelCierre({ estado: 'esperando_ventas', anulado: false }, [])).toBe(
       'Esperando las ventas del día',
     );
   });
 
   it('uno anulado se dice anulado, sea cual sea su resultado', () => {
-    expect(titularDelCierre({ estado: 'con_diferencia', anulado: true }, -5)).toBe(
+    expect(titularDelCierre({ estado: 'con_diferencia', anulado: true }, [medio('qr', -5)])).toBe(
       'Cierre anulado',
     );
   });

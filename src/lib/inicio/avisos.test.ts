@@ -8,6 +8,14 @@ const NADA: DatosDeAvisos = {
   sinClasificar: { cantidad: 0, desde: null, categoriaId: 'sc' },
 };
 
+const pagos = (vencidos: number, estaSemana: number, unico: string | null = null) => ({
+  vencidos,
+  estaSemana,
+  unico,
+});
+const textosDe = (datos: Partial<DatosDeAvisos>) =>
+  avisosDeInicio({ ...NADA, ...datos }).map((aviso) => aviso.texto);
+
 describe('avisosDeInicio', () => {
   it('sin nada pendiente no hay avisos', () => {
     expect(avisosDeInicio(NADA)).toEqual([]);
@@ -37,18 +45,25 @@ describe('avisosDeInicio', () => {
   });
 
   it('avisa los pagos que vencen esta semana, al final', () => {
-    const avisos = avisosDeInicio({ ...NADA, vencenEstaSemana: 2 });
-    expect(avisos).toEqual([{ texto: 'Esta semana vencen 2 pagos.', enlace: '/admin/gastos' }]);
-    const uno = avisosDeInicio({ ...NADA, vencenEstaSemana: 1 });
-    expect(uno.map((a) => a.texto)).toEqual(['Esta semana vence 1 pago.']);
+    expect(avisosDeInicio({ ...NADA, pagos: pagos(0, 2) })).toEqual([
+      { texto: 'Esta semana vencen 2 pagos.', enlace: '/admin/gastos' },
+    ]);
+    expect(textosDe({ pagos: pagos(0, 1, 'x') })).toEqual(['Esta semana vence 1 pago.']);
   });
 
-  it('si vence uno solo, el aviso lleva a Gastos con ese pago para pagarlo', () => {
-    const [aviso] = avisosDeInicio({
-      ...NADA,
-      vencenEstaSemana: 1,
-      unVencimiento: { id: 'fijo-1', fecha: '2026-10-30' },
-    });
+  it('avisa lo vencido, solo o junto con lo de la semana, en un solo aviso', () => {
+    expect(textosDe({ pagos: pagos(1, 0, 'x') })).toEqual(['Tenés 1 pago vencido.']);
+    expect(textosDe({ pagos: pagos(2, 0) })).toEqual(['Tenés 2 pagos vencidos.']);
+    expect(textosDe({ pagos: pagos(2, 1) })).toEqual([
+      'Tenés 2 pagos vencidos y 1 que vence esta semana.',
+    ]);
+    expect(textosDe({ pagos: pagos(1, 3) })).toEqual([
+      'Tenés 1 pago vencido y 3 que vencen esta semana.',
+    ]);
+  });
+
+  it('si es uno solo, el aviso lleva a Gastos con ese pago para pagarlo', () => {
+    const [aviso] = avisosDeInicio({ ...NADA, pagos: pagos(0, 1, 'fijo-1|2026-10-30') });
     expect(aviso!.enlace).toBe('/admin/gastos?pagar=fijo-1%7C2026-10-30');
   });
 

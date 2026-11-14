@@ -142,7 +142,7 @@ test('cada tarjeta explica en una línea qué muestra', async ({ page }) => {
   await page.goto('/admin');
   const descripciones = [
     ['Mes a mes', 'Ventas, gastos y balance de cada mes.'],
-    ['Esta semana vs la anterior', 'Las ventas sumadas día a día, contra la semana pasada.'],
+    ['Esta semana vs la anterior', 'Lo vendido sumado día a día, contra la semana pasada.'],
     ['Gastos del mes', 'En qué se fue la plata del mes.'],
     ['Más vendidos', 'Por lo que dejaron en el mes, no por unidades.'],
   ] as const;
@@ -190,7 +190,7 @@ test('la semana dice si vas arriba o abajo de la anterior, con un acumulado', as
   await page.goto('/admin');
   const semana = page.getByRole('region', { name: 'Esta semana vs la anterior' });
   await expect(semana.getByRole('heading', { name: /^Vas / })).toBeVisible();
-  await expect(semana.getByText(/^[▲▼=] \d+ vs \d+$/)).toBeVisible();
+  await expect(semana.getByText(/^[▲▼=] \$.+ vs \$.+$/)).toBeVisible();
   await expect(semana.locator('.recharts-line').first()).toBeVisible();
   await expect(semana.locator('.recharts-bar-rectangle')).toHaveCount(0);
 });

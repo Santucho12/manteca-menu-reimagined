@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
-  diferenciaParaMostrar,
   enlaceDeControl,
   filtrosDeControl,
   opcionesDeEstado,
   nombreDeEstado,
   nombreDeMedio,
+  sinCierresCargados,
   textoDeDiferencia,
   tonoDelCierre,
 } from './pantalla';
@@ -35,6 +35,10 @@ describe('filtrosDeControl', () => {
     });
     expect(filtrosDeControl({ estado: 'revisado' }, HOY).estado).toBeNull();
   });
+
+  it('lee el estado "no abrió"', () => {
+    expect(filtrosDeControl({ estado: 'no_abrio' }, HOY).estado).toBe('no_abrio');
+  });
 });
 
 describe('enlaceDeControl', () => {
@@ -58,18 +62,29 @@ describe('nombres', () => {
     expect(nombreDeEstado('cierra')).toBe('Cierra');
     expect(nombreDeEstado('con_diferencia')).toBe('Con diferencia');
     expect(nombreDeEstado('esperando_ventas')).toBe('Esperando ventas');
+    expect(nombreDeEstado('no_abrio')).toBe('No abrió');
     expect(nombreDeMedio('credito')).toBe('Tarjeta de crédito');
   });
 });
 
 describe('opcionesDeEstado', () => {
-  it('son cuatro: cierra, con diferencia, esperando ventas y pendiente', () => {
+  it('son cinco: cierra, con diferencia, esperando ventas, pendiente y no abrió', () => {
     expect(opcionesDeEstado().map((o) => o.valor)).toEqual([
       'cierra',
       'con_diferencia',
       'esperando_ventas',
       'pendiente',
+      'no_abrio',
     ]);
+  });
+});
+
+describe('sinCierresCargados', () => {
+  it('los dias pendientes y los que no abrio no son cierres: solo se listan sus dias', () => {
+    expect(sinCierresCargados('pendiente')).toBe(true);
+    expect(sinCierresCargados('no_abrio')).toBe(true);
+    expect(sinCierresCargados('cierra')).toBe(false);
+    expect(sinCierresCargados(null)).toBe(false);
   });
 });
 
@@ -90,22 +105,9 @@ describe('tonoDelCierre', () => {
     [{ estado: 'con_diferencia', anulado: false }, 'rosa'],
     [{ estado: 'pendiente', anulado: false }, 'ambar'],
     [{ estado: 'esperando_ventas', anulado: false }, 'ambar'],
+    [{ estado: 'no_abrio', anulado: false }, 'pizarra'],
     [{ estado: 'cierra', anulado: true }, 'pizarra'],
   ] as const)('%j se pinta %s', (cierre, tono) => {
     expect(tonoDelCierre(cierre)).toBe(tono);
-  });
-});
-
-describe('diferenciaParaMostrar', () => {
-  it('es la diferencia total del cierre', () => {
-    expect(diferenciaParaMostrar({ estado: 'con_diferencia', diferenciaTotalCentavos: -5 })).toBe(
-      -5,
-    );
-  });
-
-  it('es null mientras el cierre espera las ventas', () => {
-    expect(
-      diferenciaParaMostrar({ estado: 'esperando_ventas', diferenciaTotalCentavos: 0 }),
-    ).toBeNull();
   });
 });

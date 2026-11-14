@@ -61,6 +61,15 @@ describe('resultadoDelCierre', () => {
     expect(resultado.estado).toBe('cierra');
   });
 
+  it('cada medio dice si esta fuera de la tolerancia, y justo en ella no lo esta', () => {
+    const resultado = resultadoDelCierre(
+      declarado,
+      { ...ventas, credito: 360000, qr: 50000 },
+      50000,
+    );
+    expect(resultado.medios.map((m) => m.fuera)).toEqual([false, true, false, false, false]);
+  });
+
   it('un dia sin ventas espera el fondo menos retiros y gastos', () => {
     const cero = { efectivo: 0, credito: 0, debito: 0, qr: 0, transferencia: 0 };
     const resultado = resultadoDelCierre(declarado, cero, 0);

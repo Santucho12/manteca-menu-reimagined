@@ -38,6 +38,8 @@ type SemillaDeCierre = {
   otroLocal?: boolean;
   cargadoPor?: RolDePrueba;
   quedaEnCajaCentavos?: number;
+  /** Lo declarado en tarjeta de credito (por defecto, nada). */
+  creditoCentavos?: number;
 };
 
 async function filaDeCierre(fecha: string, semilla: SemillaDeCierre) {
@@ -48,6 +50,7 @@ async function filaDeCierre(fecha: string, semilla: SemillaDeCierre) {
     cargado_por: await idDeCuentaDePrueba(semilla.cargadoPor ?? 'caja'),
     fondo_inicial_centavos: 1000000,
     efectivo_centavos: 2000000,
+    credito_centavos: semilla.creditoCentavos ?? 0,
     queda_en_caja_centavos: semilla.quedaEnCajaCentavos ?? 1000000,
   };
 }

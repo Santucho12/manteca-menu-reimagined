@@ -135,6 +135,12 @@ describe('esElPagoPedido', () => {
     expect(esElPagoPedido(item!, `otro|${item!.vencimiento}`)).toBe(false);
     expect(esElPagoPedido(item!, undefined)).toBe(false);
   });
+
+  it('reconoce lo anotado a mano por su clave', () => {
+    const [anotado] = itemsPorPagar([pendiente('luz')], []);
+    expect(esElPagoPedido(anotado!, 'luz')).toBe(true);
+    expect(esElPagoPedido(anotado!, 'otra')).toBe(false);
+  });
 });
 
 describe('dentroDeLosProximos', () => {

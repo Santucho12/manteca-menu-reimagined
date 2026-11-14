@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { borrarDiasSinAbrir, sembrarDiaSinAbrir } from '../tests/cierres-de-prueba';
 import { borrarVentas, sembrarVentaConPago } from '../tests/ventas-de-prueba';
 import { SESIONES } from './ayudas';
 import {
@@ -145,6 +146,17 @@ for (const rol of ['caja', 'invitado'] as const) {
     });
   });
 }
+
+test('caja dice "No abrió" en un dia que el admin marco', async ({ page }) => {
+  const dia = '2018-09-05';
+  await sembrarDiaSinAbrir({ fecha: dia });
+  try {
+    await page.goto(`/admin/reportes/caja?desde=${dia}&hasta=${dia}`);
+    await expect(page.getByRole('row', { name: /05\/09\/2018/ })).toContainText('No abrió');
+  } finally {
+    await borrarDiasSinAbrir([dia]);
+  }
+});
 
 test('por producto y por categoria muestran lo que el Excel no detalla', async ({ page }) => {
   // Una venta sin productos, como las que deja el Excel de Fudo.

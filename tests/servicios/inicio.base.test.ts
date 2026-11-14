@@ -1,13 +1,21 @@
 import { afterAll, describe, expect, it } from 'vitest';
-import { datosDeAvisos, datosDelInicio } from '../../src/lib/inicio/consultas';
+import { datosDeAvisos, datosDelInicio, pagosDelInicio } from '../../src/lib/inicio/consultas';
 import {
   borrarCierres,
+  borrarDiasSinAbrir,
   diaLibre,
   diaSiguiente,
   sembrarCierre,
   sembrarCierreConSalidas,
+  sembrarDiaSinAbrir,
 } from '../cierres-de-prueba';
-import { borrarGastos, sembrarGasto, sembrarRecurrente } from '../gastos-de-prueba';
+import {
+  borrarGastos,
+  generarDelFijo,
+  sembrarGasto,
+  sembrarPorPagar,
+  sembrarRecurrente,
+} from '../gastos-de-prueba';
 import { sembrarVentaConRenglones } from '../reportes-de-prueba';
 import { clienteComo } from '../sesiones';
 import { borrarVentas, productoParaVender, sembrarVentaConPago } from '../ventas-de-prueba';
@@ -15,12 +23,16 @@ import { borrarVentas, productoParaVender, sembrarVentaConPago } from '../ventas
 const cierres: string[] = [];
 const gastos: string[] = [];
 const ventas: string[] = [];
+const porPagar: string[] = [];
+const recurrentes: string[] = [];
+const diasSinAbrir: string[] = [];
 const sumarUnDia = (fecha: string) => diaSiguiente(fecha);
 
 afterAll(async () => {
-  await borrarGastos({ gastos });
+  await borrarGastos({ gastos, porPagar, recurrentes });
   await borrarCierres(cierres);
   await borrarVentas(ventas);
+  await borrarDiasSinAbrir(diasSinAbrir);
 }, 30_000);
 
 async function avisos(hoy = '2099-01-01') {
@@ -74,6 +86,39 @@ describe('avisos del inicio', () => {
   it('sin ningun cierre anterior, ayer no se avisa', async () => {
     expect((await avisos('1990-01-02')).ayerSinCierre).toBeNull();
   });
+
+  it('si ayer esta marcado como que el local no abrio, no avisa', async () => {
+    const fecha = diaLibre();
+    cierres.push((await sembrarCierre({ fecha })).id);
+    const ayer = diaSiguiente(fecha);
+    await sembrarDiaSinAbrir({ fecha: ayer });
+    diasSinAbrir.push(ayer);
+    expect((await avisos(diaSiguiente(fecha, 2))).ayerSinCierre).toBeNull();
+  });
+});
+
+describe('pagos del inicio', () => {
+  const HOY = '2099-03-10';
+
+  it('cuenta lo vencido y lo que vence esta semana de lo anotado a mano', async () => {
+    const admin = await clienteComo('admin');
+    const antes = await pagosDelInicio(admin, HOY);
+    porPagar.push((await sembrarPorPagar({ vencimiento: '2099-03-01' })).id);
+    porPagar.push((await sembrarPorPagar({ vencimiento: '2099-03-12' })).id);
+    const despues = await pagosDelInicio(admin, HOY);
+    expect(despues.vencidos).toBe(antes.vencidos + 1);
+    expect(despues.estaSemana).toBe(antes.estaSemana + 1);
+  });
+
+  it('un fijo con su por pagar ya generado no se cuenta dos veces', async () => {
+    const admin = await clienteComo('admin');
+    const antes = await pagosDelInicio(admin, HOY);
+    const fijo = await sembrarRecurrente({ primerVencimiento: '2099-03-12' });
+    recurrentes.push(fijo.id);
+    await generarDelFijo(fijo.id, '2099-03-12');
+    const despues = await pagosDelInicio(admin, HOY);
+    expect(despues.estaSemana).toBe(antes.estaSemana + 1);
+  });
 });
 
 describe('datos del inicio', () => {
@@ -93,40 +138,17 @@ describe('datos del inicio', () => {
     }
   });
 
-  it('trae las ventas de ayer y su cierre con diferencia', async () => {
-    const fecha = diaLibre();
-    const producto = await productoParaVender();
-    const venta = await sembrarVentaConRenglones({
-      fecha,
-      renglones: [{ producto, cantidad: 1, precioCentavos: 80000 }],
-    });
-    const cierre = await sembrarCierre({ fecha });
-    cierres.push(cierre.id);
-    try {
-      const { ayer } = await datosDelInicio(await clienteComo('admin'), diaSiguiente(fecha));
-      expect(ayer).toMatchObject({ dia: fecha, ventas: 1, montoCentavos: 80000 });
-      expect(ayer.cierre.estado).toBe('con_diferencia');
-    } finally {
-      await borrarVentas([venta], { categoriasDelMenu: [producto.categoriaId] });
-    }
-  });
-
-  it('si ayer no hubo ventas, no avisa que falta el cierre', async () => {
+  it('aunque ayer no tenga ventas cargadas, avisa que falta el cierre', async () => {
     const fecha = diaLibre();
     cierres.push((await sembrarCierre({ fecha })).id);
     const datos = await datosDelInicio(await clienteComo('admin'), diaSiguiente(fecha, 2));
-    expect(datos.ayer.ventas).toBe(0);
-    expect(datos.avisos.some((a) => a.texto.startsWith('Ayer no se cargó'))).toBe(false);
+    expect(datos.avisos.some((a) => a.texto.startsWith('Ayer no se cargó'))).toBe(true);
   });
 
-  it('trae los recurrentes que vencen en los proximos 7 dias', async () => {
-    const recurrente = await sembrarRecurrente({ primerVencimiento: '2099-03-12' });
-    try {
-      const datos = await datosDelInicio(await clienteComo('admin'), '2099-03-10');
-      const item = datos.vencimientos.items.find((v) => v.id === recurrente.id);
-      expect(item).toMatchObject({ fecha: '2099-03-12', montoCentavos: 50000000 });
-    } finally {
-      await borrarGastos({ recurrentes: [recurrente.id] });
-    }
+  it('cuenta las ventas del mes que no tienen productos, las del Excel de Fudo', async () => {
+    const admin = await clienteComo('admin');
+    const antes = (await datosDelInicio(admin, '2016-03-20')).sinDetalle;
+    ventas.push(await sembrarVentaConPago({ fecha: '2016-03-10', medio: 'qr', centavos: 100000 }));
+    expect((await datosDelInicio(admin, '2016-03-20')).sinDetalle).toBe(antes + 1);
   });
 });
