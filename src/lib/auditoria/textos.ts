@@ -36,6 +36,12 @@ const HORA_EN_ARGENTINA = new Intl.DateTimeFormat('es-AR', {
 });
 
 export const datoDe = (tabla: string) => DATOS[tabla] ?? { modulo: 'Otros', dato: tabla };
+// La subida del Excel deja un solo registro en `ventas`, pero no es una venta: es el lote.
+const esSubida = (registro: RegistroDeAuditoria) => registro.accion === 'importacion';
+
+/** El modulo y el dato de un registro; la subida del Excel se lee como las ventas de Fudo. */
+export const datoDelRegistro = (registro: RegistroDeAuditoria) =>
+  esSubida(registro) ? { modulo: 'Ventas', dato: 'Ventas de Fudo' } : datoDe(registro.tabla);
 export const nombreDeCampo = (columna: string) => CAMPOS[columna] ?? columna;
 export const nombreDeAccion = (accion: string) => ACCIONES[accion] ?? accion;
 
@@ -92,8 +98,16 @@ const CON_NOMBRE = new Set([
   'gastos_recurrentes',
 ]);
 
+function periodoDeLaSubida(registro: RegistroDeAuditoria): string | null {
+  const desde = deFila(registro, 'desde');
+  const hasta = deFila(registro, 'hasta');
+  if (!desde || !hasta) return null;
+  return `${fechaParaMostrar(desde)} al ${fechaParaMostrar(hasta)}`;
+}
+
 /** Cual dato fue: su nombre, o el producto y la presentacion de un precio; null si no tiene. */
 export function nombreDelDato(registro: RegistroDeAuditoria, nombres: Nombres): string | null {
+  if (esSubida(registro)) return periodoDeLaSubida(registro);
   if (CON_NOMBRE.has(registro.tabla)) return nombres.get(registro.registro_id) ?? null;
   if (registro.tabla !== 'precios') return null;
   const partes = [deFila(registro, 'producto_id'), deFila(registro, 'presentacion_id')]
@@ -130,8 +144,17 @@ const RUTAS: Record<string, (registro: RegistroDeAuditoria) => string | null> = 
   aumentos: () => '/admin/menu',
 };
 
+// La subida lleva a la lista de Ventas filtrada por el periodo que cubrio el Excel.
+function enlaceDeLaSubida(registro: RegistroDeAuditoria): string {
+  const desde = deFila(registro, 'desde');
+  const hasta = deFila(registro, 'hasta');
+  if (!desde || !hasta) return '/admin/ventas';
+  return `/admin/ventas?${new URLSearchParams({ desde, hasta })}`;
+}
+
 /** Adonde ir para ver el dato: su pantalla, la que lo contiene, o ninguna. */
 export function enlaceDe(registro: RegistroDeAuditoria): string | null {
+  if (esSubida(registro)) return enlaceDeLaSubida(registro);
   return RUTAS[registro.tabla]?.(registro) ?? null;
 }
 

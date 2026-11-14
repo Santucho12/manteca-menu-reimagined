@@ -1,10 +1,10 @@
-import { resultadoDeFila, type FilaConVentas } from '../caja/resultadoDeFila';
+import { diferenciaConocida, type FilaConVentas } from '../caja/resultadoDeFila';
 import type { Cliente } from '../supabase/cliente';
 import type { CierreDelReporte } from './caja';
 import type { GastoDelDia } from './gastos';
 import type { Periodo } from './periodos';
 import { resultadoDelPeriodo } from './resultado';
-import type { RenglonDeProducto, VentaDeCategoria, VentaDelDia } from './ventas';
+import type { RenglonDeProducto, SinDetalle, VentaDeCategoria, VentaDelDia } from './ventas';
 
 type Respuesta = { data: unknown; error: { message: string } | null };
 
@@ -44,6 +44,11 @@ export const ventasPorProducto = (cliente: Cliente, p: Periodo) =>
   reporte<RenglonDeProducto>(cliente, 'reporte_ventas_por_producto', p);
 export const ventasPorCategoria = (cliente: Cliente, p: Periodo) =>
   reporte<VentaDeCategoria>(cliente, 'reporte_ventas_por_categoria', p);
+/** Lo vendido sin renglones (el Excel de Fudo no trae productos), para cerrar con el total. */
+export async function ventasSinDetalle(cliente: Cliente, p: Periodo): Promise<SinDetalle> {
+  const filas = leido<SinDetalle>(await cliente.rpc('reporte_ventas_sin_detalle', p));
+  return filas[0] ?? { ventas: 0, monto_centavos: 0 };
+}
 export const gastosPorDia = (cliente: Cliente, p: Periodo) =>
   reporte<GastoDelDia>(cliente, 'reporte_gastos', p);
 
@@ -60,7 +65,8 @@ function aCierre(c: CierreLeido): CierreDelReporte {
     fecha: c.fecha,
     persona: c.persona_nombre,
     declaradoCentavos,
-    diferenciaCentavos: resultadoDeFila(c).diferenciaTotalCentavos,
+    // Un cierre que espera las ventas no tiene diferencia todavia: no suma por empleado.
+    diferenciaCentavos: diferenciaConocida(c),
   };
 }
 

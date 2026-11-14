@@ -29,6 +29,10 @@ De cada registro se guarda:
 | Antes y después | En un cambio, el valor anterior y el nuevo de lo que cambió |
 | Motivo | En una anulación |
 
+La subida del Excel de Fudo es la excepción a "cada alta": deja un solo registro con el
+resumen, no uno por cada venta y cada pago (pedido 84). Se lee "Ventas · Ventas de Fudo" con
+el período, la acción "Subida del Excel", y lleva a Ventas filtrada por ese período.
+
 El detalle de qué registra cada módulo está en su propio archivo de `docs/modulos/`.
 
 No se registran los ingresos al sistema ni las consultas. Nunca se guarda una contraseña.
@@ -94,3 +98,12 @@ se construyó el 2026-10-09 (pedido 29); el detalle está en
 - **Fichas:** gasto, proveedor y producto muestran "Cargado por", leído del registro de
   alta; el cierre ya mostraba quién lo cargó.
 - También se registran y se filtran el reseteo y el cambio de contraseña.
+- **Subida del Excel (pedido 84):** `ventas_importar_excel` enciende
+  `manteca.importando_excel` (local a la transacción) y `auditar()` no escribe filas de
+  `ventas` ni de `pagos_de_venta` mientras esté encendida. Al terminar inserta un registro
+  `tabla = 'ventas'`, `accion = 'importacion'`, `registro_id = 'excel:<desde>:<hasta>'`, con
+  `despues = {desde, hasta, dias, nuevas, actualizadas, iguales, anuladas, total_centavos}`.
+  Si la subida falla, la transacción revierte también el registro. En pantalla,
+  `datoDelRegistro`, `nombreDelDato` y `enlaceDe` (`src/lib/auditoria/textos.ts`) la tratan
+  aparte. Pruebas: `tests/servicios/excel-en-el-sistema.base.test.ts`, los puros de
+  `src/lib/auditoria` y `e2e/auditoria.spec.ts`.

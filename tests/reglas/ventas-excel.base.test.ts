@@ -99,13 +99,26 @@ describe('subir el Excel de Fudo', () => {
     expect((await ventasDe(DIA, 'efectivo')).filter((v) => !v.anulado)).toHaveLength(3);
   });
 
-  it('queda en la auditoria quien cargo las ventas', async () => {
+  // Desde el pedido 84 la subida deja un solo registro, no uno por venta.
+  it('queda en la auditoria quien subio el Excel, en el registro de la subida', async () => {
+    const admin = await clienteComo('admin');
+    const { data: sesion } = await admin.auth.getUser();
     const [venta] = await ventasDe(DIA, 'qr');
-    const { data } = await clienteSecretoDePruebas()
+    const secreto = clienteSecretoDePruebas();
+    const { data: subida } = await secreto
       .from('auditoria')
-      .select('accion, tabla')
+      .select('usuario_id, tabla')
+      .eq('accion', 'importacion')
+      .eq('registro_id', `excel:${DIA}:${OTRO_DIA}`)
+      .order('fecha', { ascending: false })
+      .limit(1)
+      .single();
+    expect(subida).toEqual({ usuario_id: sesion.user!.id, tabla: 'ventas' });
+    const { data: porVenta } = await secreto
+      .from('auditoria')
+      .select('id')
       .eq('registro_id', venta!.id);
-    expect(data).toContainEqual({ accion: 'alta', tabla: 'ventas' });
+    expect(porVenta).toEqual([]);
   });
 });
 

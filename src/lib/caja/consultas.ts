@@ -2,7 +2,7 @@ import type { Cliente } from '../supabase/cliente';
 import { POR_PAGINA, cantidadDePaginas } from '../usuarios/presentacion';
 import { fondosAnterioresDe } from './fondosAnteriores';
 import type { FiltrosDeControl } from './pantalla';
-import type { Medio, ResultadoDeMedio } from './resultado';
+import type { EstadoDelCierre, Medio, ResultadoDeMedio } from './resultado';
 import { resultadoDeFila, type FilaConVentas } from './resultadoDeFila';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -22,7 +22,7 @@ export type FilaDeCierre = {
   id: string;
   fecha: string;
   /** Un cierre anulado conserva su cuenta, pero no cuenta para nada: se ve aparte. */
-  estado: 'cierra' | 'con_diferencia';
+  estado: EstadoDelCierre;
   anulado: boolean;
   persona: string;
   diferenciaTotalCentavos: number;

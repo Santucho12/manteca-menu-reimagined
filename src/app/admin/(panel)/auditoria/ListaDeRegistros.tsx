@@ -4,7 +4,7 @@ import { Chip } from '@/components/panel/Insignias';
 import { ListaDelPanel, type Columna } from '@/components/panel/ListaDelPanel';
 import { SinResultados } from '@/components/panel/SinResultados';
 import {
-  datoDe,
+  datoDelRegistro,
   fechaYHora,
   nombreDeAccion,
   nombreDelDato,
@@ -21,7 +21,7 @@ const ENLACE =
 
 // "Gastos · Gasto · nombre": un solo texto, para que se lea (y se busque) de corrido.
 function queEs(registro: RegistroDeAuditoria, nombres: Nombres): string {
-  const { modulo, dato } = datoDe(registro.tabla);
+  const { modulo, dato } = datoDelRegistro(registro);
   const nombre = nombreDelDato(registro, nombres);
   return `${modulo} · ${dato}${nombre ? ` · ${nombre}` : ''}`;
 }

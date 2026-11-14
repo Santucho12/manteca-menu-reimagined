@@ -9,7 +9,7 @@ import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { nombresDe, registroPorId } from '@/lib/auditoria/consultas';
 import {
   cambiosDe,
-  datoDe,
+  datoDelRegistro,
   enlaceDe,
   fechaYHora,
   nombreDeAccion,
@@ -53,7 +53,7 @@ export default async function RegistroDeAuditoria({ params }: { params: Promise<
   );
   if (!registro) notFound();
   const nombres = await nombresDe(cliente, [registro]);
-  const { modulo, dato } = datoDe(registro.tabla);
+  const { modulo, dato } = datoDelRegistro(registro);
   const enlace = enlaceDe(registro);
   const nombre = nombreDelDato(registro, nombres);
   return (

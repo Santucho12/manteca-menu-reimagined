@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   cambiosDe,
   datoDe,
+  datoDelRegistro,
   enlaceDe,
   fechaYHora,
   nombreDeAccion,
@@ -182,5 +183,47 @@ describe('nombreDelDato y el contexto de un cambio', () => {
       contexto: { producto_id: PRODUCTO },
     });
     expect(enlaceDe(precio)).toBe(`/admin/menu/productos/${PRODUCTO}`);
+  });
+});
+
+describe('la subida del Excel de Fudo', () => {
+  const subida = registro({
+    tabla: 'ventas',
+    registro_id: 'excel:2026-11-01:2026-11-05',
+    accion: 'importacion',
+    despues: {
+      desde: '2026-11-01',
+      hasta: '2026-11-05',
+      dias: 5,
+      nuevas: 40,
+      actualizadas: 2,
+      iguales: 7,
+      anuladas: 1,
+      total_centavos: 12345600,
+    },
+  });
+
+  it('se lee como subida del Excel, en el modulo Ventas, con su periodo', () => {
+    expect(datoDelRegistro(subida)).toEqual({ modulo: 'Ventas', dato: 'Ventas de Fudo' });
+    expect(nombreDeAccion('importacion')).toBe('Subida del Excel');
+    expect(nombreDelDato(subida, nombres)).toBe('01/11/2026 al 05/11/2026');
+    expect(datoDelRegistro(registro({ tabla: 'ventas', accion: 'alta' })).dato).toBe('Venta');
+  });
+
+  it('su detalle dice el periodo, lo que hizo y el total en pesos', () => {
+    expect(cambiosDe(subida, nombres)).toEqual([
+      { campo: 'Desde', antes: null, despues: '01/11/2026' },
+      { campo: 'Hasta', antes: null, despues: '05/11/2026' },
+      { campo: 'Días', antes: null, despues: '5' },
+      { campo: 'Nuevas', antes: null, despues: '40' },
+      { campo: 'Actualizadas', antes: null, despues: '2' },
+      { campo: 'Iguales', antes: null, despues: '7' },
+      { campo: 'Anuladas', antes: null, despues: '1' },
+      { campo: 'Total', antes: null, despues: '$123.456,00' },
+    ]);
+  });
+
+  it('lleva a Ventas con ese periodo', () => {
+    expect(enlaceDe(subida)).toBe('/admin/ventas?desde=2026-11-01&hasta=2026-11-05');
   });
 });

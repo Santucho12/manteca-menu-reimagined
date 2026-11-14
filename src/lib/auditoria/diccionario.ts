@@ -25,7 +25,9 @@ export const DATOS: Record<string, { modulo: string; dato: string }> = {
 
 export const CAMPOS: Record<string, string> = {
   activo: 'Activo',
+  actualizadas: 'Actualizadas',
   anulado: 'Anulado',
+  anuladas: 'Anuladas',
   canal_id: 'Tipo de venta',
   cantidad: 'Cantidad',
   cargado_por: 'Cargado por',
@@ -41,6 +43,8 @@ export const CAMPOS: Record<string, string> = {
   debe_cambiar_contrasena: 'Debe cambiar la contraseña',
   debito_centavos: 'Tarjeta de débito',
   descripcion: 'Descripción',
+  desde: 'Desde',
+  dias: 'Días',
   efectivo_centavos: 'Efectivo contado',
   email: 'Email',
   esperado_credito_centavos: 'Esperado en crédito',
@@ -54,12 +58,15 @@ export const CAMPOS: Record<string, string> = {
   foto: 'Foto',
   frecuencia: 'Cada cuánto',
   generar_desde: 'Genera desde',
+  hasta: 'Hasta',
   icono: 'Ícono',
+  iguales: 'Iguales',
   medio: 'Medio de pago',
   medio_de_pago: 'Medio de pago',
   monto_centavos: 'Monto',
   motivo_anulacion: 'Motivo de la anulación',
   nombre: 'Nombre',
+  nuevas: 'Nuevas',
   observaciones: 'Observaciones',
   origen: 'Origen',
   orden: 'Orden',
@@ -114,6 +121,7 @@ export const ACCIONES: Record<string, string> = {
   reactivacion: 'Reactivación',
   reseteo_de_contrasena: 'Reseteo de contraseña',
   cambio_de_contrasena: 'Cambio de contraseña',
+  importacion: 'Subida del Excel',
 };
 
 export const VALORES: Record<string, string> = {
@@ -130,6 +138,7 @@ export const VALORES: Record<string, string> = {
   con_diferencia: 'Con diferencia',
   revisado: 'Revisado',
   anulado: 'Anulado',
+  anuladas: 'Anuladas',
   invitado: 'Invitado',
   caja: 'Caja',
   encargado: 'Encargado',

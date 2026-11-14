@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { borrarVentas, sembrarVentaConPago } from '../tests/ventas-de-prueba';
 import { SESIONES } from './ayudas';
 import {
   borrarReportes,
@@ -144,3 +145,18 @@ for (const rol of ['caja', 'invitado'] as const) {
     });
   });
 }
+
+test('por producto y por categoria muestran lo que el Excel no detalla', async ({ page }) => {
+  // Una venta sin productos, como las que deja el Excel de Fudo.
+  const dia = '2018-08-14';
+  const venta = await sembrarVentaConPago({ fecha: dia, medio: 'qr', centavos: 123400 });
+  try {
+    for (const reporte of ['productos', 'categorias']) {
+      await page.goto(`/admin/reportes/${reporte}?desde=${dia}&hasta=${dia}`);
+      const fila = page.getByRole('row', { name: /Sin detalle de productos \(Excel de Fudo\)/ });
+      await expect(fila).toContainText('$1.234,00');
+    }
+  } finally {
+    await borrarVentas([venta]);
+  }
+});
