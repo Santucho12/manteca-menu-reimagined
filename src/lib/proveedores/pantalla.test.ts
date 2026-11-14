@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   enlaceDeProveedores,
   filasConPagado,
+  textoDePorPagar,
   filtrosDeProveedores,
   vacioDeProveedores,
 } from './pantalla';
@@ -36,6 +37,21 @@ describe('filasConPagado', () => {
     const filas = [fila, { ...fila, id: 'p2' }];
     const resultado = filasConPagado(filas, new Map([['p1', 300000]]));
     expect(resultado.map((f) => f.pagadoCentavos)).toEqual([300000, 0]);
+  });
+
+  it('suma tambien lo por pagar, o cero si no debe nada', () => {
+    const filas = [fila, { ...fila, id: 'p2' }];
+    const resultado = filasConPagado(filas, new Map(), new Map([['p2', 800000]]));
+    expect(resultado.map((f) => f.porPagarCentavos)).toEqual([0, 800000]);
+  });
+});
+
+describe('textoDePorPagar', () => {
+  it('avisa lo que se le debe, y sin deuda no dice nada', () => {
+    expect(textoDePorPagar(800000)).toBe(
+      'Tiene $8.000,00 por pagar. Si lo desactivás, sigue en Próximos pagos hasta que lo pagues.',
+    );
+    expect(textoDePorPagar(0)).toBeNull();
   });
 });
 
