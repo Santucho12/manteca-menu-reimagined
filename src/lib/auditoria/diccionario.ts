@@ -17,6 +17,7 @@ export const DATOS: Record<string, { modulo: string; dato: string }> = {
   cierres_de_caja: { modulo: 'Caja', dato: 'Cierre de caja' },
   retiros_de_caja: { modulo: 'Caja', dato: 'Retiro' },
   configuracion_de_caja: { modulo: 'Caja', dato: 'Tolerancia' },
+  dias_sin_abrir: { modulo: 'Caja', dato: 'Día sin abrir' },
   ventas: { modulo: 'Ventas', dato: 'Venta' },
   renglones_de_venta: { modulo: 'Ventas', dato: 'Producto vendido' },
   pagos_de_venta: { modulo: 'Ventas', dato: 'Pago' },
