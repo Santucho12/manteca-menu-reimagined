@@ -76,6 +76,7 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
           'Muestra el nombre, qué le comprás, el teléfono y lo pagado en el mes. Va de a 25 por página.',
           'En Buscar por nombre escribí parte del nombre y apretá Buscar.',
           'Pagado este mes suma los gastos cargados a ese proveedor del 1 del mes hasta hoy, sin los anulados.',
+          'Por pagar suma lo anotado a ese proveedor que todavía no se pagó. Desactivarlo no lo cancela: sigue en Próximos pagos.',
           'El botón verde abre el chat de WhatsApp con el proveedor: no arma ningún pedido. Si no tiene teléfono, no aparece.',
         ],
       },
@@ -140,7 +141,8 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
           'En ¿Se repite? elegí todos los meses, cada dos meses o una vez por año, y es un gasto fijo: cada pago queda por pagar el día que vence, y la frase de abajo dice qué va a pasar.',
           '¿Ya lo pagaste? Con Sí, la fecha es la del pago, viene con hoy (tocá Ayer o elegí otra) y no puede ser futura: define a qué mes cuenta. Con Todavía no, queda por pagar: la fecha es cuándo vence y el medio lo elegís al pagarlo.',
           'El proveedor aparece solo en las categorías que lo piden, y ahí es obligatorio. El monto va con coma para los centavos: 12.345,50.',
-          'Efectivo de la caja no se ofrece: lo que se paga con la caja se anota en el cierre del día.',
+          'Efectivo de la caja no se ofrece: lo que se paga con la caja se anota en el cierre del día. Efectivo (fuera de la caja) es plata que no salió de la caja.',
+          'Si ya hay un gasto del mismo proveedor, monto y día, te avisa por si lo cargaste dos veces. Si son dos compras distintas, tocá Cargar igual.',
         ],
       },
       {
