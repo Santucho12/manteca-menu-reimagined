@@ -65,7 +65,8 @@ Solo Admin.
 - Un producto que cambió de categoría: sus ventas se cuentan en la categoría que tiene hoy.
 - Un producto desactivado con ventas en el período: aparece igual.
 - Un gasto cargado hoy con fecha de un mes anterior: cambia el resultado de ese mes.
-- En el reporte de caja, un día sin cierre aparece marcado. La diferencia de cada cierre se
+- En el reporte de caja, un día sin cierre aparece marcado, y uno marcado como que no abrió
+  dice "No abrió" (pedido 85). La diferencia de cada cierre se
   dice como en Caja: "Faltan" o "Sobran" y el monto (pedido 66; sin ventas, lo esperado es $0).
 
 ## Fuera de alcance

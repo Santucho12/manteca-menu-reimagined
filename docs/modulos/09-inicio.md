@@ -29,7 +29,7 @@ Aparece solo si hay algo pendiente. Cada aviso lleva a la pantalla donde se resu
 | Personas que esperan un rol | Usuarios |
 | Productos de Fudo sin vincular | Vinculación |
 | Gastos sin clasificar | Gastos |
-| Pagos que vencen esta semana | Gastos (Próximos pagos) |
+| Pagos vencidos o que vencen esta semana | Gastos (Próximos pagos) |
 | Las ventas no se sincronizan desde hace más de un día | Ventas |
 
 ### 2. Los números del mes
@@ -55,13 +55,15 @@ gastos. Esos meses muestran solo las ventas, sin balance.
 ### 4. Más vendidos
 
 Los 5 productos que más plata dejaron en el mes, con la cantidad vendida al lado y medallas
-de oro, plata y bronce para los tres primeros.
+de oro, plata y bronce para los tres primeros. Si el mes tiene ventas del Excel de Fudo, que
+no trae productos, una nota lo aclara (pedido 85).
 
 ### 5. Esta semana contra la anterior
 
 Un gráfico acumulado: suma las ventas día a día desde hoy y los 6 días anteriores, y las
-compara con los 7 días de antes. Una píldora dice si vas arriba o abajo (verde o rojo) y
-otra muestra los dos totales.
+compara con los 7 días de antes, en pesos. El título dice cuánto vas arriba o abajo
+("Vas $7.000 arriba") y una píldora muestra los dos totales en corto ("▲ $84 k vs $77 k";
+pedido 85).
 
 ### 6. Gastos por categoría
 
@@ -145,7 +147,7 @@ Construido el 2026-10-12 (pedido 33). Diseño en `docs/superpowers/specs/2026-10
 | Ayer no se cargó el cierre | Ayer sin cierre sin anular, con algún cierre anterior | `/admin/caja/control?desde=<ayer>&hasta=<ayer>` |
 | Personas esperando un rol | `contarPendientes` | `/admin/usuarios?estado=pendientes` |
 | Gastos sin clasificar | Gastos sin anular de la categoría de sistema | `/admin/gastos` (Para clasificar, de cualquier mes; pedido 58) |
-| Pagos que vencen esta semana | Fijos activos con próximo vencimiento de hoy a 6 días | `/admin/gastos` (Próximos pagos; pedido 58) |
+| Pagos vencidos o que vencen esta semana | Lo mismo que lista Próximos pagos: vencido antes de hoy, o de hoy a 6 días; un fijo con su por pagar ya generado cuenta una vez (pedido 85) | `/admin/gastos`, con `?pagar=` si es uno solo |
 
 ### Código
 
@@ -161,13 +163,13 @@ Construido el 2026-10-12 (pedido 33). Diseño en `docs/superpowers/specs/2026-10
 
 ### Ayer y vencimientos (pedido 50, 2026-10-27)
 
-- Si ayer no hubo ventas no sale el aviso "Ayer no se cargó el cierre": un día sin ventas es
-  un día que el local no abrió.
-- Los recurrentes activos cuyo próximo vencimiento cae de hoy a 6 días, con el mismo cálculo
-  que la lista de Recurrentes, alimentan el aviso "Esta semana vencen N pagos".
+- Desde el pedido 85, el aviso "Ayer no se cargó el cierre" sale aunque ayer no haya ventas
+  cargadas (con el Excel de Fudo, las ventas llegan después). No sale si el admin marcó ayer
+  como "No abrió" en el control.
+- El aviso de pagos sale de Próximos pagos (pedido 85): cuenta lo vencido y lo de la semana.
 - Se probó una franja "Ayer" arriba de todo y una tarjeta "Vencen esta semana", y Santiago
-  las sacó de la pantalla (2026-10-27). Quedó el cálculo en `src/lib/inicio/ayer.ts` y
-  `vencimientos.ts` (puros), que usan los avisos.
+  las sacó de la pantalla (2026-10-27). `ayer.ts` y `vencimientos.ts` se borraron en el
+  pedido 85; el cálculo de pagos está en `src/lib/inicio/pagos.ts`.
 
 ### Pruebas
 

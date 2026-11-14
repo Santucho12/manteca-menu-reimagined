@@ -56,6 +56,7 @@ guarda**: se calcula siempre al mostrar, contra las ventas del día en ese momen
 | Con diferencia | Algún medio supera la tolerancia (sin ventas ese día, lo esperado es $0) |
 | Esperando ventas | Las ventas de Fudo de ese día todavía no se subieron (pedido 84) |
 | Pendiente | El día todavía no tiene cierre cargado |
+| No abrió | El admin marcó que ese día el local no abrió: no es pendiente ni avisa en Inicio (pedido 85) |
 
 Un cierre anulado no es un estado: sigue en el historial con su motivo y se ve con «Ver anulados».
 «Revisado» ya no existe.
@@ -93,12 +94,16 @@ por día y por empleado del reporte de Caja.
 
 ### Control de cierres, solo admin
 
-- Lista de todos los cierres con fecha, quién lo cargó, estado y diferencia total.
+- Lista de todos los cierres con fecha, quién lo cargó, estado y la diferencia de cada medio
+  (pedido 85: un faltante en un medio y un sobrante en otro no se compensan).
 - Filtros por fechas, persona y estado. La lista está paginada.
-- Los días sin cierre aparecen marcados.
+- Los días sin cierre aparecen marcados. Cada uno tiene "No abrió", que lo saca de pendientes y
+  lo pasa a la lista "Días que no abrió", con "Deshacer" (pedido 85). Un día con cierre sin
+  anular o un día futuro no se marcan; si después se carga un cierre de un día marcado, la
+  marca se desactiva sola.
 - Al abrir uno: lo declarado, lo esperado y la diferencia de cada medio; los retiros; los
   gastos de caja; las ventas canceladas y sin medio de pago; el comentario del empleado.
-- Acciones: editar y anular (solo el admin anula). No se marca como revisado.
+- Acciones: editar y anular, las dos solo del admin. No se marca como revisado.
 
 ### Tolerancia
 
@@ -110,10 +115,11 @@ por día y por empleado del reporte de Caja.
 1. El empleado cuenta a ciegas: no ve lo esperado hasta guardar.
 2. Un cierre por día. El segundo intento se rechaza.
 3. El cierre queda a nombre de quien tiene la sesión iniciada. No se puede elegir a otro.
-4. Un cierre guardado se puede editar: Caja el suyo y el admin cualquiera. Cada cambio queda
+4. Un cierre guardado lo edita solo el admin (pedido 85; antes Caja editaba el suyo). Caja ve
+   "¿Algo está mal? Avisale a un administrador". Cada cambio queda
    en la auditoría con el valor anterior y el nuevo. El admin puede anularlo, con motivo; el
    anulado deja libre ese día.
-5. Caja no puede anular.
+5. Caja no puede editar ni anular.
 6. El cierre no espera a las ventas: se guarda igual y su resultado se calcula al mostrarlo.
 7. Cada gasto pagado con la caja crea un gasto "Sin clasificar" en Gastos, con el monto y la
    descripción que escribió el empleado.
@@ -159,7 +165,7 @@ por día y por empleado del reporte de Caja.
 |---|---|
 | Lo esperado antes de declarar | No se muestra |
 | La diferencia después de guardar | Se muestra, y el empleado puede comentar |
-| Corregir un cierre | Se edita (rediseño del 2026-10-28); antes se anulaba y se cargaba de nuevo |
+| Corregir un cierre | Lo edita el admin (pedido 85); desde el 2026-10-28 se editaba, antes se anulaba y se cargaba de nuevo |
 | Diferencias chicas | Tolerancia que define el admin |
 | Fondo de cambio | Se declara en cada cierre, precargado con lo que quedó en el último cierre anterior; si ese no es el de ayer, un aviso dice de qué día viene |
 | Turnos | Un cierre por día (Santiago, 2026-10-09) |
