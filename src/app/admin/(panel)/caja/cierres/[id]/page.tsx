@@ -25,7 +25,15 @@ function Marcas({ cierre }: { cierre: Cierre }) {
   );
 }
 
+// Solo el admin corrige o anula un cierre guardado: a Caja se le dice a quien avisarle.
 function AccionesDelCierre({ cierre, esAdmin }: { cierre: Cierre; esAdmin: boolean }) {
+  if (!esAdmin) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        ¿Algo está mal? Avisale a un administrador: lo corrige desde el control de cierres.
+      </p>
+    );
+  }
   return (
     <div className="flex flex-wrap items-start gap-3">
       <Link href={`/admin/caja/cierres/${cierre.id}/editar`} className={ACCESO_SECUNDARIO}>
@@ -34,9 +42,7 @@ function AccionesDelCierre({ cierre, esAdmin }: { cierre: Cierre; esAdmin: boole
         </span>
         Editar cierre
       </Link>
-      {esAdmin ? (
-        <BotonDeAnular id={cierre.id} anular={anularCierreDesdeElPanel} titulo="Anular el cierre" />
-      ) : null}
+      <BotonDeAnular id={cierre.id} anular={anularCierreDesdeElPanel} titulo="Anular el cierre" />
     </div>
   );
 }

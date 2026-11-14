@@ -81,7 +81,7 @@ test('no deja cargar dos cierres del mismo dia', async ({ page }) => {
   await completar(page, fecha);
   await page.getByRole('button', { name: 'Guardar cierre' }).click();
   await expect(aviso(page)).toHaveText(
-    'Ya hay un cierre cargado para ese día. Si está mal, abrilo y editalo.',
+    'Ya hay un cierre cargado para ese día. Si está mal, lo corrige un administrador desde el control de cierres.',
   );
 });
 
@@ -156,18 +156,25 @@ test('cuando llegan las ventas de Fudo de ese dia, el cierre muestra su diferenc
   await expect(page.getByText('Con diferencia', { exact: true })).toBeVisible();
 });
 
-test('un cierre que coincide con las ventas del dia cierra, y se puede editar', async ({
-  page,
-}) => {
+test('un cierre que coincide con las ventas del dia cierra', async ({ page }) => {
   const fecha = dia();
   ventas.push(await sembrarVentaConPago({ fecha, medio: 'efectivo', centavos: 1500000 }));
   await completar(page, fecha);
   await page.getByLabel('Efectivo contado').fill('25.000');
   await page.getByRole('button', { name: 'Guardar cierre' }).click();
   await expect(page.getByText('Cierra', { exact: true })).toBeVisible();
-  await page.getByRole('link', { name: 'Editar cierre' }).click();
-  await page.getByLabel('Efectivo contado').fill('24.000');
-  await page.getByRole('button', { name: 'Guardar cambios' }).click();
-  await expect(page.getByText('Con diferencia', { exact: true })).toBeVisible();
-  await expect(page.getByText('Faltan $1.000,00').first()).toBeVisible();
+});
+
+// Caja no corrige lo que cargo: podria acomodar el numero despues de ver la diferencia.
+test('caja no edita su cierre: no ve Editar y la direccion la saca', async ({ page }) => {
+  const { id } = await sembrarCierre({ fecha: dia() });
+  await page.goto(`/admin/caja/cierres/${id}`);
+  await expect(
+    page.getByText(
+      '¿Algo está mal? Avisale a un administrador: lo corrige desde el control de cierres.',
+    ),
+  ).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Editar cierre' })).toHaveCount(0);
+  await page.goto(`/admin/caja/cierres/${id}/editar`);
+  await expect(page).toHaveURL(/\/admin$/);
 });

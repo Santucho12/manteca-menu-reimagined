@@ -18,7 +18,10 @@ export const MODULOS = {
     nombre: 'Ventas',
     tablas: ['ventas', 'renglones_de_venta', 'pagos_de_venta', 'canales_de_venta'],
   },
-  caja: { nombre: 'Caja', tablas: ['cierres_de_caja', 'retiros_de_caja', 'configuracion_de_caja'] },
+  caja: {
+    nombre: 'Caja',
+    tablas: ['cierres_de_caja', 'retiros_de_caja', 'configuracion_de_caja', 'dias_sin_abrir'],
+  },
 } as const;
 
 export type Modulo = keyof typeof MODULOS;

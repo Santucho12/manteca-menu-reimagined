@@ -1,5 +1,6 @@
 import type { Cliente } from '../supabase/cliente';
 import { POR_PAGINA, cantidadDePaginas } from '../usuarios/presentacion';
+import { diferenciasPorMedio, type DiferenciaDeMedio } from './diferencias';
 import { fondosAnterioresDe } from './fondosAnteriores';
 import type { FiltrosDeControl } from './pantalla';
 import type { EstadoDelCierre, Medio, ResultadoDeMedio } from './resultado';
@@ -25,7 +26,8 @@ export type FilaDeCierre = {
   estado: EstadoDelCierre;
   anulado: boolean;
   persona: string;
-  diferenciaTotalCentavos: number;
+  /** Los medios que no dan exacto; vacio si da todo justo o si espera las ventas. */
+  diferencias: DiferenciaDeMedio[];
   fondoInicialCentavos: number;
   retirosCentavos: number;
 };
@@ -47,7 +49,7 @@ function aFila(leida: Leida): FilaDeCierre {
     estado: resultado.estado,
     anulado: leida.anulado,
     persona: leida.persona_nombre,
-    diferenciaTotalCentavos: resultado.diferenciaTotalCentavos,
+    diferencias: diferenciasPorMedio(resultado.medios),
     fondoInicialCentavos: leida.fondo_inicial_centavos,
     retirosCentavos: leida.retiros_centavos,
   };

@@ -152,7 +152,6 @@ Editar, "Próximo pago" con el calendario, pausar y reactivar, y los últimos se
 
 - Foto del comprobante.
 - Pagos parciales, saldos pendientes y editar lo por pagar (se corrige al pagarlo).
-- Avisar en Inicio lo vencido.
 - Recurrentes semanales o con otra frecuencia.
 - Que Caja cargue o vea gastos.
 - El módulo Compras: recepción, stock y costo de los insumos.

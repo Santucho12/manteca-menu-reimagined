@@ -1,4 +1,5 @@
 import { EnlaceASeccion } from '@/components/panel/EnlaceASeccion';
+import { notaDeMasVendidos } from '@/lib/inicio/masVendidos';
 import { textoDePresentaciones } from '@/lib/inicio/meses';
 import { formatearPesos } from '@/lib/plata';
 import { EncabezadoDeTarjeta } from './EncabezadoDeTarjeta';
@@ -11,7 +12,15 @@ const MEDALLAS = [
 ];
 
 /** Los 5 productos que mas plata dejaron en el mes: un panel chico de Plan Reminder Pro. */
-export function MasVendidos({ productos }: { productos: ProductoDelReporte[] }) {
+export function MasVendidos({
+  productos,
+  sinDetalle,
+}: {
+  productos: ProductoDelReporte[];
+  /** Ventas del mes sin productos (las del Excel de Fudo): no entran en la lista. */
+  sinDetalle: number;
+}) {
+  const nota = notaDeMasVendidos(productos.length, sinDetalle);
   return (
     <section
       aria-labelledby="mas-vendidos"
@@ -26,7 +35,7 @@ export function MasVendidos({ productos }: { productos: ProductoDelReporte[] }) 
       </EncabezadoDeTarjeta>
       {productos.length === 0 ? (
         <p className="text-sm text-muted-foreground leading-relaxed">
-          Todavía no hay ventas este mes.
+          {nota ?? 'Todavía no hay ventas este mes.'}
         </p>
       ) : (
         <ol aria-label="Más vendidos" className="flex-1 flex flex-col divide-y divide-border">
@@ -46,6 +55,9 @@ export function MasVendidos({ productos }: { productos: ProductoDelReporte[] }) 
           ))}
         </ol>
       )}
+      {productos.length > 0 && nota ? (
+        <p className="mt-3 text-[11px] text-muted-foreground leading-relaxed">{nota}</p>
+      ) : null}
     </section>
   );
 }

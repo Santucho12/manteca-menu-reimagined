@@ -91,7 +91,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         puntos: [
           'Hay un cierre por día: un segundo cierre del mismo día no se guarda.',
           'Podés cargar el de un día anterior que quedó sin cargar, pero no uno de un día futuro.',
-          'Si te equivocaste, abrí el cierre y tocá Editar: el resultado se vuelve a calcular. El admin también puede anularlo, con un motivo.',
+          'Un cierre guardado no lo cambiás vos. ¿Algo está mal? Avisale a un administrador: lo corrige o lo anula desde el control de cierres.',
         ],
       },
       {
@@ -111,8 +111,9 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'Los estados',
         puntos: [
           'Pendiente: el día todavía no tiene cierre cargado.',
+          'No abrió: el día que el local no abrió, marcado a mano. No cuenta como pendiente ni avisa en Inicio; con Deshacer vuelve a pendiente.',
           'Cierra: lo contado coincide con las ventas del día, o la diferencia es menor que la tolerancia.',
-          'Con diferencia: en algún medio de pago falta o sobra más que la tolerancia.',
+          'Con diferencia: en algún medio de pago falta o sobra más que la tolerancia. Se mira cada medio por separado: un faltante en efectivo y un sobrante en tarjeta no se compensan.',
           'Anulado: no cuenta, y ese día queda libre para cargarlo de nuevo.',
         ],
       },
@@ -144,7 +145,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'Editar y anular',
         puntos: [
           'Al abrir un cierre ves lo declarado en cada medio, los retiros, los gastos de caja y el comentario de quien lo cargó.',
-          'Editar cambia lo declarado, los retiros y los gastos de caja; cada cambio queda en la auditoría.',
+          'Editar, solo el admin, cambia lo declarado, los retiros y los gastos de caja; el resultado se vuelve a calcular y cada cambio queda en la auditoría.',
           'Un cierre no se borra: se anula con un motivo, y los gastos que salieron de él quedan anulados también.',
         ],
       },

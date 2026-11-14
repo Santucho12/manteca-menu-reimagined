@@ -69,6 +69,12 @@ export const esquemaAnulacionDeCierre = z.object({
 });
 export const esquemaTolerancia = z.object({ tolerancia: montoPedido('Escribí la tolerancia.') });
 
+/** Marcar un día como que el local no abrió (marcar) o deshacer la marca. */
+export const esquemaSinAbrir = z.object({
+  fecha: z.string().refine(esFechaValida, 'Elegí una fecha válida.'),
+  marcar: z.boolean(),
+});
+
 /** Editar un cierre: lo mismo que cargarlo, con el cierre que se cambia. */
 export const esquemaEdicion = esquemaBase.extend({ id: z.uuid() }).superRefine(quedaPosible);
 

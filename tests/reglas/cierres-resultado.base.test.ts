@@ -1,5 +1,11 @@
 import { afterAll, describe, expect, it } from 'vitest';
-import { borrarCierres, datosDeCierre, diaLibre, gastosDelCierre } from '../cierres-de-prueba';
+import {
+  borrarCierres,
+  cierreDe,
+  datosDeCierre,
+  diaLibre,
+  gastosDelCierre,
+} from '../cierres-de-prueba';
 import { clienteSecretoDePruebas } from '../clientes';
 import type { RolDePrueba } from '../cuentas';
 import { clienteComo } from '../sesiones';
@@ -75,7 +81,7 @@ describe('cierres_con_resultado', () => {
 });
 
 describe('cierres_editar', () => {
-  it('cambia lo declarado y reemplaza retiros y gastos sin duplicar', async () => {
+  it('el admin cambia lo declarado y reemplaza retiros y gastos sin duplicar', async () => {
     const fecha = diaLibre();
     const id = await guardar('caja', fecha);
     const nuevos = datosDeCierre(fecha, {
@@ -83,9 +89,9 @@ describe('cierres_editar', () => {
       retiros: [{ monto_centavos: 100000, quien: 'Ana' }],
       gastos: [{ monto_centavos: 50000, descripcion: 'Servilletas' }],
     });
-    const caja = await clienteComo('caja');
+    const admin = await clienteComo('admin');
     for (let vez = 0; vez < 2; vez++) {
-      const { error } = await caja.rpc('cierres_editar', { el_id: id, datos: nuevos });
+      const { error } = await admin.rpc('cierres_editar', { el_id: id, datos: nuevos });
       expect(error).toBeNull();
     }
     const fila = (await resultado('caja', fecha)).data![0]!;
@@ -99,7 +105,7 @@ describe('cierres_editar', () => {
     const fecha = diaLibre();
     const id = await guardar('caja', fecha);
     await (
-      await clienteComo('caja')
+      await clienteComo('admin')
     ).rpc('cierres_editar', {
       el_id: id,
       datos: datosDeCierre(fecha, { efectivo_centavos: 999 }),
@@ -112,16 +118,18 @@ describe('cierres_editar', () => {
     expect(JSON.stringify(data)).toContain('999');
   });
 
-  it('caja no edita el cierre de otra persona', async () => {
+  // Caja ya no corrige lo que cargo: podria acomodar el numero despues de ver la diferencia.
+  it.each(['caja', 'adminOtroLocal'] as const)('%s no edita un cierre de caja', async (rol) => {
     const fecha = diaLibre();
-    const id = await guardar('admin', fecha);
+    const id = await guardar('caja', fecha);
     const { error } = await (
-      await clienteComo('caja')
+      await clienteComo(rol)
     ).rpc('cierres_editar', {
       el_id: id,
-      datos: datosDeCierre(fecha),
+      datos: datosDeCierre(fecha, { efectivo_centavos: 999 }),
     });
     expect(error?.code).toBe('42501');
+    expect((await cierreDe(id)).efectivo_centavos).toBe(2500050);
   });
 
   it('un cierre anulado no se edita', async () => {

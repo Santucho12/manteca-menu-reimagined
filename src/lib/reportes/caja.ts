@@ -1,5 +1,5 @@
 import { fechaParaMostrar } from '../gastos/pantalla';
-import { diasSinCierre } from '../caja/dias';
+import { diasQueNoAbrio, diasSinCierre } from '../caja/dias';
 import { sumarDias, type Periodo } from './periodos';
 
 export type CierreDelReporte = {
@@ -8,29 +8,35 @@ export type CierreDelReporte = {
   declaradoCentavos: number;
   diferenciaCentavos: number | null;
 };
-export type FilaDeCaja = { fecha: string; cierre: CierreDelReporte | null };
+export type FilaDeCaja = { fecha: string; cierre: CierreDelReporte | null; noAbrio: boolean };
 export type ResumenDeEmpleado = {
   persona: string;
   cierres: number;
   diferenciaCentavos: number | null;
 };
 
-/** Los cierres y los dias sin cierre, del mas nuevo al mas viejo. Hoy todavia no cuenta. */
+const sinCierre = (fecha: string, noAbrio: boolean): FilaDeCaja => ({
+  fecha,
+  cierre: null,
+  noAbrio,
+});
+
+/** Los cierres, los dias sin cierre y los que el local no abrio, del mas nuevo al mas viejo. */
 export function filasDeCaja(
   cierres: CierreDelReporte[],
   periodo: Periodo,
   primero: string | null,
   hoy: string,
+  sinAbrir: string[] = [],
 ): FilaDeCaja[] {
-  const faltan = diasSinCierre({
-    ...periodo,
-    conCierre: cierres.map((c) => c.fecha),
-    primero,
-    hoy: sumarDias(hoy, -1),
-  });
+  const conCierre = cierres.map((c) => c.fecha);
+  // Hoy todavia no cuenta como dia sin cierre.
+  const ayer = sumarDias(hoy, -1);
+  const faltan = diasSinCierre({ ...periodo, conCierre, sinAbrir, primero, hoy: ayer });
   return [
-    ...cierres.map((cierre) => ({ fecha: cierre.fecha, cierre })),
-    ...faltan.map((fecha) => ({ fecha, cierre: null })),
+    ...cierres.map((cierre) => ({ fecha: cierre.fecha, cierre, noAbrio: false })),
+    ...faltan.map((fecha) => sinCierre(fecha, false)),
+    ...diasQueNoAbrio({ conCierre, sinAbrir }).map((fecha) => sinCierre(fecha, true)),
   ].sort((a, b) => b.fecha.localeCompare(a.fecha));
 }
 

@@ -1,6 +1,7 @@
 import { sumarDias, type Periodo } from '../reportes/periodos';
 import type { VentaDelDia } from '../reportes/ventas';
 
+/** actual y anterior son lo vendido ese dia y el mismo dia de la semana anterior, en centavos. */
 export type DiaDeLaSemana = { dia: string; etiqueta: string; actual: number; anterior: number };
 
 const NOMBRES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
@@ -16,11 +17,11 @@ export const rangoDeSemanas = (hoy: string): Periodo => ({
 
 /** Hoy y los 6 dias anteriores, de viejo a nuevo, contra el mismo dia de la semana anterior. */
 export function semanaContraSemana(ventas: VentaDelDia[], hoy: string): DiaDeLaSemana[] {
-  const cantidad = new Map(ventas.map((v) => [v.dia, v.ventas]));
+  const monto = new Map(ventas.map((v) => [v.dia, v.monto_centavos]));
   return Array.from({ length: 7 }, (_, i) => {
     const dia = sumarDias(hoy, i - 6);
-    const anterior = cantidad.get(sumarDias(dia, -7)) ?? 0;
+    const anterior = monto.get(sumarDias(dia, -7)) ?? 0;
     const etiqueta = NOMBRES[diaDeLaSemana(dia)]!;
-    return { dia, etiqueta, actual: cantidad.get(dia) ?? 0, anterior };
+    return { dia, etiqueta, actual: monto.get(dia) ?? 0, anterior };
   });
 }

@@ -130,6 +130,7 @@ const RUTAS: Record<string, (registro: RegistroDeAuditoria) => string | null> = 
     return cierre ? `/admin/caja/cierres/${cierre}` : '/admin/caja/control';
   },
   configuracion_de_caja: () => '/admin/caja/control',
+  dias_sin_abrir: () => '/admin/caja/control?estado=no_abrio',
   perfiles: () => '/admin/usuarios',
   productos: (r) => `/admin/menu/productos/${r.registro_id}`,
   precios: (r) => {

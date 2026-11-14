@@ -10,19 +10,22 @@ import {
   primerDiaConCierre,
   toleranciaDeCaja,
 } from '@/lib/caja/consultas';
-import { diasSinCierre } from '@/lib/caja/dias';
+import { diasQueNoAbrio, diasSinCierre } from '@/lib/caja/dias';
 import {
   enlaceDeControl,
   filtrosDeControl,
+  sinCierresCargados,
   type FiltrosDeControl,
   type ParametrosDeControl,
 } from '@/lib/caja/pantalla';
+import { diasSinAbrir } from '@/lib/caja/sinAbrir';
 import { diaEnArgentina } from '@/lib/fechas';
 import { montoParaEditar } from '@/lib/gastos/plata';
 import type { Cliente } from '@/lib/supabase/cliente';
 import { cantidadDePaginas } from '@/lib/usuarios/presentacion';
 import { AccesoACargarCierre } from '../AccesoACargarCierre';
 import { ListaDeCierres } from '../ListaDeCierres';
+import { DiasQueNoAbrio } from './DiasQueNoAbrio';
 import { DiasSinCierre, FiltrosDelControl } from './FiltrosDelControl';
 import { ToleranciaEnTuerca } from './ToleranciaEnTuerca';
 
@@ -37,21 +40,25 @@ const leerElControl = (cliente: Cliente, filtros: FiltrosDeControl) =>
     diasConCierre(cliente, filtros.desde, filtros.hasta),
     primerDiaConCierre(cliente),
     fondosDelRango(cliente, filtros.desde, filtros.hasta),
+    diasSinAbrir(cliente, filtros.desde, filtros.hasta),
   ]);
 
 async function datosDelControl(searchParams: Promise<ParametrosDeControl>) {
   const hoy = diaEnArgentina(new Date());
   const filtros = filtrosDeControl(await searchParams, hoy);
   const { datos } = await exigirPaginaYLeer('admin', (cliente) => leerElControl(cliente, filtros));
-  const [lista, personas, tolerancia, conCierre, primero, fondos] = datos;
+  const [lista, personas, tolerancia, conCierre, primero, fondos, sinAbrir] = datos;
   const { desde, hasta } = filtros;
-  const faltan = diasSinCierre({ desde, hasta, conCierre, primero, hoy });
-  return { hoy, filtros, lista, personas, tolerancia, faltan, fondos };
+  const faltan = diasSinCierre({ desde, hasta, conCierre, sinAbrir, primero, hoy });
+  const noAbrio = diasQueNoAbrio({ conCierre, sinAbrir });
+  return { hoy, filtros, lista, personas, tolerancia, faltan, noAbrio, fondos };
 }
 
-// Los dias pendientes no son de nadie: con una persona elegida no se muestran.
+// Los dias sin cierre no son de nadie: con una persona elegida no se muestran.
 const verPendientes = (f: FiltrosDeControl) =>
   !f.personaId && (f.estado === null || f.estado === 'pendiente');
+const verNoAbrio = (f: FiltrosDeControl) =>
+  !f.personaId && (f.estado === null || f.estado === 'no_abrio');
 
 const Acciones = ({ tolerancia }: { tolerancia: string }) => (
   <>
@@ -65,7 +72,7 @@ export default async function ControlDeCierres({
 }: {
   searchParams: Promise<ParametrosDeControl>;
 }) {
-  const { hoy, filtros, lista, personas, tolerancia, faltan, fondos } =
+  const { hoy, filtros, lista, personas, tolerancia, faltan, noAbrio, fondos } =
     await datosDelControl(searchParams);
   return (
     <Pantalla
@@ -79,7 +86,11 @@ export default async function ControlDeCierres({
         dias={verPendientes(filtros) ? faltan : []}
         abierto={filtros.estado === 'pendiente'}
       />
-      {filtros.estado === 'pendiente' ? null : (
+      <DiasQueNoAbrio
+        dias={verNoAbrio(filtros) ? noAbrio : []}
+        abierto={filtros.estado === 'no_abrio'}
+      />
+      {sinCierresCargados(filtros.estado) ? null : (
         <ListaDeCierres filas={lista.filas} conPersona fondos={fondos} />
       )}
       <Paginas

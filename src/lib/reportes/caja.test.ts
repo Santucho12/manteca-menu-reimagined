@@ -24,6 +24,22 @@ describe('reporte de caja', () => {
     ]);
   });
 
+  it('un dia marcado como que no abrio sale como tal y no como dia sin cierre', () => {
+    const filas = filasDeCaja(
+      [cierre('2026-10-02', 'Ana', null)],
+      { desde: '2026-10-01', hasta: '2026-10-31' },
+      '2026-10-02',
+      '2026-10-06',
+      ['2026-10-04'],
+    );
+    expect(filas.map((f) => [f.fecha, f.cierre?.persona ?? null, f.noAbrio])).toEqual([
+      ['2026-10-05', null, false],
+      ['2026-10-04', null, true],
+      ['2026-10-03', null, false],
+      ['2026-10-02', 'Ana', false],
+    ]);
+  });
+
   it('resume por empleado, sumando solo las diferencias que hay', () => {
     const cierres = [
       cierre('2026-10-02', 'Beto', null),

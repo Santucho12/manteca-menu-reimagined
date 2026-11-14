@@ -7,8 +7,10 @@ import {
   esquemaAnulacionDeCierre,
   esquemaCierre,
   esquemaEdicion,
+  esquemaSinAbrir,
   esquemaTolerancia,
 } from '@/lib/caja/esquemas';
+import { marcarSinAbrir } from '@/lib/caja/sinAbrir';
 
 // Caja y Admin: el cierre queda a nombre de quien tiene la sesion, la base no deja elegir.
 export async function guardarCierreDesdeElPanel(datos: unknown) {
@@ -17,9 +19,9 @@ export async function guardarCierreDesdeElPanel(datos: unknown) {
   );
 }
 
-// Caja edita los suyos y el admin cualquiera: la base decide con la sesion.
+// Solo el admin corrige un cierre guardado: Caja podria acomodarlo despues de ver la diferencia.
 export async function editarCierreDesdeElPanel(datos: unknown) {
-  return ejecutarAccion('caja', esquemaEdicion, datos, ({ cliente }, { id, ...cierre }) =>
+  return ejecutarAccion('admin', esquemaEdicion, datos, ({ cliente }, { id, ...cierre }) =>
     editarCierre(cliente, id, cierre),
   );
 }
@@ -27,6 +29,13 @@ export async function editarCierreDesdeElPanel(datos: unknown) {
 export async function anularCierreDesdeElPanel(datos: unknown) {
   return ejecutarAccion('admin', esquemaAnulacionDeCierre, datos, ({ cliente }, { id, motivo }) =>
     anularCierre(cliente, id, motivo),
+  );
+}
+
+// Solo el admin dice que el local no abrio un dia, o lo deshace.
+export async function marcarSinAbrirDesdeElPanel(datos: unknown) {
+  return ejecutarAccion('admin', esquemaSinAbrir, datos, ({ cliente }, { fecha, marcar }) =>
+    marcarSinAbrir(cliente, fecha, marcar),
   );
 }
 

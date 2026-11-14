@@ -13,6 +13,8 @@ export type ResultadoDeMedio = {
   declaradoCentavos: number;
   esperadoCentavos: number;
   diferenciaCentavos: number;
+  /** La diferencia pasa la tolerancia: este medio hace que el cierre no cierre. */
+  fuera: boolean;
 };
 /** Sin las ventas del dia cargadas no hay contra que comparar: el cierre las espera. */
 export type EstadoDelCierre = 'cierra' | 'con_diferencia' | 'esperando_ventas';
@@ -34,15 +36,17 @@ function esperadoDe(medio: Medio, declarado: CierreDeclarado, ventas: PorMedio):
   );
 }
 
-function medioDe(medio: Medio, declarado: CierreDeclarado, ventas: PorMedio): ResultadoDeMedio {
+function medioDe(
+  medio: Medio,
+  declarado: CierreDeclarado,
+  ventas: PorMedio,
+  toleranciaCentavos: number,
+): ResultadoDeMedio {
   const declaradoCentavos = declarado.medios[medio];
   const esperadoCentavos = esperadoDe(medio, declarado, ventas);
-  return {
-    medio,
-    declaradoCentavos,
-    esperadoCentavos,
-    diferenciaCentavos: declaradoCentavos - esperadoCentavos,
-  };
+  const diferenciaCentavos = declaradoCentavos - esperadoCentavos;
+  const fuera = Math.abs(diferenciaCentavos) > toleranciaCentavos;
+  return { medio, declaradoCentavos, esperadoCentavos, diferenciaCentavos, fuera };
 }
 
 /**
@@ -55,10 +59,9 @@ export function resultadoDelCierre(
   ventas: PorMedio,
   toleranciaCentavos: number,
 ): ResultadoDelCierre {
-  const medios = MEDIOS.map((medio) => medioDe(medio, declarado, ventas));
-  const cierra = medios.every((m) => Math.abs(m.diferenciaCentavos) <= toleranciaCentavos);
+  const medios = MEDIOS.map((medio) => medioDe(medio, declarado, ventas, toleranciaCentavos));
   return {
-    estado: cierra ? 'cierra' : 'con_diferencia',
+    estado: medios.some((m) => m.fuera) ? 'con_diferencia' : 'cierra',
     medios,
     diferenciaTotalCentavos: medios.reduce((suma, m) => suma + m.diferenciaCentavos, 0),
   };

@@ -6,13 +6,9 @@ import { ListaDelPanel, type Columna } from '@/components/panel/ListaDelPanel';
 import { SinResultados } from '@/components/panel/SinResultados';
 import type { FilaDeCierre } from '@/lib/caja/consultas';
 import { diaDeLaSemana } from '@/lib/caja/diaDeLaSemana';
+import { textoDeDiferenciaDeMedio } from '@/lib/caja/diferencias';
 import { diferenciaDeFondo } from '@/lib/caja/fondo';
-import {
-  diferenciaParaMostrar,
-  nombreDeEstado,
-  textoDeDiferencia,
-  tonoDelCierre,
-} from '@/lib/caja/pantalla';
+import { nombreDeEstado, tonoDelCierre } from '@/lib/caja/pantalla';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import { formatearPesos } from '@/lib/plata';
 import { cn } from '@/lib/utils';
@@ -36,20 +32,30 @@ const EstadoConFlecha = ({ cierre }: { cierre: FilaDeCierre }) => (
   </span>
 );
 
-const tonoDeDiferencia = (centavos: number | null) =>
-  centavos === null
-    ? 'text-muted-foreground'
-    : centavos === 0
-      ? 'text-emerald-700'
-      : centavos < 0
-        ? 'text-rose-600 font-bold'
-        : 'text-amber-700 font-bold';
-
-const Diferencia = ({ centavos }: { centavos: number | null }) => (
-  <span className={cn('text-sm font-semibold', tonoDeDiferencia(centavos))}>
-    {textoDeDiferencia(centavos)}
-  </span>
-);
+// Cada medio que no da exacto, por separado: un faltante y un sobrante no se compensan.
+function Diferencia({ cierre }: { cierre: FilaDeCierre }) {
+  if (cierre.estado === 'esperando_ventas') {
+    return <span className="text-sm font-semibold text-muted-foreground">—</span>;
+  }
+  if (cierre.diferencias.length === 0) {
+    return <span className="text-sm font-semibold text-emerald-700">Sin diferencia</span>;
+  }
+  return (
+    <span className="block space-y-0.5 text-left">
+      {cierre.diferencias.map((diferencia) => (
+        <span
+          key={diferencia.medio}
+          className={cn(
+            'block text-sm font-bold',
+            diferencia.centavos < 0 ? 'text-rose-600' : 'text-amber-700',
+          )}
+        >
+          {textoDeDiferenciaDeMedio(diferencia)}
+        </span>
+      ))}
+    </span>
+  );
+}
 
 const Empleado = ({ nombre, children }: { nombre: string; children?: ReactNode }) => (
   <span className="inline-flex items-center gap-3 text-left">
@@ -115,7 +121,7 @@ function columnas(conPersona: boolean, fondos?: Map<string, number | null>) {
     {
       titulo: 'Diferencia',
       alinear: 'centro',
-      celda: (c) => <Diferencia centavos={diferenciaParaMostrar(c)} />,
+      celda: (c) => <Diferencia cierre={c} />,
     },
     { titulo: 'Estado', alinear: 'der', celda: (c) => <EstadoConFlecha cierre={c} /> },
   ] satisfies Columna<FilaDeCierre>[];
@@ -140,7 +146,7 @@ function Tarjeta({
         </div>
         <Estado cierre={cierre} />
       </div>
-      <Diferencia centavos={diferenciaParaMostrar(cierre)} />
+      <Diferencia cierre={cierre} />
     </>
   );
 }

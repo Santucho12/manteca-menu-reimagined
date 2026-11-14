@@ -1,15 +1,16 @@
-import {
-  diasConCierre,
-  listarCierres,
-  primerDiaConCierre,
-  type FilaDeCierre,
-} from '../caja/consultas';
+import { diasConCierre, listarCierres, primerDiaConCierre } from '../caja/consultas';
 import type { FiltrosDeControl } from '../caja/pantalla';
-import { listarRecurrentes, type FilaDeRecurrente } from '../gastos/consultas';
-import type { VentaDelDia } from '../reportes/ventas';
-import { resumenDeAyer, sinAvisoSiAyerNoHuboVentas } from './ayer';
-import { vencimientosDeLaSemana } from './vencimientos';
-import { datosDelResultado, ventasPorDia, ventasPorProducto } from '../reportes/consultas';
+import { diasSinAbrir } from '../caja/sinAbrir';
+import { listarRecurrentes } from '../gastos/consultas';
+import { proximosPagos } from '../gastos/fijos';
+import { pagosPendientes, vencimientosTomados } from '../gastos/pagos';
+import { itemsPorPagar } from '../gastos/porPagar';
+import {
+  datosDelResultado,
+  ventasPorDia,
+  ventasPorProducto,
+  ventasSinDetalle,
+} from '../reportes/consultas';
 import { periodoAnterior, sumarDias } from '../reportes/periodos';
 import { resultadoPorMes } from '../reportes/resultado';
 import { productosDelReporte } from '../reportes/ventas';
@@ -17,6 +18,7 @@ import type { Cliente } from '../supabase/cliente';
 import { contarPendientes } from '../usuarios/consultas';
 import { avisosDeInicio, type ConFecha, type DatosDeAvisos } from './avisos';
 import { masVendidos, mesEnCurso, ultimosDoceMeses } from './meses';
+import { pagosParaAvisar, type PagosParaAvisar } from './pagos';
 import { semanaContraSemana, rangoDeSemanas } from './semana';
 
 type Respuesta = {
@@ -31,6 +33,15 @@ function conFecha(r: Respuesta): ConFecha {
 }
 
 const DIAS_DE_AVISO = 7;
+
+const filtrosDeAyer = (desde: string, hasta: string): FiltrosDeControl => ({
+  desde,
+  hasta,
+  personaId: null,
+  estado: null,
+  anulados: false,
+  pagina: 1,
+});
 
 // Sin "revisado" un cierre con diferencia no se apaga solo: el aviso mira la ultima semana.
 export async function cierresConDiferencia(cliente: Cliente, hoy: string): Promise<ConFecha> {
@@ -59,14 +70,16 @@ export async function gastosSinClasificar(
   return { ...conFecha(gastos), categoriaId: gastos.data?.[0]?.categoria_id ?? null };
 }
 
-/** Ayer, si no tiene cierre; nada si el local todavia no habia cargado ninguno. */
+/** Ayer, si no tiene cierre ni esta marcado como dia sin abrir; nada si no habia ningun cierre. */
 async function ayerSinCierre(cliente: Cliente, hoy: string): Promise<string | null> {
   const ayer = sumarDias(hoy, -1);
-  const [primero, cargados] = await Promise.all([
+  const [primero, cargados, sinAbrir] = await Promise.all([
     primerDiaConCierre(cliente),
     diasConCierre(cliente, ayer, ayer),
+    diasSinAbrir(cliente, ayer, ayer),
   ]);
-  return !primero || primero > ayer || cargados.length > 0 ? null : ayer;
+  const resuelto = cargados.length > 0 || sinAbrir.length > 0;
+  return !primero || primero > ayer || resuelto ? null : ayer;
 }
 
 export async function datosDeAvisos(cliente: Cliente, hoy: string): Promise<DatosDeAvisos> {
@@ -79,44 +92,14 @@ export async function datosDeAvisos(cliente: Cliente, hoy: string): Promise<Dato
   return { conDiferencia, ayerSinCierre: ayer, pendientes, sinClasificar };
 }
 
-const filtrosDeAyer = (desde: string, hasta: string): FiltrosDeControl => ({
-  desde,
-  hasta,
-  personaId: null,
-  estado: null,
-  anulados: false,
-  pagina: 1,
-});
-
-async function cierresDeAyer(cliente: Cliente, hoy: string) {
-  const ayer = sumarDias(hoy, -1);
-  return (await listarCierres(cliente, filtrosDeAyer(ayer, ayer))).filas;
-}
-
-type Leido = {
-  dias: VentaDelDia[];
-  avisos: DatosDeAvisos;
-  cierres: FilaDeCierre[];
-  recurrentes: FilaDeRecurrente[];
-};
-
-/** Ayer, lo que vence en la semana y los avisos, que dependen de si ayer hubo ventas. */
-function ayerYVencimientos({ dias, avisos, cierres, recurrentes }: Leido, hoy: string) {
-  const ayer = resumenDeAyer(dias, cierres, hoy);
-  const vencimientos = vencimientosDeLaSemana(recurrentes, hoy);
-  const [unico] = vencimientos.items;
-  const datos = {
-    ...avisos,
-    vencenEstaSemana: vencimientos.items.length,
-    ...(vencimientos.items.length === 1 && unico
-      ? { unVencimiento: { id: unico.id, fecha: unico.fecha } }
-      : {}),
-  };
-  return {
-    ayer,
-    vencimientos,
-    avisos: avisosDeInicio(sinAvisoSiAyerNoHuboVentas(datos, ayer.ventas)),
-  };
+/** Lo vencido y lo que vence esta semana, de la misma lista que muestra Próximos pagos de Gastos. */
+export async function pagosDelInicio(cliente: Cliente, hoy: string): Promise<PagosParaAvisar> {
+  const [recurrentes, pendientes, tomados] = await Promise.all([
+    listarRecurrentes(cliente),
+    pagosPendientes(cliente),
+    vencimientosTomados(cliente, hoy),
+  ]);
+  return pagosParaAvisar(itemsPorPagar(pendientes, proximosPagos(recurrentes, hoy, tomados)), hoy);
 }
 
 // Todo sale a la vez: cada viaje a la base cuesta unos 300 ms y en serie se suman.
@@ -129,21 +112,24 @@ function leerElInicio(cliente: Cliente, hoy: string) {
     datosDelResultado(cliente, ultimosDoceMeses(hoy)),
     ventasPorProducto(cliente, mes),
     ventasPorDia(cliente, rangoDeSemanas(hoy)),
-    cierresDeAyer(cliente, hoy),
-    listarRecurrentes(cliente),
+    pagosDelInicio(cliente, hoy),
+    ventasSinDetalle(cliente, mes),
   ]);
 }
 
 /** Todo lo de Inicio, con el mismo calculo que Reportes. */
 export async function datosDelInicio(cliente: Cliente, hoy: string) {
-  const [avisos, actual, anterior, anio, productos, dias, cierres, recurrentes] =
-    await leerElInicio(cliente, hoy);
+  const [avisos, actual, anterior, anio, productos, dias, pagos, sinDetalle] = await leerElInicio(
+    cliente,
+    hoy,
+  );
   return {
-    ...ayerYVencimientos({ dias, avisos, cierres, recurrentes }, hoy),
+    avisos: avisosDeInicio({ ...avisos, pagos }),
     actual,
     anterior,
     meses: resultadoPorMes(anio.ventas, anio.gastos),
     masVendidos: masVendidos(productosDelReporte(productos)),
+    sinDetalle: sinDetalle.ventas,
     semana: semanaContraSemana(dias, hoy),
   };
 }

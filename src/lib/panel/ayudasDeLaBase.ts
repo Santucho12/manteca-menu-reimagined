@@ -30,9 +30,9 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
       {
         titulo: 'Lo que requiere acción',
         puntos: [
-          'Aparece solo si hay algo pendiente: cierres con diferencia, ayer sin cierre de caja, personas que esperan un rol, gastos sin clasificar y pagos que vencen en la semana.',
+          'Aparece solo si hay algo pendiente: cierres con diferencia, ayer sin cierre de caja, personas que esperan un rol, gastos sin clasificar, y pagos vencidos o que vencen en la semana, los mismos de Próximos pagos en Gastos.',
           'Cada aviso te lleva a la pantalla donde se resuelve, y desaparece solo cuando lo resolvés.',
-          'El aviso de ayer sin cierre no sale si ayer no hubo ventas: ese día el local no abrió.',
+          'El aviso de ayer sin cierre sale aunque no haya ventas cargadas. Si ese día el local no abrió, marcalo con No abrió en el control de cierres y el aviso se va.',
         ],
       },
       {
@@ -51,9 +51,9 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'Gráficos y más vendidos',
         puntos: [
           'El mes a mes muestra ventas, gastos y balance: arranca con 4 meses y se amplía a todo el año.',
-          'Esta semana vs la anterior es un acumulado: suma las ventas día a día, desde hoy y los 6 días anteriores, y las compara con los 7 días de antes. El título dice si vas arriba o abajo.',
+          'Esta semana vs la anterior es un acumulado: suma las ventas día a día, desde hoy y los 6 días anteriores, y las compara con los 7 días de antes. El título dice en pesos cuánto vas arriba o abajo.',
           'Los gastos por categoría van en una torta: las 5 categorías que más pesan, y el resto junto en Otras.',
-          'Más vendidos: los 5 productos que más plata dejaron en el mes, con medallas de oro, plata y bronce para los tres primeros.',
+          'Más vendidos: los 5 productos que más plata dejaron en el mes, con medallas de oro, plata y bronce para los tres primeros. Las ventas que entraron por el Excel de Fudo no traen productos, así que no cuentan acá.',
         ],
       },
       {
