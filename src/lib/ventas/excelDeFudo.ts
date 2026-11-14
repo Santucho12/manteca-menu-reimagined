@@ -38,6 +38,9 @@ export function fechaDeExcel(valor: unknown): string | undefined {
   return isoDe(new Date(DIA_CERO_DE_EXCEL + valor * MS_POR_DIA));
 }
 
+const MEDIOS_QUE_ENTRAN =
+  'Los que entran son: efectivo, tarjeta de crédito, tarjeta de débito, QR y transferencia.';
+
 const isoDe = (fecha: Date) => fecha.toISOString().slice(0, 10);
 
 export function medioDeFudo(nombre: string): Medio | undefined {
@@ -62,7 +65,11 @@ function leerFila(fila: unknown[], numero: number): Resultado<Linea> {
   const fecha = fechaDeExcel(celdaFecha);
   if (!fecha) return fallo(`Fila ${numero}: ${MENSAJES.fecha}`);
   const medio = medioDeFudo(String(celdaMedio ?? ''));
-  if (!medio) return fallo(`Fila ${numero}: no conocemos el medio de pago "${celdaMedio}".`);
+  if (!medio) {
+    return fallo(
+      `Fila ${numero}: no conocemos el medio de pago "${celdaMedio}". ${MEDIOS_QUE_ENTRAN}`,
+    );
+  }
   const monto = Number(celdaMonto);
   const cantidad = Number(celdaCantidad);
   if (!Number.isFinite(monto) || monto < 0) return fallo(`Fila ${numero}: ${MENSAJES.numeros}`);

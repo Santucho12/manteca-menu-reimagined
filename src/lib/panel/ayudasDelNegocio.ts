@@ -35,7 +35,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
       {
         titulo: 'Cargar una venta a mano',
         puntos: [
-          'Es para lo que no pasa por Fudo: Cheaf, encargos, ventas a comercios. El tipo de venta se elige de la lista que armás en Tipos de venta.',
+          'Es solo para lo que no pasó por Fudo: Cheaf, encargos, ventas a comercios. El tipo de venta se elige de la lista que armás en Tipos de venta.',
           'Sumá uno o varios productos. Cada uno trae el precio del menú, y lo podés cambiar. El total se calcula mientras escribís.',
           'La fecha viene con hoy; puede ser un día anterior, pero no uno futuro.',
           'Si se cobró en efectivo, suma a lo que debería haber en la caja de ese día.',
@@ -195,7 +195,8 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'Precios y Fudo',
         puntos: [
           'Los precios van en pesos enteros.',
-          'Cambiar un precio acá no lo cambia en Fudo, porque todavía no estamos integrados: cambialo también allá.',
+          'Los precios de acá no cambian los de Fudo: cambialos también allá.',
+          'Después de un aumento, la lista Pasalos a Fudo muestra cada producto con su precio anterior y el nuevo, para copiarlos.',
           'Cada cambio de precio queda en la Auditoría, con el anterior y el nuevo.',
         ],
       },
