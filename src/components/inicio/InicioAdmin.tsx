@@ -45,7 +45,7 @@ export function InicioAdmin({ datos, hoy }: { datos: DatosDelInicio; hoy: string
             <MesAMes datos={datos.meses} mesEnCurso={mesDeHoy(hoy)} />
           </div>
           <div className="xl:col-span-2">
-            <MasVendidos productos={datos.masVendidos} />
+            <MasVendidos productos={datos.masVendidos} sinDetalle={datos.sinDetalle} />
           </div>
         </div>
         <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">

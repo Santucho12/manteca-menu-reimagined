@@ -8,6 +8,7 @@ import { Celda, TablaDeDatos } from '@/components/reportes/TablaDeDatos';
 import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { primerDiaConCierre } from '@/lib/caja/consultas';
 import { textoDeDiferencia } from '@/lib/caja/pantalla';
+import { diasSinAbrir } from '@/lib/caja/sinAbrir';
 import { diaEnArgentina } from '@/lib/fechas';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import { formatearPesos } from '@/lib/plata';
@@ -39,7 +40,9 @@ function FilaDelDia({ fila }: { fila: FilaDeCaja }) {
       <Celda>
         <span className="font-medium whitespace-nowrap">{fechaParaMostrar(fila.fecha)}</span>
       </Celda>
-      <Celda>{cierre ? cierre.persona : <Chip>Sin cierre</Chip>}</Celda>
+      <Celda>
+        {cierre ? cierre.persona : <Chip>{fila.noAbrio ? 'No abrió' : 'Sin cierre'}</Chip>}
+      </Celda>
       <Celda der>{cierre ? formatearPesos(cierre.declaradoCentavos) : ''}</Celda>
       <Celda der>{cierre ? textoDeDiferencia(cierre.diferenciaCentavos) : ''}</Celda>
     </tr>
@@ -98,11 +101,16 @@ export default async function ReporteDeCaja({
 }) {
   const hoy = diaEnArgentina(new Date());
   const periodos = periodosDelReporte(await searchParams, hoy);
+  const { desde, hasta } = periodos.actual;
   const { datos } = await exigirPaginaYLeer('admin', (cliente) =>
-    Promise.all([cierresDelPeriodo(cliente, periodos.actual), primerDiaConCierre(cliente)]),
+    Promise.all([
+      cierresDelPeriodo(cliente, periodos.actual),
+      primerDiaConCierre(cliente),
+      diasSinAbrir(cliente, desde, hasta),
+    ]),
   );
-  const [cierres, primero] = datos;
-  const filas = filasDeCaja(cierres, periodos.actual, primero, hoy);
+  const [cierres, primero, sinAbrir] = datos;
+  const filas = filasDeCaja(cierres, periodos.actual, primero, hoy, sinAbrir);
   const pagina = paginaDe(filas, periodos.pagina);
   return (
     <PantallaDeReporte

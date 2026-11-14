@@ -14,6 +14,7 @@ import {
 import { EnlaceASeccion } from '@/components/panel/EnlaceASeccion';
 import type { EstadoDeVariacion } from '@/lib/inicio/estadoDeVariacion';
 import { TOOLTIP_DE_LINEAS } from '@/components/reportes/estiloDelTooltip';
+import { pesosCortos } from '@/lib/reportes/ejeCorto';
 import { CartelDeSemana } from './CartelDeSemana';
 import { EncabezadoDeTarjeta } from './EncabezadoDeTarjeta';
 import type { DiaDeLaSemana } from '@/lib/inicio/semana';
@@ -45,7 +46,7 @@ export function SemanaContraSemana({ datos }: { datos: DiaDeLaSemana[] }) {
     >
       <EncabezadoDeTarjeta
         titulo="Esta semana vs la anterior"
-        descripcion="Las ventas sumadas día a día, contra la semana pasada."
+        descripcion="Lo vendido sumado día a día, contra la semana pasada."
       >
         <EnlaceASeccion
           clave="reportes"
@@ -54,7 +55,7 @@ export function SemanaContraSemana({ datos }: { datos: DiaDeLaSemana[] }) {
           texto="Ver reportes"
         />
       </EncabezadoDeTarjeta>
-      <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h3 className={`rounded-full px-3 py-1.5 text-xs font-bold ${CHIP[resumen.estado]}`}>
           {resumen.titulo}
         </h3>
@@ -94,7 +95,13 @@ function GraficoAcumulado({ puntos }: { puntos: PuntoAcumulado[] }) {
           </defs>
           <CartesianGrid stroke="#e2e8f0" vertical={false} />
           <XAxis dataKey="etiqueta" {...EJE} tickLine={false} />
-          <YAxis allowDecimals={false} width={36} {...EJE} tickLine={false} axisLine={false} />
+          <YAxis
+            tickFormatter={pesosCortos}
+            width={56}
+            {...EJE}
+            tickLine={false}
+            axisLine={false}
+          />
           <Tooltip cursor={TOOLTIP_DE_LINEAS.cursor} content={<CartelDeSemana />} />
           <Legend iconType="circle" />
           <Area

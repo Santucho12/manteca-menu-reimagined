@@ -5,9 +5,10 @@ import { FiltroDeFecha, FiltroDeSeleccion } from '@/components/panel/Filtros';
 import { diaDeLaSemana } from '@/lib/caja/diaDeLaSemana';
 import { opcionesDeEstado, type FiltrosDeControl } from '@/lib/caja/pantalla';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
+import { BotonDeSinAbrir } from './BotonDeSinAbrir';
 
 const FILA_DEL_DIA =
-  'group/fila flex items-center gap-4 px-4 py-3 hover:bg-amber-50 transition-colors';
+  'group/fila flex flex-1 items-center gap-4 px-4 py-3 hover:bg-amber-50 transition-colors';
 
 type Persona = { id: string; nombre: string };
 
@@ -43,7 +44,7 @@ export function FiltrosDelControl({
 
 function DiaSinCierre({ dia }: { dia: string }) {
   return (
-    <li>
+    <li className="flex items-center">
       <Link href={`/admin/caja?fecha=${dia}`} className={FILA_DEL_DIA}>
         <span className="w-12 rounded-lg bg-amber-100 py-1 text-center text-[10px] font-black uppercase tracking-widest text-amber-800">
           {diaDeLaSemana(dia)}
@@ -60,6 +61,7 @@ function DiaSinCierre({ dia }: { dia: string }) {
           />
         </span>
       </Link>
+      <BotonDeSinAbrir fecha={dia} marcar />
     </li>
   );
 }

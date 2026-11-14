@@ -22,7 +22,7 @@ function aspectoDe(cierre: Cierre): Aspecto {
 /** Lo primero de la ficha: si la caja cerró, en grande, con el día y quién la cargó. */
 export function ResumenDelCierre({ cierre }: { cierre: Cierre }) {
   const { icono: Icono, fondo, color } = aspectoDe(cierre);
-  const titular = titularDelCierre(cierre, cierre.diferenciaTotalCentavos);
+  const titular = titularDelCierre(cierre, cierre.medios);
   const explicacion = explicacionDelCierre(cierre);
   return (
     <div className="bg-card rounded-[2rem] border border-border/60 shadow-xl p-5 md:p-8 flex items-center gap-4 md:gap-6">

@@ -1,5 +1,6 @@
 import { TOOLTIP } from '@/components/reportes/estiloDelTooltip';
 import type { PuntoAcumulado } from '@/lib/inicio/semanaAcumulada';
+import { formatearPesos } from '@/lib/plata';
 
 type Props = { active?: boolean; payload?: { payload: PuntoAcumulado }[] };
 
@@ -13,7 +14,7 @@ function Fila({ color, nombre, cantidad }: FilaProps) {
     <div className="flex items-center gap-2 py-0.5 text-xs">
       <span aria-hidden="true" className="h-2 w-2 rounded-full" style={{ background: color }} />
       <span className="flex-1 font-semibold text-muted-foreground">{nombre}</span>
-      <span className="font-bold text-foreground">{cantidad}</span>
+      <span className="font-bold text-foreground">{formatearPesos(cantidad)}</span>
     </div>
   );
 }
@@ -30,15 +31,15 @@ function Bloque({ titulo, esta, anterior }: { titulo: string; esta: number; ante
   );
 }
 
-/** El cartelito del gráfico: ventas de ese día y ventas sumadas hasta ese día, en las dos semanas. */
+/** El cartelito del gráfico: lo vendido ese día y lo sumado hasta ese día, en las dos semanas. */
 export function CartelDeSemana({ active, payload }: Props) {
   const punto = payload?.[0]?.payload;
   if (!active || !punto) return null;
   return (
     <div style={TOOLTIP.contentStyle} className="min-w-48">
       <p style={{ ...TOOLTIP.labelStyle, marginBottom: 0 }}>{punto.etiqueta}</p>
-      <Bloque titulo="Ventas ese día" esta={punto.delDia} anterior={punto.delDiaAnterior} />
-      <Bloque titulo="Ventas hasta ese día" esta={punto.actual} anterior={punto.anterior} />
+      <Bloque titulo="Vendido ese día" esta={punto.delDia} anterior={punto.delDiaAnterior} />
+      <Bloque titulo="Vendido hasta ese día" esta={punto.actual} anterior={punto.anterior} />
     </div>
   );
 }

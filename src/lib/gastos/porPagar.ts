@@ -100,9 +100,11 @@ export function pagoInicial(item: ItemPorPagar, hoy: string, clave: string): Dat
   };
 }
 
-/** El pago que pidio un enlace ("fijo|vencimiento", como lo manda el aviso de Inicio). */
+/** El pago que pidio un enlace: su clave, que es la de la fila ("fijo|vencimiento" o el id). */
 export function esElPagoPedido(item: ItemPorPagar, pagar: string | undefined): boolean {
-  return pagar !== undefined && pagar === `${item.fijoId}|${item.vencimiento}`;
+  if (pagar === undefined) return false;
+  const delFijo = item.fijoId !== null && pagar === `${item.fijoId}|${item.vencimiento}`;
+  return pagar === item.clave || delFijo;
 }
 
 const DIAS_DE_ADELANTO = 30;

@@ -1,4 +1,5 @@
 import { textoDePendientes } from '../usuarios/presentacion';
+import type { PagosParaAvisar } from './pagos';
 
 export type ConFecha = { cantidad: number; desde: string | null };
 export type DatosDeAvisos = {
@@ -6,10 +7,8 @@ export type DatosDeAvisos = {
   ayerSinCierre: string | null;
   pendientes: number;
   sinClasificar: ConFecha & { categoriaId: string | null };
-  // Sale de los recurrentes, que Inicio lee aparte de los avisos.
-  vencenEstaSemana?: number;
-  /** El pago, si es uno solo: el aviso lleva a pagarlo. */
-  unVencimiento?: { id: string; fecha: string };
+  /** Sale de Próximos pagos de Gastos, que Inicio lee aparte de los avisos. */
+  pagos?: PagosParaAvisar;
 };
 export type Aviso = { texto: string; enlace: string };
 
@@ -48,12 +47,20 @@ function deGastos({ cantidad }: DatosDeAvisos['sinClasificar']): Aviso[] {
   return [{ texto: `Hay ${cantidad} ${que} sin clasificar.`, enlace: '/admin/gastos' }];
 }
 
-// Si vence uno solo, Gastos abre su ventana de "Marcar como pago" (pagar = el fijo y su vencimiento).
-function deVencimientos(n = 0, uno?: DatosDeAvisos['unVencimiento']): Aviso[] {
-  if (n === 0) return [];
-  const texto = n === 1 ? 'Esta semana vence 1 pago.' : `Esta semana vencen ${n} pagos.`;
-  const pagar = n === 1 && uno ? `?pagar=${encodeURIComponent(`${uno.id}|${uno.fecha}`)}` : '';
-  return [{ texto, enlace: `/admin/gastos${pagar}` }];
+// Un solo aviso con lo vencido y lo de la semana: la tarjeta de avisos tiene alto fijo.
+function textoDePagos({ vencidos, estaSemana }: PagosParaAvisar): string {
+  const semana = `Esta semana ${enPlural(estaSemana, 'vence 1 pago', `vencen ${estaSemana} pagos`)}.`;
+  if (vencidos === 0) return semana;
+  const vencido = `${vencidos} ${enPlural(vencidos, 'pago vencido', 'pagos vencidos')}`;
+  if (estaSemana === 0) return `Tenés ${vencido}.`;
+  return `Tenés ${vencido} y ${estaSemana} que ${enPlural(estaSemana, 'vence', 'vencen')} esta semana.`;
+}
+
+// Si en total es uno solo, Gastos abre su ventana de "Marcar como pago".
+function dePagos(pagos?: PagosParaAvisar): Aviso[] {
+  if (!pagos || pagos.vencidos + pagos.estaSemana === 0) return [];
+  const pagar = pagos.unico ? `?pagar=${encodeURIComponent(pagos.unico)}` : '';
+  return [{ texto: textoDePagos(pagos), enlace: `/admin/gastos${pagar}` }];
 }
 
 /** Lo que requiere accion, en orden; cada aviso lleva a donde se resuelve. */
@@ -63,6 +70,6 @@ export function avisosDeInicio(datos: DatosDeAvisos): Aviso[] {
     ...deAyer(datos.ayerSinCierre),
     ...dePendientes(datos.pendientes),
     ...deGastos(datos.sinClasificar),
-    ...deVencimientos(datos.vencenEstaSemana, datos.unVencimiento),
+    ...dePagos(datos.pagos),
   ];
 }

@@ -51,6 +51,7 @@ function esperandoVentas(fila: FilaConVentas): ResultadoDelCierre {
       declaradoCentavos: medios[medio],
       esperadoCentavos: 0,
       diferenciaCentavos: 0,
+      fuera: false,
     })),
     diferenciaTotalCentavos: 0,
   };

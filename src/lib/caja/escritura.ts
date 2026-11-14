@@ -6,7 +6,8 @@ export const MENSAJES_DE_CAJA = {
   sinPermiso: 'No tenés permiso para hacer esto.',
   noDisponible: 'Ese cierre no está disponible. Recargá la página.',
   diaFuturo: 'No se puede cargar el cierre de un día que todavía no llegó.',
-  diaRepetido: 'Ya hay un cierre cargado para ese día. Si está mal, abrilo y editalo.',
+  diaRepetido:
+    'Ya hay un cierre cargado para ese día. Si está mal, lo corrige un administrador desde el control de cierres.',
   anulado: 'Este cierre está anulado y ya no se puede cambiar.',
   sinMotivo: 'Escribí el motivo de la anulación.',
   generico: 'No pudimos guardarlo. Revisá los datos e intentá de nuevo.',

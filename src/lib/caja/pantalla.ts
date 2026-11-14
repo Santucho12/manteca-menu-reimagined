@@ -6,8 +6,14 @@ import { numeroDePagina, unValor } from '../usuarios/presentacion';
 import type { Tono } from '../../components/panel/Insignias';
 import type { Medio } from './resultado';
 
-// Pendiente es un dia sin cierre; los otros tres son el estado de un cierre cargado.
-export const ESTADOS = ['cierra', 'con_diferencia', 'esperando_ventas', 'pendiente'] as const;
+// Pendiente y "no abrio" son dias sin cierre; los otros tres son el estado de un cierre cargado.
+export const ESTADOS = [
+  'cierra',
+  'con_diferencia',
+  'esperando_ventas',
+  'pendiente',
+  'no_abrio',
+] as const;
 export type EstadoDeCierre = (typeof ESTADOS)[number];
 
 export type FiltrosDeControl = {
@@ -26,6 +32,7 @@ const NOMBRES_DE_ESTADO: Record<EstadoDeCierre, string> = {
   con_diferencia: 'Con diferencia',
   esperando_ventas: 'Esperando ventas',
   pendiente: 'Pendiente',
+  no_abrio: 'No abrió',
 };
 const NOMBRES_DE_MEDIO: Record<Medio, string> = {
   efectivo: 'Efectivo',
@@ -84,14 +91,13 @@ const TONOS: Record<EstadoDeCierre, Tono> = {
   con_diferencia: 'rosa',
   esperando_ventas: 'ambar',
   pendiente: 'ambar',
+  no_abrio: 'pizarra',
 };
 
 /** El color de la insignia de un cierre; uno anulado se ve apagado. */
 export const tonoDelCierre = (cierre: { estado: EstadoDeCierre; anulado: boolean }): Tono =>
   cierre.anulado ? 'pizarra' : TONOS[cierre.estado];
 
-/** La diferencia de un cierre para la lista; null mientras espera las ventas del dia. */
-export const diferenciaParaMostrar = (cierre: {
-  estado: EstadoDeCierre;
-  diferenciaTotalCentavos: number;
-}): number | null => (cierre.estado === 'esperando_ventas' ? null : cierre.diferenciaTotalCentavos);
+/** Esos estados listan dias, no cierres: la lista de cierres no se muestra. */
+export const sinCierresCargados = (estado: EstadoDeCierre | null): boolean =>
+  estado === 'pendiente' || estado === 'no_abrio';

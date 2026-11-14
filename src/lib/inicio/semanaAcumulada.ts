@@ -1,3 +1,5 @@
+import { formatearPesosRedondeados } from '../plata';
+import { pesosCortos } from '../reportes/ejeCorto';
 import type { EstadoDeVariacion } from './estadoDeVariacion';
 import type { DiaDeLaSemana } from './semana';
 
@@ -28,18 +30,15 @@ export function acumularSemana(dias: DiaDeLaSemana[]): PuntoAcumulado[] {
   });
 }
 
-const ventas = (cantidad: number) => `${cantidad} ${cantidad === 1 ? 'venta' : 'ventas'}`;
-
-/** Si vas adelantado o atrasado contra la semana anterior, en una frase y una etiqueta. */
+/** Si vas adelantado o atrasado contra la semana anterior, en pesos: una frase y una etiqueta. */
 export function resumenDeLaSemana(dias: DiaDeLaSemana[]): ResumenDeLaSemana {
   const total = acumularSemana(dias).at(-1) ?? { actual: 0, anterior: 0 };
   const diferencia = total.actual - total.anterior;
-  const cifras = `${total.actual} vs ${total.anterior}`;
-  if (diferencia > 0) {
-    return { titulo: `Vas ${ventas(diferencia)} arriba`, chip: `▲ ${cifras}`, estado: 'mejora' };
-  }
-  if (diferencia < 0) {
-    return { titulo: `Vas ${ventas(-diferencia)} abajo`, chip: `▼ ${cifras}`, estado: 'empeora' };
-  }
+  const cifras = `${pesosCortos(total.actual)} vs ${pesosCortos(total.anterior)}`;
+  const monto = formatearPesosRedondeados(Math.abs(diferencia));
+  if (diferencia > 0)
+    return { titulo: `Vas ${monto} arriba`, chip: `▲ ${cifras}`, estado: 'mejora' };
+  if (diferencia < 0)
+    return { titulo: `Vas ${monto} abajo`, chip: `▼ ${cifras}`, estado: 'empeora' };
   return { titulo: 'Vas igual que la semana pasada', chip: `= ${cifras}`, estado: 'igual' };
 }
