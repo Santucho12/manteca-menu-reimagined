@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { SESIONES } from './ayudas';
+import { SESIONES, abrirSeccion } from './ayudas';
 
 // El numero de pendientes puede ir antes o despues del nombre ("3 Gastos", "Gastos 3").
 const enLista = (nombres: string[]) => nombres.map((n) => new RegExp(`^(\\d+ ?)?${n}`));
@@ -40,26 +40,42 @@ test.describe('con la sesion del admin', () => {
     await expect(inicio).toHaveCSS('color', 'rgb(43, 29, 20)');
   });
 
-  test('Proveedores, Costos, Reportes, Auditoría y Mi cuenta avisan Próximamente', async ({
+  test('Proveedores, Reportes, Auditoría y Mi cuenta abren desde la navegación', async ({
     page,
-  }, info) => {
+  }) => {
+    const secciones: [string, string][] = [
+      ['Proveedores', '/admin/proveedores'],
+      ['Reportes', '/admin/reportes'],
+      ['Auditoría', '/admin/auditoria'],
+      ['Mi cuenta', '/admin/cuenta'],
+    ];
+    for (const [nombre, ruta] of secciones) {
+      await page.goto('/admin');
+      await abrirSeccion(page, nombre);
+      await expect(page).toHaveURL(new RegExp(`${ruta}$`));
+      await expect(page.getByRole('heading', { level: 1, name: nombre })).toBeVisible();
+      await expect(page.getByText('Próximamente')).toHaveCount(0);
+    }
+  });
+
+  test('Costos todavía avisa Próximamente', async ({ page }, info) => {
     test.skip(info.project.name !== 'computadora', 'solo en la computadora');
     await page.goto('/admin');
-    for (const nombre of [/^Proveedores/, /^Costos/, /^Reportes/, /^Auditoría/, /^Mi cuenta/]) {
-      await panel(page).getByRole('link', { name: nombre }).click();
-      await expect(page.getByText('Próximamente').first()).toBeVisible();
-      // El cartel es blanco, con sombra, simple (pedido 69) y en el medio de la pantalla.
-      const cartel = page.getByRole('status').filter({ hasText: 'Próximamente' });
-      await expect(cartel).toBeVisible();
-      await expect(cartel).toHaveCSS('background-color', 'rgb(255, 255, 255)');
-      await expect(cartel).not.toHaveCSS('box-shadow', 'none');
-      const caja = (await cartel.boundingBox())!;
-      const ventana = page.viewportSize()!;
-      expect(caja.width).toBeGreaterThan(300);
-      expect(Math.abs(caja.x + caja.width / 2 - ventana.width / 2)).toBeLessThan(10);
-      expect(Math.abs(caja.y + caja.height / 2 - ventana.height / 2)).toBeLessThan(10);
-      await expect(page).toHaveURL(/\/admin$/);
-    }
+    await panel(page)
+      .getByRole('link', { name: /^Costos/ })
+      .click();
+    await expect(page.getByText('Próximamente').first()).toBeVisible();
+    // El cartel es blanco, con sombra, simple (pedido 69) y en el medio de la pantalla.
+    const cartel = page.getByRole('status').filter({ hasText: 'Próximamente' });
+    await expect(cartel).toBeVisible();
+    await expect(cartel).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+    await expect(cartel).not.toHaveCSS('box-shadow', 'none');
+    const caja = (await cartel.boundingBox())!;
+    const ventana = page.viewportSize()!;
+    expect(caja.width).toBeGreaterThan(300);
+    expect(Math.abs(caja.x + caja.width / 2 - ventana.width / 2)).toBeLessThan(10);
+    expect(Math.abs(caja.y + caja.height / 2 - ventana.height / 2)).toBeLessThan(10);
+    await expect(page).toHaveURL(/\/admin$/);
     await panel(page)
       .getByRole('link', { name: /^Ventas/ })
       .click();
