@@ -38,11 +38,9 @@ export const AYUDAS_DE_CONTROL: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'Qué tenés que saber',
         puntos: [
           'Los números salen del mismo cálculo que Inicio: el mismo dato no da distinto en dos pantallas.',
-          'Lo anulado y lo cancelado no cuentan. Las ventas incluyen las de Fudo y las cargadas a mano.',
-          'Las ventas de productos de Fudo que todavía no se asociaron a uno del menú van juntas en Sin vincular, al final.',
+          'Lo anulado no cuenta. Las ventas incluyen las del mostrador y las cargadas a mano.',
           'Un producto que cambió de categoría cuenta en la que tiene hoy.',
           'En Balance, un mes sin gastos cargados muestra solo las ventas, sin balance.',
-          'En Caja, un cierre que espera las ventas del día aparece sin diferencia.',
         ],
       },
     ],

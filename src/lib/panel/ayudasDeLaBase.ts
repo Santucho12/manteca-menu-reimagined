@@ -44,7 +44,7 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
           'Balance: lo que queda, las ventas menos los gastos. Si todavía no hay gastos cargados, no se puede calcular.',
           'Ticket promedio: cuánto deja una venta en promedio, el total vendido dividido la cantidad de ventas del mes.',
           'El número chico de cada tarjeta es el cambio contra los mismos días del mes anterior: el día 12 compara del 1 al 12 de este mes contra del 1 al 12 del anterior.',
-          'Lo cancelado y lo anulado no cuentan.',
+          'Lo anulado no cuenta.',
         ],
       },
       {
@@ -53,7 +53,7 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
           'El mes a mes muestra ventas, gastos y balance: arranca con 4 meses y se amplía a todo el año.',
           'Esta semana vs la anterior es un acumulado: suma las ventas día a día, desde hoy y los 6 días anteriores, y las compara con los 7 días de antes. El título dice en pesos cuánto vas arriba o abajo.',
           'Los gastos por categoría van en una torta: las 5 categorías que más pesan, y el resto junto en Otras.',
-          'Más vendidos: los 5 productos que más plata dejaron en el mes, con medallas de oro, plata y bronce para los tres primeros. Las ventas que entraron por el Excel de Fudo no traen productos, así que no cuentan acá.',
+          'Más vendidos: los 5 productos que más plata dejaron en el mes, con medallas de oro, plata y bronce para los tres primeros.',
         ],
       },
       {

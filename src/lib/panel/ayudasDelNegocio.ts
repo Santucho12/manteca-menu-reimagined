@@ -5,47 +5,40 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
   ventas: {
     titulo: 'Cómo funciona Ventas',
     introduccion:
-      'Todo lo que se vendió, con su total: las ventas de Fudo y las que cargás a mano. Fudo todavía no está conectado: sus ventas entran subiendo el reporte de ventas de Fudo (Excel), que trae totales por día y medio de pago, sin productos.',
+      'Todo lo que se vendió, con su total: lo cobrado en el mostrador desde Vender y lo que cargás a mano.',
     temas: [
       {
         titulo: 'La lista',
         puntos: [
-          'Arranca en el mes de hoy, de a 25 por página. Filtrá por fechas, origen (Fudo o a mano), medio de pago y estado.',
-          'El total de arriba suma lo cobrado, sin lo cancelado ni lo anulado. Lo cancelado se muestra aparte, con cuánto fue.',
-          'Las tarjetas de arriba muestran lo cobrado, el ticket promedio, las canceladas y las anuladas del período filtrado.',
+          'Arranca en el mes de hoy, de a 25 por página. Filtrá por fechas, medio de pago y estado.',
+          'El origen dice si la venta se cobró en el Mostrador o la cargaste A mano, y quién la cargó.',
+          'El total de arriba suma lo cobrado, sin lo anulado.',
+          'Las tarjetas de arriba muestran lo cobrado, el ticket promedio y las anuladas del período filtrado.',
           'Con un medio de pago elegido, el total suma solo lo que se pagó con ese medio.',
           'Abrí una venta para ver sus productos, sus pagos y quién la cargó.',
         ],
       },
       {
-        titulo: 'Subir el Excel de Fudo',
+        titulo: 'Las del mostrador',
         puntos: [
-          'Con Subir Excel de Fudo elegís el reporte de ventas que bajás de Fudo. Antes de guardar ves una vista previa de lo que va a entrar.',
-          'Cada día y medio de pago entra como tantas ventas como diga el Excel, sin productos: por eso Más vendidos no las cuenta.',
-          'Si subís dos veces el mismo período no se duplica: se actualiza lo de cada día y medio.',
-        ],
-      },
-      {
-        titulo: 'Las de Fudo',
-        puntos: [
-          'Cuando Fudo esté conectado, sus ventas van a entrar solas y no se van a duplicar aunque se traigan dos veces.',
-          'Una venta de Fudo no se edita ni se anula acá: se corrige en Fudo y el cambio llega solo.',
+          'Se cargan en Vender, en el momento de cobrar, con los productos y los precios del menú.',
+          'Se pueden pagar con uno o dos medios. Cuentan siempre en lo que debería haber en la caja de ese día.',
         ],
       },
       {
         titulo: 'Cargar una venta a mano',
         puntos: [
-          'Es solo para lo que no pasó por Fudo: Cheaf, encargos, ventas a comercios. El tipo de venta se elige de la lista que armás en Tipos de venta.',
+          'Es para lo que no se cobró en el mostrador: encargos, ventas a comercios, Cheaf, o lo que se vendió sin conexión. El tipo de venta se elige de la lista que armás en Tipos de venta.',
           'Sumá uno o varios productos. Cada uno trae el precio del menú, y lo podés cambiar. El total se calcula mientras escribís.',
           'La fecha viene con hoy; puede ser un día anterior, pero no uno futuro.',
-          'Si se cobró en efectivo, suma a lo que debería haber en la caja de ese día.',
+          'Marcá Se cobró en la caja del local si la plata entró a la caja: así suma a lo que debería haber en el cierre de ese día.',
         ],
       },
       {
         titulo: 'Anular',
         puntos: [
-          'Una venta a mano no se edita ni se borra: se anula con un motivo, deja de contar y queda en el historial.',
-          'Si te equivocaste en un monto, anulala y cargala de nuevo.',
+          'Una venta no se edita ni se borra: se anula con un motivo, deja de contar y queda en el historial.',
+          'Si te equivocaste en un monto, anulala y cargala de nuevo. Caja no anula: te avisa a vos.',
         ],
       },
     ],
@@ -53,7 +46,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
   canales: {
     titulo: 'Cómo funciona Tipos de venta',
     introduccion:
-      'Por dónde entran las ventas que no pasan por Fudo. Arrancan Cheaf, Encargo, Venta a comercios y Otro.',
+      'Por dónde se vende lo que cargás a mano. Arrancan Cheaf, Encargo, Venta a comercios y Otro.',
     temas: [
       {
         titulo: 'Qué tenés que saber',
@@ -136,6 +129,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'Cómo se calcula si cierra',
         puntos: [
           'El efectivo esperado es el fondo inicial, más las ventas en efectivo, menos los retiros y los gastos de caja. En los demás medios, lo esperado son las ventas de ese medio.',
+          'Solo cuentan las ventas cobradas en la caja del local: las del mostrador y las cargadas a mano con esa casilla marcada.',
           'Efectivo contado es todo el efectivo que había en la caja, fondo incluido. Queda en la caja no puede ser más que lo contado.',
           'Lo que queda en la caja de un día es el fondo inicial del siguiente cierre. Si no coincide, el detalle lo avisa.',
           'Para cargar un cierre que falta, usá el botón Cargar cierre o tocá el día pendiente.',
@@ -171,7 +165,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
           'Cada producto tiene nombre, descripción, categoría, precios y una etiqueta opcional: Más vendido, Artesanal o Nuevo.',
           'Carga el precio de cada forma de venta que ofrece: un café puede tener solo Grande. La pantalla dice de dónde sale el precio que ves.',
           'Si le ponés un precio propio donde la categoría tiene uno para todos, antes de guardar te avisa que el producto está tomando el de la categoría y te pregunta si querés pisarlo.',
-          'Un producto que se vende en Fudo pero no va en la carta (una botella de agua) se carga igual, sin marcar que se muestre.',
+          'Un producto que se vende en el mostrador pero no va en la carta (una botella de agua) se carga igual, sin marcar que se muestre.',
           'Si lo pasás a una categoría que se vende de otra forma, queda sin precio y se oculta hasta que le cargues uno.',
         ],
       },
@@ -192,11 +186,10 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         ],
       },
       {
-        titulo: 'Precios y Fudo',
+        titulo: 'Precios',
         puntos: [
           'Los precios van en pesos enteros.',
-          'Los precios de acá no cambian los de Fudo: cambialos también allá.',
-          'Después de un aumento, la lista Pasalos a Fudo muestra cada producto con su precio anterior y el nuevo, para copiarlos.',
+          'Son los mismos con los que se cobra en Vender: un cambio vale desde la próxima venta.',
           'Cada cambio de precio queda en la Auditoría, con el anterior y el nuevo.',
         ],
       },
@@ -224,7 +217,6 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
           'En una categoría con el mismo precio para todos, cambia ese precio y no el de cada producto: en la tabla figura como precio para todos.',
           'Si al redondear dos precios quedan iguales, se muestran así: corregilos a mano si hace falta.',
           'No hay deshacer: un error se corrige con otro aumento o editando el precio.',
-          'Acordate de cambiar los precios también en Fudo.',
         ],
       },
     ],
