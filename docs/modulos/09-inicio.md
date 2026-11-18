@@ -27,7 +27,6 @@ Aparece solo si hay algo pendiente. Cada aviso lleva a la pantalla donde se resu
 | Cierres con diferencia de la última semana | Control de cierres |
 | Ayer no se cargó el cierre | Control de cierres |
 | Personas que esperan un rol | Usuarios |
-| Productos de Fudo sin vincular | Vinculación |
 | Gastos sin clasificar | Gastos |
 | Pagos vencidos o que vencen esta semana | Gastos (Próximos pagos) |
 | Las ventas no se sincronizan desde hace más de un día | Ventas |
@@ -49,14 +48,13 @@ balance, con una barra de avance que dice qué parte de las ventas queda como ba
 Un gráfico con las ventas, los gastos y el balance. Arranca con los últimos 4 meses y se
 amplía a todo el año con "Ver todo el año". El mes en curso va más claro, con "en curso".
 
-Los meses anteriores al sistema tienen ventas, porque se trae un año de Fudo, pero no
-gastos. Esos meses muestran solo las ventas, sin balance.
+Un mes con ventas y sin gastos cargados muestra solo las ventas, sin balance.
 
 ### 4. Más vendidos
 
 Los 5 productos que más plata dejaron en el mes, con la cantidad vendida al lado y medallas
-de oro, plata y bronce para los tres primeros. Si el mes tiene ventas del Excel de Fudo, que
-no trae productos, una nota lo aclara (pedido 85).
+de oro, plata y bronce para los tres primeros. La nota que aclaraba las ventas del Excel de
+Fudo, sin productos (pedido 85), se sacó en el pedido 89: toda venta tiene sus productos.
 
 ### 5. Esta semana contra la anterior
 
@@ -73,19 +71,16 @@ porcentaje de cada una.
 ## Reglas
 
 1. Los números salen del mismo cálculo que usa Reportes.
-2. Lo cancelado y lo anulado no cuentan.
+2. Lo anulado no cuenta.
 3. El balance es ventas menos gastos. En pantalla se dice "balance", no "resultado" ni
    "margen" (Santiago, 2026-10-27).
-4. Los datos llegan hasta la última sincronización con Fudo, y se muestra de cuándo es.
-   Mientras las ventas entren por el Excel, junto al bloque del mes dice "Ventas de Fudo
-   cargadas hasta el 28/10" (o "Todavía no se subieron ventas de Fudo"), en ámbar si esa fecha
-   es anterior a ayer (pedido 84).
+4. Las ventas se cargan al cobrar (pedido 89): los números están al día. El "Ventas de Fudo
+   cargadas hasta" del pedido 84 se sacó.
 5. Los avisos no se guardan ni se marcan como vistos: se calculan al abrir la pantalla y
    desaparecen solos cuando se resuelve lo que los causa.
-6. Las ventas de productos sin vincular cuentan en los números del mes y no aparecen entre
-   los más vendidos. Tampoco las ventas sin detalle de productos del Excel de Fudo.
-7. Un cierre que espera las ventas del día (`esperando_ventas`, ver `06-cierres-de-caja.md`)
-   no entra en "Cierres con diferencia de la última semana" (pedido 84).
+6. Las ventas de productos sin vincular (solo pudo haberlas de Fudo) cuentan en los números del
+   mes y no aparecen entre los más vendidos.
+7. Todo cierre tiene resultado desde que se guarda: "Esperando ventas" se sacó en el pedido 89.
 
 ## Casos de borde
 
@@ -130,8 +125,6 @@ Construido el 2026-10-12 (pedido 33). Diseño en `docs/superpowers/specs/2026-10
 
 ### Decisiones al construirlo
 
-- "Productos de Fudo sin vincular", "Las ventas no se sincronizan" y la fecha de la última
-  sincronización (regla 4) entran con la parte de Fudo.
 - Más vendidos: cada producto con su monto y la cantidad por presentación ("3 Unidad · 2
   Docena"), porque las cantidades de distintas presentaciones no se suman.
 - "Ayer no se cargó el cierre" sale todos los días; no se avisa si el local todavía no cargó
@@ -164,7 +157,7 @@ Construido el 2026-10-12 (pedido 33). Diseño en `docs/superpowers/specs/2026-10
 ### Ayer y vencimientos (pedido 50, 2026-10-27)
 
 - Desde el pedido 85, el aviso "Ayer no se cargó el cierre" sale aunque ayer no haya ventas
-  cargadas (con el Excel de Fudo, las ventas llegan después). No sale si el admin marcó ayer
+  cargadas. No sale si el admin marcó ayer
   como "No abrió" en el control.
 - El aviso de pagos sale de Próximos pagos (pedido 85): cuenta lo vencido y lo de la semana.
 - Se probó una franja "Ayer" arriba de todo y una tarjeta "Vencen esta semana", y Santiago
