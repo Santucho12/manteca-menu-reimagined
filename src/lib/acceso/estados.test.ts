@@ -100,6 +100,7 @@ describe('enlacesDelPanel', () => {
     const enlaces = enlacesDelPanel('admin');
     expect(enlaces.map((enlace) => enlace.texto)).toEqual([
       'Inicio',
+      'Vender',
       'Ventas',
       'Caja',
       'Gastos',
@@ -115,6 +116,7 @@ describe('enlacesDelPanel', () => {
       'Día a día',
       'Día a día',
       'Día a día',
+      'Día a día',
       'Plata',
       'Plata',
       'Plata',
@@ -126,8 +128,9 @@ describe('enlacesDelPanel', () => {
     ]);
   });
 
-  it('caja ve Cargar cierre, Mis cierres y Mi cuenta', () => {
+  it('caja ve Vender primero, después Cargar cierre, Mis cierres y Mi cuenta', () => {
     expect(enlacesDelPanel('caja').map((enlace) => enlace.href)).toEqual([
+      '/admin/vender',
       '/admin/caja',
       '/admin/caja/mis-cierres',
       '/admin/cuenta',
