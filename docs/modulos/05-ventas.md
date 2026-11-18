@@ -2,174 +2,149 @@
 
 Módulo 10 de `PROPUESTA.md`. Sexto paso del orden de construcción.
 
-Este archivo tiene dos partes. La definición funcional dice qué hace el módulo y se acordó
-con Santiago el 2026-10-06. La parte técnica se escribe al construirlo.
+Este archivo tiene dos partes. La definición funcional dice qué hace el módulo: se acordó con
+Santiago el 2026-10-06 y se rehízo el 2026-11-18, cuando Manteca dejó Fudo (pedido 89). La
+parte técnica se escribe al construirlo.
 
 ## Para qué
 
-Tener en el sistema todo lo que se vendió, sin que nadie lo cargue, para saber cuánto entró
-y calcular lo que debería haber en la caja.
+Tener en el sistema todo lo que se vendió, cargado en el momento de cobrar, para saber cuánto
+entró y calcular lo que debería haber en la caja.
 
 ## Quién lo usa
 
-Solo Admin. Caja no entra a este módulo.
+| Quién | Qué hace acá |
+|---|---|
+| Caja | Vende en el mostrador. No ve las ventas ni lo vendido en el día, y no anula |
+| Admin | Vende en el mostrador, carga ventas a mano, ve todas y las anula |
 
 ## De dónde salen las ventas
 
-| Origen | Cómo entran |
+| Origen | Quién y cuándo |
 |---|---|
-| Fudo | Solas, por la API de Fudo |
-| Fuera de Fudo (Cheaf, encargos, ventas a comercios) | Las carga el admin a mano |
+| Mostrador | Caja o el admin, en el momento de cobrar, desde Vender |
+| A mano | El admin: lo que no se cobró en el mostrador (encargos, ventas a comercios, Cheaf) o lo que se vendió sin conexión |
 
-El sistema no cobra ni reemplaza a Fudo.
+Manteca dejó Fudo y registra sus ventas acá (Santiago, 2026-11-18). El sistema no factura: la
+facturación sigue fuera del sistema, como antes.
 
-## Ventas de Fudo
+## Vender en el mostrador
 
-### Sincronización
+Pantalla `/admin/vender`, pensada para una pantalla táctil de computadora o tablet. También anda
+en el celular.
 
-- Una vez por noche el sistema trae las ventas del día.
-- El admin tiene el botón "Actualizar ahora" para traer lo que falte en el momento.
-- Al guardarse un cierre de caja, el sistema trae las ventas de ese día en ese momento, para
-  poder calcular la diferencia.
-- Traer dos veces la misma venta no la duplica: se reconoce por su identificador de Fudo.
-- Si una venta cambió en Fudo después de traída (se canceló, se corrigió un pago), la
-  próxima sincronización la actualiza.
-- La primera vez se traen los últimos 12 meses.
-- Si Fudo no responde, el sistema reintenta en la próxima corrida y avisa en Inicio desde
-  cuándo no entran ventas.
+- **Productos.** Arriba, las categorías del menú en su orden; abajo, sus productos activos como
+  botones grandes, se muestren o no en la carta (el agua se vende aunque no esté en la carta).
+  Un producto con una sola forma de venta se suma de un toque; con varias (Docena, Media docena,
+  Unidad), el toque muestra cada una con su precio.
+- **Ticket.** Cada renglón con el producto, la forma de venta, la cantidad (con − y +) y el
+  subtotal, y el total abajo. Se puede sacar un renglón o vaciar el ticket.
+- **Cobrar.** Se elige el medio: efectivo, débito, crédito, QR o transferencia. "Pagar con dos
+  medios" suma un segundo medio: se escribe cuánto va con el primero y el resto va con el
+  segundo. Con efectivo se puede escribir con cuánto paga el cliente, y la pantalla muestra el
+  vuelto.
+- **Al guardar,** avisa "Venta guardada" con el total (y el vuelto, si hay) y deja el ticket
+  vacío para la próxima.
+- **Sin conexión,** avisa que no se pudo guardar y el ticket queda como estaba, para volver a
+  probar. Si no vuelve, se anota en papel y el admin la carga a mano después, con su fecha.
 
-### Qué se guarda de cada venta
+### Reglas del mostrador
 
-Fecha y hora, total, estado, los productos vendidos con cantidad y precio, y los pagos con
-su medio y su monto.
-
-### Estados
-
-| Estado en Fudo | Qué hace el sistema |
-|---|---|
-| Cerrada | Cuenta |
-| Cancelada | No cuenta. Se muestra cuánto se canceló y cuántas veces |
-| En curso | No cuenta hasta que se cierre |
-
-### Vinculación de productos
-
-- El sistema trae la lista de productos de Fudo.
-- El admin asocia cada producto de Fudo a un producto del sistema, una sola vez.
-- Varios productos de Fudo pueden apuntar al mismo producto del sistema.
-- **Las ventas de un producto sin vincular entran igual** y cuentan en la plata. En los
-  reportes por producto figuran como "sin vincular" hasta que se asocien.
-- Vincular un producto actualiza también las ventas anteriores.
-
-### Ventas sin medio de pago
-
-Si los pagos de una venta suman menos que su total, la parte sin pago se muestra aparte como
-"sin medio de pago". No suma a lo esperado de ningún medio.
-
-## Mientras no esté la API: el Excel
-
-La sincronización está postergada (Santiago, 2026-11-05). Mientras tanto el admin sube el
-Excel "Reporte-Ventas" de Fudo en `/admin/ventas/subir` (pedido 59). Trae totales por día y
-por medio de pago, sin productos. Subir dos veces el mismo período no duplica ventas: cada una
-se reconoce por su día y su medio, y la que cambió se actualiza.
-
-Cómo se lleva el resto del sistema con el Excel (pedido 84):
-
-- **Hasta qué día hay ventas.** El último día con ventas de Fudo sin anular se muestra como
-  "Ventas de Fudo cargadas hasta el 28/10" en Ventas (junto a "Subir Excel de Fudo"), en Inicio
-  y en cada reporte. Sin ninguna: "Todavía no se subieron ventas de Fudo". Si esa fecha es
-  anterior a ayer, el texto va en ámbar. Las ventas cargadas a mano no cuentan.
-- **Cierres que esperan.** Un cierre de un día posterior a ese último día queda "Esperando
-  ventas" hasta que se suba el Excel que lo cubre (ver `06-cierres-de-caja.md`).
-- **Sin detalle de productos.** Las ventas del Excel no tienen productos: en los reportes por
-  producto y por categoría van en una fila "Sin detalle de productos (Excel de Fudo)", para que
-  sumen lo mismo que Ventas por período.
-- **Medio de pago que no conocemos.** Si una fila trae otro medio, la subida se rechaza con la
-  fila y los medios que entran: efectivo, tarjeta de crédito, tarjeta de débito, QR y
-  transferencia (pedido 86).
-- **Un registro por subida.** La subida no deja un registro de auditoría por cada venta y cada
-  pago: deja uno solo, con el período y el resumen (ver "Qué queda en la auditoría").
+1. El precio es el del menú y lo calcula el servidor. En el mostrador no se cambia ni se hacen
+   descuentos.
+2. Si un precio cambió con el ticket armado, no se cobra: la pantalla avisa cuál cambió y trae
+   los precios nuevos.
+3. Se paga con uno o dos medios distintos, cada uno mayor que cero, que suman el total.
+4. La fecha es hoy en Argentina y no se elige.
+5. El tipo de venta es Local. Lo que se vende en el mostrador se cobra siempre en la caja del
+   local.
+6. Un doble toque en Cobrar guarda una sola venta.
+7. Caja no ve lo vendido en el día, ni en total ni por medio: si lo viera, dejaría de contar a
+   ciegas al cerrar la caja (ver `06-cierres-de-caja.md`).
+8. Caja no anula. Si se equivocó, le avisa al admin, que anula la venta con motivo.
+9. Se vende solo un producto activo con precio en esa forma de venta.
 
 ## Ventas cargadas a mano
 
-Son solo para lo que no pasó por Fudo: Cheaf, encargos, ventas a comercios (pedido 86).
-
 | Dato | Detalle |
 |---|---|
-| Fecha | Por defecto hoy |
+| Fecha | Por defecto hoy; no acepta un día futuro |
 | Producto | Del catálogo del sistema |
 | Cantidad | Mayor que cero |
 | Precio | Trae el del menú y se puede cambiar |
-| Medio de pago | Los mismos que usa Fudo |
+| Medio de pago | Efectivo, débito, crédito, QR o transferencia |
 | Tipo de venta (en el código, canal) | Cheaf, Encargo, Venta a comercios u Otro. El admin puede cambiar la lista |
+| Se cobró en la caja del local | Casilla, sin marcar. Marcada, la venta suma a lo esperado del cierre de ese día |
 
-- Tiene el mismo efecto que una venta de Fudo: suma a los reportes y al resultado.
-- Si se cobró con efectivo de la caja, suma a lo esperado de la caja de ese día.
-- Se anula con motivo obligatorio. No se edita el monto: se anula y se carga de nuevo.
+- Suma a los reportes y al resultado como cualquier venta.
+- Se anula con motivo obligatorio. No se edita: se anula y se carga de nuevo.
 
 ## Pantallas
 
-### Ventas (`/admin/ventas`)
+### Vender (`/admin/vender`)
 
-- Lista de ventas con fecha, origen, total, medios de pago y estado.
+La de "Vender en el mostrador". Para Caja es la primera de su menú.
+
+### Ventas (`/admin/ventas`), solo admin
+
+- Lista de ventas con fecha, origen (Mostrador o A mano), quién la cargó, total, medios de pago
+  y estado.
 - Filtros por fechas, origen, medio de pago y estado. La lista está paginada.
-- Total de lo filtrado, con las canceladas aparte.
-- Cuándo fue la última sincronización, y el botón "Actualizar ahora".
-- Al abrir una venta se ven sus productos y sus pagos.
+- Total de lo filtrado.
+- Al abrir una venta se ven sus productos y sus pagos, y se anula con motivo.
 
-### Vinculación
-
-- Arriba, los productos de Fudo sin vincular, con cuánto se vendió de cada uno.
-- Abajo, los ya vinculados, con la opción de cambiar la asociación.
-
-### Cargar una venta a mano
+### Cargar una venta a mano (`/admin/ventas/nueva`), solo admin
 
 - El formulario de la tabla de arriba.
 
 ## Reglas
 
-1. Una venta de Fudo no se edita ni se anula desde el sistema: se corrige en Fudo y la
-   sincronización trae el cambio.
-2. "El día" de una venta es el día calendario en Argentina en que se cerró.
-3. Lo cancelado y lo anulado no cuentan en ningún total y siguen visibles.
-4. Si una venta ya traída cambia, el resultado del cierre de ese día cambia solo: se
-   calcula al mostrar.
-5. Los precios de una venta de Fudo son los de Fudo, no los del menú del sistema.
-6. El sistema solo lee de Fudo. No escribe nada.
+1. "El día" de una venta es el día calendario en Argentina en que se cobró.
+2. Lo anulado no cuenta en ningún total y sigue visible.
+3. Una venta no se edita: se anula con motivo y se carga de nuevo.
+4. Lo esperado de la caja suma solo lo cobrado en la caja del local: todo lo del mostrador y lo
+   cargado a mano con la casilla marcada.
+5. Si cambian las ventas de un día (se carga o se anula una), el resultado del cierre de ese día
+   cambia solo: se calcula al mostrar.
 
 ## Casos de borde
 
-- Un producto nuevo en Fudo aparece vendido antes de estar vinculado: la venta cuenta y el
-  producto queda en la lista de pendientes.
-- Un producto se borra o se renombra en Fudo: las ventas viejas conservan su vinculación.
-- "Actualizar ahora" tocado dos veces seguidas: la segunda no hace nada hasta que termine la
-  primera.
-- Fudo corta por límite de pedidos en la carga de los 12 meses: la carga sigue desde donde
-  quedó en la próxima corrida.
-- Una venta se cierra en Fudo después de guardado el cierre de caja de ese día: el cierre se
-  recalcula y queda marcado con "hubo ventas después del cierre".
+- Se vende después de cargado el cierre del día: el resultado del cierre cambia y puede quedar
+  con diferencia.
+- Se desactiva un producto con el ticket armado: no se cobra, la pantalla avisa cuál y se saca
+  del ticket.
+- Un empleado desactivado con ventas: siguen a su nombre.
+- Se cae la conexión justo al cobrar y la venta sí se guardó: el reintento no la duplica.
 
 ## Qué queda en la auditoría
 
-- Cada venta a mano: alta y anulación, con el motivo.
-- Cada subida del Excel de Fudo, en un solo registro "Subida del Excel": quién la hizo, el
-  período (desde y hasta), los días, cuántas ventas fueron nuevas, actualizadas, iguales y
-  anuladas, y el total. Lleva a Ventas filtrada por ese período.
-- Cada vinculación y cada cambio de vinculación.
-- Cada sincronización: cuándo corrió, cuántas ventas trajo y si falló. Figura como hecha por
-  el sistema, o por el admin si usó el botón.
+- Cada venta, del mostrador o a mano: quién, cuándo y todo lo cargado.
+- Cada anulación, con quién, cuándo y el motivo.
 
 ## Fuera de alcance
 
-- Cobrar, facturar o modificar algo en Fudo.
+- Facturar o emitir comprobantes.
+- Descuentos o cambiar el precio en el mostrador.
+- Mesas y pedidos abiertos.
+- Imprimir.
+- Vender sin conexión.
 - Descontar stock.
 - Costo y ganancia de cada venta.
+
+## Lo que quedó de Fudo
+
+Hasta el 2026-11-18 las ventas iban a entrar de Fudo, por su API, y mientras tanto se subía su
+Excel "Reporte-Ventas" (pedidos 59 y 84). Desde el pedido 89 se arranca de cero, sin traer el
+historial: se sacan la subida del Excel, "Ventas de Fudo cargadas hasta", la fila "Sin detalle de
+productos (Excel de Fudo)" de los reportes y la espera de los cierres. Las ventas de Fudo que ya
+estén en la base quedan como están, con origen Fudo: nada se borra.
 
 ## Dónde se aparta de la propuesta
 
 | Propuesta | Acá | Por qué |
 |---|---|---|
-| Se sube el Excel de Fudo | Las ventas entran por la API; hasta tener las credenciales, se sube el "Reporte-Ventas" (pedido 59) | El Excel trae totales por día, sin productos. El cliente pasa al plan Pro |
-| Control de duplicados y anular una importación | No existen | Cada venta se reconoce por su identificador y se actualiza sola |
+| Las ventas se importan de Fudo | Se registran en el sistema, en el mostrador | Manteca dejó Fudo (Santiago, 2026-11-18) |
+| Reemplazar Fudo, a futuro | Entra ahora, solo para registrar ventas en el mostrador | Decisión de Santiago, 2026-11-18 |
 | Cada venta descuenta stock | No | Stock es de la segunda fase |
 
 Falta reflejarlo en `PROPUESTA.md`, con el texto que defina Santiago.
@@ -178,27 +153,20 @@ Falta reflejarlo en `PROPUESTA.md`, con el texto que defina Santiago.
 
 | Tema | Decisión |
 |---|---|
-| Fuente | La API de Fudo |
-| Frecuencia | Una vez por noche, más "Actualizar ahora" |
-| Historia inicial | Últimos 12 meses |
-| Productos sin vincular | Las ventas entran igual |
-| Canceladas | No cuentan, pero se muestran |
+| Dónde se registran las ventas | En el sistema, en el momento de cobrar (Santiago, 2026-11-18) |
+| Mesas | No: solo mostrador |
+| Historial de Fudo | No se trae: se arranca de cero |
+| Pantalla del mostrador | Táctil, de computadora o tablet |
+| Medios por venta | Uno o dos |
+| Precio en el mostrador | El del menú, sin cambios ni descuentos |
+| Quién anula | Solo el admin, con motivo |
+| Facturación | Fuera del sistema |
 | Tipos de venta a mano (antes «canales»: Santiago cambió la palabra el 2026-10-28) | Lista inicial que el admin puede cambiar |
 | Precio de venta a mano | Trae el del menú y se puede cambiar |
 
-## Sin confirmar
-
-| Qué | Cómo se confirma |
-|---|---|
-| Que la API funcione y traiga lo que dice su documentación | Probándola con las credenciales reales el primer día del plan Pro, contra los totales diarios del Excel del 5/9 al 5/10 de 2026 |
-| Límite de pedidos, historia disponible y estabilidad de la versión `v1alpha1` | Consulta enviada a Fudo el 2026-10-06 |
-
-Ventas no se construye hasta que la primera fila esté confirmada.
-
 ## Parte técnica
 
-Primera parte construida el 2026-10-11 (pedido 30), sin las credenciales de Fudo, por
-excepción de Santiago a la regla de "Sin confirmar". El detalle está en
+Primera parte construida el 2026-10-11 (pedido 30). El detalle está en
 `docs/superpowers/specs/2026-10-10-ventas-design.md`.
 
 - **Base:** tablas `ventas` (origen a mano o Fudo, identificador de Fudo único por local,
@@ -216,6 +184,4 @@ excepción de Santiago a la regla de "Sin confirmar". El detalle está en
   productos, el precio del menú editable, el total mientras se escribe), `/admin/ventas/[id]` y
   `/admin/ventas/canales`.
 
-Queda para cuando estén las credenciales de Fudo: traer las ventas (la noche, "Actualizar
-ahora" y al guardar un cierre), vincular productos y medios de pago de Fudo, y calcular lo
-esperado en los cierres. Desde el pedido 66 el resultado del cierre se calcula al mostrar con las ventas del día.
+Lo del mostrador (pedido 89) se agrega acá al construirlo.

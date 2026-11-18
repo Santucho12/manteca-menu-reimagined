@@ -3,7 +3,8 @@
 Módulo 11 de `PROPUESTA.md`. Séptimo paso del orden de construcción.
 
 Este archivo tiene dos partes. La definición funcional dice qué hace el módulo y se acordó
-con Santiago el 2026-10-06. La parte técnica se escribe al construirlo.
+con Santiago el 2026-10-06. Desde el pedido 89 (2026-11-18) las ventas se cargan en el sistema
+en el momento de cobrar, sin Fudo. La parte técnica se escribe al construirlo.
 
 ## Para qué
 
@@ -14,7 +15,7 @@ pago está la diferencia.
 
 | Quién | Qué hace acá |
 |---|---|
-| Caja | Carga el cierre del día y ve los suyos |
+| Caja | Vende en el mostrador (ver `05-ventas.md`), carga el cierre del día y ve los suyos |
 | Admin | Ve todos, los revisa y los anula. También puede cargar uno |
 
 ## Qué declara el empleado
@@ -23,7 +24,7 @@ pago está la diferencia.
 |---|---|
 | Fondo inicial | Con cuánto efectivo arrancó la caja |
 | Efectivo contado | Lo que hay en la caja al cerrar |
-| Un monto por cada otro medio de pago | Los medios que usa Fudo: tarjeta de crédito, tarjeta de débito, QR y transferencia |
+| Un monto por cada otro medio de pago | Tarjeta de crédito, tarjeta de débito, QR y transferencia |
 | Retiros | Efectivo que se sacó de la caja durante el día. Monto y quién lo retiró |
 | Gastos pagados con la caja | Descripción y monto de cada uno |
 | Queda en la caja | Con cuánto se deja la caja para el día siguiente |
@@ -39,11 +40,12 @@ Lo esperado lo calcula siempre el servidor.
 - **Diferencia:** lo declarado menos lo esperado, por cada medio. Negativa es faltante;
   positiva, sobrante.
 
-Las ventas son las de Fudo de ese día más las cargadas a mano. De las cargadas a mano, las
-cobradas en efectivo de la caja suman al efectivo esperado.
+Las ventas son las de ese día cobradas en la caja del local: todas las del mostrador y las
+cargadas a mano con "Se cobró en la caja del local" marcada (pedido 89). Una venta mayorista
+cobrada por transferencia a otra cuenta no cambia lo esperado de la caja. Con dos medios,
+cada parte suma a su medio.
 
-Las ventas sin medio de pago y las canceladas se muestran aparte y no suman a ningún
-esperado.
+Las ventas anuladas no suman a ningún esperado.
 
 ## Estados de un cierre
 
@@ -54,26 +56,15 @@ guarda**: se calcula siempre al mostrar, contra las ventas del día en ese momen
 |---|---|
 | Cierra | La diferencia de cada medio con las ventas del día está dentro de la tolerancia |
 | Con diferencia | Algún medio supera la tolerancia (sin ventas ese día, lo esperado es $0) |
-| Esperando ventas | Las ventas de Fudo de ese día todavía no se subieron (pedido 84) |
 | Pendiente | El día todavía no tiene cierre cargado |
 | No abrió | El admin marcó que ese día el local no abrió: no es pendiente ni avisa en Inicio (pedido 85) |
 
 Un cierre anulado no es un estado: sigue en el historial con su motivo y se ve con «Ver anulados».
 «Revisado» ya no existe.
 
-**Esperando ventas** (pedido 84, por el Excel de Fudo): un cierre de un día posterior al último
-día con ventas de Fudo sin anular espera; si no hay ninguna venta de Fudo, todos esperan. Las
-ventas cargadas a mano no cuentan para decidirlo. Un cierre que espera no tiene diferencia: no
-entra en el aviso de Inicio, ni en el filtro «Con diferencia» del control, ni en la diferencia
-por día y por empleado del reporte de Caja.
-
-- Caja, al guardar y en Mis cierres, ve «Guardado. El resultado va a estar cuando se carguen
-  las ventas del día», sin faltantes ni sobrantes.
-- El detalle del cierre (admin) muestra lo declarado, sin esperado ni diferencia.
-- El control filtra también por «Esperando ventas»; su pastilla va en ámbar.
-- Cuando se sube el Excel que cubre ese día, el cierre se calcula solo: el estado se calcula
-  al mostrar y no hay nada que guardar.
-- Un día cubierto por el Excel y sin ventas no espera: lo esperado es $0.
+«Esperando ventas» ya no existe (pedido 89). Lo había sumado el pedido 84, mientras las ventas
+entraban por el Excel de Fudo días después. Ahora se cargan en el momento de cobrar, y todo
+cierre tiene resultado desde que se guarda.
 
 ## Pantallas
 
@@ -81,11 +72,9 @@ por día y por empleado del reporte de Caja.
 
 - Arriba, bien visible: "Cargando como {nombre}. ¿No sos vos? Salir".
 - El formulario de la tabla de arriba. **No muestra lo esperado.**
-- Al guardar, el sistema trae las ventas del día y muestra el resultado: cierra, o cuánto
-  falta o sobra en cada medio.
+- Al guardar, muestra el resultado con las ventas del día: cierra, o cuánto falta o sobra en
+  cada medio.
 - Si hay diferencia, pide un comentario para explicarla. No es obligatorio.
-- Si las ventas no pudieron traerse, avisa que el cierre quedó guardado y que el resultado
-  va a estar más tarde.
 
 ### Mis cierres, para Caja
 
@@ -130,8 +119,8 @@ por día y por empleado del reporte de Caja.
 
 ## Casos de borde
 
-- El empleado carga el cierre y después se sigue vendiendo: el cierre se recalcula en la
-  próxima sincronización y queda marcado con "hubo ventas después del cierre".
+- El empleado carga el cierre y después se sigue vendiendo: el resultado del cierre cambia
+  solo, porque se calcula al mostrar, y puede quedar con diferencia.
 - Día sin ninguna venta: lo esperado es el fondo inicial menos retiros y gastos.
 - Bajar el fondo inicial o declarar un retiro de más tapa un faltante: el control muestra lo
   retirado en cada cierre y marca "Fondo distinto"; el detalle dice cuánto (Santiago,
@@ -163,7 +152,8 @@ por día y por empleado del reporte de Caja.
 
 | Tema | Decisión |
 |---|---|
-| Lo esperado antes de declarar | No se muestra |
+| Lo esperado antes de declarar | No se muestra, ni lo vendido en el día en la pantalla de Vender (pedido 89) |
+| Qué ventas suma lo esperado | Las cobradas en la caja del local: las del mostrador y las cargadas a mano con la casilla marcada (pedido 89) |
 | La diferencia después de guardar | Se muestra, y el empleado puede comentar |
 | Corregir un cierre | Lo edita el admin (pedido 85); desde el 2026-10-28 se editaba, antes se anulaba y se cargaba de nuevo |
 | Diferencias chicas | Tolerancia que define el admin |
@@ -214,4 +204,5 @@ o igual a la del cierre). Es solo un sí o un no: Caja lo recibe sin ningún mon
 `resultadoDeFila` (`src/lib/caja/`) da `esperando_ventas` cuando es falso, con lo declarado y
 esperado y diferencia en 0; el reporte de Caja recibe `diferenciaCentavos: null` para esos
 cierres. Pruebas: `tests/servicios/excel-en-el-sistema.base.test.ts`, los puros de
-`src/lib/caja` y `src/lib/reportes`, `e2e/caja.spec.ts` y `e2e/caja-control.spec.ts`.
+`src/lib/caja` y `src/lib/reportes`, `e2e/caja.spec.ts` y `e2e/caja-control.spec.ts`. El pedido
+89 lo saca: las ventas se cargan en el momento.
