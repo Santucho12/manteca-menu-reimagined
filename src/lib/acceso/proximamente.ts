@@ -1,4 +1,7 @@
-/** Secciones que todavía no dejan entrar desde la navegación (Santiago, 2026-10-27). */
-const EN_PROXIMAMENTE = ['proveedores', 'costos', 'reportes', 'auditoria', 'cuenta'];
+/**
+ * Secciones que todavía no dejan entrar desde la navegación: Costos no tiene pantalla en la
+ * primera fase (pedido 87, postergado). Las demás se desbloquearon en el pedido 88.
+ */
+const EN_PROXIMAMENTE = ['costos'];
 
 export const esProximamente = (clave: string) => EN_PROXIMAMENTE.includes(clave);
