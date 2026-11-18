@@ -33,11 +33,8 @@ test('muestra los cambios, ocultos incluidos, y los aplica', async ({ page }) =>
   await expect(tabla.getByRole('cell', { name: '$3.300' })).toBeInViewport();
   await page.getByRole('button', { name: 'Aplicar aumento' }).click();
   await expect(page.getByText('Listo: se actualizaron 2 precios.')).toBeVisible();
-  // Fudo no se entera del aumento: queda la lista para pasarlo a mano.
-  const paraFudo = page.getByRole('table', { name: 'Pasalos a Fudo' });
-  await expect(paraFudo.getByRole('row').filter({ hasText: oculto.nombre })).toContainText(
-    '$5.000$5.500',
-  );
+  // Sin Fudo no queda nada para pasar a mano (pedido 89).
+  await expect(page.getByRole('table', { name: 'Pasalos a Fudo' })).toHaveCount(0);
   await page.goto('/admin/menu');
   await expect(page.getByRole('listitem').filter({ hasText: oculto.nombre })).toContainText(
     '$5.500',
