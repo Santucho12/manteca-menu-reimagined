@@ -2,6 +2,38 @@ import type { Ayuda, ClaveDeAyuda } from './ayudasDeLaBase';
 
 /** Las ayudas de los modulos del negocio: ventas, caja y menu. */
 export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
+  vender: {
+    titulo: 'Cómo funciona Vender',
+    introduccion:
+      'Es el mostrador: cada venta se carga acá en el momento de cobrar, con los productos y los precios del menú.',
+    temas: [
+      {
+        titulo: 'Armar el ticket',
+        puntos: [
+          'Elegí la categoría y tocá cada forma de venta que lleva el cliente: Docena, Unidad, Grande. Tocá de nuevo para sumar otra.',
+          'Con − y + cambiás la cantidad de un renglón. Restar el último lo saca del ticket.',
+          'Cada producto va con el precio del menú, que acá no se cambia. Si cambió mientras armabas el ticket, la venta no se guarda y aparece el precio nuevo.',
+        ],
+      },
+      {
+        titulo: 'Cobrar',
+        puntos: [
+          'Elegí el medio: efectivo, débito, crédito, QR o transferencia.',
+          'Con Pagar con dos medios elegís el segundo y escribís cuánto va con el primero: el resto va con el segundo.',
+          'Con efectivo podés escribir con cuánto paga el cliente y la pantalla te muestra el vuelto.',
+          'Al cobrar queda guardada la venta, de hoy y cobrada en la caja, y el ticket queda vacío para la próxima.',
+        ],
+      },
+      {
+        titulo: 'Qué tenés que saber',
+        puntos: [
+          'Acá no ves lo vendido en el día: así contás la caja a ciegas al cerrar.',
+          'Si te equivocaste en una venta, avisale a un admin: él la anula con un motivo.',
+          'Si se corta internet, la venta no se guarda y el ticket queda como estaba. Si no vuelve, anotala y el admin la carga después.',
+        ],
+      },
+    ],
+  },
   ventas: {
     titulo: 'Cómo funciona Ventas',
     introduccion:

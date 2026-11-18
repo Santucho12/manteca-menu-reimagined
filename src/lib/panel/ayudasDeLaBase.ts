@@ -11,6 +11,7 @@ export type ClaveDeAyuda =
   | 'proveedores'
   | 'gastos'
   | 'fijos'
+  | 'vender'
   | 'ventas'
   | 'canales'
   | 'caja'
