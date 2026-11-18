@@ -128,10 +128,13 @@ export type Venta = Omit<FilaDeVenta, 'medios'> & {
     subtotal_centavos: number;
   }[];
   pagos: { medio: Medio; monto_centavos: number }[];
+  /** Si suma a lo esperado de la caja de ese día (pedido 89). */
+  en_la_caja: boolean;
 };
 
 const COLUMNAS_DE_VENTA =
   'id, fecha, cerrada_en, origen, estado, anulado, total_centavos, comentario, motivo_anulacion, ' +
+  'en_la_caja, ' +
   'canal:canales_de_venta(nombre), ' +
   'renglones:renglones_de_venta(id, descripcion, cantidad, precio_unitario_centavos, subtotal_centavos), ' +
   'pagos:pagos_de_venta(medio, monto_centavos)';

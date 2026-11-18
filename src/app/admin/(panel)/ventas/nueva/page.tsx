@@ -23,6 +23,8 @@ export default async function NuevaVenta() {
     // Vacio a proposito: la persona elige como se cobro, el formulario no lo supone.
     medio: '' as DatosDeVenta['medio'],
     comentario: '',
+    // Sin marcar: lo que se carga a mano casi nunca pasó por la caja del mostrador.
+    enLaCaja: false,
     // Ya viene una línea lista para elegir el producto: lo normal es vender al menos uno.
     renglones: [{ opcion: '', cantidad: '1', precio: '' }],
   };

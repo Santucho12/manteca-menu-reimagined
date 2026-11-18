@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm, useWatch, type Control } from 'react-hook-form';
 import { AvisoDeError } from '@/components/formularios/AvisoDeError';
 import { Campo } from '@/components/formularios/Campo';
+import { Casilla } from '@/components/formularios/Casilla';
 import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
 import { nombreDeMedio } from '@/lib/caja/pantalla';
 import { MEDIOS } from '@/lib/caja/resultado';
@@ -102,13 +103,18 @@ export function FormularioDeVenta({ inicial, canales, opciones }: Props) {
           opciones={opciones}
         />
       </TarjetaDePaso>
-      <section className="rounded-3xl border border-border bg-white px-4 py-3 shadow-sm shadow-slate-900/5 md:px-6">
+      <section className="space-y-3 rounded-3xl border border-border bg-white px-4 py-3 shadow-sm shadow-slate-900/5 md:px-6">
         <Campo
           id="comentario"
           etiqueta="Comentario (opcional)"
           placeholder="Ej: encargo para el sábado"
           error={errors.comentario?.message}
           {...registro('comentario')}
+        />
+        <Casilla
+          id="en-la-caja"
+          etiqueta="Se cobró en la caja del local"
+          {...register('enLaCaja')}
         />
       </section>
       {guardado.mensaje ? <AvisoDeError mensaje={guardado.mensaje} /> : null}

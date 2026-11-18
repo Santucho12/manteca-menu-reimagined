@@ -61,6 +61,9 @@ function Resumen({ venta }: { venta: Venta }) {
           valor={<MediosDePago medios={venta.pagos.map((p) => p.medio)} />}
         />
       </Datos>
+      <p className="text-sm text-muted-foreground">
+        Se cobró en la caja del local: {venta.en_la_caja ? 'Sí' : 'No'}
+      </p>
       {venta.comentario ? <p className="text-sm whitespace-pre-line">{venta.comentario}</p> : null}
     </Seccion>
   );

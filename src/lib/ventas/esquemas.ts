@@ -33,6 +33,8 @@ export const esquemaVenta = z.object({
   canalId: z.uuid('Elegí el canal.'),
   medio: z.enum(MEDIOS, 'Elegí cómo se cobró.'),
   comentario: z.string().trim().max(500, 'Usá hasta 500 caracteres.'),
+  // Marcada, suma a lo esperado del cierre de ese día (pedido 89).
+  enLaCaja: z.boolean(),
   renglones: z.array(renglon).min(1, 'Sumá al menos un producto.'),
 });
 
@@ -65,6 +67,7 @@ export function ventaParaLaBase(datos: DatosDeVenta) {
     canal_id: datos.canalId,
     medio: datos.medio,
     comentario: datos.comentario.trim() || null,
+    en_la_caja: datos.enLaCaja,
     renglones: datos.renglones.map(renglonParaLaBase),
   };
 }
