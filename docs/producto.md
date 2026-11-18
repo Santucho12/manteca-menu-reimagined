@@ -21,7 +21,7 @@ No son nueve módulos sueltos: son dos productos y un soporte.
 | Quién | Qué hace | Desde dónde |
 |---|---|---|
 | Dueño (Admin) | Mira los números, revisa los cierres, carga gastos, cambia el menú, administra usuarios | Celular y computadora |
-| Empleado de caja (Caja) | Carga el cierre de su turno | Celular, al final del turno |
+| Empleado de caja (Caja) | Vende en el mostrador y carga el cierre de su turno | La pantalla táctil del mostrador; el cierre, también desde el celular |
 | Cliente del local | Lee el menú desde el QR | Celular, sin cuenta |
 
 El rol Encargado queda fuera de esta fase: no tiene una tarea propia. Existe en la base,
@@ -29,7 +29,7 @@ pero no se puede asignar y no accede a nada.
 
 ## Qué no es
 
-- No cobra ni reemplaza a Fudo.
+- No procesa pagos ni factura: registra lo que se cobró.
 - No calcula cuánto cuesta ni cuánto deja cada producto.
 - No lleva stock, producción ni recetas.
 - No es contabilidad ni facturación.
@@ -61,10 +61,11 @@ uno. Cuando exista Compras, esos gastos pasan a ese módulo.
 
 Falta reflejarlo en `PROPUESTA.md`, con el texto que defina Santiago.
 
-### Caja carga su cierre y nada más
+### Caja vende y carga su cierre, nada más
 
-Caja carga el cierre de su turno y ve sus propios cierres. No ve los de otros, ni las
-ventas, ni los gastos, ni el resto del sistema.
+Caja vende en el mostrador, carga el cierre de su turno y ve sus propios cierres (Santiago,
+2026-11-18, pedido 89; antes solo cargaba el cierre). No ve los cierres de otros, ni las ventas,
+ni lo vendido en el día, ni los gastos, ni el resto del sistema: así cuenta la caja a ciegas.
 
 ### Inicio y Reportes no se pisan
 
@@ -84,23 +85,21 @@ menos gastos. No se usa la palabra "margen" en esta fase.
   que poder usarse en el teléfono.
 - El aumento masivo de precios lleva redondeo (por ejemplo, a $100). Con inflación, es la
   función del menú que más se va a usar.
-- El menú se entrega primero: es independiente, se ve y no depende de Fudo.
+- El menú se entrega primero: es independiente y se ve.
 
-### Las ventas entran solas, por la API de Fudo
+### Las ventas se cargan en el mostrador
 
-El cliente tenía el plan Avanzado de Fudo, que no trae API. El 2026-10-06 confirmó que pasa
-al plan Pro para tenerla. Las ventas entran solas, sin que nadie suba un archivo.
+Manteca dejó Fudo (Santiago, 2026-11-18, pedido 89). Cada venta se carga en el sistema en el
+momento de cobrar, desde la pantalla Vender: táctil, en una computadora o una tablet del
+mostrador. Solo mostrador, sin mesas. Se paga con uno o dos medios. Se arrancó de cero, sin
+traer el historial de Fudo.
 
-Según la especificación de Fudo (`https://api.fu.do/v1alpha1/openapi.yml`, vista el
-2026-10-06), cada venta trae fecha y hora de creación y de cierre, total, estado (cerrada,
-cancelada o en curso), sus ítems con producto, cantidad y precio, y sus pagos con medio de
-pago y monto. Se puede filtrar por fecha, se pagina de a 500 como máximo y tiene límite de
-pedidos. Falta probarla contra la cuenta real.
+- Caja vende al precio del menú, sin cambiarlo ni hacer descuentos, y no anula.
+- Lo esperado de la caja suma solo lo cobrado en la caja del local.
+- La facturación sigue fuera del sistema, como antes.
 
-El Excel "Reporte de ventas" de Fudo no sirve como fuente: trae totales por día, sin
-productos ni tickets. Mientras no estén las credenciales de la API, el admin lo sube desde
-Ventas (Santiago, 2026-10-27, pedido 59): cada día y medio de pago entra como tantas ventas de
-Fudo como diga el Excel, de partes iguales y sin productos. Cuando entre la API, ella manda.
+Antes de esto, las ventas iban a entrar de Fudo por su API, y mientras tanto se subía su Excel
+"Reporte-Ventas" (pedidos 59 y 84).
 
 ## Sin decidir
 
@@ -108,4 +107,3 @@ Fudo como diga el Excel, de partes iguales y sin productos. Cuando entre la API,
 |---|---|---|
 | Cuántos turnos hay por día | Del cliente. Se asume uno | Si hay un cierre por día o uno por turno |
 | A qué hora cierra el local | Del cliente | Si cierra después de medianoche, la fecha del cierre tiene que venir con el día anterior: hoy viene con el día de hoy y el cierre quedaría en el día equivocado |
-| Qué son las ventas sin medio de pago | En el Excel de un mes, la suma por medio de pago da menos que el total vendido. Se ve con la API | Cómo se calcula lo esperado de la caja |
