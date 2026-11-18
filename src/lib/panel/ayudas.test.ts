@@ -23,7 +23,6 @@ describe('ayudas', () => {
       'pagos vencidos',
       'No abrió',
       'en pesos',
-      'Excel de Fudo',
       'barra de avance',
       'Ventas:',
       'Gastos:',
@@ -103,14 +102,14 @@ describe('ayudas', () => {
     [
       'ventas',
       [
-        'todavía no está conectado',
-        'cancelado',
+        'Mostrador',
+        'Vender',
         'Tipos de venta',
         'precio del menú',
-        'efectivo',
+        'Se cobró en la caja del local',
         'motivo',
         'futuro',
-        'solo para lo que no pasó por Fudo',
+        'lo que no se cobró en el mostrador',
       ],
     ],
     ['canales', ['Cheaf', 'Encargo', 'Venta a comercios', 'desactivado']],
@@ -157,7 +156,6 @@ describe('ayudas', () => {
         'foto',
         'Ocultar',
         'Desactivar',
-        'Fudo',
         'al guardar',
       ],
     ],
@@ -230,10 +228,11 @@ describe('ayudas', () => {
     expect(caja).not.toContain('tocá Editar');
   });
 
-  it('el Menú no promete integrarse con Fudo', () => {
-    const texto = AYUDAS.menu.temas.flatMap((t) => t.puntos).join(' ');
-    expect(texto).not.toContain('integrados');
-    expect(texto).toContain('Pasalos a Fudo');
+  it('ninguna ayuda habla de Fudo: Manteca lo dejó (pedido 89)', () => {
+    for (const ayuda of Object.values(AYUDAS)) {
+      const texto = [ayuda.introduccion, ...ayuda.temas.flatMap((t) => [t.titulo, ...t.puntos])];
+      expect(texto.join(' ')).not.toContain('Fudo');
+    }
   });
 
   it('Reportes no ofrece atajos que la pantalla no tiene', () => {
