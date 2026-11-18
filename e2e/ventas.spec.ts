@@ -73,10 +73,10 @@ test('anula una venta a mano con motivo', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Anular' })).toHaveCount(0);
 });
 
-test('una venta de Fudo no se anula desde aca', async ({ page }) => {
+test('una venta vieja de Fudo no se anula desde aca', async ({ page }) => {
   const id = await venta({ origen: 'fudo', fecha: HOY });
   await page.goto(`/admin/ventas/${id}`);
-  await expect(page.getByText('Las ventas de Fudo se corrigen en Fudo.')).toBeVisible();
+  await expect(page.getByText('Vino de Fudo, antes de dejarlo: no se anula.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Anular' })).toHaveCount(0);
 });
 
@@ -153,7 +153,9 @@ test('un clic en cualquier parte de la fila abre la venta', async ({ page }) => 
 test('una venta de Fudo sin productos avisa que no tiene detalle', async ({ page }) => {
   const id = await venta({ fecha: HOY, origen: 'fudo' });
   await page.goto(`/admin/ventas/${id}`);
-  await expect(page.getByText(/no tiene detalle de productos/)).toBeVisible();
+  await expect(
+    page.getByText('Vino de Fudo sin detalle de productos: solo el total.'),
+  ).toBeVisible();
 });
 
 test('guarda capturas de la lista y la carga', async ({ page }, info) => {
