@@ -171,6 +171,7 @@ export type Database = {
       canales_de_venta: {
         Row: {
           activo: boolean
+          de_sistema: boolean
           fecha_actualizacion: string
           fecha_creacion: string
           id: string
@@ -179,6 +180,7 @@ export type Database = {
         }
         Insert: {
           activo?: boolean
+          de_sistema?: boolean
           fecha_actualizacion?: string
           fecha_creacion?: string
           id?: string
@@ -187,6 +189,7 @@ export type Database = {
         }
         Update: {
           activo?: boolean
+          de_sistema?: boolean
           fecha_actualizacion?: string
           fecha_creacion?: string
           id?: string
@@ -1250,6 +1253,7 @@ export type Database = {
           clave: string | null
           comentario: string | null
           creado_por: string | null
+          en_la_caja: boolean
           estado: Database["public"]["Enums"]["estado_de_venta"]
           fecha: string
           fecha_actualizacion: string
@@ -1270,6 +1274,7 @@ export type Database = {
           clave?: string | null
           comentario?: string | null
           creado_por?: string | null
+          en_la_caja?: boolean
           estado?: Database["public"]["Enums"]["estado_de_venta"]
           fecha: string
           fecha_actualizacion?: string
@@ -1290,6 +1295,7 @@ export type Database = {
           clave?: string | null
           comentario?: string | null
           creado_por?: string | null
+          en_la_caja?: boolean
           estado?: Database["public"]["Enums"]["estado_de_venta"]
           fecha?: string
           fecha_actualizacion?: string
@@ -1355,6 +1361,18 @@ export type Database = {
       }
     }
     Functions: {
+      catalogo_para_vender: {
+        Args: never
+        Returns: {
+          categoria: string
+          categoria_id: string
+          precio_centavos: number
+          presentacion: string
+          presentacion_id: string
+          producto: string
+          producto_id: string
+        }[]
+      }
       cierres_con_resultado: {
         Args: { desde: string; hasta: string; persona?: string }
         Returns: {
@@ -1375,7 +1393,6 @@ export type Database = {
           retiros_centavos: number
           tolerancia_centavos: number
           transferencia_centavos: number
-          ventas_cargadas: boolean
           ventas_credito_centavos: number
           ventas_debito_centavos: number
           ventas_efectivo_centavos: number
@@ -1567,13 +1584,6 @@ export type Database = {
           ventas: number
         }[]
       }
-      reporte_ventas_sin_detalle: {
-        Args: { desde: string; hasta: string }
-        Returns: {
-          monto_centavos: number
-          ventas: number
-        }[]
-      }
       reporte_ventas_por_dia: {
         Args: { desde: string; hasta: string }
         Returns: {
@@ -1604,23 +1614,9 @@ export type Database = {
         Args: { cuenta: string; tipos: string[] }
         Returns: Record<string, unknown>
       }
-      ventas_aplicar_lote: {
-        Args: { el_local: string; lote: Json }
-        Returns: number[]
-      }
       ventas_borrar_canal: { Args: { el_canal: string }; Returns: undefined }
-      ventas_crear_del_excel: {
-        Args: {
-          el_local: string
-          el_medio: Database["public"]["Enums"]["medio_de_caja"]
-          el_monto: number
-          la_fecha: string
-        }
-        Returns: undefined
-      }
-      ventas_fudo_cargadas_hasta: { Args: never; Returns: string }
       ventas_guardar_manual: { Args: { datos: Json }; Returns: string }
-      ventas_importar_excel: { Args: { lotes: Json }; Returns: Json }
+      ventas_guardar_mostrador: { Args: { datos: Json }; Returns: Json }
       ventas_totales: {
         Args: {
           desde: string
@@ -1637,7 +1633,6 @@ export type Database = {
           cobrado_centavos: number
         }[]
       }
-      ventas_validar_excel: { Args: { lotes: Json }; Returns: undefined }
       ventas_validar_manual: {
         Args: { datos: Json; el_local: string }
         Returns: undefined

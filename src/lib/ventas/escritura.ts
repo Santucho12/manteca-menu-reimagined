@@ -14,6 +14,8 @@ export const MENSAJES_DE_VENTAS = {
   deFudo: 'Esta venta vino de Fudo, antes de dejarlo: no se anula.',
   canalRepetido: 'Ya hay un tipo de venta con ese nombre.',
   canalConVentas: 'Ese tipo de venta ya tiene ventas: desactivalo en lugar de borrarlo.',
+  canalDelSistema:
+    'Local es el tipo de venta del mostrador: no se renombra, no se desactiva ni se borra.',
   generico: 'No pudimos guardarlo. Revisá los datos e intentá de nuevo.',
 } as const;
 
@@ -27,6 +29,7 @@ const POR_CODIGO: Record<string, string> = {
   PV306: MENSAJES_DE_VENTAS.sinMotivo,
   PV307: MENSAJES_DE_VENTAS.deFudo,
   PV309: MENSAJES_DE_VENTAS.canalConVentas,
+  PV312: MENSAJES_DE_VENTAS.canalDelSistema,
   '23505': MENSAJES_DE_VENTAS.canalRepetido,
 };
 
