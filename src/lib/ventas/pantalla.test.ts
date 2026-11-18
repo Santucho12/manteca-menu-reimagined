@@ -27,8 +27,14 @@ describe('filtrosDeVentas', () => {
     expect(
       filtrosDeVentas({ origen: 'manual', medio: 'qr', estado: 'anulada' }, HOY),
     ).toMatchObject({ origen: 'manual', medio: 'qr', estado: 'anulada' });
+    expect(filtrosDeVentas({ origen: 'mostrador' }, HOY).origen).toBe('mostrador');
     const raro = filtrosDeVentas({ origen: 'web', medio: 'cheque', estado: 'borrada' }, HOY);
     expect([raro.origen, raro.medio, raro.estado]).toEqual([null, null, null]);
+  });
+
+  it('sin Fudo, ni su origen ni sus canceladas son un filtro', () => {
+    const viejo = filtrosDeVentas({ origen: 'fudo', estado: 'cancelada' }, HOY);
+    expect([viejo.origen, viejo.estado]).toEqual([null, null]);
   });
 });
 
@@ -42,6 +48,7 @@ describe('enlaceDeVentas', () => {
 
 describe('nombres', () => {
   it('del origen y del estado, con lo anulado primero', () => {
+    expect(nombreDeOrigen('mostrador')).toBe('Mostrador');
     expect(nombreDeOrigen('manual')).toBe('A mano');
     expect(nombreDeOrigen('fudo')).toBe('Fudo');
     expect(estadoDeVenta({ estado: 'cerrada', anulado: true })).toBe('Anulada');
@@ -69,16 +76,10 @@ describe('tarjetasDelResumen', () => {
     anuladas: 1,
   };
 
-  it('cuatro tarjetas: cobrado, ticket promedio, canceladas y anuladas', () => {
+  it('tres tarjetas: cobrado, ticket promedio y anuladas (las canceladas eran de Fudo)', () => {
     expect(tarjetasDelResumen(totales)).toEqual([
       { etiqueta: 'Cobrado', valor: '$6.000,00', detalle: '2 ventas' },
       { etiqueta: 'Ticket promedio', valor: '$3.000,00', detalle: 'por venta cobrada' },
-      {
-        etiqueta: 'Canceladas',
-        valor: '$1.000,00',
-        detalle: '1 venta',
-        ayuda: 'Pedidos cancelados en Fudo: no se cobraron.',
-      },
       {
         etiqueta: 'Anuladas',
         valor: '$3.000,00',
