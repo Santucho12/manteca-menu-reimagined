@@ -37,7 +37,8 @@ Las dos direcciones: quien debe SÍ puede, y quien no debe NO puede.
 |---|---|
 | **Admin** lee y escribe lo de su local | ✅ funciona (control positivo) |
 | **Invitado** lee o escribe cualquier tabla | 🔒 vacío / 0 filas |
-| **Caja** carga el cierre de su turno y lee los suyos | ✅ funciona |
+| **Caja** vende en el mostrador, carga el cierre de su turno y lee los suyos | ✅ funciona |
+| **Caja** lee ventas, lo vendido en el día o anula una venta | 🔒 vacío / rechazado |
 | **Caja** lee o cambia el cierre de otro, o cualquier otra tabla | 🔒 vacío / 0 filas |
 | **Encargado** lee o escribe cualquier tabla | 🔒 vacío / 0 filas |
 | **Anon** lee el menú publicado (productos y categorías visibles) | ✅ funciona |

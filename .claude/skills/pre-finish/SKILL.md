@@ -84,9 +84,9 @@ Si tocaste alguna de estas áreas, verificá que se siga cumpliendo lo que dice
 | **Cualquier dato operativo** | No se borra: se **anula con motivo**, quién y cuándo. Lo anulado no cuenta en los números pero sigue en el historial |
 | **Productos, insumos, proveedores** | Se **desactivan**, no se borran, y conservan su historial |
 | **Cualquier escritura** | Dejó su **auditoría** (usuario, fecha, valor anterior y nuevo) |
-| **Usuarios y permisos** | El invitado no ve ni hace nada. Solo el admin asigna roles. Un usuario desactivado no opera. Caja solo carga el cierre de su turno y ve los suyos; en todo lo demás, caja y encargado reciben rechazo |
-| **Importación de Fudo** | Subir dos veces el mismo período no duplica ventas. Anular la importación revierte **todo** lo que generó (stock, caja esperada) |
-| **Ventas a mano** | Tienen el mismo efecto que las importadas: stock, reportes y caja esperada si se cobraron con la caja |
+| **Usuarios y permisos** | El invitado no ve ni hace nada. Solo el admin asigna roles. Un usuario desactivado no opera. Caja vende en el mostrador, carga el cierre de su turno y ve los suyos, sin ver ventas ni anular; en todo lo demás, caja y encargado reciben rechazo |
+| **Ventas en el mostrador** | El precio y el total los calcula el servidor con el menú. Un doble toque no duplica la venta. Suman a la caja esperada del día |
+| **Ventas a mano** | Suman a los reportes, y a la caja esperada solo si se cobraron en la caja del local |
 | **Cierres de caja** | Lo esperado sale de las ventas del día o turno y se calcula en el servidor. El cierre queda a nombre de quien lo cargó |
 | **Gastos y compras** | En la primera fase la compra de mercadería se carga como gasto, con su proveedor. Cuando exista el módulo Compras, deja de ser un gasto. Nunca se cuenta dos veces |
 | **Costos y precios** | Un cambio de costo de insumo recalcula todos los productos que lo usan. El precio del menú es el mismo con el que se calcula la ganancia |

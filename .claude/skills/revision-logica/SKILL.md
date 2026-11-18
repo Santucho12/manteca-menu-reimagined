@@ -29,11 +29,11 @@ sistema, no de quien lo escribió.
 Antes de razonar desde cero, leer lo que ya está decidido en `PROPUESTA.md`. Muchas
 reglas ya tienen su razón escrita, y varias son fáciles de violar sin darse cuenta:
 nada se borra, se anula; el precio del menú es el mismo con el que se calcula la ganancia;
-el invitado no ve nada; el sistema no reemplaza a Fudo. Si la implementación contradice el
+el invitado no ve nada; las ventas se cargan en el mostrador, sin Fudo. Si la implementación contradice el
 documento, eso ya es un hallazgo.
 
 Leer también `docs/producto.md`: delimita la primera fase y dice dónde se aparta de la
-propuesta (la compra de mercadería se carga como gasto; Caja solo carga su cierre;
+propuesta (la compra de mercadería se carga como gasto; Caja vende y carga su cierre;
 Encargado queda afuera).
 
 Y al revés: hay cosas **explícitamente sin definir**, listadas en "Sin decidir" de
@@ -45,9 +45,9 @@ pantallas) y reconstruí qué pasa de verdad, paso a paso. No te quedes con el n
 de la función ni con el comentario: seguí los datos.
 - ¿Qué estados existen y cómo se transiciona entre ellos?
 - ¿Qué se le muestra a cada actor y qué se le oculta?
-- ¿Qué pasa en los bordes? Subir dos veces el mismo Excel de Fudo, o dos archivos con
-  períodos que se pisan; anular una importación cuando ya hay cierres de caja hechos
-  sobre esas ventas; un producto de Fudo sin vincular; una venta de algo que nadie
+- ¿Qué pasa en los bordes? Un doble toque en Cobrar; un precio que cambió con el ticket
+  armado; una venta después de cargado el cierre del día; la conexión que se corta al
+  cobrar; una venta anulada cuando ya hay un cierre hecho; una venta de algo que nadie
   registró como producido (stock negativo); un turno que cruza la medianoche; un cierre
   cargado dos veces o un día sin cierre; un gasto recurrente en un mes que ya se generó;
   una compra pagada con la caja; un insumo que cambia de precio con productos ya

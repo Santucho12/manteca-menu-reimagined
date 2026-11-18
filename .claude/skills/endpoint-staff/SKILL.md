@@ -54,7 +54,7 @@ Un usuario **desactivado** no opera aunque conserve su rol.
 9. **Doble envío.** El botón se deshabilita mientras se envía, pero la protección real va en
    la base: una restricción única (un cierre por turno y local, una importación por
    período) hace que el segundo envío falle en vez de duplicar.
-10. **Archivos** (el Excel de Fudo). Tipo y tamaño se validan en el servidor, y el archivo
+10. **Archivos** (las fotos del menú). Tipo y tamaño se validan en el servidor, y el archivo
     se lee en el servidor: no se confía en lo que el navegador ya interpretó. Las funciones
     de Vercel aceptan cuerpos de hasta 4,5 MB; si un archivo puede pesar más, se sube
     directo a Storage y el servidor lo lee de ahí.
