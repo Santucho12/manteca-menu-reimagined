@@ -3,7 +3,6 @@ import {
   categoriasDelReporte,
   productosDelReporte,
   puntosDeVentas,
-  SIN_DETALLE,
   ticketPromedio,
   totalesDeVentas,
 } from './ventas';
@@ -81,46 +80,5 @@ describe('ventas del reporte', () => {
       { clave: 'c1', nombre: 'Panadería', ventas: 3, montoCentavos: 1000 },
       { clave: 'sin-vincular', nombre: 'Sin vincular', ventas: 1, montoCentavos: 10 },
     ]);
-  });
-});
-
-describe('las ventas sin detalle de productos', () => {
-  const vinculado = {
-    producto_id: 'p1',
-    producto: 'Medialuna',
-    categoria_id: 'c1',
-    categoria: 'Facturas',
-    presentacion: 'Unidad',
-    cantidad: 2,
-    monto_centavos: 5000,
-  };
-  const suelto = { ...vinculado, producto_id: null, producto: 'Agua', monto_centavos: 900 };
-  const sinDetalle = { ventas: 3, monto_centavos: 150000 };
-
-  it('van en una fila al final, despues de Sin vincular, aunque sumen mas', () => {
-    const filas = productosDelReporte([vinculado, suelto], sinDetalle);
-    expect(filas.map((f) => f.clave)).toEqual(['p1', 'sin-vincular', SIN_DETALLE]);
-    expect(filas.at(-1)).toMatchObject({
-      nombre: 'Sin detalle de productos (Excel de Fudo)',
-      montoCentavos: 150000,
-    });
-  });
-
-  it('sin ventas sin detalle no hay fila', () => {
-    const filas = productosDelReporte([vinculado], { ventas: 0, monto_centavos: 0 });
-    expect(filas.map((f) => f.clave)).toEqual(['p1']);
-  });
-
-  it('en categorias van al final con la cantidad de ventas', () => {
-    const filas = categoriasDelReporte(
-      [{ categoria_id: 'c1', categoria: 'Facturas', ventas: 1, monto_centavos: 5000 }],
-      sinDetalle,
-    );
-    expect(filas.at(-1)).toEqual({
-      clave: SIN_DETALLE,
-      nombre: 'Sin detalle de productos (Excel de Fudo)',
-      ventas: 3,
-      montoCentavos: 150000,
-    });
   });
 });

@@ -147,7 +147,7 @@ test('en el celular todo se ve un poco más chico y con más aire', async ({ pag
 test('los botones de arriba bajan de renglón en vez de cortarse', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 780 });
   await page.goto('/admin/ventas');
-  for (const nombre of ['Cargar venta', 'Subir Excel de Fudo', 'Tipos de venta']) {
+  for (const nombre of ['Cargar venta', 'Tipos de venta']) {
     const boton = (await page.getByRole('link', { name: nombre }).boundingBox())!;
     expect(boton.x + boton.width).toBeLessThanOrEqual(360);
   }

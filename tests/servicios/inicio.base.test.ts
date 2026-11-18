@@ -144,11 +144,4 @@ describe('datos del inicio', () => {
     const datos = await datosDelInicio(await clienteComo('admin'), diaSiguiente(fecha, 2));
     expect(datos.avisos.some((a) => a.texto.startsWith('Ayer no se cargó'))).toBe(true);
   });
-
-  it('cuenta las ventas del mes que no tienen productos, las del Excel de Fudo', async () => {
-    const admin = await clienteComo('admin');
-    const antes = (await datosDelInicio(admin, '2016-03-20')).sinDetalle;
-    ventas.push(await sembrarVentaConPago({ fecha: '2016-03-10', medio: 'qr', centavos: 100000 }));
-    expect((await datosDelInicio(admin, '2016-03-20')).sinDetalle).toBe(antes + 1);
-  });
 });

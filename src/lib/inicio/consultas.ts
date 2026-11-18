@@ -5,12 +5,7 @@ import { listarRecurrentes } from '../gastos/consultas';
 import { proximosPagos } from '../gastos/fijos';
 import { pagosPendientes, vencimientosTomados } from '../gastos/pagos';
 import { itemsPorPagar } from '../gastos/porPagar';
-import {
-  datosDelResultado,
-  ventasPorDia,
-  ventasPorProducto,
-  ventasSinDetalle,
-} from '../reportes/consultas';
+import { datosDelResultado, ventasPorDia, ventasPorProducto } from '../reportes/consultas';
 import { periodoAnterior, sumarDias } from '../reportes/periodos';
 import { resultadoPorMes } from '../reportes/resultado';
 import { productosDelReporte } from '../reportes/ventas';
@@ -113,23 +108,18 @@ function leerElInicio(cliente: Cliente, hoy: string) {
     ventasPorProducto(cliente, mes),
     ventasPorDia(cliente, rangoDeSemanas(hoy)),
     pagosDelInicio(cliente, hoy),
-    ventasSinDetalle(cliente, mes),
   ]);
 }
 
 /** Todo lo de Inicio, con el mismo calculo que Reportes. */
 export async function datosDelInicio(cliente: Cliente, hoy: string) {
-  const [avisos, actual, anterior, anio, productos, dias, pagos, sinDetalle] = await leerElInicio(
-    cliente,
-    hoy,
-  );
+  const [avisos, actual, anterior, anio, productos, dias, pagos] = await leerElInicio(cliente, hoy);
   return {
     avisos: avisosDeInicio({ ...avisos, pagos }),
     actual,
     anterior,
     meses: resultadoPorMes(anio.ventas, anio.gastos),
     masVendidos: masVendidos(productosDelReporte(productos)),
-    sinDetalle: sinDetalle.ventas,
     semana: semanaContraSemana(dias, hoy),
   };
 }

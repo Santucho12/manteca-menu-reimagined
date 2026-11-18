@@ -36,18 +36,6 @@ export type CategoriaDelReporte = {
 };
 
 export const SIN_VINCULAR = 'sin-vincular';
-export const SIN_DETALLE = 'sin-detalle';
-const NOMBRE_SIN_DETALLE = 'Sin detalle de productos (Excel de Fudo)';
-
-/** Lo que devuelve reporte_ventas_sin_detalle: las ventas del periodo sin renglones. */
-export type SinDetalle = { ventas: number; monto_centavos: number };
-
-// Va al final de todo, despues de Sin vincular: no es un producto, es lo que el Excel no detalla.
-const conSinDetalle = <T>(
-  filas: T[],
-  sinDetalle: SinDetalle | undefined,
-  fila: (s: SinDetalle) => T,
-) => (sinDetalle && sinDetalle.monto_centavos > 0 ? [...filas, fila(sinDetalle)] : filas);
 
 export const ticketPromedio = (montoCentavos: number, ventas: number) =>
   ventas === 0 ? null : Math.round(montoCentavos / ventas);
@@ -86,41 +74,20 @@ function sumarRenglon(productos: Map<string, ProductoDelReporte>, r: RenglonDePr
  * Una fila por producto con su monto. Lo no vinculado va junto en "Sin vincular" y siempre al
  * final, aunque sume mas: es lo que falta vincular, no un producto.
  */
-export function productosDelReporte(
-  renglones: RenglonDeProducto[],
-  sinDetalle?: SinDetalle,
-): ProductoDelReporte[] {
+export function productosDelReporte(renglones: RenglonDeProducto[]): ProductoDelReporte[] {
   const productos = new Map<string, ProductoDelReporte>();
   for (const r of renglones) sumarRenglon(productos, r);
-  const filas = [...productos.values()]
+  return [...productos.values()]
     .map((p) =>
       p.clave === SIN_VINCULAR ? p : { ...p, presentaciones: p.presentaciones.sort(porMonto) },
     )
     .sort((a, b) => alFinal(a) - alFinal(b) || porMonto(a, b));
-  return conSinDetalle(filas, sinDetalle, (s) => ({
-    clave: SIN_DETALLE,
-    nombre: NOMBRE_SIN_DETALLE,
-    montoCentavos: s.monto_centavos,
-    presentaciones: [],
-  }));
 }
 
-export const categoriasDelReporte = (
-  filas: VentaDeCategoria[],
-  sinDetalle?: SinDetalle,
-): CategoriaDelReporte[] =>
-  conSinDetalle(
-    filas.map((f) => ({
-      clave: f.categoria_id ?? SIN_VINCULAR,
-      nombre: f.categoria,
-      ventas: f.ventas,
-      montoCentavos: f.monto_centavos,
-    })),
-    sinDetalle,
-    (s) => ({
-      clave: SIN_DETALLE,
-      nombre: NOMBRE_SIN_DETALLE,
-      ventas: s.ventas,
-      montoCentavos: s.monto_centavos,
-    }),
-  );
+export const categoriasDelReporte = (filas: VentaDeCategoria[]): CategoriaDelReporte[] =>
+  filas.map((f) => ({
+    clave: f.categoria_id ?? SIN_VINCULAR,
+    nombre: f.categoria,
+    ventas: f.ventas,
+    montoCentavos: f.monto_centavos,
+  }));

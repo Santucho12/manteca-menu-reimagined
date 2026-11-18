@@ -62,13 +62,3 @@ describe('mesesVisibles', () => {
   it('con menos de 4 meses muestra los que hay', () =>
     expect(mesesVisibles([1, 2], false)).toEqual([1, 2]));
 });
-
-describe('masVendidos y las ventas sin detalle', () => {
-  it('no las cuenta como un producto', () => {
-    const elegidos = masVendidos([
-      { clave: 'sin-detalle', nombre: 'Sin detalle', montoCentavos: 9999, presentaciones: [] },
-      { clave: 'a', nombre: 'A', montoCentavos: 1, presentaciones: [] },
-    ]);
-    expect(elegidos.map((p) => p.clave)).toEqual(['a']);
-  });
-});

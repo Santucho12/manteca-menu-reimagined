@@ -9,7 +9,7 @@ import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import { formatearPesos } from '@/lib/plata';
 import { compararFilas, variacion } from '@/lib/reportes/comparacion';
-import { ventasPorCategoria, ventasSinDetalle } from '@/lib/reportes/consultas';
+import { ventasPorCategoria } from '@/lib/reportes/consultas';
 import { paginaDe } from '@/lib/reportes/paginas';
 import { periodosDelReporte, type ParametrosDeReporte } from '@/lib/reportes/periodos';
 import { categoriasDelReporte, type CategoriaDelReporte } from '@/lib/reportes/ventas';
@@ -31,12 +31,10 @@ export default async function ReporteDeCategorias({
     Promise.all([
       ventasPorCategoria(cliente, periodos.actual),
       ventasPorCategoria(cliente, periodos.comparacion),
-      ventasSinDetalle(cliente, periodos.actual),
-      ventasSinDetalle(cliente, periodos.comparacion),
     ]),
   );
-  const actual = categoriasDelReporte(datos[0], datos[2]);
-  const anterior = categoriasDelReporte(datos[1], datos[3]);
+  const actual = categoriasDelReporte(datos[0]);
+  const anterior = categoriasDelReporte(datos[1]);
   const pagina = paginaDe(
     compararFilas(
       actual,
