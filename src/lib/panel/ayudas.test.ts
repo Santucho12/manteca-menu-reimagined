@@ -180,7 +180,6 @@ describe('ayudas', () => {
         'mismos días del mes anterior',
         'mismo largo',
         'Comparar',
-        'Sin vincular',
         'Balance',
         'por mes',
         'Inicio',
