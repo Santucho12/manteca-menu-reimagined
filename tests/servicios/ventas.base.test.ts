@@ -47,6 +47,7 @@ const datos = (fecha: string, cambios: Partial<DatosDeVenta> = {}): DatosDeVenta
   canalId: encargo,
   medio: 'transferencia',
   comentario: 'Encargo de la escuela',
+  enLaCaja: false,
   renglones: [
     {
       opcion: `${producto.productoId}|${producto.presentacionId}`,

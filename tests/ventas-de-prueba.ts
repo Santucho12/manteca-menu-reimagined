@@ -82,7 +82,11 @@ export function datosDeVenta(
 }
 
 /** Una venta escrita sin la funcion de guardar: sirve para simular una de Fudo o de otro local. */
-type SemillaDeVenta = { origen?: 'manual' | 'fudo'; otroLocal?: boolean; fecha?: string };
+type SemillaDeVenta = {
+  origen?: 'manual' | 'fudo' | 'mostrador';
+  otroLocal?: boolean;
+  fecha?: string;
+};
 
 async function filaDeVenta(semilla: SemillaDeVenta) {
   const secreto = clienteSecretoDePruebas();
