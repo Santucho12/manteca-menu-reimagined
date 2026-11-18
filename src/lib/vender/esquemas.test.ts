@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   esquemaVentaDelMostrador,
   ventaDelMostradorParaLaBase,
+  ventaDelTicket,
   type VentaDelMostrador,
 } from './esquemas';
 
@@ -83,5 +84,32 @@ describe('esquemaVentaDelMostrador', () => {
   it('los pagos suman el total del ticket', () => {
     const pagos = [{ medio: 'efectivo', montoCentavos: 3_500_000 }];
     expect(mensajeDe({ ...venta, pagos })).toBe('Los pagos no suman el total.');
+  });
+});
+
+describe('ventaDelTicket', () => {
+  it('manda cada renglón con su precio y su cantidad, y los pagos tal cual', () => {
+    const ticket = [
+      {
+        productoId: PRODUCTO,
+        presentacionId: PRESENTACION,
+        nombre: 'Medialuna',
+        presentacion: 'Docena',
+        precioCentavos: 1_800_000,
+        cantidad: 2,
+      },
+    ];
+    const pagos = [{ medio: 'efectivo' as const, montoCentavos: 3_600_000 }];
+    expect(ventaDelTicket(ticket, pagos)).toEqual({
+      renglones: [
+        {
+          productoId: PRODUCTO,
+          presentacionId: PRESENTACION,
+          cantidad: 2,
+          precioCentavos: 1_800_000,
+        },
+      ],
+      pagos,
+    });
   });
 });
