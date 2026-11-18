@@ -113,13 +113,11 @@ leer sus cierres y los gastos de su cierre.
 | `reporte_ventas_por_producto(desde, hasta)` | Producto, categoría de hoy, presentación, cantidad y monto; sin producto, la descripción del renglón |
 | `reporte_ventas_por_categoria(desde, hasta)` | Categoría de hoy (o "Sin vincular"), ventas distintas y monto |
 | `reporte_gastos(desde, hasta)` | Día, categoría y monto de los gastos sin anular |
-| `reporte_ventas_sin_detalle(desde, hasta)` | Cantidad y monto de las ventas cerradas y sin anular que no tienen renglones (pedido 84) |
 
-Del pedido 84 (migración `20261105120000_excel_de_fudo_en_el_sistema`), además,
-`ventas_fudo_cargadas_hasta()`: el último día con ventas de Fudo sin anular, o null; solo
-admin activo. La fila "Sin detalle" la agregan `productosDelReporte` y `categoriasDelReporte`
-(`src/lib/reportes/ventas.ts`) con lo que devuelve `ventasSinDetalle`, leída en la misma tanda
-que el resto del reporte.
+El pedido 84 sumó `ventas_fudo_cargadas_hasta()` y la fila "Sin detalle" con
+`reporte_ventas_sin_detalle`; el pedido 89 los sacó (migración
+`20261118120100_vender_en_el_mostrador`), porque toda venta se carga al cobrar y con sus
+productos.
 
 ### Código
 

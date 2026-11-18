@@ -184,4 +184,29 @@ Primera parte construida el 2026-10-11 (pedido 30). El detalle está en
   productos, el precio del menú editable, el total mientras se escribe), `/admin/ventas/[id]` y
   `/admin/ventas/canales`.
 
-Lo del mostrador (pedido 89) se agrega acá al construirlo.
+### El mostrador (pedido 89)
+
+Migraciones `20261118120000_origen_mostrador` (el origen `mostrador`, solo: un valor nuevo de
+un enum no se usa en la misma transacción) y `20261118120100_vender_en_el_mostrador`.
+
+- **Base:** `ventas.en_la_caja` (si suma a lo esperado del cierre; lo que ya estaba quedó en
+  verdadero) y `canales_de_venta.de_sistema`. Cada local tiene su Local del sistema (lo crea un
+  trigger al dar de alta un local); no se renombra, no se desactiva ni se borra (`PV312`).
+- **Catálogo:** `catalogo_para_vender()`, para Caja y el admin activos: cada producto activo de
+  una categoría activa, en cada forma de venta activa, con el precio que rige (el propio o el
+  de la categoría), se muestre o no en la carta.
+- **Guardar:** `ventas_guardar_mostrador(datos)` vuelve a calcular cada precio con el menú y
+  devuelve `{ id, total_centavos }`. La misma clave devuelve la venta que ya estaba. Rechaza
+  sin productos (`PV302`), un producto que no se vende (`PV304`), un precio que cambió
+  (`PV310`), pagos que no son uno o dos medios distintos de más de $0 que suman el total
+  (`PV311`) y una cantidad que no es un entero desde 1 (`PV313`). La fecha es hoy en
+  Argentina; el tipo, Local; `en_la_caja`, verdadero.
+- **Venta a mano:** `ventas_guardar_manual` guarda `en_la_caja` (sin decirlo, falso).
+- **Sin Fudo:** se sacan `ventas_importar_excel` y sus piezas, `ventas_fudo_cargadas_hasta` y
+  `reporte_ventas_sin_detalle`.
+- **Código:** `src/lib/vender/` (ticket, pagos, cobro, catálogo, esquemas, consultas, escritura y
+  los hooks) y `/admin/vender` (`Mostrador`, `CatalogoDelMostrador`, `TicketDelMostrador`,
+  `CobroDelMostrador`, `ElegirMedio`).
+- **Pruebas:** los puros de `src/lib/vender`, `tests/servicios/vender.base.test.ts`,
+  `tests/servicios/caja-con-el-mostrador.base.test.ts`, `tests/rls/vender.base.test.ts` y
+  `e2e/vender.spec.ts`.

@@ -206,3 +206,8 @@ esperado y diferencia en 0; el reporte de Caja recibe `diferenciaCentavos: null`
 cierres. Pruebas: `tests/servicios/excel-en-el-sistema.base.test.ts`, los puros de
 `src/lib/caja` y `src/lib/reportes`, `e2e/caja.spec.ts` y `e2e/caja-control.spec.ts`. El pedido
 89 lo saca: las ventas se cargan en el momento.
+
+**Lo cobrado en la caja (pedido 89).** Migración `20261118120100_vender_en_el_mostrador`:
+`cierres_con_resultado` deja de devolver `ventas_cargadas` y suma solo las ventas con
+`en_la_caja`. `resultadoDeFila` compara siempre; el estado `esperando_ventas` ya no existe.
+Pruebas: `tests/servicios/caja-con-el-mostrador.base.test.ts` y los puros de `src/lib/caja`.
