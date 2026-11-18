@@ -13,7 +13,7 @@ export default async function PaginaDeCanales() {
   return (
     <Pantalla
       titulo="Tipos de venta"
-      subtitulo="Por dónde entran las ventas que no pasan por Fudo."
+      subtitulo="Por dónde se vende lo que cargás a mano."
       ayuda="canales"
     >
       <section

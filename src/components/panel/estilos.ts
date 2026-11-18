@@ -102,7 +102,7 @@ export const ACCESO_PRINCIPAL =
 export const ACCESO_SECUNDARIO =
   'group flex-1 lg:flex-none inline-flex h-11 items-center justify-center gap-2.5 whitespace-nowrap rounded-full border border-border bg-white pl-3 pr-5 text-sm font-semibold text-foreground shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-[#d8cdb6] hover:shadow-lg active:translate-y-0 active:scale-[0.98]';
 
-/** El acceso que confirma plata o importa (el Excel de Fudo): verde, como el resto del panel. */
+/** El acceso que confirma plata o lleva a la acción principal: verde, como el resto del panel. */
 export const ACCESO_VERDE =
   'group flex-1 lg:flex-none inline-flex h-11 items-center justify-center gap-2.5 whitespace-nowrap rounded-full bg-emerald-600 pl-3 pr-5 text-sm font-bold text-white shadow-md shadow-emerald-600/25 transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg active:translate-y-0 active:scale-[0.98]';
 

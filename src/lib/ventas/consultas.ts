@@ -8,14 +8,14 @@ import type { FiltrosDeVentas, Origen } from './pantalla';
 export type FilaDeVenta = {
   id: string;
   fecha: string;
-  /** Cuando se cerro, o null si no se sabe: las del Excel de Fudo solo traen el dia. */
+  /** Cuando se cobro, o null si no se sabe: las viejas del Excel de Fudo solo traen el dia. */
   cerrada_en: string | null;
   origen: Origen;
   estado: string;
   anulado: boolean;
   total_centavos: number;
   canal: string | null;
-  /** El nombre de quien la cargo; null si nadie (las de Fudo entran solas). */
+  /** El nombre de quien la cargo; null si nadie (las viejas de Fudo entraban solas). */
   cargada_por: string | null;
   medios: Medio[];
 };

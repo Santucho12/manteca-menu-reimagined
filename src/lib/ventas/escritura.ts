@@ -11,7 +11,7 @@ export const MENSAJES_DE_VENTAS = {
   productoNoDisponible: 'Uno de los productos ya no está disponible. Revisá la venta.',
   anulada: 'Esta venta está anulada y ya no se puede cambiar.',
   sinMotivo: 'Escribí el motivo de la anulación.',
-  deFudo: 'Las ventas de Fudo se corrigen en Fudo: el cambio llega solo.',
+  deFudo: 'Esta venta vino de Fudo, antes de dejarlo: no se anula.',
   canalRepetido: 'Ya hay un tipo de venta con ese nombre.',
   canalConVentas: 'Ese tipo de venta ya tiene ventas: desactivalo en lugar de borrarlo.',
   generico: 'No pudimos guardarlo. Revisá los datos e intentá de nuevo.',

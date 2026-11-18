@@ -29,7 +29,7 @@ export default async function NuevaVenta() {
   return (
     <Pantalla
       titulo="Cargar venta"
-      subtitulo="Para lo que no pasa por Fudo: Cheaf, encargos, ventas a comercios."
+      subtitulo="Para lo que no se cobró en el mostrador: encargos, ventas a comercios, Cheaf."
       ayuda="ventas"
     >
       <FormularioDeVenta inicial={inicial} canales={activos} opciones={opciones} />
