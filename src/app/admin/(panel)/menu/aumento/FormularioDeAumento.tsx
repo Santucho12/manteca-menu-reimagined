@@ -13,7 +13,6 @@ import { Seccion } from '@/components/panel/Seccion';
 import { esquemaAumento, type DatosDeAumento } from '@/lib/menu/esquemas';
 import { useAumento } from '@/lib/menu/useAumento';
 import { aplicarAumentoDelMenu, verCambiosDelAumento } from '../acciones';
-import { PasalosAFudo } from './PasalosAFudo';
 import { TablaDeCambios } from './TablaDeCambios';
 
 const REDONDEOS = [
@@ -81,7 +80,6 @@ export function FormularioDeAumento({
       </Seccion>
       {aumento.mensaje ? <AvisoDeError mensaje={aumento.mensaje} /> : null}
       {aumento.listo ? <AvisoDeExito titulo={aumento.listo} /> : null}
-      {aumento.aplicados?.length ? <PasalosAFudo cambios={aumento.aplicados} /> : null}
       {aumento.cambios ? <TablaDeCambios cambios={aumento.cambios} /> : null}
       {aumento.cambios?.length ? (
         <button type="button" onClick={aumento.aplicar} className={BOTON_ESMERALDA}>

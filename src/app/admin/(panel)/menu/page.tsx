@@ -4,7 +4,6 @@ import { BOTON_DE_ENCABEZADO_NEUTRO } from '@/components/panel/estilos';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { leerPanel } from '@/lib/menu/consultas';
-import { AvisoDeFudo } from './AvisoDeFudo';
 import { BotonNuevo } from './BotonNuevo';
 import { TarjetaDeCategoria } from './TarjetaDeCategoria';
 
@@ -30,7 +29,6 @@ export default async function PaginaDelMenu() {
       acciones={<Accesos />}
       ayuda="menu"
     >
-      <AvisoDeFudo />
       {categorias.map((categoria) => (
         <TarjetaDeCategoria key={categoria.id} categoria={categoria} />
       ))}
