@@ -1,4 +1,4 @@
-import type { ItemDelCatalogo } from './ticket';
+import { claveDe, type ItemDelCatalogo, type RenglonDelTicket } from './ticket';
 
 /** Lo que devuelve catalogo_para_vender: una fila por producto y forma de venta, en orden. */
 export type FilaDelCatalogo = {
@@ -42,4 +42,16 @@ export function catalogoDeFilas(filas: FilaDelCatalogo[]): CategoriaParaVender[]
     productoDe(categoria, f).formas.push(formaDe(f));
   }
   return categorias;
+}
+
+/** El ticket con los precios que rigen hoy; lo que ya no se vende sale. */
+export function preciosAlDia(
+  ticket: RenglonDelTicket[],
+  catalogo: CategoriaParaVender[],
+): RenglonDelTicket[] {
+  const formas = catalogo.flatMap((c) => c.productos.flatMap((p) => p.formas));
+  return ticket.flatMap((renglon) => {
+    const forma = formas.find((f) => claveDe(f) === claveDe(renglon));
+    return forma ? [{ ...renglon, precioCentavos: forma.precioCentavos }] : [];
+  });
 }
