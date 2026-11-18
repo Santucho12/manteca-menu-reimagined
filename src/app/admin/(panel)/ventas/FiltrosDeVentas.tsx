@@ -4,7 +4,7 @@ import { nombreDeMedio } from '@/lib/caja/pantalla';
 import { MEDIOS } from '@/lib/caja/resultado';
 import { ESTADOS_DE_LISTA, type FiltrosDeVentas as Filtros } from '@/lib/ventas/pantalla';
 
-const NOMBRES_DE_ESTADO = { cerrada: 'Cerradas', cancelada: 'Canceladas', anulada: 'Anuladas' };
+const NOMBRES_DE_ESTADO = { cerrada: 'Cerradas', anulada: 'Anuladas' };
 const todos = (texto: string) => ({ valor: '', texto });
 
 /** Los filtros de la lista: cada cambio actualiza las ventas solo, sin botón. */

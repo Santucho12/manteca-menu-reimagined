@@ -1655,7 +1655,7 @@ export type Database = {
         | "tarjeta"
         | "cheque"
         | "otro"
-      origen_de_venta: "manual" | "fudo"
+      origen_de_venta: "manual" | "fudo" | "mostrador"
       rol_usuario: "invitado" | "caja" | "encargado" | "admin"
     }
     CompositeTypes: {
@@ -1796,7 +1796,7 @@ export const Constants = {
         "cheque",
         "otro",
       ],
-      origen_de_venta: ["manual", "fudo"],
+      origen_de_venta: ["manual", "fudo", "mostrador"],
       rol_usuario: ["invitado", "caja", "encargado", "admin"],
     },
   },

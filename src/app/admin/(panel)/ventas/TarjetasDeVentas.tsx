@@ -13,7 +13,7 @@ const ICONOS: Record<string, LucideIcon> = {
 export function TarjetasDeVentas({ totales }: { totales: Totales }) {
   return (
     <section aria-label="Resumen de ventas">
-      <ul className="grid grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-3 md:gap-4">
+      <ul className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-3 md:gap-4">
         {tarjetasDelResumen(totales).map(({ etiqueta, valor, detalle, ayuda }) => {
           const Icono = ICONOS[etiqueta]!;
           return (

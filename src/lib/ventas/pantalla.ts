@@ -5,22 +5,27 @@ import { esFechaValida } from '../gastos/vencimientos';
 import { formatearPesos } from '../plata';
 import { numeroDePagina, unValor } from '../usuarios/presentacion';
 
-export const ORIGENES = ['manual', 'fudo'] as const;
-export const ESTADOS_DE_LISTA = ['cerrada', 'cancelada', 'anulada'] as const;
-export type Origen = (typeof ORIGENES)[number];
+// Lo que se filtra. Fudo quedó como origen de las ventas viejas, sin filtro (pedido 89).
+export const ORIGENES = ['mostrador', 'manual'] as const;
+export const ESTADOS_DE_LISTA = ['cerrada', 'anulada'] as const;
+export type Origen = (typeof ORIGENES)[number] | 'fudo';
 export type EstadoDeLista = (typeof ESTADOS_DE_LISTA)[number];
 
 export type FiltrosDeVentas = {
   desde: string;
   hasta: string;
-  origen: Origen | null;
+  origen: (typeof ORIGENES)[number] | null;
   medio: Medio | null;
   estado: EstadoDeLista | null;
   pagina: number;
 };
 export type ParametrosDeVentas = Record<string, string | string[] | undefined>;
 
-const NOMBRES_DE_ORIGEN: Record<Origen, string> = { manual: 'A mano', fudo: 'Fudo' };
+const NOMBRES_DE_ORIGEN: Record<Origen, string> = {
+  mostrador: 'Mostrador',
+  manual: 'A mano',
+  fudo: 'Fudo',
+};
 const NOMBRES_DE_ESTADO: Record<string, string> = {
   cerrada: 'Cerrada',
   cancelada: 'Cancelada',
@@ -107,17 +112,11 @@ function tarjetaDeTicket({ cobradoCentavos, cobradas }: Totales): TarjetaDelResu
   return { etiqueta: 'Ticket promedio', valor, detalle: 'por venta cobrada' };
 }
 
-/** Las tarjetas de arriba de la lista: lo cobrado, el ticket promedio y lo que no cuenta. */
+/** Las tarjetas de arriba de la lista: lo cobrado, el ticket promedio y lo anulado. */
 export function tarjetasDelResumen(totales: Totales): TarjetaDelResumen[] {
   return [
     tarjeta('Cobrado', totales.cobradoCentavos, totales.cobradas),
     tarjetaDeTicket(totales),
-    tarjeta(
-      'Canceladas',
-      totales.canceladoCentavos,
-      totales.canceladas,
-      'Pedidos cancelados en Fudo: no se cobraron.',
-    ),
     tarjeta(
       'Anuladas',
       totales.anuladoCentavos,

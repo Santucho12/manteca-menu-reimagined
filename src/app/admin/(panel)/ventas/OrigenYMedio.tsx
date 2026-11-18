@@ -2,6 +2,7 @@ import {
   ArrowLeftRight,
   Banknote,
   CreditCard,
+  History,
   PenLine,
   QrCode,
   Store,
@@ -21,9 +22,15 @@ const ICONOS_DE_MEDIO: Record<Medio, LucideIcon> = {
 
 const CHIP = 'inline-flex items-center gap-1.5 text-xs font-semibold whitespace-nowrap';
 
+const ICONOS_DE_ORIGEN: Record<Origen, LucideIcon> = {
+  mostrador: Store,
+  manual: PenLine,
+  fudo: History,
+};
+
 /** De donde viene la venta: un ícono y el nombre. */
 export function OrigenDeVenta({ origen }: { origen: Origen }) {
-  const Icono = origen === 'fudo' ? Store : PenLine;
+  const Icono = ICONOS_DE_ORIGEN[origen];
   return (
     <span className={CHIP}>
       <Icono size={14} className="text-muted-foreground" aria-hidden="true" />
