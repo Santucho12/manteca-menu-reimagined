@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import { MEDIOS } from '../caja/resultado';
+import type { PagoDelMostrador } from './pagos';
+import type { RenglonDelTicket } from './ticket';
 
 const CANTIDAD = 'La cantidad es un número entero, desde 1.';
 
@@ -55,5 +57,21 @@ export function ventaDelMostradorParaLaBase(venta: VentaDelMostrador) {
       precio_centavos: r.precioCentavos,
     })),
     pagos: venta.pagos.map((p) => ({ medio: p.medio, monto_centavos: p.montoCentavos })),
+  };
+}
+
+/** Lo que se manda al cobrar, sin la clave: la pone quien guarda. */
+export function ventaDelTicket(
+  ticket: RenglonDelTicket[],
+  pagos: PagoDelMostrador[],
+): Omit<VentaDelMostrador, 'clave'> {
+  return {
+    renglones: ticket.map((r) => ({
+      productoId: r.productoId,
+      presentacionId: r.presentacionId,
+      cantidad: r.cantidad,
+      precioCentavos: r.precioCentavos,
+    })),
+    pagos,
   };
 }
