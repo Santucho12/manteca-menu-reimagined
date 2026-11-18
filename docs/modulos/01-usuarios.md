@@ -101,8 +101,8 @@ Acciones sobre una cuenta:
 5. Una contraseña temporal sirve hasta que se usa. Un reseteo nuevo reemplaza a la anterior.
 6. Un admin no resetea su propia contraseña: la cambia desde Mi cuenta.
 7. Una cuenta desactivada no entra aunque tenga una contraseña temporal pendiente.
-8. Caja entra a `/admin` y llega directo a Vender (pedido 89; antes llegaba a la carga de su
-   cierre).
+8. Caja entra a `/admin` y ve su inicio, con Vender como acción principal y la carga de su
+   cierre al lado (pedido 89; antes, solo la carga del cierre).
 
 ## Mensajes
 

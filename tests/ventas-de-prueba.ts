@@ -165,6 +165,15 @@ export async function borrarVentas(
   await borrarMenuDePrueba(extras.categoriasDelMenu ?? []);
 }
 
+/** Las ventas que llevan ese producto: las del mostrador no tienen comentario para buscarlas. */
+export async function idsDeVentasDelProducto(productoId: string): Promise<string[]> {
+  const { data } = await clienteSecretoDePruebas()
+    .from('renglones_de_venta')
+    .select('venta_id')
+    .eq('producto_id', productoId);
+  return [...new Set((data ?? []).map((renglon) => renglon.venta_id))];
+}
+
 /** Las ventas cargadas por pantalla con ese comentario. */
 export async function idsDeVentasComentadas(comentario: string): Promise<string[]> {
   const { data } = await clienteSecretoDePruebas()

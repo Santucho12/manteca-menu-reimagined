@@ -227,6 +227,14 @@ describe('ayudas', () => {
     expect(caja).not.toContain('tocá Editar');
   });
 
+  it('la ayuda de Vender cuenta cómo se arma el ticket y cómo se cobra', () => {
+    const ayuda = AYUDAS.vender;
+    const texto = [ayuda.introduccion, ...ayuda.temas.flatMap((t) => t.puntos)].join(' ');
+    for (const parte of ['Tocá', 'dos medios', 'vuelto', 'precio del menú', 'a ciegas', 'admin']) {
+      expect(texto).toContain(parte);
+    }
+  });
+
   it('ninguna ayuda habla de Fudo: Manteca lo dejó (pedido 89)', () => {
     for (const ayuda of Object.values(AYUDAS)) {
       const texto = [ayuda.introduccion, ...ayuda.temas.flatMap((t) => [t.titulo, ...t.puntos])];
@@ -246,6 +254,7 @@ describe('ayudas', () => {
       'proveedores',
       'gastos',
       'fijos',
+      'vender',
       'ventas',
       'canales',
       'caja',

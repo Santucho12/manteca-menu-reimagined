@@ -93,10 +93,11 @@ test.describe('sin sesion', () => {
 test.describe('con la sesion de caja', () => {
   test.use({ storageState: SESIONES.caja });
 
-  test('ve su nombre, sus tres enlaces y Salir, y nada mas', async ({ page }) => {
+  test('ve su nombre, sus cuatro enlaces y Salir, y nada mas', async ({ page }) => {
     await page.goto('/admin');
     await expect(page.getByRole('heading', { level: 1, name: 'Hola, Prueba Caja' })).toBeVisible();
     await expect(page.getByRole('navigation', { name: 'Panel' }).getByRole('link')).toHaveText([
+      'Vender',
       'Cargar cierre',
       'Mis cierres',
       'Mi cuenta',
@@ -104,6 +105,9 @@ test.describe('con la sesion de caja', () => {
     await expect(page.getByRole('button', { name: 'Salir' })).toBeVisible();
     await page.getByRole('main').getByRole('link', { name: 'Cargar el cierre de caja' }).click();
     await expect(page).toHaveURL(/\/admin\/caja$/);
+    await page.goto('/admin');
+    await page.getByRole('main').getByRole('link', { name: 'Vender', exact: true }).click();
+    await expect(page).toHaveURL(/\/admin\/vender$/);
   });
 
   test('guarda una captura de su inicio', async ({ page }, info) => {
