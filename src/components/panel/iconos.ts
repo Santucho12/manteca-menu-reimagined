@@ -7,6 +7,7 @@ import {
   ListChecks,
   Receipt,
   ShoppingBag,
+  Store,
   Truck,
   UserCog,
   Users,
@@ -18,6 +19,7 @@ import type { EnlaceDelPanel } from '@/lib/acceso/estados';
 // Plan Reminder Pro no tiene estas secciones: los eligio Claude (skill estetica-panel).
 export const ICONOS_DEL_PANEL: Record<EnlaceDelPanel['clave'], LucideIcon> = {
   inicio: LayoutDashboard,
+  vender: Store,
   menu: BookOpen,
   ventas: ShoppingBag,
   proveedores: Truck,

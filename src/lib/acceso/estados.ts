@@ -20,6 +20,7 @@ export type Pagina = 'publica' | 'panel' | 'cuenta' | 'caja' | 'admin' | 'cambia
 export type EnlaceDelPanel = {
   clave:
     | 'inicio'
+    | 'vender'
     | 'menu'
     | 'ventas'
     | 'proveedores'
@@ -52,12 +53,14 @@ const PERMITIDOS: Record<Exclude<Pagina, 'publica'>, readonly EstadoDeAcceso[]> 
 
 const ENLACES: Record<'caja' | 'admin', EnlaceDelPanel[]> = {
   caja: [
+    { clave: 'vender', href: '/admin/vender', texto: 'Vender' },
     { clave: 'caja', href: '/admin/caja', texto: 'Cargar cierre' },
     { clave: 'cierres', href: '/admin/caja/mis-cierres', texto: 'Mis cierres' },
     { clave: 'cuenta', href: '/admin/cuenta', texto: 'Mi cuenta' },
   ],
   admin: [
     { clave: 'inicio', href: '/admin', texto: 'Inicio', grupo: 'Día a día' },
+    { clave: 'vender', href: '/admin/vender', texto: 'Vender', grupo: 'Día a día' },
     { clave: 'ventas', href: '/admin/ventas', texto: 'Ventas', grupo: 'Día a día' },
     { clave: 'caja', href: '/admin/caja/control', texto: 'Caja', grupo: 'Día a día' },
     { clave: 'gastos', href: '/admin/gastos', texto: 'Gastos', grupo: 'Plata' },
