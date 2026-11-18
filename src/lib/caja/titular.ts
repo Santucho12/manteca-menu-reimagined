@@ -9,6 +9,9 @@ const EN_FRASE: Record<Medio, string> = {
   transferencia: 'transferencia',
 };
 
+/** El medio dicho dentro de una frase: "Faltan $500 en tarjeta de débito". */
+export const medioEnFrase = (medio: Medio) => EN_FRASE[medio];
+
 // Un faltante en un medio y un sobrante en otro no se suman: se dice en cuantos no cierra.
 function deUnCierreConDiferencia(medios: ResultadoDeMedio[]): string {
   const fuera = medios.filter((medio) => medio.fuera);
