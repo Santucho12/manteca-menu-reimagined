@@ -5,7 +5,6 @@ import { BarraAutomatica } from '@/components/panel/BarraAutomatica';
 import { FiltroDeFecha } from '@/components/panel/Filtros';
 import { ATAJO } from '@/components/panel/estilos';
 import { Pantalla } from '@/components/panel/Pantalla';
-import { VentasCargadasHasta } from '@/components/panel/VentasCargadasHasta';
 import {
   atajos,
   enlaceDeReporte,
@@ -82,7 +81,6 @@ export function PantallaDeReporte({
       <BarraAutomatica accion={ruta}>
         <Fechas periodos={periodos} conComparacion={conComparacion} />
       </BarraAutomatica>
-      <VentasCargadasHasta />
       {children}
       <EnlaceDeVolver href="/admin/reportes">Volver a reportes</EnlaceDeVolver>
     </Pantalla>

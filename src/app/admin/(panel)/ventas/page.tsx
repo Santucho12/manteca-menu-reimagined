@@ -1,8 +1,6 @@
-import { VentasCargadasHasta } from '@/components/panel/VentasCargadasHasta';
-import { FileSpreadsheet, Plus, Store } from 'lucide-react';
+import { Plus, Store } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { FranjaDeAviso } from '@/components/panel/Avisos';
 import {
   ACCESO_SECUNDARIO,
   ACCESO_VERDE,
@@ -25,17 +23,11 @@ export const metadata: Metadata = { title: 'Ventas' };
 function Accesos() {
   return (
     <>
-      <Link href="/admin/ventas/nueva" className={ACCESO_SECUNDARIO}>
-        <span className={ICONO_DE_ACCESO_SUAVE}>
+      <Link href="/admin/ventas/nueva" className={ACCESO_VERDE}>
+        <span className={ICONO_DE_ACCESO_SOBRE_VERDE}>
           <Plus size={16} strokeWidth={2.6} aria-hidden="true" />
         </span>
         Cargar venta
-      </Link>
-      <Link href="/admin/ventas/subir" className={ACCESO_VERDE}>
-        <span className={ICONO_DE_ACCESO_SOBRE_VERDE}>
-          <FileSpreadsheet size={15} aria-hidden="true" />
-        </span>
-        Subir Excel de Fudo
       </Link>
       <Link href="/admin/ventas/canales" className={ACCESO_SECUNDARIO}>
         <span className={ICONO_DE_ACCESO_SUAVE}>
@@ -64,13 +56,6 @@ export default async function PaginaDeVentas({
       acciones={<Accesos />}
       ayuda="ventas"
     >
-      <FranjaDeAviso>
-        <p>
-          Fudo todavía no está conectado: sus ventas entran subiendo el Excel de Fudo, y se ven
-          junto con las cargadas a mano.
-        </p>
-      </FranjaDeAviso>
-      <VentasCargadasHasta />
       <FiltrosDeVentas filtros={filtros} />
       <TarjetasDeVentas totales={lista.totales} />
       <ListaDeVentas filas={lista.filas} total={lista.total} />

@@ -7,21 +7,9 @@ import {
 } from '../tests/gastos-de-prueba';
 import { borrarMenuDePrueba, sembrarCategoria, sembrarProducto } from '../tests/menu-de-prueba';
 import { borrarProveedores, sembrarProveedor } from '../tests/proveedores-de-prueba';
-import { clienteSecretoDePruebas } from '../tests/clientes';
-import { borrarVentas } from '../tests/ventas-de-prueba';
 import { SESIONES, esperarNoEncontrado, esperarHidratacion } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
-
-// El mismo Excel de ventas-excel.spec.ts: tres dias de marzo de 2020, sin ventas de muestra.
-const EXCEL_DE_FUDO = 'e2e/archivos/reporte-ventas-fudo.xlsx';
-async function borrarVentasDelExcel() {
-  const { data } = await clienteSecretoDePruebas()
-    .from('ventas')
-    .select('id')
-    .like('fudo_id', 'excel:2020-03-%');
-  await borrarVentas((data ?? []).map((v) => v.id));
-}
 
 const HOY = diaEnArgentina(new Date());
 let categorias: string[] = [];
@@ -137,36 +125,3 @@ for (const rol of ['caja', 'invitado'] as const) {
     });
   });
 }
-
-test('una subida del Excel deja un solo registro, con su resumen y su periodo', async ({
-  page,
-}) => {
-  // La auditoria no se borra: otras corridas dejaron subidas del mismo periodo. Se cuenta antes.
-  const subidas = page
-    .getByRole('list', { name: 'Registros' })
-    .getByRole('listitem')
-    .filter({ hasText: 'Ventas · Ventas de Fudo · 02/03/2020 al 04/03/2020' });
-  try {
-    await page.goto('/admin/auditoria?modulo=ventas&accion=importacion');
-    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-    const antes = await subidas.count();
-    await page.goto('/admin/ventas/subir');
-    await page.getByLabel('Reporte de ventas de Fudo').setInputFiles(EXCEL_DE_FUDO);
-    await page.getByRole('button', { name: 'Revisar archivo' }).click();
-    await page.getByRole('button', { name: 'Guardar ventas' }).click();
-    await expect(page.getByText('Listo: 11 ventas nuevas.')).toBeVisible();
-    await page.goto('/admin/auditoria?modulo=ventas&accion=importacion');
-    await expect(subidas).toHaveCount(antes + 1);
-    const subida = subidas.first();
-    await expect(subida).toContainText('Subida del Excel');
-    await subida.getByRole('link', { name: 'Ver el detalle' }).click();
-    await expect(page).toHaveURL(/\/admin\/auditoria\/\d+$/, { timeout: 15_000 });
-    const cambios = page.getByRole('list', { name: 'Cambios' });
-    await expect(cambios).toContainText('Nuevas11');
-    await expect(cambios).toContainText('Total$63.501,00');
-    await page.getByRole('link', { name: 'Ver el dato' }).click();
-    await expect(page).toHaveURL(/\/admin\/ventas\?desde=2020-03-02&hasta=2020-03-04$/);
-  } finally {
-    await borrarVentasDelExcel();
-  }
-});
