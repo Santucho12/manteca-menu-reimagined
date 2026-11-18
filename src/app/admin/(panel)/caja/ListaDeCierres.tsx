@@ -34,9 +34,6 @@ const EstadoConFlecha = ({ cierre }: { cierre: FilaDeCierre }) => (
 
 // Cada medio que no da exacto, por separado: un faltante y un sobrante no se compensan.
 function Diferencia({ cierre }: { cierre: FilaDeCierre }) {
-  if (cierre.estado === 'esperando_ventas') {
-    return <span className="text-sm font-semibold text-muted-foreground">—</span>;
-  }
   if (cierre.diferencias.length === 0) {
     return <span className="text-sm font-semibold text-emerald-700">Sin diferencia</span>;
   }

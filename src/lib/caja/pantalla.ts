@@ -6,14 +6,8 @@ import { numeroDePagina, unValor } from '../usuarios/presentacion';
 import type { Tono } from '../../components/panel/Insignias';
 import type { Medio } from './resultado';
 
-// Pendiente y "no abrio" son dias sin cierre; los otros tres son el estado de un cierre cargado.
-export const ESTADOS = [
-  'cierra',
-  'con_diferencia',
-  'esperando_ventas',
-  'pendiente',
-  'no_abrio',
-] as const;
+// Pendiente y "no abrio" son dias sin cierre; los otros dos son el estado de un cierre cargado.
+export const ESTADOS = ['cierra', 'con_diferencia', 'pendiente', 'no_abrio'] as const;
 export type EstadoDeCierre = (typeof ESTADOS)[number];
 
 export type FiltrosDeControl = {
@@ -30,7 +24,6 @@ export type ParametrosDeControl = Record<string, string | string[] | undefined>;
 const NOMBRES_DE_ESTADO: Record<EstadoDeCierre, string> = {
   cierra: 'Cierra',
   con_diferencia: 'Con diferencia',
-  esperando_ventas: 'Esperando ventas',
   pendiente: 'Pendiente',
   no_abrio: 'No abrió',
 };
@@ -89,7 +82,6 @@ export function textoDeDiferencia(centavos: number | null): string {
 const TONOS: Record<EstadoDeCierre, Tono> = {
   cierra: 'esmeralda',
   con_diferencia: 'rosa',
-  esperando_ventas: 'ambar',
   pendiente: 'ambar',
   no_abrio: 'pizarra',
 };

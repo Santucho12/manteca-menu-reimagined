@@ -18,13 +18,12 @@ function Pastilla({ centavos }: { centavos: number }) {
   );
 }
 
-// Mientras el cierre espera las ventas del dia no hay esperado ni diferencia que mostrar.
-function Tarjeta({ medio, esperando }: { medio: ResultadoDeMedio; esperando: boolean }) {
+function Tarjeta({ medio }: { medio: ResultadoDeMedio }) {
   return (
     <li className="rounded-2xl border border-border/60 bg-secondary/30 p-4 space-y-3">
       <div className="flex items-center justify-between gap-2">
         <span className="font-bold">{nombreDeMedio(medio.medio)}</span>
-        {esperando ? null : <Pastilla centavos={medio.diferenciaCentavos} />}
+        <Pastilla centavos={medio.diferenciaCentavos} />
       </div>
       <dl className="grid grid-cols-2 gap-3">
         <div>
@@ -33,27 +32,23 @@ function Tarjeta({ medio, esperando }: { medio: ResultadoDeMedio; esperando: boo
             {formatearPesos(medio.declaradoCentavos)}
           </dd>
         </div>
-        {esperando ? null : (
-          <div>
-            <dt className={ROTULO}>Esperado</dt>
-            <dd className="font-display text-lg font-bold text-muted-foreground">
-              {formatearPesos(medio.esperadoCentavos)}
-            </dd>
-          </div>
-        )}
+        <div>
+          <dt className={ROTULO}>Esperado</dt>
+          <dd className="font-display text-lg font-bold text-muted-foreground">
+            {formatearPesos(medio.esperadoCentavos)}
+          </dd>
+        </div>
       </dl>
     </li>
   );
 }
 
-type Props = { medios: ResultadoDeMedio[]; esperando?: boolean };
-
 /** Una tarjeta por medio de pago: lo que se declaró, lo que se esperaba y si cierra. */
-export function MediosDelCierre({ medios, esperando = false }: Props) {
+export function MediosDelCierre({ medios }: { medios: ResultadoDeMedio[] }) {
   return (
     <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       {medios.map((medio) => (
-        <Tarjeta key={medio.medio} medio={medio} esperando={esperando} />
+        <Tarjeta key={medio.medio} medio={medio} />
       ))}
     </ul>
   );

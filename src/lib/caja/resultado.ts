@@ -17,7 +17,7 @@ export type ResultadoDeMedio = {
   fuera: boolean;
 };
 /** Sin las ventas del dia cargadas no hay contra que comparar: el cierre las espera. */
-export type EstadoDelCierre = 'cierra' | 'con_diferencia' | 'esperando_ventas';
+export type EstadoDelCierre = 'cierra' | 'con_diferencia';
 export type ResultadoDelCierre = {
   estado: EstadoDelCierre;
   medios: ResultadoDeMedio[];

@@ -1,7 +1,7 @@
-import { AlertTriangle, Ban, CheckCircle2, Clock, type LucideIcon } from 'lucide-react';
+import { AlertTriangle, Ban, CheckCircle2, type LucideIcon } from 'lucide-react';
 import type { Cierre } from '@/lib/caja/consultas';
 import { nombreDeEstado } from '@/lib/caja/pantalla';
-import { explicacionDelCierre, titularDelCierre } from '@/lib/caja/titular';
+import { titularDelCierre } from '@/lib/caja/titular';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import { diaDeLaSemana } from '@/lib/caja/diaDeLaSemana';
 import { cn } from '@/lib/utils';
@@ -13,9 +13,6 @@ function aspectoDe(cierre: Cierre): Aspecto {
   if (cierre.estado === 'cierra') {
     return { icono: CheckCircle2, fondo: 'bg-emerald-50', color: 'text-emerald-600' };
   }
-  if (cierre.estado === 'esperando_ventas') {
-    return { icono: Clock, fondo: 'bg-amber-50', color: 'text-amber-600' };
-  }
   return { icono: AlertTriangle, fondo: 'bg-rose-50', color: 'text-rose-600' };
 }
 
@@ -23,7 +20,6 @@ function aspectoDe(cierre: Cierre): Aspecto {
 export function ResumenDelCierre({ cierre }: { cierre: Cierre }) {
   const { icono: Icono, fondo, color } = aspectoDe(cierre);
   const titular = titularDelCierre(cierre, cierre.medios);
-  const explicacion = explicacionDelCierre(cierre);
   return (
     <div className="bg-card rounded-[2rem] border border-border/60 shadow-xl p-5 md:p-8 flex items-center gap-4 md:gap-6">
       <div
@@ -42,7 +38,6 @@ export function ResumenDelCierre({ cierre }: { cierre: Cierre }) {
         <p className={cn('font-display text-2xl md:text-3xl font-bold tracking-tight', color)}>
           {titular}
         </p>
-        {explicacion ? <p className="text-sm">{explicacion}</p> : null}
         <p className="text-sm text-muted-foreground">Cargado por {cierre.persona}</p>
       </div>
     </div>
