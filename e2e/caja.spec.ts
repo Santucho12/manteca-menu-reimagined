@@ -7,7 +7,7 @@ import {
   idsDeCierresDe,
   sembrarCierre,
 } from '../tests/cierres-de-prueba';
-import { borrarVentas, sembrarVenta, sembrarVentaConPago } from '../tests/ventas-de-prueba';
+import { borrarVentas, sembrarVentaConPago } from '../tests/ventas-de-prueba';
 import { SESIONES, aviso, esperarHidratacion, esperarNoEncontrado } from './ayudas';
 
 test.use({ storageState: SESIONES.caja });
@@ -129,31 +129,13 @@ test.describe('con la sesion de invitado', () => {
   });
 });
 
-// Un dia posterior a la ultima venta de Fudo: sus ventas todavia no se cargaron.
-const SIN_VENTAS_CARGADAS = '2099-04-15';
-
-test('un cierre sin las ventas del dia cargadas las espera, sin faltantes', async ({ page }) => {
-  fechas.push(SIN_VENTAS_CARGADAS);
-  const { id } = await sembrarCierre({ fecha: SIN_VENTAS_CARGADAS });
-  await page.goto(`/admin/caja/cierres/${id}`);
-  await expect(page.getByText('Esperando las ventas del día')).toBeVisible();
-  await expect(
-    page.getByText('Guardado. El resultado va a estar cuando se carguen las ventas del día.'),
-  ).toBeVisible();
-  await expect(page.getByText(/^(Faltan|Sobran) /)).toHaveCount(0);
-  await expect(page.getByText('Esperado', { exact: true })).toHaveCount(0);
-  await page.goto('/admin/caja/mis-cierres');
-  await expect(page.getByText('Esperando ventas', { exact: true }).first()).toBeVisible();
-});
-
-test('cuando llegan las ventas de Fudo de ese dia, el cierre muestra su diferencia', async ({
-  page,
-}) => {
-  fechas.push(SIN_VENTAS_CARGADAS);
-  const { id } = await sembrarCierre({ fecha: SIN_VENTAS_CARGADAS });
-  ventas.push((await sembrarVenta({ origen: 'fudo', fecha: SIN_VENTAS_CARGADAS })).id);
+// Las ventas se cargan al cobrar (pedido 89): un cierre ya no espera las de Fudo.
+test('un cierre se compara con las ventas del dia desde que se guarda', async ({ page }) => {
+  const { id } = await sembrarCierre({ fecha: dia() });
   await page.goto(`/admin/caja/cierres/${id}`);
   await expect(page.getByText('Con diferencia', { exact: true })).toBeVisible();
+  await expect(page.getByText('Esperado', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('Esperando las ventas del día')).toHaveCount(0);
 });
 
 test('un cierre que coincide con las ventas del dia cierra', async ({ page }) => {

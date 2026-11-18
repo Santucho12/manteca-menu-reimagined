@@ -90,21 +90,11 @@ test('marca los dias pendientes y filtra por estado', async ({ page }) => {
   await expect(page.getByText('No hay cierres para mostrar.')).toBeVisible();
 });
 
-test('filtra los cierres que esperan las ventas, y su detalle no muestra esperado', async ({
-  page,
-}) => {
-  // Despues de la ultima venta de Fudo: el dia no tiene ventas cargadas.
-  const fecha = '2099-04-16';
-  fechas.push(fecha);
-  await sembrarCierre({ fecha });
-  await page.goto(`/admin/caja/control?${delDia(fecha)}&estado=esperando_ventas`);
-  const cierre = fila(page, 'Cierres', fechaParaMostrar(fecha));
-  await expect(cierre).toContainText('Esperando ventas');
-  await expect(cierre).not.toContainText(/Faltan|Sobran/);
-  await cierre.getByRole('link').click();
-  await expect(page.getByText('Esperando las ventas del día')).toBeVisible();
-  await expect(page.getByText('Esperado', { exact: true })).toHaveCount(0);
-  await expect(page.getByText('$20.000,00').first()).toBeVisible();
+test('el estado ya no ofrece Esperando ventas', async ({ page }) => {
+  await page.goto('/admin/caja/control');
+  await page.getByRole('combobox', { name: 'Estado' }).click();
+  await expect(page.getByRole('option', { name: 'Con diferencia', exact: true })).toBeVisible();
+  await expect(page.getByRole('option', { name: 'Esperando ventas' })).toHaveCount(0);
 });
 
 test('marca un dia pendiente como que no abrio y lo deshace', async ({ page }) => {
