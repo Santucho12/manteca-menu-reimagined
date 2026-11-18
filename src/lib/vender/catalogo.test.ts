@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { catalogoDeFilas, type FilaDelCatalogo } from './catalogo';
+import { catalogoDeFilas, preciosAlDia, type FilaDelCatalogo } from './catalogo';
 
 const fila = (
   categoria: string,
@@ -46,5 +46,30 @@ describe('catalogoDeFilas', () => {
 
   it('sin filas no hay categorías', () => {
     expect(catalogoDeFilas([])).toEqual([]);
+  });
+});
+
+describe('preciosAlDia', () => {
+  const catalogo = catalogoDeFilas([
+    fila('Facturas', 'Medialuna', 'Docena', 1900000),
+    fila('Facturas', 'Medialuna', 'Unidad', 200000),
+  ]);
+  const enElTicket = (presentacion: string, precio: number, cantidad = 1) => ({
+    productoId: 'p-Medialuna',
+    presentacionId: `f-Medialuna-${presentacion}`,
+    nombre: 'Medialuna',
+    presentacion,
+    precioCentavos: precio,
+    cantidad,
+  });
+
+  it('cada renglón toma el precio que tiene hoy el catálogo, con su cantidad', () => {
+    expect(preciosAlDia([enElTicket('Docena', 1800000, 2)], catalogo)).toEqual([
+      enElTicket('Docena', 1900000, 2),
+    ]);
+  });
+
+  it('lo que ya no se vende sale del ticket', () => {
+    expect(preciosAlDia([enElTicket('Media docena', 1000000)], catalogo)).toEqual([]);
   });
 });
