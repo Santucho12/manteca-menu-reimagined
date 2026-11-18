@@ -10,8 +10,12 @@ describe('pagosDelCobro', () => {
   });
 
   it('con dos medios, el primero lleva lo escrito y el segundo el resto', () => {
-    const cobro = { medio: 'efectivo', segundoMedio: 'qr', montoDelPrimeroCentavos: 500_000 };
-    expect(pagosDelCobro(2_150_000, cobro as const)).toEqual({
+    const cobro = {
+      medio: 'efectivo',
+      segundoMedio: 'qr',
+      montoDelPrimeroCentavos: 500_000,
+    } as const;
+    expect(pagosDelCobro(2_150_000, cobro)).toEqual({
       ok: true,
       datos: [
         { medio: 'efectivo', montoCentavos: 500_000 },
@@ -31,8 +35,12 @@ describe('pagosDelCobro', () => {
   it('con el primer medio va una parte: ni $0 ni el total entero', () => {
     const mensaje = 'Con el primer medio va una parte: más de $0 y menos de $5.000,00.';
     for (const monto of [0, 500_000, 600_000]) {
-      const cobro = { medio: 'efectivo', segundoMedio: 'debito', montoDelPrimeroCentavos: monto };
-      expect(pagosDelCobro(500_000, cobro as const)).toEqual({ ok: false, mensaje });
+      const cobro = {
+        medio: 'efectivo',
+        segundoMedio: 'debito',
+        montoDelPrimeroCentavos: monto,
+      } as const;
+      expect(pagosDelCobro(500_000, cobro)).toEqual({ ok: false, mensaje });
     }
   });
 
