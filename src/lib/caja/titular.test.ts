@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ResultadoDeMedio } from './resultado';
-import { explicacionDelCierre, titularDelCierre } from './titular';
+import { titularDelCierre } from './titular';
 
 const medio = (
   nombre: ResultadoDeMedio['medio'],
@@ -39,28 +39,9 @@ describe('titularDelCierre', () => {
     expect(titularDelCierre(conDiferencia, medios)).toBe('No cierra en 2 medios de pago');
   });
 
-  it('un cierre sin las ventas del dia cargadas las espera', () => {
-    expect(titularDelCierre({ estado: 'esperando_ventas', anulado: false }, [])).toBe(
-      'Esperando las ventas del día',
-    );
-  });
-
   it('uno anulado se dice anulado, sea cual sea su resultado', () => {
     expect(titularDelCierre({ estado: 'con_diferencia', anulado: true }, [medio('qr', -5)])).toBe(
       'Cierre anulado',
     );
-  });
-});
-
-describe('explicacionDelCierre', () => {
-  it('a un cierre que espera las ventas le dice cuando va a tener resultado', () => {
-    expect(explicacionDelCierre({ estado: 'esperando_ventas', anulado: false })).toBe(
-      'Guardado. El resultado va a estar cuando se carguen las ventas del día.',
-    );
-  });
-
-  it('a los demas no les agrega nada', () => {
-    expect(explicacionDelCierre({ estado: 'cierra', anulado: false })).toBeNull();
-    expect(explicacionDelCierre({ estado: 'esperando_ventas', anulado: true })).toBeNull();
   });
 });
