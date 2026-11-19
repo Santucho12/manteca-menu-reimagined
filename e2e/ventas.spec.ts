@@ -4,6 +4,7 @@ import { diaEnArgentina } from '../src/lib/fechas';
 import { diaLibre } from '../tests/cierres-de-prueba';
 import {
   borrarVentas,
+  idDeCanal,
   idsDeVentasComentadas,
   productoParaVender,
   sembrarVenta,
@@ -139,6 +140,19 @@ test('los filtros actualizan la lista solos: sin boton Filtrar ni filtro de orig
   await page.getByRole('option', { name: 'Anuladas', exact: true }).click();
   await expect(page).toHaveURL(/estado=anulada/);
   await expect(page.getByText('No hay ventas para mostrar')).toBeVisible();
+});
+
+test('filtra por tipo de venta, con los totales del tipo', async ({ page }) => {
+  const dia = diaLibre();
+  await venta({ fecha: dia, origen: 'mostrador', canalId: await idDeCanal('Local') });
+  await venta({ fecha: dia, canalId: await idDeCanal('Encargo') });
+  await page.goto(`/admin/ventas?desde=${dia}&hasta=${dia}`);
+  await esperarHidratacion(page.getByRole('combobox', { name: 'Tipo de venta' }));
+  await page.getByRole('combobox', { name: 'Tipo de venta' }).click();
+  await page.getByRole('option', { name: 'Local', exact: true }).click();
+  await expect(page).toHaveURL(/tipo=/);
+  await expect(page.getByRole('list', { name: 'Ventas' }).getByRole('listitem')).toHaveCount(1);
+  await expect(page.getByRole('region', { name: 'Resumen de ventas' })).toContainText('1 venta');
 });
 
 test('el resumen son tres tarjetas, con el ticket promedio', async ({ page }) => {

@@ -34,6 +34,7 @@ export const PANTALLAS_PARA_CALENTAR = [
   '/admin/reportes/ventas',
   '/admin/reportes/productos',
   '/admin/reportes/categorias',
+  '/admin/reportes/tipos',
   '/admin/reportes/gastos',
   '/admin/reportes/gastos-por-periodo',
   '/admin/reportes/caja',

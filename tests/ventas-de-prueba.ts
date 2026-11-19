@@ -86,6 +86,7 @@ type SemillaDeVenta = {
   origen?: 'manual' | 'fudo' | 'mostrador';
   otroLocal?: boolean;
   fecha?: string;
+  canalId?: string;
 };
 
 async function filaDeVenta(semilla: SemillaDeVenta) {
@@ -99,6 +100,7 @@ async function filaDeVenta(semilla: SemillaDeVenta) {
     fudo_id: origen === 'fudo' ? randomUUID() : null,
     fecha: semilla.fecha ?? '2026-10-05',
     total_centavos: 100000,
+    canal_id: semilla.canalId ?? null,
   };
 }
 

@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { borrarDiasSinAbrir, sembrarDiaSinAbrir } from '../tests/cierres-de-prueba';
+import { sembrarVentaConRenglones } from '../tests/reportes-de-prueba';
+import { borrarVentas, idDeCanal, productoParaVender } from '../tests/ventas-de-prueba';
 import { SESIONES } from './ayudas';
 import {
   borrarReportes,
@@ -23,6 +25,7 @@ const TITULOS = [
   'Ventas por período',
   'Ventas por producto',
   'Ventas por categoría',
+  'Ventas por tipo de venta',
   'Gastos por categoría',
   'Gastos por período',
   'Caja',
@@ -67,6 +70,34 @@ test('ventas por categoria: monto y cantidad de ventas', async ({ page }) => {
   await page.goto(`/admin/reportes/categorias?${DE_ABRIL}`);
   const fila = page.getByRole('row').filter({ hasText: '$4.500,00' });
   await expect(fila.getByRole('cell').nth(1)).toHaveText('2');
+});
+
+test('ventas por tipo: cada tipo con sus ventas, su monto y su parte del total', async ({
+  page,
+}) => {
+  const producto = await productoParaVender();
+  const [local, encargo] = await Promise.all([idDeCanal('Local'), idDeCanal('Encargo')]);
+  const vender = (canalId: string, precioCentavos: number) =>
+    sembrarVentaConRenglones({
+      fecha: '2018-06-04',
+      canalId,
+      renglones: [{ producto, cantidad: 1, precioCentavos }],
+    });
+  const ventas = [
+    await vender(local, 100000),
+    await vender(local, 200000),
+    await vender(encargo, 100000),
+  ];
+  try {
+    await page.goto('/admin/reportes/tipos?desde=2018-06-01&hasta=2018-06-30');
+    const fila = page.getByRole('row').filter({ hasText: 'Local' });
+    await expect(fila).toContainText('$3.000,00');
+    await expect(fila).toContainText('75 %');
+    await expect(fila.getByRole('cell').nth(1)).toHaveText('2');
+    await expect(page.getByRole('row').filter({ hasText: 'Encargo' })).toContainText('25 %');
+  } finally {
+    await borrarVentas(ventas, { categoriasDelMenu: [producto.categoriaId] });
+  }
 });
 
 test('un periodo sin ventas lo dice', async ({ page }) => {
