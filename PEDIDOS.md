@@ -155,6 +155,8 @@ Manteca hace dos cierres por día, uno al mediodía y otro a la noche (Santiago,
 
 **Excepción (Santiago, 2026-11-19): en un worktree.** Para trabajar a la vez que la sesión de Materia prima, este pedido se hace en el worktree `orca/manteca-cierres-por-turno`, con su `.env.local` y su `npm install`, y la aplicación en el puerto 3220. Las dos sesiones comparten `mantecatest` y no corren `npm run e2e` a la vez. Sin `git push`: al terminar entra al `main` local con merge commit, y después se borran la rama y el worktree.
 
+**Excepción (Santiago, 2026-11-19): sin superpowers instalado.** Como en el pedido 94, sus pasos se siguen a mano: revisión lógica, spec y plan en `docs/superpowers/`, TDD y cierre con `pre-finish`. Queda sin hacer la ejecución con subagentes.
+
 ### 93. Datos de ejemplo en la base de pruebas
 Santiago pide inventar ejemplos y cargar la base con datos falsos (2026-11-18). Van solo a la base de pruebas, en un local aparte con sus propias cuentas, para que no cambien lo que miran los tests: ventas de mostrador, cierres (algunos con diferencia), gastos y proveedores de los últimos meses. Un comando los vuelve a armar. La base real arranca de cero. Se arma después del pedido 89 y crece con los pedidos 90 a 92.
 

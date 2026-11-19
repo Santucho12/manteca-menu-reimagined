@@ -80,17 +80,17 @@ faltantes y sobrantes falsos.
 6. **Cuándo está trabado el mostrador.** Hay tres casos, y el servidor rechaza la venta en los
    tres:
    - **Llegó la hora:** pasó la hora del turno abierto, ese turno tiene ventas en la caja, no
-     tiene cierre y no hay una postergación vigente. Código `PV303`: «Es hora del cierre del
+     tiene cierre y no hay una postergación vigente. Código `PV314`: «Es hora del cierre del
      mediodía» o «… de la noche».
-   - **Quedó una caja anterior sin cerrar:** el último turno con ventas de un día anterior no
-     tiene cierre.
+   - **Quedó la caja de ayer sin cerrar:** el último turno con ventas de ayer no tiene cierre.
      - Pasa, por ejemplo, si a la noche se fueron sin cerrar: a la mañana la caja tiene todavía
-       la plata de anoche. Se carga ese cierre o se posterga. Código `PV303`, con el día y el
+       la plata de anoche. Se carga ese cierre o se posterga. Código `PV314`, con el día y el
        turno **(decisión al construir)**.
-     - Solo cuenta el último turno con ventas. Un turno más viejo sin cierre sigue pendiente en
-       el control, pero no traba.
+     - Solo cuenta ayer, y de ayer el último turno con ventas. Un turno más viejo sin cierre
+       sigue pendiente en el control, pero no traba: si el local estuvo cerrado unos días, no se
+       arrastra una caja de hace una semana.
      - Un día marcado «No abrió» no traba.
-   - **Ya se cerró la Noche de hoy:** no se vende hasta mañana. Código `PV304`: «La caja de hoy
+   - **Ya se cerró la Noche de hoy:** no se vende hasta mañana. Código `PV315`: «La caja de hoy
      ya cerró». Si hace falta seguir vendiendo, el admin anula el cierre de la noche y la caja
      se reabre **(decisión al construir)**.
 7. **Postergar.** «Postergar 10 min» da 10 minutos más desde el momento del toque, sin límite de
@@ -116,7 +116,7 @@ faltantes y sobrantes falsos.
       qué, hasta cuándo está postergado y la próxima hora de corte.
     - La pantalla vuelve a preguntar cuando llega esa hora o cuando vence la postergación, y
       además cada minuto.
-    - Si una venta se rechaza con `PV303` o `PV304`, la ventana aparece en el momento.
+    - Si una venta se rechaza con `PV314` o `PV315`, la ventana aparece en el momento.
 
 ### Cargar el cierre
 
@@ -133,7 +133,7 @@ faltantes y sobrantes falsos.
 13. **Rechazos al guardar:**
     - un turno de hoy cuya hora no llegó se puede cerrar antes (cierran temprano);
     - la Noche de hoy no se carga si el Mediodía tiene ventas en la caja y no tiene cierre
-      (`PC307`: «Primero cargá el cierre del mediodía»);
+      (`PC309`: «Primero cargá el cierre del mediodía»);
     - un día futuro sigue rechazado (`PC301`).
 14. **El fondo inicial** viene precargado con lo que quedó en el cierre anterior, contando el
     turno:
@@ -194,14 +194,14 @@ faltantes y sobrantes falsos.
     `motivo` (`hora`, `anterior` o `cerrada`), `postergado_hasta` y `proxima_hora`, sin montos.
     `caja_estado_del_mostrador()` lo llama con `now()` y es la que usa la app.
   - `caja_postergar_cierre()` inserta la postergación del turno que traba. Si no hay traba, la
-    rechaza (`PC308`: «No hay ningún cierre para postergar»).
+    rechaza (`PC310`: «No hay ningún cierre para postergar»).
   - `cierres_turnos_pendientes(desde, hasta)`, solo para el admin: la lista de `(fecha, turno)`
     de la regla 17.
 - **Funciones que cambian:**
-  - `ventas_guardar_mostrador`: el turno y la traba (`PV303` y `PV304`), con la clave repetida
+  - `ventas_guardar_mostrador`: el turno y la traba (`PV314` y `PV315`), con la clave repetida
     respondiendo como antes.
   - `ventas_guardar_manual`: el turno elegido.
-  - `cierres_guardar`: el turno y `PC307`.
+  - `cierres_guardar`: el turno y `PC309`.
   - `cierres_con_resultado`: devuelve `turno` y filtra las ventas por turno.
   - `cierres_fondo_sugerido` y `cierres_fecha_del_fondo`: reciben el turno.
   - `cierres_fondos_anteriores`: ordena por fecha y turno.
@@ -235,9 +235,12 @@ faltantes y sobrantes falsos.
   - la traba por hora, la de una caja anterior sin cerrar y la de la caja ya cerrada;
   - postergar y que se venza;
   - un Mediodía sin ventas que no traba;
-  - lo esperado por turno, el fondo por turno y `PC302`, `PC307` y `PC308`;
+  - lo esperado por turno, el fondo por turno y `PC302`, `PC309` y `PC310`;
   - los pendientes por turno;
   - RLS de las postergaciones: invitado, caja y encargado reciben rechazo fuera de lo suyo.
+- `npm run sembrar:pruebas` deja las horas del local principal en 23:58 y 23:59, para que las
+  pruebas que venden hoy no queden trabadas a la tarde. Las que prueban la traba cambian la hora
+  y la restauran al terminar.
 - Las horas se prueban **cambiando la hora de cierre configurada** respecto de `now()`, no el
   reloj. Por ejemplo, para «ya pasó la hora» se pone la del Mediodía un minuto antes de ahora.
   La función de cálculo recibe el momento como parámetro, para los bordes.
