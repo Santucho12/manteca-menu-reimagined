@@ -55,16 +55,20 @@ de cualquier otro tipo no tienen control: si una no se carga, nadie se entera.
 ### El cierre
 
 5. El cierre de cada turno tiene, después de la Caja, una sección por cada tipo que se controla,
-   con «Cantidad de ventas» y «Total». Esos datos se anotan según la app o el registro de ese tipo.
-   - Si un tipo no tuvo ventas, se deja en cero.
-   - Los dos datos son obligatorios en cada sección, aunque sea con cero.
+   con «Total facturado» y «Cantidad de ventas». Se anotan según la facturación de ese tipo, por
+   ejemplo «PedidosYa facturó $100.000» (Santiago, 2026-11-19).
+   - El total es obligatorio; si el tipo no tuvo ventas, se pone cero.
+   - La cantidad es opcional: si se anota, se compara también y ayuda a encontrar la venta que
+     falta.
+   - Ejemplo: en el sistema hay tres ventas de PedidosYa, de $40.000, $35.000 y $25.000. Si se
+     anota $100.000, da correcto.
 6. Lo esperado de cada sección es lo cargado de ese tipo en la fecha y el turno del cierre: las
    ventas cerradas y sin anular, con cualquier medio de pago.
 7. Diferencia de cada sección:
    - **Total:** lo anotado menos lo cargado.
-   - **Cantidad:** la de ventas, también como diferencia.
-   - Si el total supera la tolerancia o la cantidad no coincide, la sección queda «Con
-     diferencia».
+   - **Cantidad:** si se anotó, la de ventas, también como diferencia.
+   - Si la diferencia del total supera la tolerancia, o si la cantidad anotada no coincide, la
+     sección queda «Con diferencia».
    - El cierre queda «Con diferencia» si la Caja o alguna sección lo está.
 8. A ciegas: igual que la Caja, lo cargado se ve recién al guardar.
 9. Los tipos se fijan al guardar. Si después se prende o se apaga «Se controla en el cierre», los
@@ -83,7 +87,7 @@ de cualquier otro tipo no tienen control: si una no se carga, nadie se entera.
   - `alter type medio_de_caja add value 'fuera_de_caja'`;
   - la columna `se_controla_en_el_cierre boolean not null default false` en `canales_de_venta`,
     con `grant update` para el admin;
-  - la tabla `controles_de_cierre` (`cierre_id`, `canal_id`, `cantidad`, `total_centavos`), única
+  - la tabla `controles_de_cierre` (`cierre_id`, `canal_id`, `cantidad` que admite nulo, `total_centavos`), única
     por `(cierre_id, canal_id)`. RLS: el admin ve las de su local y Caja las de sus cierres. Nadie
     escribe directo: se escribe por `cierres_guardar` y `cierres_editar`. Lleva auditoría.
   - `ventas_guardar_mostrador` lee `datos.canal_id`: sin él va Local; un tipo de otro local o
