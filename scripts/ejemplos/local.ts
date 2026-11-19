@@ -36,7 +36,7 @@ async function faltantes(
   return nombres.filter((nombre) => !ya.has(nombre));
 }
 
-/** Los tipos de venta y las categorías de gasto de arranque, como los del local principal. */
+/** Los tipos de venta, las categorías de gasto y la tolerancia de caja de arranque, como en el principal. */
 export async function asegurarCatalogos(secreto: Cliente, local: string): Promise<void> {
   const canales = await faltantes(secreto, 'canales_de_venta', local, CANALES);
   const enCanales = await secreto
@@ -54,6 +54,16 @@ export async function asegurarCatalogos(secreto: Cliente, local: string): Promis
     .from('categorias_de_gasto')
     .insert(filas.map((c) => ({ ...c, local_id: local })));
   comprobar(enGastos.error, 'sumar las categorías de gasto');
+  await asegurarConfiguracionDeCaja(secreto, local);
+}
+
+// La migración de Caja le dio la tolerancia solo a los locales que ya estaban, y el control de
+// cierres la necesita.
+async function asegurarConfiguracionDeCaja(secreto: Cliente, local: string): Promise<void> {
+  const { error } = await secreto
+    .from('configuracion_de_caja')
+    .upsert({ local_id: local }, { onConflict: 'local_id', ignoreDuplicates: true });
+  comprobar(error, 'sumar la tolerancia de caja');
 }
 
 /** Lo que vende el mostrador del local de ejemplo, leído con la sesión de su caja. */
