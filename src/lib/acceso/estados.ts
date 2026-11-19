@@ -59,8 +59,8 @@ const ENLACES: Record<'caja' | 'admin', EnlaceDelPanel[]> = {
     { clave: 'cuenta', href: '/admin/cuenta', texto: 'Mi cuenta' },
   ],
   admin: [
+    // Sin Vender: el admin entra desde Ventas, y la barra entra entera en una pantalla baja.
     { clave: 'inicio', href: '/admin', texto: 'Inicio', grupo: 'Día a día' },
-    { clave: 'vender', href: '/admin/vender', texto: 'Vender', grupo: 'Día a día' },
     { clave: 'ventas', href: '/admin/ventas', texto: 'Ventas', grupo: 'Día a día' },
     { clave: 'caja', href: '/admin/caja/control', texto: 'Caja', grupo: 'Día a día' },
     { clave: 'gastos', href: '/admin/gastos', texto: 'Gastos', grupo: 'Plata' },

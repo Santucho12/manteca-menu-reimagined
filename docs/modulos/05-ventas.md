@@ -83,7 +83,9 @@ en el celular.
 
 ### Vender (`/admin/vender`)
 
-La de "Vender en el mostrador". Para Caja es la primera de su menú.
+La de "Vender en el mostrador". Para Caja es la primera de su menú; el admin entra con el botón
+Vender de arriba de Ventas, porque su barra lateral tiene que entrar entera en una pantalla baja
+(pedido 83).
 
 ### Ventas (`/admin/ventas`), solo admin
 

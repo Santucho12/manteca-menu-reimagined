@@ -1,4 +1,4 @@
-import { Plus, Store } from 'lucide-react';
+import { Plus, ShoppingCart, Store } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
@@ -23,8 +23,14 @@ export const metadata: Metadata = { title: 'Ventas' };
 function Accesos() {
   return (
     <>
-      <Link href="/admin/ventas/nueva" className={ACCESO_VERDE}>
+      <Link href="/admin/vender" className={ACCESO_VERDE}>
         <span className={ICONO_DE_ACCESO_SOBRE_VERDE}>
+          <ShoppingCart size={15} aria-hidden="true" />
+        </span>
+        Vender
+      </Link>
+      <Link href="/admin/ventas/nueva" className={ACCESO_SECUNDARIO}>
+        <span className={ICONO_DE_ACCESO_SUAVE}>
           <Plus size={16} strokeWidth={2.6} aria-hidden="true" />
         </span>
         Cargar venta
