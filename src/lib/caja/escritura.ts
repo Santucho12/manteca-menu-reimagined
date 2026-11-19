@@ -1,13 +1,15 @@
 import { exito, fallo, type Resultado } from '../resultado';
 import type { Cliente } from '../supabase/cliente';
 import { cierreParaLaBase, type DatosDeCierre } from './esquemas';
+import type { HorasDeCierre } from './turnos';
 
 export const MENSAJES_DE_CAJA = {
   sinPermiso: 'No tenés permiso para hacer esto.',
   noDisponible: 'Ese cierre no está disponible. Recargá la página.',
   diaFuturo: 'No se puede cargar el cierre de un día que todavía no llegó.',
-  diaRepetido:
-    'Ya hay un cierre cargado para ese día. Si está mal, lo corrige un administrador desde el control de cierres.',
+  turnoRepetido:
+    'Ya hay un cierre cargado para ese turno. Si está mal, lo corrige un administrador desde el control de cierres.',
+  primeroElMediodia: 'Primero cargá el cierre del mediodía.',
   anulado: 'Este cierre está anulado y ya no se puede cambiar.',
   sinMotivo: 'Escribí el motivo de la anulación.',
   generico: 'No pudimos guardarlo. Revisá los datos e intentá de nuevo.',
@@ -16,7 +18,8 @@ export const MENSAJES_DE_CAJA = {
 const POR_CODIGO: Record<string, string> = {
   '42501': MENSAJES_DE_CAJA.sinPermiso,
   PC301: MENSAJES_DE_CAJA.diaFuturo,
-  PC302: MENSAJES_DE_CAJA.diaRepetido,
+  PC302: MENSAJES_DE_CAJA.turnoRepetido,
+  PC309: MENSAJES_DE_CAJA.primeroElMediodia,
   PC303: MENSAJES_DE_CAJA.anulado,
   PC304: MENSAJES_DE_CAJA.sinMotivo,
 };
@@ -67,6 +70,20 @@ export async function cambiarTolerancia(cliente: Cliente, centavos: number): Pro
   const { data, error } = await cliente
     .from('configuracion_de_caja')
     .update({ tolerancia_centavos: centavos })
+    .not('id', 'is', null)
+    .select('id');
+  if (error) return fallo(mensajeDe(error));
+  return data.length === 1 ? exito(undefined) : fallo(MENSAJES_DE_CAJA.sinPermiso);
+}
+
+/** Las horas de cierre de cada turno: las cambia solo el admin, como la tolerancia. */
+export async function cambiarHorasDeCierre(
+  cliente: Cliente,
+  horas: HorasDeCierre,
+): Promise<Resultado> {
+  const { data, error } = await cliente
+    .from('configuracion_de_caja')
+    .update({ hora_cierre_mediodia: horas.mediodia, hora_cierre_noche: horas.noche })
     .not('id', 'is', null)
     .select('id');
   if (error) return fallo(mensajeDe(error));

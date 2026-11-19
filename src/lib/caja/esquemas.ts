@@ -23,6 +23,8 @@ const montoMayorQueCero = z
 
 const esquemaBase = z.object({
   fecha: z.string().refine(esFechaValida, 'Elegí una fecha válida.'),
+  // 1 es el Mediodía y 2 la Noche: el formulario lo maneja como texto.
+  turno: z.enum(['1', '2'], 'Elegí el turno.'),
   fondoInicial: montoPedido('Escribí con cuánto arrancó la caja.'),
   efectivo: montoPedido('Escribí cuánto efectivo hay en la caja.'),
   credito: montoOpcional,
@@ -86,6 +88,7 @@ const centavos = (texto: string) => centavosDeCaja(texto)!;
 export function cierreParaLaBase(datos: DatosDeCierre) {
   return {
     fecha: datos.fecha,
+    turno: Number(datos.turno),
     fondo_inicial_centavos: centavos(datos.fondoInicial),
     efectivo_centavos: centavos(datos.efectivo),
     credito_centavos: centavos(datos.credito),

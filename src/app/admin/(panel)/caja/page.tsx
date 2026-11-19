@@ -2,11 +2,13 @@ import type { Metadata } from 'next';
 import { BOTON_PELIGRO } from '@/components/panel/estilos';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
+import { cierreACargar } from '@/lib/caja/cierreACargar';
 import { fechaDelFondoSugerido, fondoSugerido } from '@/lib/caja/consultas';
+import type { Cliente } from '@/lib/supabase/cliente';
+import { estadoDelMostrador } from '@/lib/vender/consultas';
 import { avisoDelFondo } from '@/lib/caja/fondo';
 import { diaEnArgentina } from '@/lib/fechas';
 import { montoParaEditar } from '@/lib/gastos/plata';
-import { esFechaValida } from '@/lib/gastos/vencimientos';
 import { unValor } from '@/lib/usuarios/presentacion';
 import { FormularioDeCierre } from './FormularioDeCierre';
 
@@ -26,17 +28,30 @@ function QuienCarga({ nombre }: { nombre: string }) {
   );
 }
 
+type Pedido = { fecha?: string; turno?: string };
+
+// El cierre que se carga sale del estado del mostrador, y con el su fondo sugerido.
+async function leerCierreACargar(cliente: Cliente, pedido: Pedido, hoy: string) {
+  const { fecha, turno } = cierreACargar(pedido, hoy, await estadoDelMostrador(cliente));
+  const [fondo, diaDelFondo] = await Promise.all([
+    fondoSugerido(cliente, fecha, turno),
+    fechaDelFondoSugerido(cliente, fecha, turno),
+  ]);
+  return { fecha, turno, fondo, diaDelFondo };
+}
+
 export default async function CargarCierre({ searchParams }: { searchParams: Parametros }) {
   const hoy = diaEnArgentina(new Date());
-  const pedida = unValor((await searchParams).fecha);
-  // Un dia anterior que quedo sin cargar llega por la URL; un dia futuro o invalido, no.
-  const fecha = pedida && esFechaValida(pedida) && pedida <= hoy ? pedida : hoy;
+  const parametros = await searchParams;
+  // Un dia o un turno que quedo sin cargar llega por la URL; un dia futuro o invalido, no.
+  const pedido = { fecha: unValor(parametros.fecha), turno: unValor(parametros.turno) };
   const { perfil, datos } = await exigirPaginaYLeer('caja', (cliente) =>
-    Promise.all([fondoSugerido(cliente, fecha), fechaDelFondoSugerido(cliente, fecha)]),
+    leerCierreACargar(cliente, pedido, hoy),
   );
-  const [fondo, diaDelFondo] = datos;
+  const { fecha, turno, fondo, diaDelFondo } = datos;
   const inicial = {
     fecha,
+    turno: turno === 1 ? ('1' as const) : ('2' as const),
     fondoInicial: fondo === null ? '' : montoParaEditar(fondo),
     efectivo: '',
     credito: '',
@@ -51,7 +66,7 @@ export default async function CargarCierre({ searchParams }: { searchParams: Par
   return (
     <Pantalla
       titulo="Cierre de caja"
-      subtitulo="Contá lo que hay en la caja y cargalo al terminar el día."
+      subtitulo="Contá lo que hay en la caja y cargalo al terminar el turno."
       ayuda="caja"
     >
       <QuienCarga nombre={perfil.nombre} />

@@ -16,6 +16,7 @@ import { esquemaVenta, type DatosDeVenta } from '@/lib/ventas/esquemas';
 import type { OpcionDeVenta } from '@/lib/ventas/opciones';
 import { totalEscrito } from '@/lib/ventas/renglones';
 import { guardarVentaDesdeElPanel } from '../acciones';
+import { TurnoDeLaCaja } from './TurnoDeLaCaja';
 import { BarraDeGuardar } from './BarraDeGuardar';
 import { RenglonesDeVenta } from './RenglonesDeVenta';
 import { TarjetaDePaso } from '@/components/panel/TarjetaDePaso';
@@ -116,6 +117,7 @@ export function FormularioDeVenta({ inicial, canales, opciones }: Props) {
           etiqueta="Se cobró en la caja del local"
           {...register('enLaCaja')}
         />
+        <TurnoDeLaCaja control={control} register={register} />
       </section>
       {guardado.mensaje ? <AvisoDeError mensaje={guardado.mensaje} /> : null}
       <BarraDeGuardar total={<TotalDeLaVenta control={control} />} enviando={guardado.enviando} />
