@@ -15,6 +15,7 @@ export const MENSAJES_DE_COSTOS: Record<string, string> = {
   PK302: 'Un insumo está desactivado: reactivalo en Materia prima o sacalo de la receta.',
   PK303: 'Un insumo está dos veces en la receta.',
   PK304: 'Agregá al menos un insumo.',
+  PK305: 'Esa presentación ya usa la receta del producto. Recargá la página.',
 };
 const GENERICO = 'No pudimos guardarlo. Revisá los datos e intentá de nuevo.';
 
@@ -66,4 +67,17 @@ export function guardarMargenes(cliente: Cliente, datos: DatosDeMargenes) {
     () => cliente.from(tabla).update(fila).not('id', 'is', null).select('id'),
     () => cliente.from(tabla).insert(fila).select('id'),
   );
+}
+
+/** La presentacion deja su receta propia y vuelve a usar la del producto. */
+export async function usarLaRecetaDelProducto(
+  cliente: Cliente,
+  productoId: string,
+  presentacionId: string,
+): Promise<Resultado> {
+  const { error } = await cliente.rpc('recetas_usar_la_del_producto', {
+    el_producto: productoId,
+    la_presentacion: presentacionId,
+  });
+  return error ? fallo(mensajeDe(error)) : exito(undefined);
 }

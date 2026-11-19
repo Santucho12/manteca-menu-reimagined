@@ -14,6 +14,7 @@ import {
 } from '@/lib/costos/consultas';
 import { datosDeLaReceta } from '@/lib/costos/formulario';
 import { Presentaciones } from '../../Presentaciones';
+import { BotonDeLaRecetaDelProducto } from './BotonDeLaRecetaDelProducto';
 import { FormularioDeReceta } from './FormularioDeReceta';
 
 export const metadata: Metadata = { title: 'Receta' };
@@ -47,6 +48,15 @@ function RecetasPropias({ receta, elegida }: { receta: RecetaDelProducto; elegid
                 {p.propia ? 'Editar la suya' : 'Darle su propia receta'}
               </Link>
             )}
+            {p.propia ? (
+              <>
+                {' · '}
+                <BotonDeLaRecetaDelProducto
+                  productoId={receta.producto.productoId}
+                  presentacionId={p.id}
+                />
+              </>
+            ) : null}
           </li>
         ))}
       </ul>
