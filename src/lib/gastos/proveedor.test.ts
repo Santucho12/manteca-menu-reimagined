@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { muestraProveedor } from './proveedor';
+import { avisoDeMercaderia, muestraProveedor } from './proveedor';
 
 const categorias = [
   { id: 'merca', nombre: 'Mercadería', activo: true, pide_proveedor: true },
@@ -21,5 +21,23 @@ describe('muestraProveedor', () => {
     expect(muestraProveedor(categorias, 'luz', { categoriaId: 'merca', proveedorId: 'p' })).toBe(
       false,
     );
+  });
+});
+
+describe('avisoDeMercaderia', () => {
+  const categorias = [
+    { id: 'merca', nombre: 'Mercadería' },
+    { id: 'luz', nombre: 'Servicios' },
+  ];
+
+  it('en Mercaderia avisa que una compra con detalle va en Compras', () => {
+    expect(avisoDeMercaderia(categorias, 'merca')).toBe(
+      'Cargada acá cuenta en el resultado, pero no cambia el precio de ningún insumo. Si querés que lo actualice, cargala en Compras.',
+    );
+  });
+
+  it('en otra categoria no dice nada', () => {
+    expect(avisoDeMercaderia(categorias, 'luz')).toBeNull();
+    expect(avisoDeMercaderia(categorias, '')).toBeNull();
   });
 });
