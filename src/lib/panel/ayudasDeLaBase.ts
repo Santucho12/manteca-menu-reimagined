@@ -11,6 +11,7 @@ export type ClaveDeAyuda =
   | 'proveedores'
   | 'materia-prima'
   | 'costos'
+  | 'compras'
   | 'gastos'
   | 'fijos'
   | 'vender'
@@ -105,6 +106,42 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
           'Un proveedor no se borra: se desactiva y conserva sus gastos. Desactivado, no se ofrece al cargar un gasto nuevo.',
           'Si tiene gastos fijos activos, te avisa: sus pagos siguen apareciendo por pagar hasta que los pauses aparte, en Gastos.',
           'Con Ver desactivados los ves, y desde su ficha lo podés reactivar.',
+        ],
+      },
+    ],
+  },
+  compras: {
+    titulo: 'Cómo funciona Compras',
+    introduccion:
+      'Acá cargás la mercadería que entra, con lo que llegó y a qué precio. Cada compra genera su gasto de Mercadería y actualiza lo que cuesta cada insumo.',
+    temas: [
+      {
+        titulo: 'Cargar compra',
+        puntos: [
+          'Elegí el proveedor, el día que llegó y, por cada renglón, qué llegó, cuánto y a qué precio la unidad, con impuestos.',
+          'Otros cargos (flete, percepciones, redondeos) suman al total pero no al costo de los insumos.',
+          'Si ya la pagaste, elegí con qué y cuándo; si no, queda por pagar con su vencimiento, en Próximos pagos de Gastos.',
+          'Un renglón a $0 es una bonificación: no cambia el precio del insumo.',
+        ],
+      },
+      {
+        titulo: 'Armar pedido',
+        puntos: [
+          'Elegí el proveedor y lo que le pedís. Mandar por WhatsApp abre su chat con el pedido escrito.',
+          'Cuando llega, entrá al pedido y tocá Recibir: cargás lo que vino de verdad. Lo que no llegó no queda pendiente.',
+        ],
+      },
+      {
+        titulo: 'Pagada con la caja',
+        puntos: [
+          'Lo que Caja pagó con la caja llega a Gastos para clasificar. Ahí, Es una compra carga sus renglones sin crear otro gasto.',
+        ],
+      },
+      {
+        titulo: 'Anular',
+        puntos: [
+          'Una compra no se edita: se puede anular, con motivo, y cargar de nuevo. Al anularla se anula su gasto y los insumos vuelven al precio de la compra anterior.',
+          'Si lo por pagar ya se pagó, primero se anula el pago, en Gastos. Una compra pagada con la caja vuelve a quedar para clasificar.',
         ],
       },
     ],

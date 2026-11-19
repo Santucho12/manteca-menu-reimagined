@@ -126,6 +126,11 @@ const RUTAS: Record<string, (registro: RegistroDeAuditoria) => string | null> = 
   gastos_por_pagar: () => '/admin/gastos',
   proveedores: (r) => `/admin/proveedores/${r.registro_id}`,
   insumos: (r) => `/admin/materia-prima/${r.registro_id}`,
+  compras: (r) => `/admin/compras/${r.registro_id}`,
+  renglones_de_compra: (r) => {
+    const compra = deFila(r, 'compra_id');
+    return compra ? `/admin/compras/${compra}` : '/admin/compras';
+  },
   recetas: (r) => {
     const producto = deFila(r, 'producto_id');
     return producto ? `/admin/costos/productos/${producto}` : '/admin/costos';

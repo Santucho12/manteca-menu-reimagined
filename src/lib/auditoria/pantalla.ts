@@ -11,6 +11,7 @@ export const MODULOS = {
   },
   proveedores: { nombre: 'Proveedores', tablas: ['proveedores'] },
   materia_prima: { nombre: 'Materia prima', tablas: ['insumos', 'formas_de_compra'] },
+  compras: { nombre: 'Compras', tablas: ['compras', 'renglones_de_compra'] },
   costos: {
     nombre: 'Costos',
     tablas: ['recetas', 'renglones_de_receta', 'costos_de_presentacion', 'configuracion_de_costos'],
