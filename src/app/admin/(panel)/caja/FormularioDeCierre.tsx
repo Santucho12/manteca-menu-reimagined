@@ -15,6 +15,7 @@ import { conValorInicial, type Registro } from '@/lib/formularios/valorInicial';
 import { useGuardar } from '@/lib/gastos/useGuardar';
 import { editarCierreDesdeElPanel, guardarCierreDesdeElPanel } from './acciones';
 import { CAMPO_CONTRASTADO } from './contraste';
+import { ControlesPorTipo, type TipoControlado } from './ControlesPorTipo';
 import { ElegirTurno } from './ElegirTurno';
 import { GastosDeCaja, Retiros } from './Salidas';
 
@@ -53,10 +54,15 @@ function Montos({ registro, errors }: PropsDeMontos) {
   );
 }
 
-type Props = { inicial: DatosDeCierre; id?: string; avisoDelFondo?: string | null };
+type Props = {
+  inicial: DatosDeCierre;
+  id?: string;
+  avisoDelFondo?: string | null;
+  tipos?: TipoControlado[];
+};
 
 /** Cargar un cierre nuevo o, con el id, editar uno existente; al terminar abre su resultado. */
-export function FormularioDeCierre({ inicial, id, avisoDelFondo }: Props) {
+export function FormularioDeCierre({ inicial, id, avisoDelFondo, tipos = [] }: Props) {
   const router = useRouter();
   const verDetalle = (cierre: string) => router.push(`/admin/caja/cierres/${cierre}`);
   const guardar = (datos: DatosDeCierre) =>
@@ -105,6 +111,7 @@ export function FormularioDeCierre({ inicial, id, avisoDelFondo }: Props) {
           error={errors.quedaEnCaja?.message}
           {...registro('quedaEnCaja')}
         />
+        <ControlesPorTipo tipos={tipos} registro={registro} errors={errors} />
         <CampoDeTextoLargo
           className={CAMPO_CONTRASTADO}
           id="comentario"

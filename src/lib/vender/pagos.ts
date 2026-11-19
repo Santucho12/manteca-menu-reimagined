@@ -1,4 +1,4 @@
-import type { Medio } from '../caja/resultado';
+import type { MedioDeVenta as Medio } from '../caja/resultado';
 import { formatearPesos } from '../plata';
 import { exito, fallo, type Resultado } from '../resultado';
 

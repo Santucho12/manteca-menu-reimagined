@@ -4,7 +4,7 @@ import { esFechaValida } from '../gastos/vencimientos';
 import { formatearPesos } from '../plata';
 import { numeroDePagina, unValor } from '../usuarios/presentacion';
 import type { Tono } from '../../components/panel/Insignias';
-import type { Medio } from './resultado';
+import type { Medio, MedioDeVenta } from './resultado';
 
 // Pendiente y "no abrio" son dias sin cierre; los otros dos son el estado de un cierre cargado.
 export const ESTADOS = ['cierra', 'con_diferencia', 'pendiente', 'no_abrio'] as const;
@@ -27,16 +27,17 @@ const NOMBRES_DE_ESTADO: Record<EstadoDeCierre, string> = {
   pendiente: 'Pendiente',
   no_abrio: 'No abrió',
 };
-const NOMBRES_DE_MEDIO: Record<Medio, string> = {
+const NOMBRES_DE_MEDIO: Record<MedioDeVenta, string> = {
   efectivo: 'Efectivo',
   credito: 'Tarjeta de crédito',
   debito: 'Tarjeta de débito',
   qr: 'QR',
   transferencia: 'Transferencia',
+  fuera_de_caja: 'Fuera de la caja',
 };
 
 export const nombreDeEstado = (estado: EstadoDeCierre) => NOMBRES_DE_ESTADO[estado];
-export const nombreDeMedio = (medio: Medio) => NOMBRES_DE_MEDIO[medio];
+export const nombreDeMedio = (medio: MedioDeVenta) => NOMBRES_DE_MEDIO[medio];
 export const opcionesDeEstado = () =>
   ESTADOS.map((estado) => ({ valor: estado as string, texto: NOMBRES_DE_ESTADO[estado] }));
 

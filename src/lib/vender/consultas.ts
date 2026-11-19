@@ -18,3 +18,22 @@ export async function estadoDelMostrador(cliente: Cliente): Promise<EstadoDelTur
   if (error) throw new Error(`No pudimos leer el estado de la caja: ${error.message}`);
   return estadoDeFila((data as unknown as FilaDelEstado[])[0]!);
 }
+
+export type TipoParaVender = {
+  id: string;
+  nombre: string;
+  deSistema: boolean;
+  seControla: boolean;
+};
+
+/** Los tipos de venta activos para elegir en Vender, Local primero. */
+export async function tiposParaVender(cliente: Cliente): Promise<TipoParaVender[]> {
+  const { data, error } = await cliente.rpc('caja_tipos_para_vender');
+  if (error) throw new Error(`No pudimos leer los tipos de venta: ${error.message}`);
+  return (data ?? []).map((t) => ({
+    id: t.id,
+    nombre: t.nombre,
+    deSistema: t.de_sistema,
+    seControla: t.se_controla_en_el_cierre,
+  }));
+}

@@ -12,6 +12,7 @@ type DeUnCierre = Pick<
   | 'declarados'
   | 'retiros'
   | 'gastos'
+  | 'controles'
 >;
 
 // Un medio sin ventas se deja vacio, como lo escribe la persona.
@@ -39,5 +40,10 @@ export function datosParaEditar(cierre: DeUnCierre): DatosDeCierre {
     quedaEnCaja: montoParaEditar(cierre.quedaEnCajaCentavos),
     comentario: cierre.comentario ?? '',
     ...salidasParaEditar(cierre),
+    controles: cierre.controles.map((c) => ({
+      canalId: c.canalId,
+      total: montoParaEditar(c.anotadoCentavos),
+      cantidad: c.cantidadAnotada === null ? '' : String(c.cantidadAnotada),
+    })),
   };
 }

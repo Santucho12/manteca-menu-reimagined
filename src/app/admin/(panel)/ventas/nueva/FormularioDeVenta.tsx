@@ -10,7 +10,7 @@ import { Campo } from '@/components/formularios/Campo';
 import { Casilla } from '@/components/formularios/Casilla';
 import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
 import { nombreDeMedio } from '@/lib/caja/pantalla';
-import { MEDIOS } from '@/lib/caja/resultado';
+import { MEDIOS_DE_VENTA as MEDIOS } from '@/lib/caja/resultado';
 import { conValorInicial, type Registro } from '@/lib/formularios/valorInicial';
 import { useGuardar } from '@/lib/gastos/useGuardar';
 import { formatearPesos } from '@/lib/plata';

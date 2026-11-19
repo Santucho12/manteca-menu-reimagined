@@ -1,16 +1,17 @@
 import { textoDeDiferencia, type EstadoDeCierre } from './pantalla';
-import type { Medio, ResultadoDeMedio } from './resultado';
+import type { MedioDeVenta, ResultadoDeMedio } from './resultado';
 
-const EN_FRASE: Record<Medio, string> = {
+const EN_FRASE: Record<MedioDeVenta, string> = {
   efectivo: 'efectivo',
   credito: 'tarjeta de crédito',
   debito: 'tarjeta de débito',
   qr: 'QR',
   transferencia: 'transferencia',
+  fuera_de_caja: 'fuera de la caja',
 };
 
 /** El medio dicho dentro de una frase: "Faltan $500 en tarjeta de débito". */
-export const medioEnFrase = (medio: Medio) => EN_FRASE[medio];
+export const medioEnFrase = (medio: MedioDeVenta) => EN_FRASE[medio];
 
 // Un faltante en un medio y un sobrante en otro no se suman: se dice en cuantos no cierra.
 function deUnCierreConDiferencia(medios: ResultadoDeMedio[]): string {

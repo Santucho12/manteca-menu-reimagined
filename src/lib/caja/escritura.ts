@@ -10,6 +10,7 @@ export const MENSAJES_DE_CAJA = {
   turnoRepetido:
     'Ya hay un cierre cargado para ese turno. Si está mal, lo corrige un administrador desde el control de cierres.',
   primeroElMediodia: 'Primero cargá el cierre del mediodía.',
+  tipoSinControl: 'Uno de los tipos de venta ya no se controla en el cierre. Recargá la página.',
   anulado: 'Este cierre está anulado y ya no se puede cambiar.',
   sinMotivo: 'Escribí el motivo de la anulación.',
   generico: 'No pudimos guardarlo. Revisá los datos e intentá de nuevo.',
@@ -20,6 +21,7 @@ const POR_CODIGO: Record<string, string> = {
   PC301: MENSAJES_DE_CAJA.diaFuturo,
   PC302: MENSAJES_DE_CAJA.turnoRepetido,
   PC309: MENSAJES_DE_CAJA.primeroElMediodia,
+  PC311: MENSAJES_DE_CAJA.tipoSinControl,
   PC303: MENSAJES_DE_CAJA.anulado,
   PC304: MENSAJES_DE_CAJA.sinMotivo,
 };

@@ -20,7 +20,11 @@ export default async function EditarCierre({ params }: { params: Promise<{ id: s
       subtitulo="Corregí lo que haga falta: el resultado se vuelve a calcular con las ventas del día."
       ayuda="control"
     >
-      <FormularioDeCierre id={cierre.id} inicial={datosParaEditar(cierre)} />
+      <FormularioDeCierre
+        id={cierre.id}
+        inicial={datosParaEditar(cierre)}
+        tipos={cierre.controles.map((c) => ({ canalId: c.canalId, nombre: c.tipo }))}
+      />
     </Pantalla>
   );
 }

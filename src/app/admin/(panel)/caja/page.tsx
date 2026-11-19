@@ -5,7 +5,7 @@ import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { cierreACargar } from '@/lib/caja/cierreACargar';
 import { fechaDelFondoSugerido, fondoSugerido } from '@/lib/caja/consultas';
 import type { Cliente } from '@/lib/supabase/cliente';
-import { estadoDelMostrador } from '@/lib/vender/consultas';
+import { estadoDelMostrador, tiposParaVender } from '@/lib/vender/consultas';
 import { avisoDelFondo } from '@/lib/caja/fondo';
 import { diaEnArgentina } from '@/lib/fechas';
 import { montoParaEditar } from '@/lib/gastos/plata';
@@ -33,11 +33,15 @@ type Pedido = { fecha?: string; turno?: string };
 // El cierre que se carga sale del estado del mostrador, y con el su fondo sugerido.
 async function leerCierreACargar(cliente: Cliente, pedido: Pedido, hoy: string) {
   const { fecha, turno } = cierreACargar(pedido, hoy, await estadoDelMostrador(cliente));
-  const [fondo, diaDelFondo] = await Promise.all([
+  const [fondo, diaDelFondo, tipos] = await Promise.all([
     fondoSugerido(cliente, fecha, turno),
     fechaDelFondoSugerido(cliente, fecha, turno),
+    tiposParaVender(cliente),
   ]);
-  return { fecha, turno, fondo, diaDelFondo };
+  const controlados = tipos
+    .filter((t) => t.seControla)
+    .map((t) => ({ canalId: t.id, nombre: t.nombre }));
+  return { fecha, turno, fondo, diaDelFondo, controlados };
 }
 
 export default async function CargarCierre({ searchParams }: { searchParams: Parametros }) {
@@ -48,7 +52,7 @@ export default async function CargarCierre({ searchParams }: { searchParams: Par
   const { perfil, datos } = await exigirPaginaYLeer('caja', (cliente) =>
     leerCierreACargar(cliente, pedido, hoy),
   );
-  const { fecha, turno, fondo, diaDelFondo } = datos;
+  const { fecha, turno, fondo, diaDelFondo, controlados } = datos;
   const inicial = {
     fecha,
     turno: turno === 1 ? ('1' as const) : ('2' as const),
@@ -62,6 +66,7 @@ export default async function CargarCierre({ searchParams }: { searchParams: Par
     comentario: '',
     retiros: [],
     gastos: [],
+    controles: controlados.map((t) => ({ canalId: t.canalId, total: '', cantidad: '' })),
   };
   return (
     <Pantalla
@@ -70,7 +75,11 @@ export default async function CargarCierre({ searchParams }: { searchParams: Par
       ayuda="caja"
     >
       <QuienCarga nombre={perfil.nombre} />
-      <FormularioDeCierre inicial={inicial} avisoDelFondo={avisoDelFondo(diaDelFondo, fecha)} />
+      <FormularioDeCierre
+        inicial={inicial}
+        avisoDelFondo={avisoDelFondo(diaDelFondo, fecha)}
+        tipos={controlados}
+      />
     </Pantalla>
   );
 }

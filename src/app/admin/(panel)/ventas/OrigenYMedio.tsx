@@ -9,7 +9,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { nombreDeMedio } from '@/lib/caja/pantalla';
-import type { Medio } from '@/lib/caja/resultado';
+import type { MedioDeVenta as Medio } from '@/lib/caja/resultado';
 import { nombreDeOrigen, type Origen } from '@/lib/ventas/pantalla';
 
 const ICONOS_DE_MEDIO: Record<Medio, LucideIcon> = {
@@ -18,6 +18,7 @@ const ICONOS_DE_MEDIO: Record<Medio, LucideIcon> = {
   debito: CreditCard,
   qr: QrCode,
   transferencia: ArrowLeftRight,
+  fuera_de_caja: Store,
 };
 
 const CHIP = 'inline-flex items-center gap-1.5 text-xs font-semibold whitespace-nowrap';

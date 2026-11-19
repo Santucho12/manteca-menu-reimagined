@@ -99,3 +99,14 @@ export async function cambiarEstadoDeCanal(cliente: Cliente, id: string, activo:
     await cliente.from('canales_de_venta').update({ activo }).eq('id', id).select('id'),
   );
 }
+
+/** Si un tipo de venta se controla en el cierre (pedido 99); solo el admin lo cambia. */
+export async function cambiarControlDeCanal(cliente: Cliente, id: string, controla: boolean) {
+  return alCambiar(
+    await cliente
+      .from('canales_de_venta')
+      .update({ se_controla_en_el_cierre: controla })
+      .eq('id', id)
+      .select('id'),
+  );
+}

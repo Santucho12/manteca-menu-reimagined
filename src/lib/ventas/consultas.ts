@@ -1,4 +1,4 @@
-import type { Medio } from '../caja/resultado';
+import type { MedioDeVenta as Medio } from '../caja/resultado';
 import { leerPanel } from '../menu/consultas';
 import type { Cliente } from '../supabase/cliente';
 import { POR_PAGINA, cantidadDePaginas } from '../usuarios/presentacion';

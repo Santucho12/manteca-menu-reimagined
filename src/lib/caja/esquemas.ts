@@ -21,6 +21,13 @@ const montoMayorQueCero = z
   .string()
   .refine((texto) => centavosDeMonto(texto) !== undefined, MAL_ESCRITO);
 
+// Lo que dice la facturación de un tipo de venta controlado: el total, y si se quiere la cantidad.
+const control = z.object({
+  canalId: z.uuid(),
+  total: montoPedido('Escribí cuánto facturó.'),
+  cantidad: z.string().trim().regex(/^\d*$/, 'La cantidad es un número entero.'),
+});
+
 const esquemaBase = z.object({
   fecha: z.string().refine(esFechaValida, 'Elegí una fecha válida.'),
   // 1 es el Mediodía y 2 la Noche: el formulario lo maneja como texto.
@@ -39,6 +46,7 @@ const esquemaBase = z.object({
       quien: z.string().trim().min(1, 'Escribí quién retiró.').max(80, 'Usá hasta 80 caracteres.'),
     }),
   ),
+  controles: z.array(control),
   gastos: z.array(
     z.object({
       monto: montoMayorQueCero,
@@ -98,6 +106,11 @@ export function cierreParaLaBase(datos: DatosDeCierre) {
     queda_en_caja_centavos: centavos(datos.quedaEnCaja),
     comentario: datos.comentario.trim() || null,
     ...salidasParaLaBase(datos),
+    controles: datos.controles.map((c) => ({
+      canal_id: c.canalId,
+      total_centavos: centavos(c.total),
+      cantidad: c.cantidad === '' ? null : Number(c.cantidad),
+    })),
   };
 }
 
