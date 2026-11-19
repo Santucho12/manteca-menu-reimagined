@@ -13,6 +13,7 @@ export const AYUDAS_DE_CONTROL: Partial<Record<ClaveDeAyuda, Ayuda>> = {
           'Ventas por período: cuánto se vendió cada día, cuántas ventas y el ticket promedio.',
           'Ventas por producto: cuánto dejó cada producto y cuántos se vendieron de cada forma de venta.',
           'Ventas por categoría: cuánto dejó cada categoría del menú.',
+          'Ventas por tipo de venta: cuánto entró por el mostrador (Local) y cuánto por encargos, comercios y los demás tipos, con la parte del total de cada uno.',
           'Gastos por categoría y Gastos por período: en qué se fue la plata y cuánto se gastó cada día o cada mes.',
           'Caja: los cierres de cada día, quién los cargó y los días sin cierre.',
           'Balance: ventas menos gastos, con los gastos abiertos por categoría.',

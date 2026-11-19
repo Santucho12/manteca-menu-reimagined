@@ -12,7 +12,7 @@ import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import { cantidadDePaginas } from '@/lib/usuarios/presentacion';
-import { listarVentas } from '@/lib/ventas/consultas';
+import { canalesDeVenta, listarVentas } from '@/lib/ventas/consultas';
 import { enlaceDeVentas, filtrosDeVentas, type ParametrosDeVentas } from '@/lib/ventas/pantalla';
 import { FiltrosDeVentas } from './FiltrosDeVentas';
 import { ListaDeVentas } from './ListaDeVentas';
@@ -52,9 +52,10 @@ export default async function PaginaDeVentas({
 }) {
   const hoy = diaEnArgentina(new Date());
   const filtros = filtrosDeVentas(await searchParams, hoy);
-  const { datos: lista } = await exigirPaginaYLeer('admin', (cliente) =>
-    listarVentas(cliente, filtros),
+  const { datos } = await exigirPaginaYLeer('admin', (cliente) =>
+    Promise.all([listarVentas(cliente, filtros), canalesDeVenta(cliente)]),
   );
+  const [lista, tipos] = datos;
   return (
     <Pantalla
       titulo="Ventas"
@@ -62,7 +63,7 @@ export default async function PaginaDeVentas({
       acciones={<Accesos />}
       ayuda="ventas"
     >
-      <FiltrosDeVentas filtros={filtros} />
+      <FiltrosDeVentas filtros={filtros} tipos={tipos} />
       <TarjetasDeVentas totales={lista.totales} />
       <ListaDeVentas filas={lista.filas} total={lista.total} />
       <Paginas

@@ -42,7 +42,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
       {
         titulo: 'La lista',
         puntos: [
-          'Arranca en el mes de hoy, de a 25 por página. Filtrá por fechas, medio de pago y estado.',
+          'Arranca en el mes de hoy, de a 25 por página. Filtrá por fechas, medio de pago, tipo de venta y estado: los totales de arriba siguen al filtro.',
           'El origen dice si la venta se cobró en el Mostrador o la cargaste A mano, y quién la cargó.',
           'El total de arriba suma lo cobrado, sin lo anulado.',
           'Las tarjetas de arriba muestran lo cobrado, el ticket promedio y las anuladas del período filtrado.',
