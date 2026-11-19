@@ -9,19 +9,14 @@ import { BOTON_CANCELAR, BOTON_PELIGRO } from '@/components/panel/estilos';
 import { Interruptor } from '@/components/panel/Interruptor';
 import { Ventana } from '@/components/panel/Ventana';
 import { useAccionDelMenu } from '@/lib/menu/useAccionDelMenu';
-import {
-  borrarCanalDesdeElPanel,
-  cambiarControlDeCanalDesdeElPanel,
-  cambiarEstadoDeCanalDesdeElPanel,
-} from '../acciones';
+import { borrarCanalDesdeElPanel, cambiarEstadoDeCanalDesdeElPanel } from '../acciones';
 
 const BASE =
   'flex h-7 w-7 pointer-coarse:h-11 pointer-coarse:w-11 items-center justify-center rounded-full text-slate-400 transition-all duration-200 active:scale-95 disabled:opacity-40';
 const EDITAR = `${BASE} hover:bg-[#2563eb]/10 hover:text-[#2563eb] hover:scale-110`;
 const BORRAR = `${BASE} hover:bg-rose-50 hover:text-rose-600 hover:scale-110`;
 
-/** controla es null para Local: es la caja y no se controla aparte. */
-type Props = { id: string; nombre: string; activo: boolean; controla: boolean | null };
+type Props = { id: string; nombre: string; activo: boolean };
 
 function VentanaDeBorrar({
   nombre,
@@ -61,40 +56,13 @@ function VentanaDeBorrar({
   );
 }
 
-type PropsDelControl = {
-  nombre: string;
-  controla: boolean | null;
-  deshabilitado: boolean;
-  alCambiar: () => void;
-};
-
-// En la misma fila que las acciones; Local deja el lugar vacío para que todo quede alineado.
-function ControlDelCierre({ nombre, controla, deshabilitado, alCambiar }: PropsDelControl) {
-  if (controla === null) return <span className="hidden w-[12.5rem] sm:block" aria-hidden="true" />;
-  return (
-    <label className="flex w-[12.5rem] items-center justify-end gap-2 whitespace-nowrap text-xs font-semibold text-muted-foreground">
-      Se controla en el cierre
-      <Interruptor
-        activo={controla}
-        etiqueta={`${nombre} se controla en el cierre`}
-        deshabilitado={deshabilitado}
-        alCambiar={alCambiar}
-      />
-    </label>
-  );
-}
-
 /** Editar, prender o apagar y borrar un canal. Apagarlo no toca las ventas que ya lo usan. */
-export function AccionesDeCanal({ id, nombre, activo, controla }: Props) {
+export function AccionesDeCanal({ id, nombre, activo }: Props) {
   const router = useRouter();
   const { mensaje, enviando, hacer } = useAccionDelMenu();
   const [borrando, setBorrando] = useState(false);
   const alternar = async () => {
     const listo = await hacer(() => cambiarEstadoDeCanalDesdeElPanel({ id, activo: !activo }));
-    if (listo) router.refresh();
-  };
-  const alternarControl = async () => {
-    const listo = await hacer(() => cambiarControlDeCanalDesdeElPanel({ id, controla: !controla }));
     if (listo) router.refresh();
   };
   const borrar = async () => {
@@ -106,13 +74,6 @@ export function AccionesDeCanal({ id, nombre, activo, controla }: Props) {
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-2">
-        <ControlDelCierre
-          nombre={nombre}
-          controla={controla}
-          deshabilitado={enviando}
-          alCambiar={alternarControl}
-        />
-        <span className="hidden h-6 w-px bg-border sm:block" aria-hidden="true" />
         <div className="flex items-center gap-1.5">
           <Interruptor
             activo={activo}

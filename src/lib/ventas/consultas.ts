@@ -161,18 +161,10 @@ export async function opcionesParaVender(cliente: Cliente): Promise<OpcionDeVent
 
 export async function canalesDeVenta(
   cliente: Cliente,
-): Promise<
-  {
-    id: string;
-    nombre: string;
-    activo: boolean;
-    de_sistema: boolean;
-    se_controla_en_el_cierre: boolean;
-  }[]
-> {
+): Promise<{ id: string; nombre: string; activo: boolean }[]> {
   const respuesta = await cliente
     .from('canales_de_venta')
-    .select('id, nombre, activo, de_sistema, se_controla_en_el_cierre')
+    .select('id, nombre, activo')
     .order('activo', { ascending: false })
     .order('nombre');
   return comprobar(respuesta, 'los tipos de venta');
