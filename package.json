@@ -15,7 +15,8 @@
     "test": "vitest run",
     "verificar": "npm run lint && npm run tipos && npm test && npm run build",
     "e2e": "playwright test",
-    "sembrar:pruebas": "tsx scripts/sembrar-pruebas.ts"
+    "sembrar:pruebas": "tsx scripts/sembrar-pruebas.ts",
+    "sembrar:ejemplos": "tsx scripts/sembrar-ejemplos.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "5.9.1",

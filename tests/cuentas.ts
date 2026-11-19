@@ -57,7 +57,11 @@ export async function listarCuentas(cliente: Cliente, porPagina = 1000): Promise
   }
 }
 
-async function crearCuenta(cliente: Cliente, email: string, password: string): Promise<string> {
+export async function crearCuenta(
+  cliente: Cliente,
+  email: string,
+  password: string,
+): Promise<string> {
   // email_confirm evita depender de que la confirmacion por mail este apagada.
   const { data, error } = await cliente.auth.admin.createUser({
     email,
