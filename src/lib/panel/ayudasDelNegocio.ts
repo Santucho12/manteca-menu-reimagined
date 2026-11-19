@@ -28,6 +28,8 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'Qué tenés que saber',
         puntos: [
           'Acá no ves lo vendido en el día: así contás la caja a ciegas al cerrar.',
+          'A la hora de cierre de cada turno, Vender se traba hasta que cargues el cierre. Si hay gente esperando, tocá Postergar 10 min: lo vendido mientras tanto queda en el turno que vas a cerrar. Podés postergar las veces que haga falta, y cada vez queda registrada.',
+          'Después del cierre de la noche no se vende hasta el día siguiente.',
           'Si te equivocaste en una venta, avisale a un admin: él la anula con un motivo.',
           'Si se corta internet, la venta no se guarda y el ticket queda como estaba. Si no vuelve, anotala y el admin la carga después.',
         ],
@@ -63,7 +65,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
           'Es para lo que no se cobró en el mostrador: encargos, ventas a comercios, Cheaf, o lo que se vendió sin conexión. El tipo de venta se elige de la lista que armás en Tipos de venta.',
           'Sumá uno o varios productos. Cada uno trae el precio del menú, y lo podés cambiar. El total se calcula mientras escribís.',
           'La fecha viene con hoy; puede ser un día anterior, pero no uno futuro.',
-          'Marcá Se cobró en la caja del local si la plata entró a la caja: así suma a lo que debería haber en el cierre de ese día.',
+          'Marcá Se cobró en la caja del local si la plata entró a la caja, y elegí el turno: así suma a lo que debería haber en el cierre de ese turno.',
         ],
       },
       {
@@ -93,7 +95,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
   caja: {
     titulo: 'Cómo funciona el cierre de caja',
     introduccion:
-      'Al terminar el turno, contá lo que hay en la caja y cargalo acá. El cierre queda a tu nombre.',
+      'Hay dos cierres por día, uno al mediodía y otro a la noche. Al terminar tu turno, contá lo que hay en la caja y cargalo acá. El cierre queda a tu nombre.',
     temas: [
       {
         titulo: 'Qué se carga',
@@ -114,7 +116,8 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
       {
         titulo: 'Reglas',
         puntos: [
-          'Hay un cierre por día: un segundo cierre del mismo día no se guarda.',
+          'Hay un cierre por turno: un segundo cierre del mismo turno no se guarda. Arriba elegís si es el del mediodía o el de la noche; viene elegido el que toca.',
+          'La noche de hoy se carga después del mediodía, si al mediodía se vendió.',
           'Podés cargar el de un día anterior que quedó sin cargar, pero no uno de un día futuro.',
           'Un cierre guardado no lo cambiás vos. ¿Algo está mal? Avisale a un administrador: lo corrige o lo anula desde el control de cierres.',
         ],
@@ -122,7 +125,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
       {
         titulo: 'Después de guardar',
         puntos: [
-          'Ves el resultado enseguida: Cierra si lo que contaste coincide con las ventas del día, o Con diferencia si no.',
+          'Ves el resultado enseguida: Cierra si lo que contaste coincide con las ventas del turno, o Con diferencia si no.',
           'En Mis cierres ves los que cargaste vos, con su estado. Los de otros no se ven.',
         ],
       },
@@ -130,12 +133,13 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
   },
   control: {
     titulo: 'Cómo funciona el control de cierres',
-    introduccion: 'Acá revisás los cierres de cada día: quién los cargó, qué declaró y si cierran.',
+    introduccion:
+      'Acá revisás los cierres de cada turno: quién los cargó, qué declaró y si cierran.',
     temas: [
       {
         titulo: 'Los estados',
         puntos: [
-          'Pendiente: el día todavía no tiene cierre cargado.',
+          'Pendiente: un turno que vendió en la caja y todavía no tiene cierre. Un turno sin ventas no queda pendiente.',
           'No abrió: el día que el local no abrió, marcado a mano. No cuenta como pendiente ni avisa en Inicio; con Deshacer vuelve a pendiente.',
           'Cierra: lo contado coincide con las ventas del día, o la diferencia es menor que la tolerancia.',
           'Con diferencia: en algún medio de pago falta o sobra más que la tolerancia. Se mira cada medio por separado: un faltante en efectivo y un sobrante en tarjeta no se compensan.',
@@ -146,8 +150,16 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'La lista',
         puntos: [
           'Filtrá por fechas, persona y estado.',
-          'Los días pendientes aparecen en una franja que se abre, con el botón para cargar cada uno. El estado Pendiente los lista.',
+          'Los turnos pendientes aparecen en una franja que se abre, con el botón para cargar cada uno. El estado Pendiente los lista.',
+          'Cada cierre dice su turno, Mediodía o Noche. Al abrirlo ves si se postergó y cuántas veces.',
           'Fondo distinto avisa que la caja arrancó con otro monto del que quedó el día anterior: puede tapar un faltante. El detalle dice cuánto.',
+        ],
+      },
+      {
+        titulo: 'Las horas de cierre',
+        puntos: [
+          'Con el botón Horas de cierre, arriba, elegís a qué hora se traba Vender para el cierre del mediodía y para el de la noche.',
+          'Lo vendido de cada turno se compara con su propio cierre.',
         ],
       },
       {
