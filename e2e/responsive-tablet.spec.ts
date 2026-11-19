@@ -181,9 +181,10 @@ test.describe('en una tablet, con el dedo', () => {
   });
 
   test('los filtros van de a dos por renglón', async ({ page }) => {
+    // Con el tipo de venta (pedido 90), el estado pasa al renglón siguiente.
     await mismaFila(page, '/admin/ventas', [
       [page.getByLabel('Desde'), page.getByLabel('Hasta')],
-      [page.getByLabel('Medio de pago'), page.getByLabel('Estado')],
+      [page.getByLabel('Medio de pago'), page.getByLabel('Tipo de venta')],
     ]);
     await mismaFila(page, '/admin/reportes/ventas', [
       [page.getByLabel('Desde', { exact: true }), page.getByLabel('Hasta', { exact: true })],
