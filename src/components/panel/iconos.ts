@@ -12,6 +12,7 @@ import {
   UserCog,
   Users,
   Wallet,
+  Wheat,
   type LucideIcon,
 } from 'lucide-react';
 import type { EnlaceDelPanel } from '@/lib/acceso/estados';
@@ -23,6 +24,7 @@ export const ICONOS_DEL_PANEL: Record<EnlaceDelPanel['clave'], LucideIcon> = {
   menu: BookOpen,
   ventas: ShoppingBag,
   proveedores: Truck,
+  'materia-prima': Wheat,
   costos: Calculator,
   gastos: Receipt,
   caja: Wallet,

@@ -125,6 +125,7 @@ const conNombre =
     tabla:
       | 'perfiles'
       | 'proveedores'
+      | 'insumos'
       | 'categorias_de_gasto'
       | 'categorias'
       | 'productos'
@@ -138,6 +139,7 @@ const conNombre =
 const BUSQUEDAS: Busqueda[] = [
   conNombre('perfiles'),
   conNombre('proveedores'),
+  conNombre('insumos'),
   conNombre('categorias_de_gasto'),
   conNombre('categorias'),
   conNombre('productos'),

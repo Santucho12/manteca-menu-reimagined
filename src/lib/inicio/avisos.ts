@@ -9,6 +9,8 @@ export type DatosDeAvisos = {
   ayerSinCierre: { fecha: string; turnos: number[] } | null;
   pendientes: number;
   sinClasificar: ConFecha & { categoriaId: string | null };
+  /** Los productos con alguna presentacion debajo del margen minimo (Costos). */
+  debajoDelMinimo?: number;
   /** Sale de Próximos pagos de Gastos, que Inicio lee aparte de los avisos. */
   pagos?: PagosParaAvisar;
 };
@@ -61,6 +63,12 @@ function dePagos(pagos?: PagosParaAvisar): Aviso[] {
   return [{ texto: textoDePagos(pagos), enlace: `/admin/gastos${pagar}` }];
 }
 
+function deCostos(cantidad = 0): Aviso[] {
+  if (cantidad === 0) return [];
+  const texto = enPlural(cantidad, '1 producto está', `${cantidad} productos están`);
+  return [{ texto: `${texto} debajo del margen mínimo.`, enlace: '/admin/costos?filtro=debajo' }];
+}
+
 /** Lo que requiere accion, en orden; cada aviso lleva a donde se resuelve. */
 export function avisosDeInicio(datos: DatosDeAvisos): Aviso[] {
   return [
@@ -69,5 +77,6 @@ export function avisosDeInicio(datos: DatosDeAvisos): Aviso[] {
     ...dePendientes(datos.pendientes),
     ...deGastos(datos.sinClasificar),
     ...dePagos(datos.pagos),
+    ...deCostos(datos.debajoDelMinimo),
   ];
 }

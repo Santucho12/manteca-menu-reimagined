@@ -50,6 +50,13 @@ describe('tablasDe', () => {
       'postergaciones_de_cierre',
     ]);
     expect(tablasDe('menu')).toContain('precios');
+    expect(tablasDe('materia_prima')).toEqual(['insumos', 'formas_de_compra']);
+    expect(tablasDe('costos')).toEqual([
+      'recetas',
+      'renglones_de_receta',
+      'costos_de_presentacion',
+      'configuracion_de_costos',
+    ]);
     expect(tablasDe('gastos')).toContain('gastos_por_pagar');
     expect(tablasDe('ventas')).toEqual([
       'ventas',

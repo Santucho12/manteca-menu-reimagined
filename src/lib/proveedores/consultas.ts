@@ -26,7 +26,7 @@ type Filtrable<T> = {
 
 // En ilike, % y _ son comodines y PostgREST lee * como %: los dos primeros se escapan y el *
 // pasa a _, un comodin de un solo caracter que despues se descarta comparando exacto.
-function escapado(texto: string): string {
+export function escapado(texto: string): string {
   return texto.replace(/[\\%_]/g, '\\$&').replace(/\*/g, '_');
 }
 

@@ -56,6 +56,21 @@ describe('ayudas', () => {
       ],
     ],
     [
+      'costos',
+      [
+        'Margen objetivo',
+        'Margen mínimo',
+        'Precio sugerido',
+        'receta propia',
+        'Unidades',
+        'Agregado',
+      ],
+    ],
+    [
+      'materia-prima',
+      ['En qué se mide', 'por kilo', 'Precio de referencia', 'última compra', 'mismo nombre'],
+    ],
+    [
       'gastos',
       [
         'Pagados',
@@ -263,6 +278,8 @@ describe('ayudas', () => {
       'inicio',
       'cuenta',
       'proveedores',
+      'materia-prima',
+      'costos',
       'gastos',
       'fijos',
       'vender',
