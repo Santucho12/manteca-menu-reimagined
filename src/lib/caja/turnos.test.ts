@@ -8,6 +8,7 @@ import {
   nombreDelTurno,
   textoDeAyerSinCierre,
   textoDeLaTraba,
+  textoDePostergaciones,
   textoDePostergado,
   type EstadoDelTurno,
 } from './turnos';
@@ -130,5 +131,13 @@ describe('textoDeAyerSinCierre', () => {
     expect(textoDeAyerSinCierre([1])).toBe('Ayer quedó sin cargar el cierre del mediodía.');
     expect(textoDeAyerSinCierre([2, 1])).toBe('Ayer quedó sin cargar el cierre de los dos turnos.');
     expect(textoDeAyerSinCierre([])).toBeNull();
+  });
+});
+
+describe('textoDePostergaciones', () => {
+  it('cuenta las veces y los minutos', () => {
+    expect(textoDePostergaciones({ veces: 1, minutos: 10 })).toBe('Se postergó 1 vez (10 min).');
+    expect(textoDePostergaciones({ veces: 3, minutos: 30 })).toBe('Se postergó 3 veces (30 min).');
+    expect(textoDePostergaciones(null)).toBeNull();
   });
 });
