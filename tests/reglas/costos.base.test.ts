@@ -177,3 +177,51 @@ describe('guardar una receta', () => {
     expect(error?.code).toBe('PI303');
   });
 });
+
+describe('volver a la receta del producto', () => {
+  it('la presentacion deja su receta propia y vuelve a usar la del producto', async () => {
+    const { categoria, producto, harina } = await recetaDeMedialuna();
+    await sembrarUnidades(categoria, 1, 12);
+    const docena = categoria.presentaciones[1]!.id;
+    await guardar({
+      producto_id: producto.id,
+      renglones: [{ insumo_id: harina.id, cantidad: 10 }],
+    });
+    await guardar({
+      producto_id: producto.id,
+      presentacion_id: docena,
+      renglones: [{ insumo_id: harina.id, cantidad: 100 }],
+    });
+    const admin = await clienteComo('admin');
+    const { error } = await admin.rpc('recetas_usar_la_del_producto', {
+      el_producto: producto.id,
+      la_presentacion: docena,
+    });
+    expect(error).toBeNull();
+    // 10 g a 128 centavos, por 12 unidades.
+    const fila = (await costosDe(producto.id)).find((f) => f.presentacion_id === docena);
+    expect(fila).toMatchObject({ costo_centavos: 15_360, estado: 'ok' });
+  });
+
+  it('sin receta propia no hay nada que volver: PK305', async () => {
+    const { categoria, producto } = await siembra.menu();
+    const { error } = await (
+      await clienteComo('admin')
+    ).rpc('recetas_usar_la_del_producto', {
+      el_producto: producto.id,
+      la_presentacion: categoria.presentaciones[0]!.id,
+    });
+    expect(error?.code).toBe('PK305');
+  });
+
+  it('caja no lo hace', async () => {
+    const { categoria, producto } = await siembra.menu();
+    const { error } = await (
+      await clienteComo('caja')
+    ).rpc('recetas_usar_la_del_producto', {
+      el_producto: producto.id,
+      la_presentacion: categoria.presentaciones[0]!.id,
+    });
+    expect(error?.code).toBe('PK300');
+  });
+});
