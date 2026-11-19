@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import type { FormaParaComprar } from './formas';
 import {
   enlaceDelPedido,
+  formasDelProveedor,
+  opcionesDeFormas,
+  precioPropuesto,
   estadoDeCompra,
   filtrosDeCompras,
   pagoDeCompra,
@@ -55,5 +59,45 @@ describe('filtrosDeCompras', () => {
       proveedor: 'p1',
     });
     expect(filtrosDeCompras({ estado: 'otra' })).toEqual({ estado: 'todas', proveedor: null });
+  });
+});
+
+const forma = (cambios: Partial<FormaParaComprar>): FormaParaComprar => ({
+  id: 'f1',
+  proveedorId: 'p1',
+  insumo: 'Harina 000',
+  unidad: 'g',
+  comoSeCompra: 'Bolsa de 25 kg',
+  contenido: 25000,
+  ultimoPrecioCentavos: null,
+  referenciaCentavos: 3_200_000,
+  ...cambios,
+});
+
+describe('las formas de compra en el formulario', () => {
+  it('ofrece las del proveedor y las que no tienen proveedor', () => {
+    const formas = [
+      forma({}),
+      forma({ id: 'f2', proveedorId: 'otro' }),
+      forma({ id: 'f3', proveedorId: null }),
+    ];
+    expect(formasDelProveedor(formas, 'p1').map((f) => f.id)).toEqual(['f1', 'f3']);
+    expect(formasDelProveedor(formas, '')).toEqual([]);
+  });
+
+  it('cada opcion dice el insumo, como se compra y el ultimo precio o la referencia', () => {
+    expect(
+      opcionesDeFormas([forma({}), forma({ id: 'f2', ultimoPrecioCentavos: 3_000_000 })]),
+    ).toEqual([
+      { valor: '', texto: 'Elegí qué' },
+      { valor: 'f1', texto: 'Harina 000 · Bolsa de 25 kg · referencia $32.000,00' },
+      { valor: 'f2', texto: 'Harina 000 · Bolsa de 25 kg · última $30.000,00' },
+    ]);
+  });
+
+  it('el precio que propone es el ultimo pagado o, si no, la referencia', () => {
+    expect(precioPropuesto(forma({ ultimoPrecioCentavos: 3_000_000 }))).toBe('30.000');
+    expect(precioPropuesto(forma({}))).toBe('32.000');
+    expect(precioPropuesto(forma({ referenciaCentavos: null }))).toBe('');
   });
 });
