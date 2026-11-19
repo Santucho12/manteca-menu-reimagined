@@ -459,6 +459,67 @@ export type Database = {
           },
         ]
       }
+      formas_de_compra: {
+        Row: {
+          activo: boolean
+          como_se_compra: string
+          contenido: number
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          insumo_id: string
+          local_id: string
+          precio_referencia_centavos: number | null
+          proveedor_id: string | null
+        }
+        Insert: {
+          activo?: boolean
+          como_se_compra: string
+          contenido: number
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          insumo_id: string
+          local_id?: string
+          precio_referencia_centavos?: number | null
+          proveedor_id?: string | null
+        }
+        Update: {
+          activo?: boolean
+          como_se_compra?: string
+          contenido?: number
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          insumo_id?: string
+          local_id?: string
+          precio_referencia_centavos?: number | null
+          proveedor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "formas_de_compra_insumo_id_fkey"
+            columns: ["insumo_id"]
+            isOneToOne: false
+            referencedRelation: "insumos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "formas_de_compra_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "formas_de_compra_proveedor_id_fkey"
+            columns: ["proveedor_id"]
+            isOneToOne: false
+            referencedRelation: "proveedores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gastos: {
         Row: {
           anulado: boolean
@@ -773,6 +834,47 @@ export type Database = {
             columns: ["proveedor_id"]
             isOneToOne: false
             referencedRelation: "proveedores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      insumos: {
+        Row: {
+          activo: boolean
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          local_id: string
+          nombre: string
+          observaciones: string | null
+          unidad_de_uso: Database["public"]["Enums"]["unidad_de_uso"]
+        }
+        Insert: {
+          activo?: boolean
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          nombre: string
+          observaciones?: string | null
+          unidad_de_uso: Database["public"]["Enums"]["unidad_de_uso"]
+        }
+        Update: {
+          activo?: boolean
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          nombre?: string
+          observaciones?: string | null
+          unidad_de_uso?: Database["public"]["Enums"]["unidad_de_uso"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insumos_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
             referencedColumns: ["id"]
           },
         ]
@@ -1423,6 +1525,15 @@ export type Database = {
         Args: { la_fecha: string; marcar: boolean }
         Returns: undefined
       }
+      costo_de_insumos: {
+        Args: never
+        Returns: {
+          costo_por_unidad: number
+          fecha_origen: string
+          insumo_id: string
+          origen: string
+        }[]
+      }
       es_admin_activo: { Args: never; Returns: boolean }
       es_caja_activa: { Args: never; Returns: boolean }
       es_vencimiento_del_fijo: {
@@ -1584,15 +1695,6 @@ export type Database = {
           ventas: number
         }[]
       }
-      reporte_ventas_por_tipo: {
-        Args: { desde: string; hasta: string }
-        Returns: {
-          canal_id: string
-          monto_centavos: number
-          tipo: string
-          ventas: number
-        }[]
-      }
       reporte_ventas_por_dia: {
         Args: { desde: string; hasta: string }
         Returns: {
@@ -1613,6 +1715,15 @@ export type Database = {
           producto_id: string
         }[]
       }
+      reporte_ventas_por_tipo: {
+        Args: { desde: string; hasta: string }
+        Returns: {
+          canal_id: string
+          monto_centavos: number
+          tipo: string
+          ventas: number
+        }[]
+      }
       reportes_exigir_admin: { Args: never; Returns: undefined }
       rol_de_cuenta_nueva: {
         Args: { cuentas: number }
@@ -1626,6 +1737,17 @@ export type Database = {
       ventas_borrar_canal: { Args: { el_canal: string }; Returns: undefined }
       ventas_guardar_manual: { Args: { datos: Json }; Returns: string }
       ventas_guardar_mostrador: { Args: { datos: Json }; Returns: Json }
+      ventas_renglones_del_mostrador: {
+        Args: { datos: Json; el_local: string }
+        Returns: {
+          cantidad: number
+          descripcion: string
+          mandado_centavos: number
+          precio_centavos: number
+          presentacion_id: string
+          producto_id: string
+        }[]
+      }
       ventas_totales: {
         Args: {
           desde: string
@@ -1647,6 +1769,14 @@ export type Database = {
         Args: { datos: Json; el_local: string }
         Returns: undefined
       }
+      ventas_validar_mostrador: {
+        Args: { datos: Json; el_local: string }
+        Returns: number
+      }
+      ventas_validar_pagos_del_mostrador: {
+        Args: { datos: Json; el_total: number }
+        Returns: undefined
+      }
     }
     Enums: {
       estado_de_venta: "cerrada" | "cancelada" | "en_curso"
@@ -1655,13 +1785,14 @@ export type Database = {
       medio_de_caja: "efectivo" | "credito" | "debito" | "qr" | "transferencia"
       medio_de_pago:
         | "efectivo_caja"
-        | "efectivo"
         | "transferencia"
         | "tarjeta"
-        | "cheque"
         | "otro"
+        | "efectivo"
+        | "cheque"
       origen_de_venta: "manual" | "fudo" | "mostrador"
       rol_usuario: "invitado" | "caja" | "encargado" | "admin"
+      unidad_de_uso: "g" | "ml" | "unidad"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1795,14 +1926,15 @@ export const Constants = {
       medio_de_caja: ["efectivo", "credito", "debito", "qr", "transferencia"],
       medio_de_pago: [
         "efectivo_caja",
-        "efectivo",
         "transferencia",
         "tarjeta",
-        "cheque",
         "otro",
+        "efectivo",
+        "cheque",
       ],
       origen_de_venta: ["manual", "fudo", "mostrador"],
       rol_usuario: ["invitado", "caja", "encargado", "admin"],
+      unidad_de_uso: ["g", "ml", "unidad"],
     },
   },
 } as const
