@@ -107,6 +107,17 @@ test.describe('con la sesion de caja', () => {
     expect(await idsDeVentasDelProducto(medialuna.id)).toEqual([]);
   });
 
+  test('las categorías se ven enteras: ninguna queda cortada', async ({ page }) => {
+    await abrirLaCategoria(page);
+    const grupo = page.getByRole('group', { name: 'Categorías' });
+    const caja = (await grupo.boundingBox())!;
+    for (const categoria of await grupo.getByRole('button').all()) {
+      const boton = (await categoria.boundingBox())!;
+      expect(boton.x).toBeGreaterThanOrEqual(caja.x);
+      expect(boton.x + boton.width).toBeLessThanOrEqual(caja.x + caja.width + 1);
+    }
+  });
+
   test('sin medio elegido no cobra', async ({ page }) => {
     await abrirLaCategoria(page);
     await sumar(page, 'Unidad').click();
