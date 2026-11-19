@@ -82,6 +82,16 @@ test('la venta a mano marcada como cobrada en la caja lo dice en su detalle', as
   await expect(page.getByText('Se cobró en la caja del local: Sí')).toBeVisible();
 });
 
+// La barra lateral del admin no suma Vender: en una pantalla baja no entraría (pedido 83).
+test('el admin entra a Vender desde Ventas', async ({ page }) => {
+  await page.goto('/admin/ventas');
+  await expect(
+    page.getByRole('navigation', { name: 'Panel' }).getByRole('link', { name: /^Vender/ }),
+  ).toHaveCount(0);
+  await page.getByRole('main').getByRole('link', { name: 'Vender', exact: true }).click();
+  await expect(page).toHaveURL(/\/admin\/vender$/);
+});
+
 test('anula una venta a mano con motivo', async ({ page }) => {
   const id = await venta({ fecha: HOY });
   await page.goto(`/admin/ventas/${id}`);

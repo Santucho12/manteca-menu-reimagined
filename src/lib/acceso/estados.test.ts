@@ -100,7 +100,6 @@ describe('enlacesDelPanel', () => {
     const enlaces = enlacesDelPanel('admin');
     expect(enlaces.map((enlace) => enlace.texto)).toEqual([
       'Inicio',
-      'Vender',
       'Ventas',
       'Caja',
       'Gastos',
@@ -113,7 +112,6 @@ describe('enlacesDelPanel', () => {
       'Mi cuenta',
     ]);
     expect(enlaces.map((enlace) => enlace.grupo)).toEqual([
-      'Día a día',
       'Día a día',
       'Día a día',
       'Día a día',

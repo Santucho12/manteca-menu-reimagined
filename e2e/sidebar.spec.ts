@@ -90,10 +90,10 @@ test.describe('con la sesion del admin', () => {
 test.describe('con la sesion de caja', () => {
   test.use({ storageState: SESIONES.caja });
 
-  test('ve sus tres secciones', async ({ page }) => {
+  test('ve sus cuatro secciones, con Vender primero', async ({ page }) => {
     await page.goto('/admin/caja/mis-cierres');
     await expect(panel(page).getByRole('link')).toHaveText(
-      enLista(['Cargar cierre', 'Mis cierres', 'Mi cuenta']),
+      enLista(['Vender', 'Cargar cierre', 'Mis cierres', 'Mi cuenta']),
     );
     await expect(panel(page).getByRole('link', { name: /^Mis cierres/ })).toHaveAttribute(
       'aria-current',
