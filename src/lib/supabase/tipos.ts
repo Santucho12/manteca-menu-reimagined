@@ -317,6 +317,7 @@ export type Database = {
           qr_centavos: number
           queda_en_caja_centavos: number
           transferencia_centavos: number
+          turno: number
         }
         Insert: {
           anulado?: boolean
@@ -337,6 +338,7 @@ export type Database = {
           qr_centavos?: number
           queda_en_caja_centavos: number
           transferencia_centavos?: number
+          turno?: number
         }
         Update: {
           anulado?: boolean
@@ -357,6 +359,7 @@ export type Database = {
           qr_centavos?: number
           queda_en_caja_centavos?: number
           transferencia_centavos?: number
+          turno?: number
         }
         Relationships: [
           {
@@ -386,6 +389,8 @@ export type Database = {
         Row: {
           fecha_actualizacion: string
           fecha_creacion: string
+          hora_cierre_mediodia: string
+          hora_cierre_noche: string
           id: string
           local_id: string
           tolerancia_centavos: number
@@ -393,6 +398,8 @@ export type Database = {
         Insert: {
           fecha_actualizacion?: string
           fecha_creacion?: string
+          hora_cierre_mediodia?: string
+          hora_cierre_noche?: string
           id?: string
           local_id: string
           tolerancia_centavos?: number
@@ -400,6 +407,8 @@ export type Database = {
         Update: {
           fecha_actualizacion?: string
           fecha_creacion?: string
+          hora_cierre_mediodia?: string
+          hora_cierre_noche?: string
           id?: string
           local_id?: string
           tolerancia_centavos?: number
@@ -1265,6 +1274,7 @@ export type Database = {
           motivo_anulacion: string | null
           origen: Database["public"]["Enums"]["origen_de_venta"]
           total_centavos: number
+          turno: number
         }
         Insert: {
           anulado?: boolean
@@ -1286,6 +1296,7 @@ export type Database = {
           motivo_anulacion?: string | null
           origen?: Database["public"]["Enums"]["origen_de_venta"]
           total_centavos: number
+          turno?: number
         }
         Update: {
           anulado?: boolean
@@ -1307,6 +1318,7 @@ export type Database = {
           motivo_anulacion?: string | null
           origen?: Database["public"]["Enums"]["origen_de_venta"]
           total_centavos?: number
+          turno?: number
         }
         Relationships: [
           {
@@ -1393,6 +1405,7 @@ export type Database = {
           retiros_centavos: number
           tolerancia_centavos: number
           transferencia_centavos: number
+          turno: number
           ventas_credito_centavos: number
           ventas_debito_centavos: number
           ventas_efectivo_centavos: number
@@ -1405,8 +1418,14 @@ export type Database = {
         Returns: undefined
       }
       cierres_exigir_quien_carga: { Args: never; Returns: undefined }
-      cierres_fecha_del_fondo: { Args: { la_fecha: string }; Returns: string }
-      cierres_fondo_sugerido: { Args: { la_fecha: string }; Returns: number }
+      cierres_fecha_del_fondo: {
+        Args: { el_turno?: number; la_fecha: string }
+        Returns: string
+      }
+      cierres_fondo_sugerido: {
+        Args: { el_turno?: number; la_fecha: string }
+        Returns: number
+      }
       cierres_fondos_anteriores: {
         Args: { ids: string[] }
         Returns: {
