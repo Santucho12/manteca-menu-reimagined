@@ -104,6 +104,7 @@ describe('ayudas', () => {
       [
         'Mostrador',
         'Vender',
+        'tipo de venta',
         'Tipos de venta',
         'precio del menú',
         'Se cobró en la caja del local',
@@ -180,6 +181,7 @@ describe('ayudas', () => {
         'mismos días del mes anterior',
         'mismo largo',
         'Comparar',
+        'Ventas por tipo de venta',
         'Balance',
         'por mes',
         'Inicio',
