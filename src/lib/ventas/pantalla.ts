@@ -16,6 +16,8 @@ export type FiltrosDeVentas = {
   hasta: string;
   origen: (typeof ORIGENES)[number] | null;
   medio: Medio | null;
+  /** El id del tipo de venta (pedido 90). */
+  tipo: string | null;
   estado: EstadoDeLista | null;
   pagina: number;
 };
@@ -49,6 +51,8 @@ function unoDe<T extends string>(lista: readonly T[], texto: string | undefined)
   return lista.find((valor) => valor === texto) ?? null;
 }
 const fechaDe = (texto: string | undefined) => (texto && esFechaValida(texto) ? texto : null);
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const idDe = (texto: string | undefined) => (texto && UUID.test(texto) ? texto : null);
 
 /** Los filtros de la lista, leidos de la URL; sin fechas, el mes de hoy en Argentina. */
 export function filtrosDeVentas(parametros: ParametrosDeVentas, hoy: string): FiltrosDeVentas {
@@ -60,6 +64,7 @@ export function filtrosDeVentas(parametros: ParametrosDeVentas, hoy: string): Fi
     hasta: desde <= hasta ? hasta : desde,
     origen: unoDe(ORIGENES, unValor(parametros.origen)),
     medio: unoDe(MEDIOS, unValor(parametros.medio)),
+    tipo: idDe(unValor(parametros.tipo)),
     estado: unoDe(ESTADOS_DE_LISTA, unValor(parametros.estado)),
     pagina: numeroDePagina(unValor(parametros.pagina)),
   };
@@ -72,6 +77,7 @@ export function enlaceDeVentas(filtros: FiltrosDeVentas, hoy: string): string {
   if (filtros.hasta !== mes.hasta) parametros.set('hasta', filtros.hasta);
   if (filtros.origen) parametros.set('origen', filtros.origen);
   if (filtros.medio) parametros.set('medio', filtros.medio);
+  if (filtros.tipo) parametros.set('tipo', filtros.tipo);
   if (filtros.estado) parametros.set('estado', filtros.estado);
   if (filtros.pagina > 1) parametros.set('pagina', String(filtros.pagina));
   const texto = parametros.toString();
