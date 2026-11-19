@@ -9,19 +9,14 @@ import { BOTON_CANCELAR, BOTON_PELIGRO } from '@/components/panel/estilos';
 import { Interruptor } from '@/components/panel/Interruptor';
 import { Ventana } from '@/components/panel/Ventana';
 import { useAccionDelMenu } from '@/lib/menu/useAccionDelMenu';
-import {
-  borrarCanalDesdeElPanel,
-  cambiarControlDeCanalDesdeElPanel,
-  cambiarEstadoDeCanalDesdeElPanel,
-} from '../acciones';
+import { borrarCanalDesdeElPanel, cambiarEstadoDeCanalDesdeElPanel } from '../acciones';
 
 const BASE =
   'flex h-7 w-7 pointer-coarse:h-11 pointer-coarse:w-11 items-center justify-center rounded-full text-slate-400 transition-all duration-200 active:scale-95 disabled:opacity-40';
 const EDITAR = `${BASE} hover:bg-[#2563eb]/10 hover:text-[#2563eb] hover:scale-110`;
 const BORRAR = `${BASE} hover:bg-rose-50 hover:text-rose-600 hover:scale-110`;
 
-/** controla es null para Local: es la caja y no se controla aparte. */
-type Props = { id: string; nombre: string; activo: boolean; controla: boolean | null };
+type Props = { id: string; nombre: string; activo: boolean };
 
 function VentanaDeBorrar({
   nombre,
@@ -62,16 +57,12 @@ function VentanaDeBorrar({
 }
 
 /** Editar, prender o apagar y borrar un canal. Apagarlo no toca las ventas que ya lo usan. */
-export function AccionesDeCanal({ id, nombre, activo, controla }: Props) {
+export function AccionesDeCanal({ id, nombre, activo }: Props) {
   const router = useRouter();
   const { mensaje, enviando, hacer } = useAccionDelMenu();
   const [borrando, setBorrando] = useState(false);
   const alternar = async () => {
     const listo = await hacer(() => cambiarEstadoDeCanalDesdeElPanel({ id, activo: !activo }));
-    if (listo) router.refresh();
-  };
-  const alternarControl = async () => {
-    const listo = await hacer(() => cambiarControlDeCanalDesdeElPanel({ id, controla: !controla }));
     if (listo) router.refresh();
   };
   const borrar = async () => {
@@ -82,41 +73,32 @@ export function AccionesDeCanal({ id, nombre, activo, controla }: Props) {
   };
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-1.5">
-        <Interruptor
-          activo={activo}
-          etiqueta={`Tipo de venta ${nombre} activo`}
-          deshabilitado={enviando}
-          alCambiar={alternar}
-        />
-        <Link
-          href={`/admin/ventas/canales/${id}`}
-          aria-label={`Editar ${nombre}`}
-          className={EDITAR}
-        >
-          <Pencil size={16} aria-hidden="true" />
-        </Link>
-        <button
-          type="button"
-          disabled={enviando}
-          aria-label={`Borrar ${nombre}`}
-          onClick={() => setBorrando(true)}
-          className={BORRAR}
-        >
-          <Trash2 size={16} aria-hidden="true" />
-        </button>
-      </div>
-      {controla === null ? null : (
-        <label className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-2">
+        <div className="flex items-center gap-1.5">
           <Interruptor
-            activo={controla}
-            etiqueta={`${nombre} se controla en el cierre`}
+            activo={activo}
+            etiqueta={`Tipo de venta ${nombre} activo`}
             deshabilitado={enviando}
-            alCambiar={alternarControl}
+            alCambiar={alternar}
           />
-          Se controla en el cierre
-        </label>
-      )}
+          <Link
+            href={`/admin/ventas/canales/${id}`}
+            aria-label={`Editar ${nombre}`}
+            className={EDITAR}
+          >
+            <Pencil size={16} aria-hidden="true" />
+          </Link>
+          <button
+            type="button"
+            disabled={enviando}
+            aria-label={`Borrar ${nombre}`}
+            onClick={() => setBorrando(true)}
+            className={BORRAR}
+          >
+            <Trash2 size={16} aria-hidden="true" />
+          </button>
+        </div>
+      </div>
       {mensaje && !borrando ? <AvisoDeError mensaje={mensaje} /> : null}
       {borrando ? (
         <VentanaDeBorrar

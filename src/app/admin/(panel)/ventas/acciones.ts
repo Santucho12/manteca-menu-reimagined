@@ -5,7 +5,6 @@ import { ejecutarAccion } from '@/lib/acceso/servidor';
 import {
   anularVenta,
   borrarCanal,
-  cambiarControlDeCanal,
   cambiarEstadoDeCanal,
   crearCanal,
   editarCanal,
@@ -47,13 +46,5 @@ export async function cambiarEstadoDeCanalDesdeElPanel(datos: unknown) {
   const esquema = conId.extend({ activo: z.boolean() });
   return ejecutarAccion('admin', esquema, datos, ({ cliente }, { id, activo }) =>
     cambiarEstadoDeCanal(cliente, id, activo),
-  );
-}
-
-// Solo el admin elige qué tipos de venta se controlan en el cierre (pedido 99).
-export async function cambiarControlDeCanalDesdeElPanel(datos: unknown) {
-  const esquema = conId.extend({ controla: z.boolean() });
-  return ejecutarAccion('admin', esquema, datos, ({ cliente }, { id, controla }) =>
-    cambiarControlDeCanal(cliente, id, controla),
   );
 }
