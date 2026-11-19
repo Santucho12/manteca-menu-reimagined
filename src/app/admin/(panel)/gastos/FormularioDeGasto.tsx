@@ -15,7 +15,7 @@ import {
   type DatosDeCarga,
 } from '@/lib/gastos/esquemas';
 import { avisoDeLaCarga } from '@/lib/gastos/pantalla';
-import { muestraProveedor } from '@/lib/gastos/proveedor';
+import { avisoDeMercaderia, muestraProveedor } from '@/lib/gastos/proveedor';
 import { useGuardar } from '@/lib/gastos/useGuardar';
 import { cargarGastoDesdeElPanel, editarGastoDesdeElPanel } from './acciones';
 import { CamposDelGasto, type PropsDeCampos } from './CamposDelGasto';
@@ -73,6 +73,11 @@ export function FormularioDeGasto({ inicial, id, categorias, proveedores, ...res
           medioOpcional={quedaPorPagar({ seRepite, yaPagado })}
         />
       </div>
+      {avisoDeMercaderia(categorias, categoriaId) ? (
+        <p className="text-xs text-muted-foreground">
+          {avisoDeMercaderia(categorias, categoriaId)}
+        </p>
+      ) : null}
       {guardado.mensaje === MENSAJE_DE_REPETIDO ? (
         <AvisoDeRepetido enviando={guardado.enviando} alConfirmar={cargarIgual} />
       ) : guardado.mensaje ? (

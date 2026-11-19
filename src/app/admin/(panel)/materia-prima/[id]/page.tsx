@@ -9,6 +9,7 @@ import { InsigniaDeEstado } from '@/components/panel/Insignias';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { Dato, Datos, Seccion } from '@/components/panel/Seccion';
 import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
+import { ultimosPrecios } from '@/lib/compras/consultas';
 import { insumoPorId, type Insumo } from '@/lib/materia-prima/consultas';
 import { costoParaMostrar, textoDelOrigen } from '@/lib/materia-prima/costo';
 import { textoDeUnidad } from '@/lib/materia-prima/pantalla';
@@ -44,7 +45,10 @@ const Acciones = ({ id }: { id: string }) => (
 
 export default async function FichaDeInsumo({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { cliente, datos: insumo } = await exigirPaginaYLeer('admin', (c) => insumoPorId(c, id));
+  const { cliente, datos } = await exigirPaginaYLeer('admin', (c) =>
+    Promise.all([insumoPorId(c, id), ultimosPrecios(c)]),
+  );
+  const [insumo, precios] = datos;
   if (!insumo) notFound();
   return (
     <Pantalla
@@ -60,7 +64,7 @@ export default async function FichaDeInsumo({ params }: { params: Promise<{ id: 
       )}
       <CargadoPor cliente={cliente} tabla="insumos" id={insumo.id} />
       <DatosDelInsumo insumo={insumo} />
-      <FormasDeCompra insumo={insumo} />
+      <FormasDeCompra insumo={insumo} precios={precios} />
       <EstadoDelInsumo id={insumo.id} activo={insumo.activo} />
       <EnlaceDeVolver href="/admin/materia-prima">Volver a materia prima</EnlaceDeVolver>
     </Pantalla>

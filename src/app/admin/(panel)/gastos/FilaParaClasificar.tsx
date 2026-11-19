@@ -1,10 +1,12 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { AvisoDeError } from '@/components/formularios/AvisoDeError';
 import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
+import { ENLACE_EN_TEXTO } from '@/components/panel/Avisos';
 import { BOTON_DE_FILA } from '@/components/panel/estilos';
 import type {
   FilaParaClasificar as Gasto,
@@ -76,6 +78,12 @@ export function FilaParaClasificar({ gasto, categorias, proveedores }: Props) {
           Listo
         </button>
       </div>
+      <Link
+        href={`/admin/compras/desde-gasto/${gasto.id}`}
+        className={`text-xs ${ENLACE_EN_TEXTO}`}
+      >
+        Es una compra
+      </Link>
       {mensaje ? <AvisoDeError mensaje={mensaje} /> : null}
     </li>
   );

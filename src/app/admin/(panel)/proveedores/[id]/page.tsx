@@ -16,6 +16,7 @@ import { textoDePorPagar } from '@/lib/proveedores/pantalla';
 import { proveedorPorId, type Proveedor } from '@/lib/proveedores/consultas';
 import { telefonoParaMostrar, urlDeWhatsApp } from '@/lib/proveedores/telefono';
 import { BotonDeEstado } from '../BotonDeEstado';
+import { ComprasDelProveedor } from './ComprasDelProveedor';
 import { PagosDelProveedor } from './PagosDelProveedor';
 
 export const metadata: Metadata = { title: 'Proveedor' };
@@ -113,6 +114,7 @@ export default async function FichaDeProveedor({ params }: { params: Promise<{ i
         proveedorId={proveedor.id}
         hoy={diaEnArgentina(new Date())}
       />
+      <ComprasDelProveedor cliente={cliente} proveedorId={proveedor.id} />
       <EnlaceDeVolver href="/admin/proveedores">Volver a proveedores</EnlaceDeVolver>
     </Pantalla>
   );

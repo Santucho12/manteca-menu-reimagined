@@ -2,12 +2,25 @@ import Link from 'next/link';
 import { FALTA_EL_DATO } from '@/components/panel/estilos';
 import { InsigniaDeEstado } from '@/components/panel/Insignias';
 import { Seccion } from '@/components/panel/Seccion';
+import type { UltimoPrecio } from '@/lib/compras/consultas';
+import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import type { FormaDeCompra, Insumo } from '@/lib/materia-prima/consultas';
 import { contenidoParaEditar } from '@/lib/materia-prima/esquemas';
 import { textoDeUnidad } from '@/lib/materia-prima/pantalla';
 import { formatearPesos } from '@/lib/plata';
 
-function Forma({ forma, insumo }: { forma: FormaDeCompra; insumo: Insumo }) {
+type Precios = Map<string, UltimoPrecio>;
+
+function Forma({
+  forma,
+  insumo,
+  precios,
+}: {
+  forma: FormaDeCompra;
+  insumo: Insumo;
+  precios: Precios;
+}) {
+  const ultimo = precios.get(forma.id);
   const unidad = textoDeUnidad(insumo.unidad_de_uso).toLowerCase();
   return (
     <li className="flex flex-wrap items-start justify-between gap-3 py-3">
@@ -22,6 +35,12 @@ function Forma({ forma, insumo }: { forma: FormaDeCompra; insumo: Insumo }) {
           {forma.proveedor ?? 'Sin proveedor'} · Trae {contenidoParaEditar(forma.contenido)}{' '}
           {unidad}
         </p>
+        {ultimo ? (
+          <p className="text-xs font-semibold">
+            Última compra: {formatearPesos(ultimo.precioCentavos)}, el{' '}
+            {fechaParaMostrar(ultimo.fecha)}
+          </p>
+        ) : null}
         {forma.activo ? null : <InsigniaDeEstado tono="pizarra">Desactivada</InsigniaDeEstado>}
       </div>
       <p className="text-sm font-bold whitespace-nowrap">
@@ -37,7 +56,7 @@ function Forma({ forma, insumo }: { forma: FormaDeCompra; insumo: Insumo }) {
 }
 
 /** A quien y en que presentacion se compra el insumo, con su precio de referencia. */
-export function FormasDeCompra({ insumo }: { insumo: Insumo }) {
+export function FormasDeCompra({ insumo, precios }: { insumo: Insumo; precios: Precios }) {
   return (
     <Seccion titulo="Formas de compra" forma="lista">
       {insumo.formas.length === 0 ? (
@@ -45,7 +64,7 @@ export function FormasDeCompra({ insumo }: { insumo: Insumo }) {
       ) : (
         <ul aria-label="Formas de compra" className="divide-y divide-border">
           {insumo.formas.map((forma) => (
-            <Forma key={forma.id} forma={forma} insumo={insumo} />
+            <Forma key={forma.id} forma={forma} insumo={insumo} precios={precios} />
           ))}
         </ul>
       )}

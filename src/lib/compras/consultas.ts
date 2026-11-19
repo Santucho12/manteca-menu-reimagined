@@ -150,3 +150,49 @@ export async function comprasDelProveedor(cliente: Cliente, proveedorId: string)
   const todas = await listarCompras(cliente, { estado: 'todas', proveedor: proveedorId });
   return todas.slice(0, 10);
 }
+
+export type GastoParaCompra = {
+  id: string;
+  fecha: string;
+  montoCentavos: number;
+  descripcion: string | null;
+};
+
+type GastoDeLaBase = {
+  id: string;
+  fecha: string;
+  monto_centavos: number;
+  descripcion: string | null;
+  cierre_id: string | null;
+  compra_id: string | null;
+  anulado: boolean;
+  categorias_de_gasto: { de_sistema: boolean } | null;
+};
+
+const COLUMNAS_DEL_GASTO =
+  'id, fecha, monto_centavos, descripcion, cierre_id, compra_id, anulado, categorias_de_gasto(de_sistema)';
+
+const estaParaClasificar = (g: GastoDeLaBase) =>
+  Boolean(g.cierre_id && !g.compra_id && !g.anulado && g.categorias_de_gasto?.de_sistema);
+
+/** El gasto de caja sin clasificar sobre el que se arma una compra; si ya no lo esta, nada. */
+export async function gastoParaCompra(
+  cliente: Cliente,
+  id: string,
+): Promise<GastoParaCompra | null> {
+  if (!UUID.test(id)) return null;
+  const { data, error } = await cliente
+    .from('gastos')
+    .select(COLUMNAS_DEL_GASTO)
+    .eq('id', id)
+    .maybeSingle();
+  if (error) throw new Error(`No pudimos leer el gasto: ${error.message}`);
+  const gasto = data as GastoDeLaBase | null;
+  if (!gasto || !estaParaClasificar(gasto)) return null;
+  return {
+    id: gasto.id,
+    fecha: gasto.fecha,
+    montoCentavos: gasto.monto_centavos,
+    descripcion: gasto.descripcion,
+  };
+}
