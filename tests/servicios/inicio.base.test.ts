@@ -56,13 +56,13 @@ describe('avisos del inicio', () => {
     expect(despues.desde! <= fecha).toBe(true);
   });
 
-  it('un cierre que espera las ventas no cuenta como con diferencia', async () => {
-    // Despues del ultimo dia con ventas de Fudo: el dia no tiene ventas cargadas.
+  it('un cierre de un dia sin ventas ya no espera: cuenta como con diferencia', async () => {
+    // Las ventas se cargan al cobrar (pedido 89): sin ventas, lo esperado es lo de la caja.
     const fecha = '2099-05-20';
     const antes = (await avisos(diaSiguiente(fecha))).conDiferencia.cantidad;
     cierres.push((await sembrarCierre({ fecha })).id);
     const despues = (await avisos(diaSiguiente(fecha))).conDiferencia.cantidad;
-    expect(despues).toBe(antes);
+    expect(despues).toBe(antes + 1);
   });
 
   it('cuenta los gastos sin clasificar, no los anulados', async () => {
