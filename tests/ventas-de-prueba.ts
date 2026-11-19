@@ -201,6 +201,8 @@ type VentaConPago = {
   estado?: 'cerrada' | 'cancelada';
   anulada?: boolean;
   otroLocal?: boolean;
+  /** 1 es el Mediodia y 2 la Noche (por defecto, la Noche). */
+  turno?: 1 | 2;
 };
 
 async function localDe(otroLocal: boolean | undefined) {
@@ -217,6 +219,7 @@ function filaDeVentaConPago(semilla: VentaConPago, local: string) {
     total_centavos: semilla.centavos,
     anulado: semilla.anulada ?? false,
     motivo_anulacion: semilla.anulada ? 'Prueba' : null,
+    turno: semilla.turno ?? 2,
   };
 }
 
