@@ -4,7 +4,7 @@ import type { Resultado } from '../resultado';
 import type { Creado } from './escritura';
 import type { DatosDeProveedor } from './esquemas';
 
-type Guardar = (datos: DatosDeProveedor, confirmar: boolean) => Promise<Resultado<Creado>>;
+type Guardar<T> = (datos: T, confirmar: boolean) => Promise<Resultado<Creado>>;
 type Estado = {
   mensaje: string | null;
   repetido: { nombre: string } | null;
@@ -21,10 +21,14 @@ function estadoDe(resultado: Resultado<Creado>): Estado {
 }
 
 /** Guarda; si el nombre ya existe, guarda la pregunta y "Cargar igual" repite con la confirmacion. */
-export function useGuardarProveedor(guardar: Guardar, alGuardar: (id: string) => void) {
+/** Sirve igual para un insumo: tambien avisa si el nombre ya existe. */
+export function useGuardarProveedor<T = DatosDeProveedor>(
+  guardar: Guardar<T>,
+  alGuardar: (id: string) => void,
+) {
   const [estado, setEstado] = useState<Estado>(NADA);
   const { enviando, unaVez } = useUnaVez();
-  const correr = (datos: DatosDeProveedor, confirmar: boolean) =>
+  const correr = (datos: T, confirmar: boolean) =>
     unaVez(async () => {
       const resultado = await guardar(datos, confirmar);
       setEstado(estadoDe(resultado));
@@ -33,9 +37,9 @@ export function useGuardarProveedor(guardar: Guardar, alGuardar: (id: string) =>
   return {
     ...estado,
     enviando,
-    enviar: (datos: DatosDeProveedor) => correr(datos, false),
+    enviar: (datos: T) => correr(datos, false),
     // Con lo que esta en pantalla: la persona pudo corregir algo mientras veia el aviso.
-    confirmar: (datos: DatosDeProveedor) => correr(datos, true),
+    confirmar: (datos: T) => correr(datos, true),
     volver: () => setEstado(NADA),
   };
 }
