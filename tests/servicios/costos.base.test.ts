@@ -1,6 +1,7 @@
 import { afterAll, describe, expect, it } from 'vitest';
 import {
   cuantosDebajoDelMinimo,
+  insumosParaReceta,
   listarCostos,
   margenesDelLocal,
   presentacionesParaAjustar,
@@ -113,6 +114,15 @@ describe('recetaDelProducto', () => {
 
   it('un id mal escrito no trae nada', async () => {
     expect(await recetaDelProducto(await admin(), 'no-es-un-id')).toBeNull();
+  });
+});
+
+describe('insumosParaReceta', () => {
+  it('ofrece los activos, por nombre, con su unidad', async () => {
+    const insumo = await siembra.insumo(1_000, 1, 'ml');
+    const lista = await insumosParaReceta(await admin());
+    expect(lista).toContainEqual({ id: insumo.id, nombre: insumo.nombre, unidad: 'ml' });
+    expect(await insumosParaReceta(await clienteComo('caja'))).toEqual([]);
   });
 });
 
