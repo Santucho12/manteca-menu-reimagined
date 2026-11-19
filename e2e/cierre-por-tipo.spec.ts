@@ -1,7 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { diaEnArgentina } from '../src/lib/fechas';
 import { borrarCierres, idsDeCierresDe } from '../tests/cierres-de-prueba';
-import { clienteSecretoDePruebas } from '../tests/clientes';
 import {
   sembrarCategoria,
   sembrarProducto,
@@ -28,26 +27,13 @@ test.afterEach(async () => {
   await borrarVentas(vendidas, { canales: [plataforma.id], categoriasDelMenu: [categoria.id] });
 });
 
-const controlar = () =>
-  clienteSecretoDePruebas()
-    .from('canales_de_venta')
-    .update({ se_controla_en_el_cierre: true })
-    .eq('id', plataforma.id);
-
 test.describe('con la sesión de admin', () => {
   test.use({ storageState: SESIONES.admin });
 
-  test('en Tipos de venta se elige qué se controla en el cierre', async ({ page }) => {
+  test('en Tipos de venta no hay interruptor del cierre: todos se controlan', async ({ page }) => {
     await page.goto('/admin/ventas/canales');
-    const interruptor = page.getByRole('switch', {
-      name: `${plataforma.nombre} se controla en el cierre`,
-    });
-    await esperarHidratacion(interruptor);
-    await interruptor.click();
-    await expect(interruptor).toHaveAttribute('aria-checked', 'true');
-    await expect(page.getByRole('switch', { name: 'Local se controla en el cierre' })).toHaveCount(
-      0,
-    );
+    await expect(page.getByText(plataforma.nombre)).toBeVisible();
+    await expect(page.getByRole('switch', { name: /se controla en el cierre/ })).toHaveCount(0);
   });
 });
 
@@ -73,7 +59,6 @@ test.describe('con la sesión de caja', () => {
   test.use({ storageState: SESIONES.caja });
 
   test('vende con un tipo, lo controla en el cierre y da correcto', async ({ page }) => {
-    await controlar();
     await venderDelTipo(page);
     await page.goto(`/admin/caja?fecha=${HOY}&turno=1`);
     await page.getByLabel('Fondo inicial').fill('0');
