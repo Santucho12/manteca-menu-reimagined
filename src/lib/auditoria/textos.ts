@@ -126,6 +126,14 @@ const RUTAS: Record<string, (registro: RegistroDeAuditoria) => string | null> = 
   gastos_por_pagar: () => '/admin/gastos',
   proveedores: (r) => `/admin/proveedores/${r.registro_id}`,
   insumos: (r) => `/admin/materia-prima/${r.registro_id}`,
+  recetas: (r) => {
+    const producto = deFila(r, 'producto_id');
+    return producto ? `/admin/costos/productos/${producto}` : '/admin/costos';
+  },
+  // Un renglon no guarda el producto: lleva a la lista de Costos.
+  renglones_de_receta: () => '/admin/costos',
+  costos_de_presentacion: () => '/admin/costos/ajustes',
+  configuracion_de_costos: () => '/admin/costos/ajustes',
   formas_de_compra: (r) => {
     const insumo = deFila(r, 'insumo_id');
     return insumo

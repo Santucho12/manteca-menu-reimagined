@@ -128,3 +128,8 @@ export async function listarCostos(
     ? filas.sort((a, b) => a.producto.localeCompare(b.producto, 'es'))
     : filas.sort(porPorcentaje);
 }
+
+/** Cuantos productos tienen alguna presentacion debajo del margen minimo: el aviso de Inicio. */
+export async function cuantosDebajoDelMinimo(cliente: Cliente): Promise<number> {
+  return (await listarCostos(cliente, { filtro: 'debajo', orden: 'nombre' })).length;
+}

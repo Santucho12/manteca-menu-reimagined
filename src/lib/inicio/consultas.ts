@@ -1,3 +1,4 @@
+import { cuantosDebajoDelMinimo } from '../costos/consultas';
 import { listarCierres } from '../caja/consultas';
 import { turnosPendientes } from '../caja/consultasDeTurnos';
 import type { FiltrosDeControl } from '../caja/pantalla';
@@ -106,14 +107,16 @@ function leerElInicio(cliente: Cliente, hoy: string) {
     ventasPorProducto(cliente, mes),
     ventasPorDia(cliente, rangoDeSemanas(hoy)),
     pagosDelInicio(cliente, hoy),
+    cuantosDebajoDelMinimo(cliente),
   ]);
 }
 
 /** Todo lo de Inicio, con el mismo calculo que Reportes. */
 export async function datosDelInicio(cliente: Cliente, hoy: string) {
-  const [avisos, actual, anterior, anio, productos, dias, pagos] = await leerElInicio(cliente, hoy);
+  const [avisos, actual, anterior, anio, productos, dias, pagos, debajoDelMinimo] =
+    await leerElInicio(cliente, hoy);
   return {
-    avisos: avisosDeInicio({ ...avisos, pagos }),
+    avisos: avisosDeInicio({ ...avisos, pagos, debajoDelMinimo }),
     actual,
     anterior,
     meses: resultadoPorMes(anio.ventas, anio.gastos),
