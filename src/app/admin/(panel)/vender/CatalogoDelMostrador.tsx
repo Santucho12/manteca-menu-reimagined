@@ -46,10 +46,11 @@ export function CatalogoDelMostrador({ catalogo, sumar }: Props) {
       aria-label="Productos"
       className="bg-card rounded-[2rem] border border-border/60 shadow-xl p-4 md:p-6 space-y-5"
     >
+      {/* Bajan de renglón en vez de deslizarse: en el mostrador, una categoría escondida no se ve. */}
       <div
         role="group"
         aria-label="Categorías"
-        className="flex gap-1 p-1.5 rounded-2xl bg-secondary/40 overflow-x-auto"
+        className="flex flex-wrap gap-1 p-1.5 rounded-2xl bg-secondary/40"
       >
         {catalogo.map((c) => (
           <button
