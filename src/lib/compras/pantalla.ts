@@ -1,4 +1,7 @@
 import { fechaParaMostrar } from '../gastos/pantalla';
+import { montoParaEditar } from '../gastos/plata';
+import { formatearPesos } from '../plata';
+import type { FormaParaComprar } from './formas';
 import { contenidoParaEditar } from '../materia-prima/esquemas';
 import { unValor } from '../usuarios/presentacion';
 
@@ -62,4 +65,35 @@ export function enlaceDeCompras({ estado, proveedor }: FiltrosDeCompras): string
   if (proveedor) parametros.set('proveedor', proveedor);
   const texto = parametros.toString();
   return texto ? `/admin/compras?${texto}` : '/admin/compras';
+}
+
+/** Las formas que se le compran a este proveedor, y las que no tienen proveedor. */
+export function formasDelProveedor(formas: FormaParaComprar[], proveedorId: string) {
+  if (proveedorId === '') return [];
+  return formas.filter((f) => f.proveedorId === proveedorId || f.proveedorId === null);
+}
+
+function precioDeReferencia(forma: FormaParaComprar): string {
+  if (forma.ultimoPrecioCentavos !== null) {
+    return `última ${formatearPesos(forma.ultimoPrecioCentavos)}`;
+  }
+  return forma.referenciaCentavos === null
+    ? 'sin precio'
+    : `referencia ${formatearPesos(forma.referenciaCentavos)}`;
+}
+
+export function opcionesDeFormas(formas: FormaParaComprar[]) {
+  return [
+    { valor: '', texto: 'Elegí qué' },
+    ...formas.map((f) => ({
+      valor: f.id,
+      texto: `${f.insumo} · ${f.comoSeCompra} · ${precioDeReferencia(f)}`,
+    })),
+  ];
+}
+
+/** El precio que se propone al cargar: el ultimo pagado o, si no hay, la referencia. */
+export function precioPropuesto(forma: FormaParaComprar): string {
+  const centavos = forma.ultimoPrecioCentavos ?? forma.referenciaCentavos;
+  return centavos === null ? '' : montoParaEditar(centavos);
 }
