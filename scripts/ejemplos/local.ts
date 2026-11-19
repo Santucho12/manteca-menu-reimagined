@@ -71,7 +71,7 @@ export async function formasDelLocal(caja: Cliente): Promise<FormaDeEjemplo[]> {
 /** Un mapa de nombre a id: categorías de gasto o proveedores del local. */
 export async function idsPorNombre(
   cliente: Cliente,
-  tabla: 'categorias_de_gasto' | 'proveedores',
+  tabla: 'categorias_de_gasto' | 'proveedores' | 'canales_de_venta',
   local: string,
 ): Promise<Map<string, string>> {
   const { data, error } = await cliente.from(tabla).select('id, nombre').eq('local_id', local);

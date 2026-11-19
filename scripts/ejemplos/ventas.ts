@@ -80,3 +80,27 @@ export function ventasDelDia(azar: Azar, dia: string, formas: FormaDeEjemplo[]):
     a.cerradaEn.localeCompare(b.cerradaEn),
   );
 }
+
+/** Una venta cargada a mano: no pasó por el mostrador ni por la caja. */
+export type VentaAManoDeEjemplo = VentaDeEjemplo & { tipo: 'Encargo' | 'Venta a comercios' };
+
+type Tipo = VentaAManoDeEjemplo['tipo'];
+
+function ventaAMano(dia: string, cerradaEn: string, renglon: RenglonDeEjemplo, tipo: Tipo) {
+  const totalCentavos = renglon.precioCentavos * renglon.cantidad;
+  const pagos = [{ medio: 'transferencia' as const, montoCentavos: totalCentavos }];
+  return { fecha: dia, cerradaEn, renglones: [renglon], pagos, totalCentavos, tipo };
+}
+
+/** A veces, un encargo o una venta a comercios del día, de varias docenas, por transferencia. */
+export function ventasAManoDelDia(
+  azar: Azar,
+  dia: string,
+  formas: FormaDeEjemplo[],
+): VentaAManoDeEjemplo[] {
+  if (azar() >= 0.4) return [];
+  const forma = formas[entero(azar, 0, formas.length - 1)]!;
+  const renglon = { ...forma, cantidad: entero(azar, 4, 12) };
+  const tipo: Tipo = azar() < 0.6 ? 'Encargo' : 'Venta a comercios';
+  return [ventaAMano(dia, horaAlAzar(azar, dia), renglon, tipo)];
+}

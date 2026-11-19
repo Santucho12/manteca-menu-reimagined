@@ -9,10 +9,12 @@ import {
   escribirProveedores,
   escribirVentas,
   marcarSinAbrir,
+  type Destino,
 } from './escribir';
-import { asegurarCatalogos, asegurarLocal, formasDelLocal } from './local';
+import { asegurarCatalogos, asegurarLocal, formasDelLocal, idsPorNombre } from './local';
 import { copiarMenu } from './menu';
 import { planDeEjemplo, type PlanDeEjemplo } from './plan';
+import type { VentaAManoDeEjemplo, VentaDeEjemplo } from './ventas';
 
 export { borrarLocalDeEjemplo };
 
@@ -37,14 +39,16 @@ export type ResumenDeEjemplo = {
 
 type Sesiones = { admin: Cliente; caja: Cliente };
 
-async function prepararLocal(secreto: Cliente, opciones: OpcionesDeEjemplo) {
+type Cuentas = { localId: string; adminId: string; cajaId: string };
+
+async function prepararLocal(secreto: Cliente, opciones: OpcionesDeEjemplo): Promise<Cuentas> {
   const localId = await asegurarLocal(secreto, opciones.local);
   await asegurarCatalogos(secreto, localId);
   await copiarMenu(secreto, await idDelLocalPrincipal(secreto), localId);
   const [admin, caja] = cuentasDeEjemplo(opciones.prefijo);
-  await asegurarCuentaDeEjemplo(secreto, admin!, opciones.contrasena, localId);
+  const adminId = await asegurarCuentaDeEjemplo(secreto, admin!, opciones.contrasena, localId);
   const cajaId = await asegurarCuentaDeEjemplo(secreto, caja!, opciones.contrasena, localId);
-  return { localId, cajaId };
+  return { localId, adminId, cajaId };
 }
 
 async function sesionesDeEjemplo(opciones: OpcionesDeEjemplo): Promise<Sesiones> {
@@ -55,36 +59,55 @@ async function sesionesDeEjemplo(opciones: OpcionesDeEjemplo): Promise<Sesiones>
   };
 }
 
-async function canalDelMostrador(secreto: Cliente, localId: string): Promise<string> {
-  const { data, error } = await secreto
-    .from('canales_de_venta')
-    .select('id')
-    .eq('local_id', localId)
-    .eq('de_sistema', true)
-    .single();
-  if (error) throw new Error(`El local de ejemplo no tiene Local: ${error.message}`);
-  return data.id;
-}
+type Destinos = { mostrador: Destino<VentaDeEjemplo>; aMano: Destino<VentaAManoDeEjemplo> };
 
-type Destino = { local: string; cajaId: string; canalId: string };
+// Las del mostrador, de tipo Local y a nombre de la caja; las otras, a mano por el admin.
+const delMostrador = (cuentas: Cuentas, canal: string): Destino<VentaDeEjemplo> => ({
+  local: cuentas.localId,
+  creadoPor: cuentas.cajaId,
+  origen: 'mostrador',
+  enLaCaja: true,
+  canalDe: () => canal,
+});
+
+const aManoDelAdmin = (
+  cuentas: Cuentas,
+  canales: Map<string, string>,
+): Destino<VentaAManoDeEjemplo> => ({
+  local: cuentas.localId,
+  creadoPor: cuentas.adminId,
+  origen: 'manual',
+  enLaCaja: false,
+  canalDe: (venta) => canales.get(venta.tipo)!,
+});
+
+async function destinosDe(secreto: Cliente, cuentas: Cuentas): Promise<Destinos> {
+  const canales = await idsPorNombre(secreto, 'canales_de_venta', cuentas.localId);
+  return {
+    mostrador: delMostrador(cuentas, canales.get('Local')!),
+    aMano: aManoDelAdmin(cuentas, canales),
+  };
+}
 
 async function escribirPlan(
   secreto: Cliente,
-  destino: Destino,
+  destinos: Destinos,
   sesiones: Sesiones,
   plan: PlanDeEjemplo,
 ) {
-  await escribirVentas(secreto, destino, plan.ventas);
+  const local = destinos.mostrador.local;
+  await escribirVentas(secreto, destinos.mostrador, plan.ventas);
+  await escribirVentas(secreto, destinos.aMano, plan.aMano);
   await escribirCierres(sesiones.caja, plan.cierres);
   await marcarSinAbrir(sesiones.admin, plan.sinAbrir);
-  await escribirProveedores(sesiones.admin, destino.local);
-  await escribirGastos(sesiones.admin, destino.local, plan.gastos);
+  await escribirProveedores(sesiones.admin, local);
+  await escribirGastos(sesiones.admin, local, plan.gastos);
 }
 
 // Los gastos de caja de cada cierre también quedan en Gastos, como Sin clasificar.
 const resumenDe = (localId: string, plan: PlanDeEjemplo): ResumenDeEjemplo => ({
   localId,
-  ventas: plan.ventas.length,
+  ventas: plan.ventas.length + plan.aMano.length,
   cierres: plan.cierres.length,
   gastos: plan.gastos.length + plan.cierres.reduce((s, c) => s + c.gastos.length, 0),
   sinAbrir: plan.sinAbrir,
@@ -98,12 +121,11 @@ export async function sembrarEjemplos(
   secreto: Cliente,
   opciones: OpcionesDeEjemplo,
 ): Promise<ResumenDeEjemplo> {
-  const { localId, cajaId } = await prepararLocal(secreto, opciones);
+  const cuentas = await prepararLocal(secreto, opciones);
   const sesiones = await sesionesDeEjemplo(opciones);
-  await borrarDatosDeEjemplo(secreto, localId);
+  await borrarDatosDeEjemplo(secreto, cuentas.localId);
   const formas = await formasDelLocal(sesiones.caja);
   const plan = planDeEjemplo(opciones.semilla, opciones.hoy, formas, opciones.dias);
-  const destino = { local: localId, cajaId, canalId: await canalDelMostrador(secreto, localId) };
-  await escribirPlan(secreto, destino, sesiones, plan);
-  return resumenDe(localId, plan);
+  await escribirPlan(secreto, await destinosDe(secreto, cuentas), sesiones, plan);
+  return resumenDe(cuentas.localId, plan);
 }

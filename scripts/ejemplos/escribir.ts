@@ -16,21 +16,28 @@ function tandas<T>(lista: T[]): T[][] {
   );
 }
 
-type Destino = { local: string; cajaId: string; canalId: string };
+/** Cómo quedan escritas: del mostrador por la caja, o a mano por el admin y fuera de la caja. */
+export type Destino<V extends VentaDeEjemplo> = {
+  local: string;
+  creadoPor: string;
+  origen: 'mostrador' | 'manual';
+  enLaCaja: boolean;
+  canalDe: (venta: V) => string;
+};
 
-function filasDeLaTanda(destino: Destino, tanda: VentaDeEjemplo[]) {
+function filasDeLaTanda<V extends VentaDeEjemplo>(destino: Destino<V>, tanda: V[]) {
   const conId = tanda.map((venta) => ({ venta, id: crypto.randomUUID() }));
   const ventas = conId.map(({ venta, id }) => ({
     id,
     local_id: destino.local,
-    origen: 'mostrador' as const,
+    origen: destino.origen,
     fecha: venta.fecha,
     cerrada_en: venta.cerradaEn,
     total_centavos: venta.totalCentavos,
-    canal_id: destino.canalId,
+    canal_id: destino.canalDe(venta),
     clave: crypto.randomUUID(),
-    en_la_caja: true,
-    creado_por: destino.cajaId,
+    en_la_caja: destino.enLaCaja,
+    creado_por: destino.creadoPor,
   }));
   return { conId, ventas };
 }
@@ -64,9 +71,13 @@ const pagosDe = (local: string, conId: ConId) =>
 
 /**
  * Las ventas de días pasados van directo, con la clave secreta: la función del mostrador guarda
- * siempre con la fecha de hoy. Quedan a nombre de la caja de ejemplo.
+ * siempre con la fecha de hoy. Quedan a nombre de quien dice el destino.
  */
-export async function escribirVentas(secreto: Cliente, destino: Destino, ventas: VentaDeEjemplo[]) {
+export async function escribirVentas<V extends VentaDeEjemplo>(
+  secreto: Cliente,
+  destino: Destino<V>,
+  ventas: V[],
+) {
   for (const tanda of tandas(ventas)) {
     const { conId, ventas: filas } = filasDeLaTanda(destino, tanda);
     comprobar((await secreto.from('ventas').insert(filas)).error, 'escribir las ventas');

@@ -2,13 +2,21 @@ import { sumarDias } from '../../src/lib/reportes/periodos';
 import { crearAzar, entero, type Azar } from './azar';
 import { cierreDelDia, type CierreDeEjemplo } from './cierres';
 import { gastosDelPeriodo, type GastoDeEjemplo } from './gastos';
-import { ventasDelDia, type FormaDeEjemplo, type VentaDeEjemplo } from './ventas';
+import {
+  ventasAManoDelDia,
+  ventasDelDia,
+  type FormaDeEjemplo,
+  type VentaAManoDeEjemplo,
+  type VentaDeEjemplo,
+} from './ventas';
 
 /** Todo lo inventado, listo para escribir en la base. */
 export type PlanDeEjemplo = {
   dias: string[];
   sinAbrir: string[];
   ventas: VentaDeEjemplo[];
+  /** Encargos y ventas a comercios: no suman a la caja. */
+  aMano: VentaAManoDeEjemplo[];
   cierres: CierreDeEjemplo[];
   gastos: GastoDeEjemplo[];
 };
@@ -26,7 +34,8 @@ function diasSinAbrir(azar: Azar, dias: string[]): string[] {
 
 function delDia(azar: Azar, dia: string, formas: FormaDeEjemplo[], ultimo: boolean) {
   const ventas = ventasDelDia(azar, dia, formas);
-  return { ventas, cierre: ultimo ? null : cierreDelDia(azar, dia, ventas) };
+  const cierre = ultimo ? null : cierreDelDia(azar, dia, ventas);
+  return { ventas, cierre, aMano: ventasAManoDelDia(azar, dia, formas) };
 }
 
 /**
@@ -46,5 +55,6 @@ export function planDeEjemplo(
   const diarios = abiertos.map((d) => delDia(azar, d, formas, d === dias.at(-1)));
   const ventas = diarios.flatMap((d) => d.ventas);
   const cierres = diarios.flatMap((d) => (d.cierre ? [d.cierre] : []));
-  return { dias, sinAbrir, ventas, cierres, gastos: gastosDelPeriodo(azar, dias) };
+  const aMano = diarios.flatMap((d) => d.aMano);
+  return { dias, sinAbrir, ventas, aMano, cierres, gastos: gastosDelPeriodo(azar, dias) };
 }
