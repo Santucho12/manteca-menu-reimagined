@@ -115,3 +115,20 @@ si no hay ninguno.
 ## Fuera de alcance
 
 Stock, producción, preparaciones dentro de otras recetas y el centro de avisos.
+
+## Parte técnica (pedido 95)
+
+- Base: `supabase/migrations/20261119140000_recetas_y_costos.sql`. Tablas `recetas`,
+  `renglones_de_receta`, `costos_de_presentacion` y `configuracion_de_costos`, solo para el
+  admin activo de su local. Recetas y renglones se escriben solo con `recetas_guardar(datos)`
+  (`PK300` sin permiso, `PK301` algo de otro local o de otra categoría, `PK302` un insumo
+  desactivado nuevo, `PK303` repetidos, `PK304` sin insumos). Unidades y márgenes se escriben
+  directo, con RLS. La unidad de uso de un insumo que está en una receta no cambia (`PI303`).
+- El costo se calcula en un solo lugar: `costos_de_productos_del_local(local)` (sin acceso
+  directo) y `costos_de_productos()`, que lo da solo al admin activo de su local. Redondea al
+  centavo una vez, la mitad hacia arriba. La venta (pedido 97) va a usar la primera.
+- La ganancia, el porcentaje, el sugerido y "debajo del mínimo" son TypeScript puro, en
+  `src/lib/costos/calculo.ts`. Lista, receta y ajustes en `src/lib/costos/`; pantallas en
+  `src/app/admin/(panel)/costos/`. El aviso de Inicio sale de `cuantosDebajoDelMinimo`.
+- Queda sin hacer: volver una presentación a "usa la receta del producto" una vez que tiene la
+  suya, y el buscador de insumos (hoy es una lista para elegir).

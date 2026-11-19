@@ -31,7 +31,7 @@ auditoría. El mapa de rutas, los recortes de cada módulo y el orden están en
 - La compra de mercadería se carga como un gasto, con su proveedor. La regla de
   `PROPUESTA.md` de que las compras no son gastos vale desde que exista el módulo Compras.
 - Por excepción de Santiago (2026-11-19, pedidos 94 a 97) se construyen ya Materia prima,
-  Recetas y Costos, y Compras, sin stock ni producción. Materia prima existe desde el pedido 94.
+  Recetas y Costos, y Compras, sin stock ni producción. Materia prima existe desde el pedido 94, y Recetas y Costos desde el 95.
 - Lo de la segunda fase (materia prima, composición y costos, compras, producción, stock,
   centro de avisos, notas, IA) no se construye por adelantado. Las reglas de este archivo y
   de las skills que hablan de esos módulos aplican cuando el módulo exista: hasta entonces,
