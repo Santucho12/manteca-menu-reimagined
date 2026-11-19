@@ -1,16 +1,11 @@
-import { diasConCierre, listarCierres, primerDiaConCierre } from '../caja/consultas';
+import { listarCierres } from '../caja/consultas';
+import { turnosPendientes } from '../caja/consultasDeTurnos';
 import type { FiltrosDeControl } from '../caja/pantalla';
-import { diasSinAbrir } from '../caja/sinAbrir';
 import { listarRecurrentes } from '../gastos/consultas';
 import { proximosPagos } from '../gastos/fijos';
 import { pagosPendientes, vencimientosTomados } from '../gastos/pagos';
 import { itemsPorPagar } from '../gastos/porPagar';
-import {
-  datosDelResultado,
-  ventasPorDia,
-  ventasPorProducto,
-  ventasSinDetalle,
-} from '../reportes/consultas';
+import { datosDelResultado, ventasPorDia, ventasPorProducto } from '../reportes/consultas';
 import { periodoAnterior, sumarDias } from '../reportes/periodos';
 import { resultadoPorMes } from '../reportes/resultado';
 import { productosDelReporte } from '../reportes/ventas';
@@ -70,16 +65,14 @@ export async function gastosSinClasificar(
   return { ...conFecha(gastos), categoriaId: gastos.data?.[0]?.categoria_id ?? null };
 }
 
-/** Ayer, si no tiene cierre ni esta marcado como dia sin abrir; nada si no habia ningun cierre. */
-async function ayerSinCierre(cliente: Cliente, hoy: string): Promise<string | null> {
+/** Los turnos de ayer con ventas en la caja y sin cierre (la base ya saca los dias sin abrir). */
+async function ayerSinCierre(
+  cliente: Cliente,
+  hoy: string,
+): Promise<DatosDeAvisos['ayerSinCierre']> {
   const ayer = sumarDias(hoy, -1);
-  const [primero, cargados, sinAbrir] = await Promise.all([
-    primerDiaConCierre(cliente),
-    diasConCierre(cliente, ayer, ayer),
-    diasSinAbrir(cliente, ayer, ayer),
-  ]);
-  const resuelto = cargados.length > 0 || sinAbrir.length > 0;
-  return !primero || primero > ayer || resuelto ? null : ayer;
+  const pendientes = await turnosPendientes(cliente, ayer, ayer);
+  return pendientes.length === 0 ? null : { fecha: ayer, turnos: pendientes.map((p) => p.turno) };
 }
 
 export async function datosDeAvisos(cliente: Cliente, hoy: string): Promise<DatosDeAvisos> {
@@ -113,23 +106,18 @@ function leerElInicio(cliente: Cliente, hoy: string) {
     ventasPorProducto(cliente, mes),
     ventasPorDia(cliente, rangoDeSemanas(hoy)),
     pagosDelInicio(cliente, hoy),
-    ventasSinDetalle(cliente, mes),
   ]);
 }
 
 /** Todo lo de Inicio, con el mismo calculo que Reportes. */
 export async function datosDelInicio(cliente: Cliente, hoy: string) {
-  const [avisos, actual, anterior, anio, productos, dias, pagos, sinDetalle] = await leerElInicio(
-    cliente,
-    hoy,
-  );
+  const [avisos, actual, anterior, anio, productos, dias, pagos] = await leerElInicio(cliente, hoy);
   return {
     avisos: avisosDeInicio({ ...avisos, pagos }),
     actual,
     anterior,
     meses: resultadoPorMes(anio.ventas, anio.gastos),
     masVendidos: masVendidos(productosDelReporte(productos)),
-    sinDetalle: sinDetalle.ventas,
     semana: semanaContraSemana(dias, hoy),
   };
 }

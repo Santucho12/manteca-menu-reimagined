@@ -1,4 +1,5 @@
 import { Banknote, ChevronRight } from 'lucide-react';
+import { nombreDelTurno } from '@/lib/caja/turnos';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Chip, InsigniaDeEstado } from '@/components/panel/Insignias';
@@ -34,9 +35,6 @@ const EstadoConFlecha = ({ cierre }: { cierre: FilaDeCierre }) => (
 
 // Cada medio que no da exacto, por separado: un faltante y un sobrante no se compensan.
 function Diferencia({ cierre }: { cierre: FilaDeCierre }) {
-  if (cierre.estado === 'esperando_ventas') {
-    return <span className="text-sm font-semibold text-muted-foreground">—</span>;
-  }
   if (cierre.diferencias.length === 0) {
     return <span className="text-sm font-semibold text-emerald-700">Sin diferencia</span>;
   }
@@ -83,6 +81,9 @@ const Fecha = ({ cierre }: { cierre: FilaDeCierre }) => (
     >
       {fechaParaMostrar(cierre.fecha)}
     </Link>
+    <span className="text-xs font-semibold text-muted-foreground">
+      {nombreDelTurno(cierre.turno)}
+    </span>
   </span>
 );
 

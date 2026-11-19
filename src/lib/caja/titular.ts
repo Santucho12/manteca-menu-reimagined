@@ -9,6 +9,9 @@ const EN_FRASE: Record<Medio, string> = {
   transferencia: 'transferencia',
 };
 
+/** El medio dicho dentro de una frase: "Faltan $500 en tarjeta de débito". */
+export const medioEnFrase = (medio: Medio) => EN_FRASE[medio];
+
 // Un faltante en un medio y un sobrante en otro no se suman: se dice en cuantos no cierra.
 function deUnCierreConDiferencia(medios: ResultadoDeMedio[]): string {
   const fuera = medios.filter((medio) => medio.fuera);
@@ -25,16 +28,6 @@ export function titularDelCierre(
   medios: ResultadoDeMedio[],
 ): string {
   if (cierre.anulado) return 'Cierre anulado';
-  if (cierre.estado === 'esperando_ventas') return 'Esperando las ventas del día';
   if (cierre.estado === 'cierra') return 'La caja cierra';
   return deUnCierreConDiferencia(medios);
 }
-
-/** Lo que se le explica a quien mira un cierre que todavia no tiene contra que compararse. */
-export const explicacionDelCierre = (cierre: {
-  estado: EstadoDeCierre;
-  anulado: boolean;
-}): string | null =>
-  !cierre.anulado && cierre.estado === 'esperando_ventas'
-    ? 'Guardado. El resultado va a estar cuando se carguen las ventas del día.'
-    : null;

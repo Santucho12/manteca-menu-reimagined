@@ -5,6 +5,7 @@ import { fondosAnterioresDe } from './fondosAnteriores';
 import type { FiltrosDeControl } from './pantalla';
 import type { EstadoDelCierre, Medio, ResultadoDeMedio } from './resultado';
 import { resultadoDeFila, type FilaConVentas } from './resultadoDeFila';
+import type { Turno } from './turnos';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const SIN_LIMITE = { desde: '2000-01-01', hasta: '2100-12-31' };
@@ -12,6 +13,7 @@ const SIN_LIMITE = { desde: '2000-01-01', hasta: '2100-12-31' };
 type Leida = FilaConVentas & {
   id: string;
   fecha: string;
+  turno: number;
   anulado: boolean;
   persona_nombre: string;
   motivo_anulacion: string | null;
@@ -22,6 +24,7 @@ type Leida = FilaConVentas & {
 export type FilaDeCierre = {
   id: string;
   fecha: string;
+  turno: Turno;
   /** Un cierre anulado conserva su cuenta, pero no cuenta para nada: se ve aparte. */
   estado: EstadoDelCierre;
   anulado: boolean;
@@ -46,6 +49,7 @@ function aFila(leida: Leida): FilaDeCierre {
   return {
     id: leida.id,
     fecha: leida.fecha,
+    turno: leida.turno as Turno,
     estado: resultado.estado,
     anulado: leida.anulado,
     persona: leida.persona_nombre,
@@ -107,10 +111,10 @@ export type Cierre = FilaDeCierre & {
 };
 
 const COLUMNAS_DE_CIERRE =
-  'id, fecha, retiros:retiros_de_caja(monto_centavos, quien), ' +
+  'id, fecha, turno, retiros:retiros_de_caja(monto_centavos, quien), ' +
   'gastos(id, monto_centavos, descripcion, anulado)';
 
-type Salidas = Pick<Cierre, 'retiros' | 'gastos'> & { fecha: string };
+type Salidas = Pick<Cierre, 'retiros' | 'gastos'> & { fecha: string; turno: Turno };
 
 // La fila del cierre con sus retiros y sus gastos: de ahi sale la fecha para leer su cuenta.
 async function salidasDelCierre(cliente: Cliente, id: string): Promise<Salidas | null> {
@@ -148,7 +152,7 @@ export async function cierreConFondoAnterior(
   if (!salidas) return null;
   const [delDia, fondoAnteriorCentavos] = await Promise.all([
     leerCierres(cliente, salidas.fecha, salidas.fecha),
-    fondoSugerido(cliente, salidas.fecha),
+    fondoSugerido(cliente, salidas.fecha, salidas.turno),
   ]);
   const cierre = armarCierre(id, salidas, delDia);
   return cierre ? { cierre, fondoAnteriorCentavos } : null;
@@ -170,9 +174,16 @@ function detalleDe(leida: Leida) {
   };
 }
 
-/** Lo que quedo en la caja en el ultimo cierre anterior a esa fecha, para precargar el fondo. */
-export async function fondoSugerido(cliente: Cliente, fecha: string): Promise<number | null> {
-  const respuesta = await cliente.rpc('cierres_fondo_sugerido', { la_fecha: fecha });
+/** Lo que quedo en la caja en el ultimo cierre anterior a ese turno, para precargar el fondo. */
+export async function fondoSugerido(
+  cliente: Cliente,
+  fecha: string,
+  turno: Turno = 2,
+): Promise<number | null> {
+  const respuesta = await cliente.rpc('cierres_fondo_sugerido', {
+    la_fecha: fecha,
+    el_turno: turno,
+  });
   return comprobar(respuesta, 'el fondo de la caja');
 }
 
@@ -187,7 +198,7 @@ export async function fondosDelRango(
 ): Promise<Map<string, number | null>> {
   const [cierres, antes] = await Promise.all([
     leerCierres(cliente, desde, hasta),
-    fondoSugerido(cliente, desde),
+    fondoSugerido(cliente, desde, 1),
   ]);
   return fondosAnterioresDe(cierres, antes);
 }
@@ -196,8 +207,12 @@ export async function fondosDelRango(
 export async function fechaDelFondoSugerido(
   cliente: Cliente,
   fecha: string,
+  turno: Turno = 2,
 ): Promise<string | null> {
-  const respuesta = await cliente.rpc('cierres_fecha_del_fondo', { la_fecha: fecha });
+  const respuesta = await cliente.rpc('cierres_fecha_del_fondo', {
+    la_fecha: fecha,
+    el_turno: turno,
+  });
   return comprobar(respuesta, 'el dia del fondo de la caja');
 }
 

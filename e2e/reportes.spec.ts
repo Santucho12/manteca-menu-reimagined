@@ -1,6 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
 import { borrarDiasSinAbrir, sembrarDiaSinAbrir } from '../tests/cierres-de-prueba';
-import { borrarVentas, sembrarVentaConPago } from '../tests/ventas-de-prueba';
+import { sembrarVentaConRenglones } from '../tests/reportes-de-prueba';
+import {
+  borrarVentas,
+  idDeCanal,
+  productoParaVender,
+  sembrarVentaConPago,
+} from '../tests/ventas-de-prueba';
 import { SESIONES } from './ayudas';
 import {
   borrarReportes,
@@ -24,6 +30,7 @@ const TITULOS = [
   'Ventas por período',
   'Ventas por producto',
   'Ventas por categoría',
+  'Ventas por tipo de venta',
   'Gastos por categoría',
   'Gastos por período',
   'Caja',
@@ -70,6 +77,34 @@ test('ventas por categoria: monto y cantidad de ventas', async ({ page }) => {
   await expect(fila.getByRole('cell').nth(1)).toHaveText('2');
 });
 
+test('ventas por tipo: cada tipo con sus ventas, su monto y su parte del total', async ({
+  page,
+}) => {
+  const producto = await productoParaVender();
+  const [local, encargo] = await Promise.all([idDeCanal('Local'), idDeCanal('Encargo')]);
+  const vender = (canalId: string, precioCentavos: number) =>
+    sembrarVentaConRenglones({
+      fecha: '2018-06-04',
+      canalId,
+      renglones: [{ producto, cantidad: 1, precioCentavos }],
+    });
+  const ventas = [
+    await vender(local, 100000),
+    await vender(local, 200000),
+    await vender(encargo, 100000),
+  ];
+  try {
+    await page.goto('/admin/reportes/tipos?desde=2018-06-01&hasta=2018-06-30');
+    const fila = page.getByRole('row').filter({ hasText: 'Local' });
+    await expect(fila).toContainText('$3.000,00');
+    await expect(fila).toContainText('75 %');
+    await expect(fila.getByRole('cell').nth(1)).toHaveText('2');
+    await expect(page.getByRole('row').filter({ hasText: 'Encargo' })).toContainText('25 %');
+  } finally {
+    await borrarVentas(ventas, { categoriasDelMenu: [producto.categoriaId] });
+  }
+});
+
 test('un periodo sin ventas lo dice', async ({ page }) => {
   await page.goto('/admin/reportes/ventas?desde=2017-01-01&hasta=2017-01-31');
   await expect(page.getByText('No hay ventas en este período.')).toBeVisible();
@@ -110,8 +145,11 @@ test('resultado: sin gastos cargados no lo calcula', async ({ page }) => {
 test('caja: cada cierre con su diferencia, el dia sin cierre y el resumen por empleado', async ({
   page,
 }) => {
+  // El día sin cierre tiene que haber vendido en la caja: sin ventas, el local no abrió.
+  const venta = await sembrarVentaConPago({ fecha: '2018-04-11', medio: 'qr', centavos: 1000 });
   await page.goto('/admin/reportes/caja?desde=2018-04-10&hasta=2018-04-12');
   await expect(page.getByRole('row', { name: /11\/04\/2018/ })).toContainText('Sin cierre');
+  await borrarVentas([venta]);
   const cierre = page.getByRole('row', { name: /10\/04\/2018/ });
   await expect(cierre).toContainText('Prueba Caja');
   await expect(cierre).toContainText('$20.000,00');
@@ -155,20 +193,5 @@ test('caja dice "No abrió" en un dia que el admin marco', async ({ page }) => {
     await expect(page.getByRole('row', { name: /05\/09\/2018/ })).toContainText('No abrió');
   } finally {
     await borrarDiasSinAbrir([dia]);
-  }
-});
-
-test('por producto y por categoria muestran lo que el Excel no detalla', async ({ page }) => {
-  // Una venta sin productos, como las que deja el Excel de Fudo.
-  const dia = '2018-08-14';
-  const venta = await sembrarVentaConPago({ fecha: dia, medio: 'qr', centavos: 123400 });
-  try {
-    for (const reporte of ['productos', 'categorias']) {
-      await page.goto(`/admin/reportes/${reporte}?desde=${dia}&hasta=${dia}`);
-      const fila = page.getByRole('row', { name: /Sin detalle de productos \(Excel de Fudo\)/ });
-      await expect(fila).toContainText('$1.234,00');
-    }
-  } finally {
-    await borrarVentas([venta]);
   }
 });

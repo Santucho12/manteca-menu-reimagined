@@ -6,7 +6,13 @@ import { formatearPesosEnteros } from '@/lib/plata';
 
 const CELDA = 'py-3 px-3 align-top text-xs';
 
-export function TablaDeCambios({ cambios }: { cambios: CambioDePrecio[] }) {
+export function TablaDeCambios({
+  cambios,
+  nombre = 'Cambios de precio',
+}: {
+  cambios: CambioDePrecio[];
+  nombre?: string;
+}) {
   if (cambios.length === 0) {
     return (
       <SinResultados titulo="Sin cambios" texto="No hay precios para aumentar en ese alcance." />
@@ -14,7 +20,7 @@ export function TablaDeCambios({ cambios }: { cambios: CambioDePrecio[] }) {
   }
   return (
     <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden">
-      <table aria-label="Cambios de precio" className="w-full text-left">
+      <table aria-label={nombre} className="w-full text-left">
         <thead>
           <tr className="border-b border-border bg-muted/30">
             <th className={TITULO_DE_COLUMNA}>Qué</th>

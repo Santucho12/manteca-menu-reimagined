@@ -24,7 +24,7 @@ cargue quede a nombre de quien lo cargó.
 | Rol | Qué puede |
 |---|---|
 | Invitado | Nada. Es el rol de quien se acaba de registrar |
-| Caja | Cargar el cierre de su turno y ver los suyos |
+| Caja | Vender en el mostrador, cargar el cierre de su turno y ver los suyos (pedido 89) |
 | Admin | Todo |
 | Encargado | Nada. Existe, pero no se puede asignar en esta fase |
 
@@ -101,8 +101,8 @@ Acciones sobre una cuenta:
 5. Una contraseña temporal sirve hasta que se usa. Un reseteo nuevo reemplaza a la anterior.
 6. Un admin no resetea su propia contraseña: la cambia desde Mi cuenta.
 7. Una cuenta desactivada no entra aunque tenga una contraseña temporal pendiente.
-8. Caja entra a `/admin` y llega directo a la carga de su cierre. Mientras ese módulo no
-   exista, ve una pantalla con su nombre, Mi cuenta y "Salir".
+8. Caja entra a `/admin` y ve su inicio, con Vender como acción principal y la carga de su
+   cierre al lado (pedido 89; antes, solo la carga del cierre).
 
 ## Mensajes
 

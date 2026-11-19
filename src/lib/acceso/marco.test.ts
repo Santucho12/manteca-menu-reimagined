@@ -18,8 +18,9 @@ describe('enlacesDelMarco', () => {
     expect(enlacesDelMarco('admin', NADA).every((enlace) => enlace.insignia === null)).toBe(true);
   });
 
-  it('caja ve sus tres enlaces, sin numero', () => {
+  it('caja ve sus cuatro enlaces, sin numero', () => {
     expect(enlacesDelMarco('caja', { usuarios: 3, caja: 2, gastos: 1 })).toEqual([
+      { clave: 'vender', href: '/admin/vender', texto: 'Vender', insignia: null },
       { clave: 'caja', href: '/admin/caja', texto: 'Cargar cierre', insignia: null },
       { clave: 'cierres', href: '/admin/caja/mis-cierres', texto: 'Mis cierres', insignia: null },
       { clave: 'cuenta', href: '/admin/cuenta', texto: 'Mi cuenta', insignia: null },

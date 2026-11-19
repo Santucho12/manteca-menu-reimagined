@@ -1,4 +1,4 @@
-import { MEDIOS, resultadoDelCierre, type ResultadoDelCierre } from './resultado';
+import { resultadoDelCierre, type ResultadoDelCierre } from './resultado';
 
 /** Lo que devuelve cierres_con_resultado: lo declarado y lo vendido ese dia por medio. */
 export type FilaConVentas = {
@@ -16,8 +16,6 @@ export type FilaConVentas = {
   ventas_qr_centavos: number;
   ventas_transferencia_centavos: number;
   tolerancia_centavos: number;
-  /** Si el dia ya tiene ventas de Fudo cargadas (con el Excel, llegan dias despues). */
-  ventas_cargadas: boolean;
 };
 
 const declaradoDe = (f: FilaConVentas) => ({
@@ -41,28 +39,10 @@ const vendidoDe = (f: FilaConVentas) => ({
   transferencia: f.ventas_transferencia_centavos,
 });
 
-// Sin las ventas del dia no hay esperado: se muestra lo declarado, sin faltantes ni sobrantes.
-function esperandoVentas(fila: FilaConVentas): ResultadoDelCierre {
-  const { medios } = declaradoDe(fila);
-  return {
-    estado: 'esperando_ventas',
-    medios: MEDIOS.map((medio) => ({
-      medio,
-      declaradoCentavos: medios[medio],
-      esperadoCentavos: 0,
-      diferenciaCentavos: 0,
-      fuera: false,
-    })),
-    diferenciaTotalCentavos: 0,
-  };
-}
-
-/** El estado y la diferencia de cada medio de un cierre, contra las ventas de su dia. */
+/**
+ * El estado y la diferencia de cada medio de un cierre, contra las ventas de su dia. Las ventas
+ * se cargan al cobrar (pedido 89): todo cierre se compara desde que se guarda.
+ */
 export function resultadoDeFila(fila: FilaConVentas): ResultadoDelCierre {
-  if (!fila.ventas_cargadas) return esperandoVentas(fila);
   return resultadoDelCierre(declaradoDe(fila), vendidoDe(fila), fila.tolerancia_centavos);
 }
-
-/** La diferencia total, o null si todavia no se sabe porque faltan las ventas del dia. */
-export const diferenciaConocida = (fila: FilaConVentas): number | null =>
-  fila.ventas_cargadas ? resultadoDeFila(fila).diferenciaTotalCentavos : null;

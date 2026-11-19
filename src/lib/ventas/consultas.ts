@@ -8,14 +8,14 @@ import type { FiltrosDeVentas, Origen } from './pantalla';
 export type FilaDeVenta = {
   id: string;
   fecha: string;
-  /** Cuando se cerro, o null si no se sabe: las del Excel de Fudo solo traen el dia. */
+  /** Cuando se cobro, o null si no se sabe: las viejas del Excel de Fudo solo traen el dia. */
   cerrada_en: string | null;
   origen: Origen;
   estado: string;
   anulado: boolean;
   total_centavos: number;
   canal: string | null;
-  /** El nombre de quien la cargo; null si nadie (las de Fudo entran solas). */
+  /** El nombre de quien la cargo; null si nadie (las viejas de Fudo entraban solas). */
   cargada_por: string | null;
   medios: Medio[];
 };
@@ -59,6 +59,7 @@ function consultaDe(cliente: Cliente, filtros: FiltrosDeVentas, contar = false) 
     .lte('fecha', filtros.hasta);
   if (filtros.origen) consulta = consulta.eq('origen', filtros.origen);
   if (filtros.medio) consulta = consulta.eq('pagos.medio', filtros.medio);
+  if (filtros.tipo) consulta = consulta.eq('canal_id', filtros.tipo);
   if (filtros.estado === 'anulada') consulta = consulta.eq('anulado', true);
   else if (filtros.estado) consulta = consulta.eq('estado', filtros.estado).eq('anulado', false);
   return consulta;
@@ -70,6 +71,7 @@ async function totalesDe(cliente: Cliente, filtros: FiltrosDeVentas): Promise<To
     hasta: filtros.hasta,
     ...(filtros.origen ? { el_origen: filtros.origen } : {}),
     ...(filtros.medio ? { el_medio: filtros.medio } : {}),
+    ...(filtros.tipo ? { el_canal: filtros.tipo } : {}),
   });
   const [fila] = comprobar(respuesta, 'los totales');
   return {
@@ -128,10 +130,13 @@ export type Venta = Omit<FilaDeVenta, 'medios'> & {
     subtotal_centavos: number;
   }[];
   pagos: { medio: Medio; monto_centavos: number }[];
+  /** Si suma a lo esperado de la caja de ese día (pedido 89). */
+  en_la_caja: boolean;
 };
 
 const COLUMNAS_DE_VENTA =
   'id, fecha, cerrada_en, origen, estado, anulado, total_centavos, comentario, motivo_anulacion, ' +
+  'en_la_caja, ' +
   'canal:canales_de_venta(nombre), ' +
   'renglones:renglones_de_venta(id, descripcion, cantidad, precio_unitario_centavos, subtotal_centavos), ' +
   'pagos:pagos_de_venta(medio, monto_centavos)';
@@ -163,11 +168,4 @@ export async function canalesDeVenta(
     .order('activo', { ascending: false })
     .order('nombre');
   return comprobar(respuesta, 'los tipos de venta');
-}
-
-/** El ultimo dia con ventas de Fudo sin anular, o null si todavia no se subio ninguna. */
-export async function ventasFudoCargadasHasta(cliente: Cliente): Promise<string | null> {
-  const { data, error } = await cliente.rpc('ventas_fudo_cargadas_hasta');
-  if (error) throw new Error(`No pudimos leer hasta cuando hay ventas: ${error.message}`);
-  return data ?? null;
 }

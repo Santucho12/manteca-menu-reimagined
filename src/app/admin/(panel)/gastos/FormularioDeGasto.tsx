@@ -8,12 +8,18 @@ import { AvisoDeError } from '@/components/formularios/AvisoDeError';
 import { PieDelFormulario } from '@/components/formularios/PieDelFormulario';
 import { conValorInicial } from '@/lib/formularios/valorInicial';
 import type { Opcion, OpcionDeCategoria } from '@/lib/gastos/consultas';
-import { esquemaCarga, quedaPorPagar, type DatosDeCarga } from '@/lib/gastos/esquemas';
+import {
+  esquemaCarga,
+  MENSAJE_DE_REPETIDO,
+  quedaPorPagar,
+  type DatosDeCarga,
+} from '@/lib/gastos/esquemas';
 import { avisoDeLaCarga } from '@/lib/gastos/pantalla';
 import { muestraProveedor } from '@/lib/gastos/proveedor';
 import { useGuardar } from '@/lib/gastos/useGuardar';
 import { cargarGastoDesdeElPanel, editarGastoDesdeElPanel } from './acciones';
 import { CamposDelGasto, type PropsDeCampos } from './CamposDelGasto';
+import { AvisoDeRepetido } from './AvisoDeRepetido';
 import { FechaYRepeticion } from './FechaYRepeticion';
 
 type Props = {
@@ -45,8 +51,10 @@ export function FormularioDeGasto({ inicial, id, categorias, proveedores, ...res
   });
   const conProveedor = muestraProveedor(categorias, categoriaId, inicial);
   // Sin el campo a la vista, el gasto se guarda sin proveedor.
-  const enviar = handleSubmit((datos) =>
-    guardado.enviar(conProveedor ? datos : { ...datos, proveedorId: '' }),
+  const listos = (datos: DatosDeCarga) => (conProveedor ? datos : { ...datos, proveedorId: '' });
+  const enviar = handleSubmit((datos) => guardado.enviar(listos(datos)));
+  const cargarIgual = handleSubmit((datos) =>
+    guardado.enviar({ ...listos(datos), cargarIgual: true }),
   );
   const registro = conValorInicial(register, inicial);
   const { errors } = formState;
@@ -65,7 +73,11 @@ export function FormularioDeGasto({ inicial, id, categorias, proveedores, ...res
           medioOpcional={quedaPorPagar({ seRepite, yaPagado })}
         />
       </div>
-      {guardado.mensaje ? <AvisoDeError mensaje={guardado.mensaje} /> : null}
+      {guardado.mensaje === MENSAJE_DE_REPETIDO ? (
+        <AvisoDeRepetido enviando={guardado.enviando} alConfirmar={cargarIgual} />
+      ) : guardado.mensaje ? (
+        <AvisoDeError mensaje={guardado.mensaje} />
+      ) : null}
       <PieDelFormulario enviando={guardado.enviando} cancelar="/admin/gastos" />
     </form>
   );

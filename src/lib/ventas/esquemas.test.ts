@@ -19,6 +19,8 @@ const venta: DatosDeVenta = {
   canalId: CANAL,
   medio: 'transferencia',
   comentario: '  ',
+  enLaCaja: true,
+  turno: '1',
   renglones: [
     { opcion: `${PRODUCTO}|${PRESENTACION}`, cantidad: '1,5', precio: '3.333,33' },
     { opcion: `${PRODUCTO}|${PRESENTACION}`, cantidad: '2', precio: '1.000' },
@@ -33,6 +35,8 @@ describe('esquemaVenta', () => {
       canal_id: CANAL,
       medio: 'transferencia',
       comentario: null,
+      en_la_caja: true,
+      turno: 1,
       renglones: [
         {
           producto_id: PRODUCTO,
@@ -48,6 +52,17 @@ describe('esquemaVenta', () => {
         },
       ],
     });
+  });
+
+  it('cobrada en la caja, guarda el turno; sin cobrar en la caja, queda en la noche', () => {
+    expect(ventaParaLaBase(esquemaVenta.parse({ ...venta, turno: '1' })).turno).toBe(1);
+    expect(ventaParaLaBase(esquemaVenta.parse({ ...venta, enLaCaja: false })).turno).toBe(2);
+    expect(esquemaVenta.safeParse({ ...venta, turno: '0' }).success).toBe(false);
+  });
+
+  it('dice si se cobró en la caja del local, y sin marcar es que no', () => {
+    expect(esquemaVenta.parse({ ...venta, enLaCaja: false }).enLaCaja).toBe(false);
+    expect(esquemaVenta.safeParse({ ...venta, enLaCaja: 'si' }).success).toBe(false);
   });
 
   it('pide al menos un producto, canal y medio de pago', () => {

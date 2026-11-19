@@ -4,6 +4,7 @@ import { diaEnArgentina } from '../src/lib/fechas';
 import { diaLibre } from '../tests/cierres-de-prueba';
 import {
   borrarVentas,
+  idDeCanal,
   idsDeVentasComentadas,
   productoParaVender,
   sembrarVenta,
@@ -61,6 +62,35 @@ test('carga una venta con dos productos y ve su total y su detalle', async ({ pa
   await expect(renglones.getByRole('listitem')).toHaveCount(2);
   await expect(page.getByText(/^Total: ?\$2\.500,00$/)).toBeVisible();
   await expect(page.getByText(comentario)).toBeVisible();
+  await expect(page.getByText('Se cobró en la caja del local: No')).toBeVisible();
+});
+
+test('la venta a mano marcada como cobrada en la caja lo dice en su detalle', async ({ page }) => {
+  const producto = await productoParaVender();
+  menu.push(producto.categoriaId);
+  const comentario = `En la caja ${randomUUID().slice(0, 8)}`;
+  comentarios.push(comentario);
+  await page.goto('/admin/ventas/nueva');
+  const casilla = page.getByLabel('Se cobró en la caja del local');
+  await esperarHidratacion(casilla);
+  await expect(casilla).not.toBeChecked();
+  await page.getByLabel('Tipo de venta', { exact: true }).selectOption({ label: 'Local' });
+  await page.getByLabel('Medio de pago').selectOption({ label: 'Efectivo' });
+  await elegirProducto(page, 'Producto 1', producto.texto);
+  await casilla.check();
+  await page.getByLabel('Comentario').fill(comentario);
+  await page.getByRole('button', { name: 'Guardar venta' }).click();
+  await expect(page.getByText('Se cobró en la caja del local: Sí')).toBeVisible();
+});
+
+// La barra lateral del admin no suma Vender: en una pantalla baja no entraría (pedido 83).
+test('el admin entra a Vender desde Ventas', async ({ page }) => {
+  await page.goto('/admin/ventas');
+  await expect(
+    page.getByRole('navigation', { name: 'Panel' }).getByRole('link', { name: /^Vender/ }),
+  ).toHaveCount(0);
+  await page.getByRole('main').getByRole('link', { name: 'Vender', exact: true }).click();
+  await expect(page).toHaveURL(/\/admin\/vender$/);
 });
 
 test('anula una venta a mano con motivo', async ({ page }) => {
@@ -73,10 +103,10 @@ test('anula una venta a mano con motivo', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Anular' })).toHaveCount(0);
 });
 
-test('una venta de Fudo no se anula desde aca', async ({ page }) => {
+test('una venta vieja de Fudo no se anula desde aca', async ({ page }) => {
   const id = await venta({ origen: 'fudo', fecha: HOY });
   await page.goto(`/admin/ventas/${id}`);
-  await expect(page.getByText('Las ventas de Fudo se corrigen en Fudo.')).toBeVisible();
+  await expect(page.getByText('Vino de Fudo, antes de dejarlo: no se anula.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Anular' })).toHaveCount(0);
 });
 
@@ -84,13 +114,13 @@ test('filtra por fechas y origen y muestra el total', async ({ page }) => {
   const dia = diaLibre();
   await venta({ fecha: dia });
   await venta({ fecha: dia });
-  await venta({ fecha: dia, origen: 'fudo' });
+  await venta({ fecha: dia, origen: 'mostrador' });
   await page.goto(`/admin/ventas?desde=${dia}&hasta=${dia}`);
-  await expect(page.getByText('Fudo todavía no está conectado')).toBeVisible();
+  await expect(page.getByText(/Fudo/)).toHaveCount(0);
   const resumen = page.getByRole('region', { name: 'Resumen de ventas' });
   await expect(resumen).toContainText('$3.000,00');
   await expect(resumen).toContainText('3 ventas');
-  await page.goto(`/admin/ventas?desde=${dia}&hasta=${dia}&origen=fudo`);
+  await page.goto(`/admin/ventas?desde=${dia}&hasta=${dia}&origen=mostrador`);
   await expect(page.getByRole('list', { name: 'Ventas' }).getByRole('listitem')).toHaveCount(1);
   await expect(resumen).toContainText('$1.000,00');
   await expect(resumen).toContainText('1 venta');
@@ -112,15 +142,29 @@ test('los filtros actualizan la lista solos: sin boton Filtrar ni filtro de orig
   await expect(page.getByText('No hay ventas para mostrar')).toBeVisible();
 });
 
-test('el resumen son cuatro tarjetas, con el ticket promedio', async ({ page }) => {
+test('filtra por tipo de venta, con los totales del tipo', async ({ page }) => {
+  const dia = diaLibre();
+  await venta({ fecha: dia, origen: 'mostrador', canalId: await idDeCanal('Local') });
+  await venta({ fecha: dia, canalId: await idDeCanal('Encargo') });
+  await page.goto(`/admin/ventas?desde=${dia}&hasta=${dia}`);
+  await esperarHidratacion(page.getByRole('combobox', { name: 'Tipo de venta' }));
+  await page.getByRole('combobox', { name: 'Tipo de venta' }).click();
+  await page.getByRole('option', { name: 'Local', exact: true }).click();
+  await expect(page).toHaveURL(/tipo=/);
+  await expect(page.getByRole('list', { name: 'Ventas' }).getByRole('listitem')).toHaveCount(1);
+  await expect(page.getByRole('region', { name: 'Resumen de ventas' })).toContainText('1 venta');
+});
+
+test('el resumen son tres tarjetas, con el ticket promedio', async ({ page }) => {
   const dia = diaLibre();
   await venta({ fecha: dia });
   await venta({ fecha: dia });
   await page.goto(`/admin/ventas?desde=${dia}&hasta=${dia}`);
   const resumen = page.getByRole('region', { name: 'Resumen de ventas' });
-  for (const etiqueta of ['Cobrado', 'Ticket promedio', 'Canceladas', 'Anuladas']) {
+  for (const etiqueta of ['Cobrado', 'Ticket promedio', 'Anuladas']) {
     await expect(resumen.getByRole('term').filter({ hasText: etiqueta })).toBeVisible();
   }
+  await expect(resumen.getByRole('term').filter({ hasText: 'Canceladas' })).toHaveCount(0);
   const ticket = resumen.getByRole('listitem').filter({ hasText: 'Ticket promedio' });
   await expect(ticket).toContainText('$1.000,00');
 });
@@ -153,7 +197,9 @@ test('un clic en cualquier parte de la fila abre la venta', async ({ page }) => 
 test('una venta de Fudo sin productos avisa que no tiene detalle', async ({ page }) => {
   const id = await venta({ fecha: HOY, origen: 'fudo' });
   await page.goto(`/admin/ventas/${id}`);
-  await expect(page.getByText(/no tiene detalle de productos/)).toBeVisible();
+  await expect(
+    page.getByText('Vino de Fudo sin detalle de productos: solo el total.'),
+  ).toBeVisible();
 });
 
 test('guarda capturas de la lista y la carga', async ({ page }, info) => {

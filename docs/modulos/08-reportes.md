@@ -21,6 +21,7 @@ Solo Admin.
 | Ventas por período | Ventas de cada día, con cantidad de ventas y ticket promedio |
 | Ventas por producto | Cantidad y monto de cada producto |
 | Ventas por categoría | Cantidad y monto de cada categoría |
+| Ventas por tipo de venta | Cantidad, monto y parte del total de cada tipo: Local (el mostrador) y los que se cargan a mano (pedido 90) |
 | Gastos por categoría | Monto de cada categoría |
 | Gastos por período | Gastos de cada día o de cada mes |
 | Caja | Diferencia de cada cierre, por día y por empleado |
@@ -41,27 +42,25 @@ Solo Admin.
 
 1. Los números salen del mismo cálculo que usa Inicio. El mismo dato no da distinto en dos
    pantallas.
-2. Lo cancelado y lo anulado no cuentan.
+2. Lo anulado no cuenta.
 3. "El día" es el día calendario en Argentina.
-4. Las ventas incluyen las de Fudo y las cargadas a mano.
-5. En los reportes por producto y por categoría, las ventas de productos de Fudo sin
-   vincular van en una fila "sin vincular". Las ventas sin ningún producto (las del Excel de
-   Fudo) van al final, después de "Sin vincular", en una fila "Sin detalle de productos (Excel
-   de Fudo)" con su monto y su cantidad de ventas. Así el total por producto y por categoría es
-   igual al de Ventas por período. Sin esas ventas, la fila no aparece (pedido 84).
+4. Las ventas incluyen las del mostrador y las cargadas a mano (pedido 89).
+5. Toda venta tiene sus productos, así que el total por producto y por categoría es igual al de
+   Ventas por período. La fila "Sin detalle de productos (Excel de Fudo)" del pedido 84 se sacó
+   en el pedido 89.
 6. El resultado es ventas menos gastos. No se usa la palabra "margen".
-7. Cada reporte dice hasta cuándo están sincronizadas las ventas. Mientras entren por el Excel,
-   dice "Ventas de Fudo cargadas hasta el 28/10", debajo del filtro de fechas, en ámbar si esa
-   fecha es anterior a ayer (pedido 84).
-8. Las tablas largas están paginadas.
+7. Las tablas largas están paginadas.
+
+Desde el pedido 89 las ventas se cargan al cobrar: los reportes ya no dicen hasta cuándo hay
+ventas, como hacían mientras entraban por el Excel de Fudo (pedido 84).
 
 ## Casos de borde
 
 - Período sin datos: el reporte lo dice, en vez de mostrar una tabla vacía.
 - Período de comparación sin datos: la variación no se calcula y se muestra "sin datos para
   comparar".
-- Meses anteriores al sistema: tienen ventas (se trae un año de Fudo) pero no gastos. El
-  reporte de resultado muestra esos meses solo con ventas, sin resultado.
+- Un mes con ventas y sin gastos cargados: el reporte de resultado lo muestra solo con
+  ventas, sin resultado.
 - Un producto que cambió de categoría: sus ventas se cuentan en la categoría que tiene hoy.
 - Un producto desactivado con ventas en el período: aparece igual.
 - Un gasto cargado hoy con fecha de un mes anterior: cambia el resultado de ese mes.
@@ -115,13 +114,11 @@ leer sus cierres y los gastos de su cierre.
 | `reporte_ventas_por_producto(desde, hasta)` | Producto, categoría de hoy, presentación, cantidad y monto; sin producto, la descripción del renglón |
 | `reporte_ventas_por_categoria(desde, hasta)` | Categoría de hoy (o "Sin vincular"), ventas distintas y monto |
 | `reporte_gastos(desde, hasta)` | Día, categoría y monto de los gastos sin anular |
-| `reporte_ventas_sin_detalle(desde, hasta)` | Cantidad y monto de las ventas cerradas y sin anular que no tienen renglones (pedido 84) |
 
-Del pedido 84 (migración `20261105120000_excel_de_fudo_en_el_sistema`), además,
-`ventas_fudo_cargadas_hasta()`: el último día con ventas de Fudo sin anular, o null; solo
-admin activo. La fila "Sin detalle" la agregan `productosDelReporte` y `categoriasDelReporte`
-(`src/lib/reportes/ventas.ts`) con lo que devuelve `ventasSinDetalle`, leída en la misma tanda
-que el resto del reporte.
+El pedido 84 sumó `ventas_fudo_cargadas_hasta()` y la fila "Sin detalle" con
+`reporte_ventas_sin_detalle`; el pedido 89 los sacó (migración
+`20261118120100_vender_en_el_mostrador`), porque toda venta se carga al cobrar y con sus
+productos.
 
 ### Código
 

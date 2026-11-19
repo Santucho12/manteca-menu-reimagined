@@ -1,11 +1,7 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-import { ejecutarAccion, exigirAccion } from '@/lib/acceso/servidor';
-import { exito } from '@/lib/resultado';
-import { archivoDelFormulario, mensajeDeLaSubida } from '@/lib/ventas/mensajesDeLaSubida';
-import { guardarSubida, vistaDeLaSubida } from '@/lib/ventas/subidaDeFudo';
+import { ejecutarAccion } from '@/lib/acceso/servidor';
 import {
   anularVenta,
   borrarCanal,
@@ -17,25 +13,6 @@ import {
 import { esquemaAnulacionDeVenta, esquemaCanal, esquemaVenta } from '@/lib/ventas/esquemas';
 
 const conId = z.object({ id: z.uuid() });
-
-/** Revisa el archivo de Fudo y dice que entraria, sin guardar nada. */
-export async function revisarExcelDeFudo(datos: FormData) {
-  const acceso = await exigirAccion('admin');
-  if (!acceso.ok) return acceso;
-  const archivo = await archivoDelFormulario(datos);
-  return archivo.ok ? vistaDeLaSubida(archivo.datos) : archivo;
-}
-
-/** Guarda las ventas del archivo de Fudo. */
-export async function guardarExcelDeFudo(datos: FormData) {
-  const acceso = await exigirAccion('admin');
-  if (!acceso.ok) return acceso;
-  const archivo = await archivoDelFormulario(datos);
-  if (!archivo.ok) return archivo;
-  const resultado = await guardarSubida(acceso.datos.cliente, archivo.datos);
-  revalidatePath('/admin', 'layout');
-  return resultado.ok ? exito(mensajeDeLaSubida(resultado.datos)) : resultado;
-}
 
 export async function guardarVentaDesdeElPanel(datos: unknown) {
   return ejecutarAccion('admin', esquemaVenta, datos, ({ cliente }, venta) =>

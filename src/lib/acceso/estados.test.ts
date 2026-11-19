@@ -126,8 +126,9 @@ describe('enlacesDelPanel', () => {
     ]);
   });
 
-  it('caja ve Cargar cierre, Mis cierres y Mi cuenta', () => {
+  it('caja ve Vender primero, después Cargar cierre, Mis cierres y Mi cuenta', () => {
     expect(enlacesDelPanel('caja').map((enlace) => enlace.href)).toEqual([
+      '/admin/vender',
       '/admin/caja',
       '/admin/caja/mis-cierres',
       '/admin/cuenta',

@@ -13,6 +13,8 @@ export type SemillaConRenglones = {
   fecha: string;
   estado?: 'cerrada' | 'cancelada';
   anulado?: boolean;
+  /** El tipo de venta; sin él, como las viejas de Fudo. */
+  canalId?: string;
   renglones: RenglonSembrado[];
 };
 
@@ -28,6 +30,7 @@ async function insertarVenta(semilla: SemillaConRenglones, local: string): Promi
       anulado: semilla.anulado ?? false,
       motivo_anulacion: semilla.anulado ? 'Prueba de reportes' : null,
       total_centavos: semilla.renglones.reduce((suma, r) => suma + subtotalDe(r), 0),
+      canal_id: semilla.canalId ?? null,
     })
     .select('id')
     .single();

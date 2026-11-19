@@ -63,7 +63,7 @@ documento de verificación y los tests de reproducción.
 ## Paso 0 · Elegir el módulo y armar su inventario
 
 Un módulo es **una pantalla o un flujo**, no una superficie entera: "Cierre de caja →
-cargar", "Importación de Fudo → anular", "Gastos recurrentes". Si el usuario nombra algo
+cargar", "Vender en el mostrador → cobrar", "Gastos recurrentes". Si el usuario nombra algo
 grande ("el panel"), **partilo y confirmá por cuál empezar.**
 
 ### Mapa de módulos
@@ -79,9 +79,8 @@ exista el código**, para no re-derivarlo en cada corrida.
 | Proveedores | §2 | — | — |
 | Gestión del menú digital (y el menú web público) | §9 | — | — |
 | Catálogo mínimo de productos (nombre, variantes y precio) | §4, recortado | — | — |
-| Ventas — importación de Fudo | §10 | — | — |
-| Ventas — vinculación de productos | §10 | — | — |
-| Ventas — carga a mano (fuera de Fudo) | §10 | — | — |
+| Ventas — vender en el mostrador | §10, sin Fudo | — | — |
+| Ventas — carga a mano | §10 | — | — |
 | Cierres de caja — carga | §11 | — | — |
 | Cierres de caja — control desde administración | §11 | — | — |
 | Gastos (únicos y recurrentes) | §12 | — | — |
@@ -109,7 +108,7 @@ sido probado.
 ### Por dónde empezar, y qué hacer con lo que aparece de otro módulo
 
 **El orden es por riesgo, no por el orden del menú**: arrancá por donde se mueve plata
-(Cierres de caja, Importación de Fudo, Ventas a mano, Gastos), seguí por los números que
+(Cierres de caja, Vender en el mostrador, Ventas a mano, Gastos), seguí por los números que
 salen de ahí (Dashboard, Reportes, Auditoría) y dejá la administración (Proveedores,
 Menú, Usuarios) para el final. Usuarios es la excepción: su parte de permisos va primero.
 
@@ -156,9 +155,9 @@ cierra, una tabla que se desborda en el celular. En este proyecto no se simula l
 las llamadas (`CLAUDE.md`): si hay que ver qué envía una pantalla, se la usa de verdad y
 se mira lo que quedó en la base.
 
-**d) Archivos de Fudo de prueba.** La importación se prueba con Excel reales o armados
-con los bordes: el mismo archivo dos veces, períodos que se pisan, un producto sin
-vincular, columnas faltantes, filas con cantidad cero o negativa, un archivo vacío.
+**d) Bordes del mostrador.** La venta se prueba con los bordes: el doble toque en Cobrar,
+un precio que cambia con el ticket armado, un producto desactivado en medio, dos medios que
+no suman el total, la conexión que se corta al cobrar.
 
 ### Los comandos
 
@@ -249,8 +248,8 @@ Que ande no es que esté bien pensado. Con el módulo ya probado, pasá por cada
   peor que no poder anular, porque no falla: deja los números sin cerrar y nadie se
   entera. Ver la lente 6.
 - **¿El número significa algo ahí?** Un margen sobre un producto sin costo cargado, un
-  ticket promedio cuando Fudo no exporta el detalle por ticket, una diferencia de caja
-  sobre un día sin ventas importadas.
+  ticket promedio sobre ventas cargadas a mano de a una por día, una diferencia de caja
+  sobre ventas que no se cobraron en la caja.
 - **¿El corte es del negocio o del código?** Un límite, un día, un filtro que quedó por
   cómo se implementó y no porque alguien lo decidió.
 - **¿Hay asimetría entre actores?** Algo que uno ve y otro no, o que uno necesita y no puede.
@@ -337,7 +336,7 @@ enterado?"**:
 
 | Si se anula… | ¿lo refleja? |
 |---|---|
-| una **importación de Fudo** | todas sus ventas, el stock que descontaron, la caja esperada de esos turnos, dashboard, reportes |
+| una **venta del mostrador** | caja esperada de ese día, dashboard, reportes, más vendidos |
 | una **venta a mano** | stock, caja esperada si se cobró con la caja, reportes, ganancia por producto |
 | un **cierre de caja** | reportes de diferencias, avisos de caja con diferencia, gastos pagados con la caja que colgaban de él |
 | un **gasto** | resultado del mes, reportes por categoría; si era recurrente, los que se generaron y los que faltan generar |
@@ -421,7 +420,7 @@ la tabla es una pasada que no pasó.
 |---|---|---|---|
 | Cierres de caja — carga | ✅ verificado 2026-11-03 | 6 (cerró en la 6) | 2, 5, 9, 11 |
 | Proveedores | ✅ verificado 2026-11-04 — **sin hallazgos** | 6 | — |
-| Importación de Fudo | ⏳ parcial — faltan lentes 3 y 6 | 4 | 4, 7 |
+| Vender en el mostrador | ⏳ parcial — faltan lentes 3 y 6 | 4 | 4, 7 |
 | Gastos | ⬜ pendiente | — | — |
 
 ## Registro de criterios

@@ -53,8 +53,8 @@ escriben antes que la migración y se los ve fallar.
 - **Local en cada tabla operativa**, con índice, y las policies filtran por él. Es una
   decisión interna: no se menciona en ningún texto para el cliente.
 - **Índices** en lo que se busca y filtra: fechas, producto, proveedor, anulación, local.
-- **Duplicados frenados por la base:** una restricción única impide subir dos veces el mismo
-  período de Fudo o cargar dos cierres del mismo turno.
+- **Duplicados frenados por la base:** una restricción única impide guardar dos veces la misma
+  venta (su clave de carga) o cargar dos cierres del mismo día.
 
 ## Permisos: son DOS capas
 
@@ -117,8 +117,7 @@ propósito, decilo. Cada tabla nueva trae su test (`tests-rls`).
 Lo que tiene que pasar entero o no pasar va en una función `security definer` con
 `set search_path = public` y `raise exception ... using errcode = 'Pxxxx'`:
 
-- importar un reporte de Fudo (todas sus ventas o ninguna);
-- anular una importación (revierte ventas, stock y caja esperada en una transacción);
+- guardar una venta del mostrador (la venta, sus renglones y sus pagos, o nada);
 - recibir una compra (suma stock y actualiza el costo actual);
 - registrar producción (descuenta insumos y suma producto terminado).
 

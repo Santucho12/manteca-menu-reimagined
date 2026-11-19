@@ -6,7 +6,12 @@ import {
   sembrarProveedor,
 } from '../tests/proveedores-de-prueba';
 import { diaEnArgentina } from '../src/lib/fechas';
-import { borrarGastos, sembrarGasto, sembrarRecurrente } from '../tests/gastos-de-prueba';
+import {
+  borrarGastos,
+  sembrarGasto,
+  sembrarPorPagar,
+  sembrarRecurrente,
+} from '../tests/gastos-de-prueba';
 import { SESIONES } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
@@ -14,10 +19,12 @@ test.use({ storageState: SESIONES.admin });
 let nombres: string[] = [];
 let gastos: string[] = [];
 let recurrentes: string[] = [];
+let porPagar: string[] = [];
 test.afterEach(async () => {
-  await borrarGastos({ gastos, recurrentes });
+  await borrarGastos({ gastos, recurrentes, porPagar });
   gastos = [];
   recurrentes = [];
+  porPagar = [];
   await borrarProveedores(await idsDeProveedoresLlamados(nombres));
   nombres = [];
 });
@@ -175,3 +182,14 @@ for (const rol of ['caja', 'invitado'] as const) {
     });
   });
 }
+
+test('lo por pagar se ve en la lista, en la ficha y al desactivar', async ({ page }) => {
+  const proveedor = await sembrarProveedor({ nombre: nuevoNombre() });
+  porPagar.push((await sembrarPorPagar({ proveedorId: proveedor.id })).id);
+  await page.goto(`/admin/proveedores?q=${encodeURIComponent(proveedor.nombre)}`);
+  await expect(page.getByText('Por pagar').first()).toBeVisible();
+  await expect(page.getByText('$8.000,00').first()).toBeVisible();
+  await page.goto(`/admin/proveedores/${proveedor.id}`);
+  await expect(page.getByText('Por pagar: $8.000,00')).toBeVisible();
+  await expect(page.getByText('Tiene $8.000,00 por pagar.')).toBeVisible();
+});

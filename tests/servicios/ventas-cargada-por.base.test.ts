@@ -28,6 +28,7 @@ const filtros = {
   hasta: HOY,
   origen: null,
   medio: null,
+  tipo: null,
   estado: null,
   pagina: 1,
 } as const;

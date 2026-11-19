@@ -23,7 +23,6 @@ describe('ayudas', () => {
       'pagos vencidos',
       'No abrió',
       'en pesos',
-      'Excel de Fudo',
       'barra de avance',
       'Ventas:',
       'Gastos:',
@@ -53,6 +52,7 @@ describe('ayudas', () => {
         'mismo nombre',
         'gastos fijos',
         'Observaciones',
+        'Por pagar',
       ],
     ],
     [
@@ -81,6 +81,8 @@ describe('ayudas', () => {
         'Efectivo de la caja',
         'monto, la fecha ni el medio',
         '12.345,50',
+        'Cargar igual',
+        'fuera de la caja',
       ],
     ],
     [
@@ -100,13 +102,15 @@ describe('ayudas', () => {
     [
       'ventas',
       [
-        'todavía no está conectado',
-        'cancelado',
+        'Mostrador',
+        'Vender',
+        'tipo de venta',
         'Tipos de venta',
         'precio del menú',
-        'efectivo',
+        'Se cobró en la caja del local',
         'motivo',
         'futuro',
+        'lo que no se cobró en el mostrador',
       ],
     ],
     ['canales', ['Cheaf', 'Encargo', 'Venta a comercios', 'desactivado']],
@@ -118,7 +122,7 @@ describe('ayudas', () => {
         'a ciegas',
         'Retiros',
         'Sin clasificar',
-        'un cierre por día',
+        'un cierre por turno',
         'día anterior',
         'Avisale a un administrador',
         'Mis cierres',
@@ -153,7 +157,6 @@ describe('ayudas', () => {
         'foto',
         'Ocultar',
         'Desactivar',
-        'Fudo',
         'al guardar',
       ],
     ],
@@ -178,7 +181,7 @@ describe('ayudas', () => {
         'mismos días del mes anterior',
         'mismo largo',
         'Comparar',
-        'Sin vincular',
+        'Ventas por tipo de venta',
         'Balance',
         'por mes',
         'Inicio',
@@ -226,6 +229,30 @@ describe('ayudas', () => {
     expect(caja).not.toContain('tocá Editar');
   });
 
+  it('la ayuda de Vender cuenta cómo se arma el ticket y cómo se cobra', () => {
+    const ayuda = AYUDAS.vender;
+    const texto = [ayuda.introduccion, ...ayuda.temas.flatMap((t) => t.puntos)].join(' ');
+    for (const parte of ['Tocá', 'dos medios', 'vuelto', 'precio del menú', 'a ciegas', 'admin']) {
+      expect(texto).toContain(parte);
+    }
+  });
+
+  it('Vender, Caja y el control cuentan los turnos y la traba del cierre (pedido 98)', () => {
+    const texto = (clave: 'vender' | 'caja' | 'control') =>
+      AYUDAS[clave].temas.flatMap((t) => t.puntos).join(' ');
+    expect(texto('vender')).toContain('Postergar 10 min');
+    expect(texto('caja')).toContain('un cierre por turno');
+    expect(texto('caja')).not.toContain('un cierre por día');
+    expect(texto('control')).toContain('Horas de cierre');
+  });
+
+  it('ninguna ayuda habla de Fudo: Manteca lo dejó (pedido 89)', () => {
+    for (const ayuda of Object.values(AYUDAS)) {
+      const texto = [ayuda.introduccion, ...ayuda.temas.flatMap((t) => [t.titulo, ...t.puntos])];
+      expect(texto.join(' ')).not.toContain('Fudo');
+    }
+  });
+
   it('Reportes no ofrece atajos que la pantalla no tiene', () => {
     const texto = AYUDAS.reportes.temas.flatMap((t) => t.puntos).join(' ');
     expect(texto).not.toContain('esta semana');
@@ -238,6 +265,7 @@ describe('ayudas', () => {
       'proveedores',
       'gastos',
       'fijos',
+      'vender',
       'ventas',
       'canales',
       'caja',

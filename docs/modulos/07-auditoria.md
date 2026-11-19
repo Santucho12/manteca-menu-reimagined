@@ -29,9 +29,9 @@ De cada registro se guarda:
 | Antes y después | En un cambio, el valor anterior y el nuevo de lo que cambió |
 | Motivo | En una anulación |
 
-La subida del Excel de Fudo es la excepción a "cada alta": deja un solo registro con el
-resumen, no uno por cada venta y cada pago (pedido 84). Se lee "Ventas · Ventas de Fudo" con
-el período, la acción "Subida del Excel", y lleva a Ventas filtrada por ese período.
+Mientras existió, la subida del Excel de Fudo fue la excepción a "cada alta": dejaba un solo
+registro con el resumen (pedido 84). Se sacó en el pedido 89; los registros de subidas que haya
+siguen leyéndose como "Ventas · Ventas de Fudo", con el período y la acción "Subida del Excel".
 
 El detalle de qué registra cada módulo está en su propio archivo de `docs/modulos/`.
 
@@ -64,7 +64,6 @@ entrar a Auditoría. La historia completa de ese dato se ve en Auditoría, filtr
 
 - Un aumento masivo de precios genera un registro por cada precio cambiado, además del
   registro del aumento.
-- Una sincronización con Fudo genera un solo registro con el resumen, no uno por venta.
 - Un cambio que no modifica ningún valor no genera registro.
 
 ## Fuera de alcance

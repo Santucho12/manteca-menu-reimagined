@@ -1,3 +1,4 @@
+import { formatearPesos } from '../plata';
 import { numeroDePagina, unValor } from '../usuarios/presentacion';
 import type { FilaDeProveedor, FiltrosDeProveedores } from './consultas';
 
@@ -28,14 +29,25 @@ export function enlaceDeProveedores({ busqueda, desactivados, pagina }: FiltrosD
   return texto ? `/admin/proveedores?${texto}` : '/admin/proveedores';
 }
 
-export type FilaConPagado = FilaDeProveedor & { pagadoCentavos: number };
+export type FilaConPagado = FilaDeProveedor & { pagadoCentavos: number; porPagarCentavos: number };
 
-/** Cada proveedor con lo pagado en el mes; sin gastos en el mes, cero. */
+/** Cada proveedor con lo pagado en el mes y lo que se le debe; sin nada, cero. */
 export function filasConPagado(
   filas: FilaDeProveedor[],
   pagado: Map<string, number>,
+  porPagar: Map<string, number> = new Map(),
 ): FilaConPagado[] {
-  return filas.map((fila) => ({ ...fila, pagadoCentavos: pagado.get(fila.id) ?? 0 }));
+  return filas.map((fila) => ({
+    ...fila,
+    pagadoCentavos: pagado.get(fila.id) ?? 0,
+    porPagarCentavos: porPagar.get(fila.id) ?? 0,
+  }));
+}
+
+/** Desactivar no cancela lo que se le debe: el aviso lo dice antes. */
+export function textoDePorPagar(centavos: number): string | null {
+  if (centavos === 0) return null;
+  return `Tiene ${formatearPesos(centavos)} por pagar. Si lo desactivás, sigue en Próximos pagos hasta que lo pagues.`;
 }
 
 /** Que dice la lista vacia, segun por que esta vacia. */

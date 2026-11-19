@@ -1,16 +1,23 @@
-import { Wallet } from 'lucide-react';
+import { Store, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { EncabezadoDePantalla } from './EncabezadoDePantalla';
 import { EntradaDePantalla } from './Entradas';
-import { BOTON_DE_ENCABEZADO } from './estilos';
+import { BOTON_DE_ENCABEZADO, BOTON_DE_ENCABEZADO_NEUTRO } from './estilos';
 
-/** Caja entra directo a lo unico que hace aca: cargar el cierre. */
+/** Caja entra a lo que hace aca: vender en el mostrador y cargar el cierre (pedido 89). */
 export function InicioCaja({ nombre }: { nombre: string }) {
   return (
     <>
-      <EncabezadoDePantalla titulo={`Hola, ${nombre}`} subtitulo="Cargá el cierre de tu turno." />
-      <EntradaDePantalla>
-        <Link href="/admin/caja" className={`${BOTON_DE_ENCABEZADO} w-fit`}>
+      <EncabezadoDePantalla
+        titulo={`Hola, ${nombre}`}
+        subtitulo="Vendé en el mostrador y, al final del turno, cargá el cierre."
+      />
+      <EntradaDePantalla className="flex flex-wrap gap-3">
+        <Link href="/admin/vender" className={`${BOTON_DE_ENCABEZADO} w-fit`}>
+          <Store size={18} />
+          Vender
+        </Link>
+        <Link href="/admin/caja" className={`${BOTON_DE_ENCABEZADO_NEUTRO} w-fit`}>
           <Wallet size={18} />
           Cargar el cierre de caja
         </Link>

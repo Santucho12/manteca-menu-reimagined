@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   categoriasDelReporte,
+  parteDelTotal,
   productosDelReporte,
   puntosDeVentas,
-  SIN_DETALLE,
   ticketPromedio,
+  tiposDelReporte,
   totalesDeVentas,
 } from './ventas';
 
@@ -84,43 +85,22 @@ describe('ventas del reporte', () => {
   });
 });
 
-describe('las ventas sin detalle de productos', () => {
-  const vinculado = {
-    producto_id: 'p1',
-    producto: 'Medialuna',
-    categoria_id: 'c1',
-    categoria: 'Facturas',
-    presentacion: 'Unidad',
-    cantidad: 2,
-    monto_centavos: 5000,
-  };
-  const suelto = { ...vinculado, producto_id: null, producto: 'Agua', monto_centavos: 900 };
-  const sinDetalle = { ventas: 3, monto_centavos: 150000 };
-
-  it('van en una fila al final, despues de Sin vincular, aunque sumen mas', () => {
-    const filas = productosDelReporte([vinculado, suelto], sinDetalle);
-    expect(filas.map((f) => f.clave)).toEqual(['p1', 'sin-vincular', SIN_DETALLE]);
-    expect(filas.at(-1)).toMatchObject({
-      nombre: 'Sin detalle de productos (Excel de Fudo)',
-      montoCentavos: 150000,
-    });
+describe('las ventas por tipo', () => {
+  it('una fila por tipo con sus ventas y su monto; sin tipo, las viejas de Fudo', () => {
+    expect(
+      tiposDelReporte([
+        { canal_id: 'local', tipo: 'Local', ventas: 40, monto_centavos: 900000 },
+        { canal_id: null, tipo: 'Sin tipo', ventas: 2, monto_centavos: 100000 },
+      ]),
+    ).toEqual([
+      { clave: 'local', nombre: 'Local', ventas: 40, montoCentavos: 900000 },
+      { clave: 'sin-tipo', nombre: 'Sin tipo', ventas: 2, montoCentavos: 100000 },
+    ]);
   });
 
-  it('sin ventas sin detalle no hay fila', () => {
-    const filas = productosDelReporte([vinculado], { ventas: 0, monto_centavos: 0 });
-    expect(filas.map((f) => f.clave)).toEqual(['p1']);
-  });
-
-  it('en categorias van al final con la cantidad de ventas', () => {
-    const filas = categoriasDelReporte(
-      [{ categoria_id: 'c1', categoria: 'Facturas', ventas: 1, monto_centavos: 5000 }],
-      sinDetalle,
-    );
-    expect(filas.at(-1)).toEqual({
-      clave: SIN_DETALLE,
-      nombre: 'Sin detalle de productos (Excel de Fudo)',
-      ventas: 3,
-      montoCentavos: 150000,
-    });
+  it('la parte del total va en por ciento redondeado; sin total no hay parte', () => {
+    expect(parteDelTotal(900000, 1000000)).toBe(90);
+    expect(parteDelTotal(1, 3)).toBe(33);
+    expect(parteDelTotal(0, 0)).toBeNull();
   });
 });

@@ -18,7 +18,7 @@ function aplicacionDe({ datos, cambios }: Vista): DatosDeAplicarAumento {
 }
 
 function despuesDeAplicar(resultado: Resultado<{ cantidad: number }>, vista: Vista): Estado {
-  if (!resultado.ok) return { vista, mensaje: resultado.mensaje, listo: null };
+  if (!resultado.ok) return { ...VACIO, vista, mensaje: resultado.mensaje };
   return { ...VACIO, listo: `Listo: se actualizaron ${resultado.datos.cantidad} precios.` };
 }
 

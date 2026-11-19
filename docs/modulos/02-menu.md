@@ -41,8 +41,10 @@ La categoría define sus **presentaciones**: las formas en que se vende lo que t
 Cada producto tiene nombre, descripción, etiqueta opcional, orden dentro de su categoría y
 la casilla "se muestra en el menú". No tiene foto propia: la foto es de la categoría.
 
-Todos los productos viven en una sola lista. Los que se venden en Fudo pero no van en el
-menú (una botella de agua) existen igual, con la casilla sin marcar.
+Todos los productos viven en una sola lista. Los que se venden en el mostrador pero no van en
+el menú (una botella de agua) existen igual, con la casilla sin marcar. Vender (ver
+`05-ventas.md`) ofrece todos los productos activos con precio, se muestren o no en la carta, al
+precio que dice el menú (pedido 89).
 
 ### Precios
 
@@ -98,6 +100,8 @@ a mano. "Más vendido" reemplaza a la etiqueta "Popular" de la página actual.
 - Pide un porcentaje, que puede ser negativo.
 - Pide el redondeo: a $10, $50, $100 o $500, al más cercano. Viene marcado $100.
 - Antes de aplicar muestra la lista con el precio actual y el nuevo de cada uno.
+- Lo que sumó el pedido 86 para Fudo (la lista "Pasalos a Fudo" y el aviso de que los precios
+  no cambiaban allá) se sacó en el pedido 89: los precios del menú son los que cobra Vender.
 - Se aplica recién al confirmar. No tiene "deshacer": un error se corrige con otro cambio.
 
 ## Reglas
@@ -168,12 +172,6 @@ El texto de la foto ya está en `PROPUESTA.md` (2026-10-08).
 | Etiquetas | Lista fija: Más vendido, Artesanal, Nuevo |
 | Qué se edita de la página | Solo categorías y productos |
 | Productos fuera del menú | Una sola lista, con la casilla "se muestra en el menú" |
-
-## Sin decidir
-
-| Qué | De qué depende |
-|---|---|
-| Cómo se vinculan las facturas con Fudo | De si Fudo vende "docena de facturas" o cada factura por separado. Se ve con el archivo real, al definir Ventas |
 
 ## Parte técnica
 

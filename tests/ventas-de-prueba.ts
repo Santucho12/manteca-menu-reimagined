@@ -82,7 +82,12 @@ export function datosDeVenta(
 }
 
 /** Una venta escrita sin la funcion de guardar: sirve para simular una de Fudo o de otro local. */
-type SemillaDeVenta = { origen?: 'manual' | 'fudo'; otroLocal?: boolean; fecha?: string };
+type SemillaDeVenta = {
+  origen?: 'manual' | 'fudo' | 'mostrador';
+  otroLocal?: boolean;
+  fecha?: string;
+  canalId?: string;
+};
 
 async function filaDeVenta(semilla: SemillaDeVenta) {
   const secreto = clienteSecretoDePruebas();
@@ -95,6 +100,7 @@ async function filaDeVenta(semilla: SemillaDeVenta) {
     fudo_id: origen === 'fudo' ? randomUUID() : null,
     fecha: semilla.fecha ?? '2026-10-05',
     total_centavos: 100000,
+    canal_id: semilla.canalId ?? null,
   };
 }
 
@@ -161,6 +167,15 @@ export async function borrarVentas(
   await borrarMenuDePrueba(extras.categoriasDelMenu ?? []);
 }
 
+/** Las ventas que llevan ese producto: las del mostrador no tienen comentario para buscarlas. */
+export async function idsDeVentasDelProducto(productoId: string): Promise<string[]> {
+  const { data } = await clienteSecretoDePruebas()
+    .from('renglones_de_venta')
+    .select('venta_id')
+    .eq('producto_id', productoId);
+  return [...new Set((data ?? []).map((renglon) => renglon.venta_id))];
+}
+
 /** Las ventas cargadas por pantalla con ese comentario. */
 export async function idsDeVentasComentadas(comentario: string): Promise<string[]> {
   const { data } = await clienteSecretoDePruebas()
@@ -186,6 +201,8 @@ type VentaConPago = {
   estado?: 'cerrada' | 'cancelada';
   anulada?: boolean;
   otroLocal?: boolean;
+  /** 1 es el Mediodia y 2 la Noche (por defecto, la Noche). */
+  turno?: 1 | 2;
 };
 
 async function localDe(otroLocal: boolean | undefined) {
@@ -202,6 +219,7 @@ function filaDeVentaConPago(semilla: VentaConPago, local: string) {
     total_centavos: semilla.centavos,
     anulado: semilla.anulada ?? false,
     motivo_anulacion: semilla.anulada ? 'Prueba' : null,
+    turno: semilla.turno ?? 2,
   };
 }
 

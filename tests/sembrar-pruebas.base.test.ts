@@ -1,5 +1,8 @@
 import { execSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
+import { horasDeCierre } from './cierres-de-prueba';
+import { clienteSecretoDePruebas } from './clientes';
+import { idDelLocalPrincipal } from './locales';
 
 // Corre el comando de verdad, en otro proceso: arranca npm y tsx, por eso tarda.
 const ESPERA_MS = 60_000;
@@ -24,7 +27,30 @@ function avisoDeVariables(variables: Record<string, string>): string {
   return '';
 }
 
+async function horasDelLocalPrincipal() {
+  const secreto = clienteSecretoDePruebas();
+  const { data } = await secreto
+    .from('configuracion_de_caja')
+    .select('hora_cierre_mediodia, hora_cierre_noche')
+    .eq('local_id', await idDelLocalPrincipal(secreto))
+    .single();
+  return data;
+}
+
 describe('comando sembrar:pruebas', () => {
+  it(
+    'deja las horas de cierre tan tarde que las pruebas que venden hoy no se traban',
+    async () => {
+      await horasDeCierre('16:00', '23:00');
+      correr();
+      expect(await horasDelLocalPrincipal()).toEqual({
+        hora_cierre_mediodia: '23:58:00',
+        hora_cierre_noche: '23:59:00',
+      });
+    },
+    ESPERA_MS,
+  );
+
   it(
     'avisa que las cuentas ya estaban cuando no falta ninguna',
     () => {

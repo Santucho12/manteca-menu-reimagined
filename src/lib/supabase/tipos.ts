@@ -171,6 +171,7 @@ export type Database = {
       canales_de_venta: {
         Row: {
           activo: boolean
+          de_sistema: boolean
           fecha_actualizacion: string
           fecha_creacion: string
           id: string
@@ -179,6 +180,7 @@ export type Database = {
         }
         Insert: {
           activo?: boolean
+          de_sistema?: boolean
           fecha_actualizacion?: string
           fecha_creacion?: string
           id?: string
@@ -187,6 +189,7 @@ export type Database = {
         }
         Update: {
           activo?: boolean
+          de_sistema?: boolean
           fecha_actualizacion?: string
           fecha_creacion?: string
           id?: string
@@ -314,6 +317,7 @@ export type Database = {
           qr_centavos: number
           queda_en_caja_centavos: number
           transferencia_centavos: number
+          turno: number
         }
         Insert: {
           anulado?: boolean
@@ -334,6 +338,7 @@ export type Database = {
           qr_centavos?: number
           queda_en_caja_centavos: number
           transferencia_centavos?: number
+          turno?: number
         }
         Update: {
           anulado?: boolean
@@ -354,6 +359,7 @@ export type Database = {
           qr_centavos?: number
           queda_en_caja_centavos?: number
           transferencia_centavos?: number
+          turno?: number
         }
         Relationships: [
           {
@@ -383,6 +389,8 @@ export type Database = {
         Row: {
           fecha_actualizacion: string
           fecha_creacion: string
+          hora_cierre_mediodia: string
+          hora_cierre_noche: string
           id: string
           local_id: string
           tolerancia_centavos: number
@@ -390,6 +398,8 @@ export type Database = {
         Insert: {
           fecha_actualizacion?: string
           fecha_creacion?: string
+          hora_cierre_mediodia?: string
+          hora_cierre_noche?: string
           id?: string
           local_id: string
           tolerancia_centavos?: number
@@ -397,6 +407,8 @@ export type Database = {
         Update: {
           fecha_actualizacion?: string
           fecha_creacion?: string
+          hora_cierre_mediodia?: string
+          hora_cierre_noche?: string
           id?: string
           local_id?: string
           tolerancia_centavos?: number
@@ -952,6 +964,42 @@ export type Database = {
           },
         ]
       }
+      postergaciones_de_cierre: {
+        Row: {
+          desde: string
+          fecha: string
+          fecha_actualizacion: string
+          fecha_creacion: string
+          hasta: string
+          id: string
+          local_id: string
+          postergado_por: string
+          turno: number
+        }
+        Insert: {
+          desde: string
+          fecha: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          hasta: string
+          id?: string
+          local_id?: string
+          postergado_por?: string
+          turno: number
+        }
+        Update: {
+          desde?: string
+          fecha?: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          hasta?: string
+          id?: string
+          local_id?: string
+          postergado_por?: string
+          turno?: number
+        }
+        Relationships: []
+      }
       presentaciones: {
         Row: {
           activo: boolean
@@ -1250,6 +1298,7 @@ export type Database = {
           clave: string | null
           comentario: string | null
           creado_por: string | null
+          en_la_caja: boolean
           estado: Database["public"]["Enums"]["estado_de_venta"]
           fecha: string
           fecha_actualizacion: string
@@ -1261,6 +1310,7 @@ export type Database = {
           motivo_anulacion: string | null
           origen: Database["public"]["Enums"]["origen_de_venta"]
           total_centavos: number
+          turno: number
         }
         Insert: {
           anulado?: boolean
@@ -1270,6 +1320,7 @@ export type Database = {
           clave?: string | null
           comentario?: string | null
           creado_por?: string | null
+          en_la_caja?: boolean
           estado?: Database["public"]["Enums"]["estado_de_venta"]
           fecha: string
           fecha_actualizacion?: string
@@ -1281,6 +1332,7 @@ export type Database = {
           motivo_anulacion?: string | null
           origen?: Database["public"]["Enums"]["origen_de_venta"]
           total_centavos: number
+          turno?: number
         }
         Update: {
           anulado?: boolean
@@ -1290,6 +1342,7 @@ export type Database = {
           clave?: string | null
           comentario?: string | null
           creado_por?: string | null
+          en_la_caja?: boolean
           estado?: Database["public"]["Enums"]["estado_de_venta"]
           fecha?: string
           fecha_actualizacion?: string
@@ -1301,6 +1354,7 @@ export type Database = {
           motivo_anulacion?: string | null
           origen?: Database["public"]["Enums"]["origen_de_venta"]
           total_centavos?: number
+          turno?: number
         }
         Relationships: [
           {
@@ -1355,6 +1409,47 @@ export type Database = {
       }
     }
     Functions: {
+      caja_estado_del_mostrador: {
+        Args: never
+        Returns: {
+          fecha: string
+          fecha_trabada: string
+          hora_de_corte: string
+          motivo: string
+          postergado_hasta: string
+          proxima_hora: string
+          trabado: boolean
+          turno: number
+          turno_trabado: number
+        }[]
+      }
+      caja_estado_del_turno: {
+        Args: { momento: string }
+        Returns: {
+          fecha: string
+          fecha_trabada: string
+          hora_de_corte: string
+          motivo: string
+          postergado_hasta: string
+          proxima_hora: string
+          trabado: boolean
+          turno: number
+          turno_trabado: number
+        }[]
+      }
+      caja_postergar_cierre: { Args: never; Returns: string }
+      catalogo_para_vender: {
+        Args: never
+        Returns: {
+          categoria: string
+          categoria_id: string
+          precio_centavos: number
+          presentacion: string
+          presentacion_id: string
+          producto: string
+          producto_id: string
+        }[]
+      }
       cierres_con_resultado: {
         Args: { desde: string; hasta: string; persona?: string }
         Returns: {
@@ -1375,7 +1470,7 @@ export type Database = {
           retiros_centavos: number
           tolerancia_centavos: number
           transferencia_centavos: number
-          ventas_cargadas: boolean
+          turno: number
           ventas_credito_centavos: number
           ventas_debito_centavos: number
           ventas_efectivo_centavos: number
@@ -1388,8 +1483,14 @@ export type Database = {
         Returns: undefined
       }
       cierres_exigir_quien_carga: { Args: never; Returns: undefined }
-      cierres_fecha_del_fondo: { Args: { la_fecha: string }; Returns: string }
-      cierres_fondo_sugerido: { Args: { la_fecha: string }; Returns: number }
+      cierres_fecha_del_fondo: {
+        Args: { el_turno?: number; la_fecha: string }
+        Returns: string
+      }
+      cierres_fondo_sugerido: {
+        Args: { el_turno?: number; la_fecha: string }
+        Returns: number
+      }
       cierres_fondos_anteriores: {
         Args: { ids: string[] }
         Returns: {
@@ -1472,6 +1573,10 @@ export type Database = {
       menu_escribir_precios_del_producto: {
         Args: { el_local: string; el_producto: string; lista: Json }
         Returns: undefined
+      }
+      cierres_turnos_pendientes: {
+        Args: { desde: string; hasta: string; momento?: string }
+        Returns: { fecha: string; turno: number }[]
       }
       menu_escribir_presentaciones: {
         Args: { el_local: string; la_categoria: string; lista: Json }
@@ -1567,10 +1672,12 @@ export type Database = {
           ventas: number
         }[]
       }
-      reporte_ventas_sin_detalle: {
+      reporte_ventas_por_tipo: {
         Args: { desde: string; hasta: string }
         Returns: {
+          canal_id: string
           monto_centavos: number
+          tipo: string
           ventas: number
         }[]
       }
@@ -1604,26 +1711,13 @@ export type Database = {
         Args: { cuenta: string; tipos: string[] }
         Returns: Record<string, unknown>
       }
-      ventas_aplicar_lote: {
-        Args: { el_local: string; lote: Json }
-        Returns: number[]
-      }
       ventas_borrar_canal: { Args: { el_canal: string }; Returns: undefined }
-      ventas_crear_del_excel: {
-        Args: {
-          el_local: string
-          el_medio: Database["public"]["Enums"]["medio_de_caja"]
-          el_monto: number
-          la_fecha: string
-        }
-        Returns: undefined
-      }
-      ventas_fudo_cargadas_hasta: { Args: never; Returns: string }
       ventas_guardar_manual: { Args: { datos: Json }; Returns: string }
-      ventas_importar_excel: { Args: { lotes: Json }; Returns: Json }
+      ventas_guardar_mostrador: { Args: { datos: Json }; Returns: Json }
       ventas_totales: {
         Args: {
           desde: string
+          el_canal?: string
           el_medio?: string
           el_origen?: string
           hasta: string
@@ -1637,7 +1731,6 @@ export type Database = {
           cobrado_centavos: number
         }[]
       }
-      ventas_validar_excel: { Args: { lotes: Json }; Returns: undefined }
       ventas_validar_manual: {
         Args: { datos: Json; el_local: string }
         Returns: undefined
@@ -1655,7 +1748,7 @@ export type Database = {
         | "tarjeta"
         | "cheque"
         | "otro"
-      origen_de_venta: "manual" | "fudo"
+      origen_de_venta: "manual" | "fudo" | "mostrador"
       rol_usuario: "invitado" | "caja" | "encargado" | "admin"
     }
     CompositeTypes: {
@@ -1796,7 +1889,7 @@ export const Constants = {
         "cheque",
         "otro",
       ],
-      origen_de_venta: ["manual", "fudo"],
+      origen_de_venta: ["manual", "fudo", "mostrador"],
       rol_usuario: ["invitado", "caja", "encargado", "admin"],
     },
   },

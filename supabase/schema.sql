@@ -1,5 +1,5 @@
 -- Esquema completo de la base del Sistema Manteca, al dia con la ultima migracion
--- (20261028200000_gastos_efectivo_y_cheque). Se actualiza en el mismo cambio que cada
+-- (20261119130100_traba_del_cierre). Se actualiza en el mismo cambio que cada
 -- migracion.
 
 -- Tipos
@@ -3959,3 +3959,1060 @@ create trigger desmarcar_sin_abrir after insert on public.cierres_de_caja
 revoke all on function public.cierres_marcar_sin_abrir(date, boolean) from public, anon;
 grant execute on function public.cierres_marcar_sin_abrir(date, boolean) to authenticated;
 revoke all on function public.cierres_desmarcar_sin_abrir() from public, anon, authenticated;
+
+-- Pedido 89: Manteca deja Fudo y vende en el mostrador. Una venta puede venir del mostrador.
+-- Va en su propia migracion: un valor nuevo de un enum no se usa en la transaccion que lo agrega.
+alter type public.origen_de_venta add value if not exists 'mostrador';
+
+-- Pedido 89: vender en el mostrador, sin Fudo. Caja y el admin guardan cada venta al cobrar, con
+-- los precios del menu que calcula la base; lo esperado de la caja suma solo lo cobrado en la
+-- caja del local; Local es el tipo de venta del mostrador; y salen la subida del Excel de Fudo y
+-- la espera de los cierres.
+
+-- 1. Si la venta se cobro en la caja del local. Las que ya estaban contaban en lo esperado y
+--    siguen contando; nadie inserta directo, asi que el valor por defecto solo lo usan las
+--    siembras de prueba. Las funciones de guardar lo dicen siempre.
+alter table public.ventas add column if not exists en_la_caja boolean not null default true;
+
+-- 2. Local: el tipo de venta del mostrador, uno por local y del sistema.
+alter table public.canales_de_venta
+  add column if not exists de_sistema boolean not null default false;
+
+insert into public.canales_de_venta (local_id, nombre, activo, de_sistema)
+select l.id, 'Local', true, true from public.locales l
+on conflict (local_id, lower(nombre)) do update set de_sistema = true, activo = true;
+
+create or replace function public.crear_tipo_de_venta_local()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  insert into public.canales_de_venta (local_id, nombre, activo, de_sistema)
+  values (new.id, 'Local', true, true)
+  on conflict (local_id, lower(nombre)) do update set de_sistema = true, activo = true;
+  return new;
+end
+$$;
+
+drop trigger if exists tipo_de_venta_local on public.locales;
+create trigger tipo_de_venta_local after insert on public.locales
+  for each row execute function public.crear_tipo_de_venta_local();
+
+-- Local no se renombra ni se desactiva: el mostrador vende siempre con ese tipo.
+create or replace function public.reglas_de_canales()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if old.de_sistema
+     and (new.nombre is distinct from old.nombre or not new.activo or not new.de_sistema) then
+    raise exception 'Local es el tipo de venta del mostrador' using errcode = 'PV312';
+  end if;
+  return new;
+end
+$$;
+
+drop trigger if exists reglas on public.canales_de_venta;
+create trigger reglas before update on public.canales_de_venta
+  for each row execute function public.reglas_de_canales();
+
+create or replace function public.ventas_borrar_canal(el_canal uuid)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  el_local uuid := public.local_del_usuario();
+  el_borrado public.canales_de_venta;
+begin
+  if not public.es_admin_activo() then
+    raise exception 'No tenes permiso para borrar canales' using errcode = '42501';
+  end if;
+  select * into el_borrado from public.canales_de_venta c
+   where c.id = el_canal and c.local_id = el_local;
+  if not found then
+    raise exception 'Ese canal no esta disponible' using errcode = 'PV303';
+  end if;
+  if el_borrado.de_sistema then
+    raise exception 'Local es el tipo de venta del mostrador' using errcode = 'PV312';
+  end if;
+  if exists (select 1 from public.ventas v where v.canal_id = el_canal) then
+    raise exception 'Ese canal ya tiene ventas: se desactiva, no se borra' using errcode = 'PV309';
+  end if;
+  delete from public.canales_de_venta where id = el_canal;
+  insert into public.auditoria (local_id, usuario_id, tabla, registro_id, accion, antes)
+  values (el_local, (select auth.uid()), 'canales_de_venta', el_canal::text, 'baja', to_jsonb(el_borrado));
+end
+$$;
+
+-- 3. Lo que se vende en el mostrador: cada producto activo, en cada forma de venta activa de su
+--    categoria, con el precio que rige (el propio o el de la categoria). Se muestre o no en la
+--    carta. Lo leen Caja y el admin; Caja no ve las tablas del menu.
+create or replace function public.catalogo_para_vender()
+returns table (
+  categoria_id uuid, categoria text, producto_id uuid, producto text,
+  presentacion_id uuid, presentacion text, precio_centavos bigint
+)
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+begin
+  if not (public.es_caja_activa() or public.es_admin_activo()) then
+    raise exception 'No tenes permiso para vender' using errcode = '42501';
+  end if;
+  return query
+  select c.id, c.nombre, p.id, p.nombre, pre.id, pre.nombre,
+         coalesce(propio.monto_centavos, comun.monto_centavos)
+    from public.categorias c
+    join public.productos p on p.categoria_id = c.id and p.activo
+    join public.presentaciones pre on pre.categoria_id = c.id and pre.activo
+    left join public.precios propio
+      on propio.presentacion_id = pre.id and propio.producto_id = p.id and propio.activo
+    left join public.precios comun
+      on comun.presentacion_id = pre.id and comun.producto_id is null and comun.activo
+   where c.local_id = public.local_del_usuario() and c.activo
+     and coalesce(propio.monto_centavos, comun.monto_centavos) is not null
+   order by c.orden, c.id, p.orden, p.id, pre.orden, pre.id;
+end
+$$;
+
+-- 4. Guardar una venta del mostrador. La base vuelve a calcular cada precio con el menu: si el
+--    que vio quien vende ya no es el que rige, la venta no se guarda.
+create or replace function public.ventas_renglones_del_mostrador(el_local uuid, datos jsonb)
+returns table (
+  producto_id uuid, presentacion_id uuid, descripcion text, cantidad numeric,
+  precio_centavos bigint, mandado_centavos bigint
+)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select p.id, pre.id, p.nombre || ' · ' || pre.nombre, (r ->> 'cantidad')::numeric,
+         coalesce(propio.monto_centavos, comun.monto_centavos), (r ->> 'precio_centavos')::bigint
+    from jsonb_array_elements(datos -> 'renglones') r
+    join public.productos p
+      on p.id = (r ->> 'producto_id')::uuid and p.local_id = el_local and p.activo
+    join public.categorias c on c.id = p.categoria_id and c.activo
+    join public.presentaciones pre
+      on pre.id = (r ->> 'presentacion_id')::uuid and pre.categoria_id = p.categoria_id and pre.activo
+    left join public.precios propio
+      on propio.presentacion_id = pre.id and propio.producto_id = p.id and propio.activo
+    left join public.precios comun
+      on comun.presentacion_id = pre.id and comun.producto_id is null and comun.activo
+   where coalesce(propio.monto_centavos, comun.monto_centavos) is not null
+$$;
+
+-- Uno o dos medios distintos, de los cinco del cierre, cada uno de mas de $0, que suman el total.
+create or replace function public.ventas_validar_pagos_del_mostrador(datos jsonb, el_total bigint)
+returns void
+language plpgsql
+stable
+set search_path = ''
+as $$
+declare
+  pagos jsonb := coalesce(datos -> 'pagos', '[]');
+begin
+  if jsonb_array_length(pagos) not between 1 and 2
+     or (select count(distinct p ->> 'medio') from jsonb_array_elements(pagos) p)
+        <> jsonb_array_length(pagos)
+     or exists (select 1 from jsonb_array_elements(pagos) p
+                 where not coalesce((p ->> 'medio') = any (enum_range(null::public.medio_de_caja)::text[]), false)
+                    or coalesce((p ->> 'monto_centavos')::bigint, 0) <= 0)
+     or (select sum((p ->> 'monto_centavos')::bigint) from jsonb_array_elements(pagos) p)
+        <> el_total then
+    raise exception 'Los pagos no suman el total' using errcode = 'PV311';
+  end if;
+end
+$$;
+
+-- Devuelve el total de la venta, calculado con los precios del menu.
+create or replace function public.ventas_validar_mostrador(el_local uuid, datos jsonb)
+returns bigint
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+declare
+  renglones jsonb := coalesce(datos -> 'renglones', '[]');
+  cambiado text;
+  el_total bigint;
+begin
+  if jsonb_array_length(renglones) = 0 then
+    raise exception 'La venta no tiene productos' using errcode = 'PV302';
+  end if;
+  if exists (select 1 from jsonb_array_elements(renglones) r
+              where (r ->> 'cantidad')::numeric < 1
+                 or (r ->> 'cantidad')::numeric <> trunc((r ->> 'cantidad')::numeric)) then
+    raise exception 'La cantidad es un entero desde 1' using errcode = 'PV313';
+  end if;
+  if (select count(*) from public.ventas_renglones_del_mostrador(el_local, datos))
+     <> jsonb_array_length(renglones) then
+    raise exception 'Ese producto no esta disponible' using errcode = 'PV304';
+  end if;
+  select r.descripcion into cambiado from public.ventas_renglones_del_mostrador(el_local, datos) r
+   where r.precio_centavos <> r.mandado_centavos limit 1;
+  if cambiado is not null then
+    raise exception 'Cambio el precio de %', cambiado using errcode = 'PV310';
+  end if;
+  select sum(r.cantidad * r.precio_centavos)::bigint into el_total
+    from public.ventas_renglones_del_mostrador(el_local, datos) r;
+  perform public.ventas_validar_pagos_del_mostrador(datos, el_total);
+  return el_total;
+end
+$$;
+
+create or replace function public.ventas_guardar_mostrador(datos jsonb)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  el_local uuid := public.local_del_usuario();
+  la_clave uuid := (datos ->> 'clave')::uuid;
+  el_total bigint;
+  nueva uuid;
+begin
+  if not (public.es_caja_activa() or public.es_admin_activo()) then
+    raise exception 'No tenes permiso para vender' using errcode = '42501';
+  end if;
+  -- La misma clave otra vez (un toque repetido, un reintento sin conexion): la que ya estaba.
+  select v.id, v.total_centavos into nueva, el_total
+    from public.ventas v where v.local_id = el_local and v.clave = la_clave;
+  if nueva is not null then
+    return jsonb_build_object('id', nueva, 'total_centavos', el_total);
+  end if;
+  el_total := public.ventas_validar_mostrador(el_local, datos);
+  insert into public.ventas (local_id, origen, fecha, estado, total_centavos, canal_id, clave, en_la_caja)
+  values (el_local, 'mostrador', (now() at time zone 'America/Argentina/Buenos_Aires')::date,
+          'cerrada', el_total,
+          (select c.id from public.canales_de_venta c where c.local_id = el_local and c.de_sistema),
+          la_clave, true)
+  returning id into nueva;
+  insert into public.renglones_de_venta (local_id, venta_id, producto_id, presentacion_id, descripcion,
+                                         cantidad, precio_unitario_centavos, subtotal_centavos)
+  select el_local, nueva, r.producto_id, r.presentacion_id, r.descripcion, r.cantidad,
+         r.precio_centavos, (r.cantidad * r.precio_centavos)::bigint
+    from public.ventas_renglones_del_mostrador(el_local, datos) r;
+  insert into public.pagos_de_venta (local_id, venta_id, medio, monto_centavos)
+  select el_local, nueva, (p ->> 'medio')::public.medio_de_caja, (p ->> 'monto_centavos')::bigint
+    from jsonb_array_elements(datos -> 'pagos') p;
+  return jsonb_build_object('id', nueva, 'total_centavos', el_total);
+end
+$$;
+
+-- 5. La venta a mano dice si se cobro en la caja del local; sin decirlo, no.
+create or replace function public.ventas_guardar_manual(datos jsonb)
+returns uuid
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  el_local uuid := public.local_del_usuario();
+  la_clave uuid := (datos ->> 'clave')::uuid;
+  el_total bigint;
+  nueva uuid;
+begin
+  perform public.ventas_validar_manual(el_local, datos);
+  select v.id into nueva from public.ventas v where v.local_id = el_local and v.clave = la_clave;
+  if nueva is not null then
+    return nueva;
+  end if;
+  -- Cada subtotal se redondea a centavos; el total es la suma de los subtotales.
+  select coalesce(sum(round((r ->> 'cantidad')::numeric * (r ->> 'precio_unitario_centavos')::bigint)), 0)
+    into el_total
+    from jsonb_array_elements(datos -> 'renglones') r;
+  insert into public.ventas (local_id, origen, fecha, estado, total_centavos, canal_id, comentario, clave,
+                             en_la_caja)
+  values (el_local, 'manual', (datos ->> 'fecha')::date, 'cerrada', el_total,
+          (datos ->> 'canal_id')::uuid, nullif(trim(datos ->> 'comentario'), ''), la_clave,
+          coalesce((datos ->> 'en_la_caja')::boolean, false))
+  returning id into nueva;
+  insert into public.renglones_de_venta (local_id, venta_id, producto_id, presentacion_id, descripcion,
+                                         cantidad, precio_unitario_centavos, subtotal_centavos)
+  select el_local, nueva, p.id, pr.id, p.nombre || ' · ' || pr.nombre, (r ->> 'cantidad')::numeric,
+         (r ->> 'precio_unitario_centavos')::bigint,
+         round((r ->> 'cantidad')::numeric * (r ->> 'precio_unitario_centavos')::bigint)
+    from jsonb_array_elements(datos -> 'renglones') r
+    join public.productos p on p.id = (r ->> 'producto_id')::uuid
+    join public.presentaciones pr on pr.id = (r ->> 'presentacion_id')::uuid;
+  insert into public.pagos_de_venta (local_id, venta_id, medio, monto_centavos)
+  values (el_local, nueva, (datos ->> 'medio')::public.medio_de_caja, el_total);
+  return nueva;
+end
+$$;
+
+-- 6. Lo esperado de la caja suma solo lo cobrado en la caja del local, y ningun cierre espera
+--    las ventas: se cargan al cobrar. Cambia lo que devuelve: se borra y se vuelve a crear.
+drop function if exists public.cierres_con_resultado(date, date, uuid);
+create function public.cierres_con_resultado(desde date, hasta date, persona uuid default null)
+returns table (
+  id uuid, fecha date, cargado_por uuid, persona_nombre text, anulado boolean,
+  motivo_anulacion text, comentario text,
+  fondo_inicial_centavos bigint, efectivo_centavos bigint, credito_centavos bigint,
+  debito_centavos bigint, qr_centavos bigint, transferencia_centavos bigint,
+  queda_en_caja_centavos bigint, retiros_centavos bigint, gastos_centavos bigint,
+  ventas_efectivo_centavos bigint, ventas_credito_centavos bigint, ventas_debito_centavos bigint,
+  ventas_qr_centavos bigint, ventas_transferencia_centavos bigint, tolerancia_centavos bigint
+)
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+begin
+  perform public.cierres_exigir_quien_carga();
+  return query
+  select c.id, c.fecha, c.cargado_por, p.nombre, c.anulado, c.motivo_anulacion, c.comentario,
+    c.fondo_inicial_centavos, c.efectivo_centavos, c.credito_centavos, c.debito_centavos,
+    c.qr_centavos, c.transferencia_centavos, c.queda_en_caja_centavos,
+    coalesce((select sum(r.monto_centavos) from public.retiros_de_caja r where r.cierre_id = c.id), 0)::bigint,
+    coalesce((select sum(g.monto_centavos) from public.gastos g where g.cierre_id = c.id and not g.anulado), 0)::bigint,
+    coalesce(v.efectivo, 0)::bigint, coalesce(v.credito, 0)::bigint, coalesce(v.debito, 0)::bigint,
+    coalesce(v.qr, 0)::bigint, coalesce(v.transferencia, 0)::bigint,
+    coalesce((select k.tolerancia_centavos from public.configuracion_de_caja k where k.local_id = c.local_id), 50000)
+  from public.cierres_de_caja c
+  join public.perfiles p on p.id = c.cargado_por
+  left join lateral (
+    select sum(pv.monto_centavos) filter (where pv.medio = 'efectivo') as efectivo,
+           sum(pv.monto_centavos) filter (where pv.medio = 'credito') as credito,
+           sum(pv.monto_centavos) filter (where pv.medio = 'debito') as debito,
+           sum(pv.monto_centavos) filter (where pv.medio = 'qr') as qr,
+           sum(pv.monto_centavos) filter (where pv.medio = 'transferencia') as transferencia
+      from public.ventas ve
+      join public.pagos_de_venta pv on pv.venta_id = ve.id
+     where ve.local_id = c.local_id and ve.fecha = c.fecha and ve.estado = 'cerrada'
+       and not ve.anulado and ve.en_la_caja
+  ) v on true
+  where c.fecha between desde and hasta
+    and (persona is null or c.cargado_por = persona)
+    and ((public.es_admin_activo() and c.local_id = public.local_del_usuario())
+         or (c.cargado_por = (select auth.uid()) and public.es_caja_activa()))
+  order by c.fecha desc, c.fecha_creacion desc;
+end
+$$;
+
+-- 7. Sin Fudo: la subida del Excel, hasta cuando hay ventas y lo vendido sin detalle.
+drop function if exists public.ventas_importar_excel(jsonb);
+drop function if exists public.ventas_auditar_subida(uuid, jsonb, int[]);
+drop function if exists public.ventas_aplicar_lote(uuid, jsonb);
+drop function if exists public.ventas_crear_del_excel(uuid, date, public.medio_de_caja, bigint);
+drop function if exists public.ventas_validar_excel(jsonb);
+drop function if exists public.ventas_fudo_cargadas_hasta();
+drop function if exists public.reporte_ventas_sin_detalle(date, date);
+
+-- Permisos
+revoke all on function
+  public.crear_tipo_de_venta_local(),
+  public.reglas_de_canales(),
+  public.ventas_renglones_del_mostrador(uuid, jsonb),
+  public.ventas_validar_pagos_del_mostrador(jsonb, bigint),
+  public.ventas_validar_mostrador(uuid, jsonb)
+  from public, anon, authenticated;
+revoke all on function public.catalogo_para_vender() from public, anon;
+revoke all on function public.ventas_guardar_mostrador(jsonb) from public, anon;
+revoke all on function public.cierres_con_resultado(date, date, uuid) from public, anon;
+grant execute on function public.catalogo_para_vender() to authenticated;
+grant execute on function public.ventas_guardar_mostrador(jsonb) to authenticated;
+grant execute on function public.cierres_con_resultado(date, date, uuid) to authenticated;
+
+-- Pedido 90: ventas por tipo de venta. El reporte suma cada tipo, y los totales de la lista de
+-- Ventas siguen tambien al filtro por tipo.
+
+-- Lo cerrado y sin anular del periodo, por tipo; las ventas viejas de Fudo no tienen tipo.
+create or replace function public.reporte_ventas_por_tipo(desde date, hasta date)
+returns table (canal_id uuid, tipo text, ventas bigint, monto_centavos bigint)
+language plpgsql
+stable
+security invoker
+set search_path = ''
+as $$
+#variable_conflict use_column
+begin
+  perform public.reportes_exigir_admin();
+  return query
+    select c.id, coalesce(c.nombre, 'Sin tipo'), count(*)::bigint, sum(v.total_centavos)::bigint
+      from public.ventas v
+      left join public.canales_de_venta c on c.id = v.canal_id
+     where v.local_id = public.local_del_usuario() and v.estado = 'cerrada' and not v.anulado
+       and v.fecha between desde and hasta
+     group by c.id, c.nombre
+     order by 4 desc, 2, 1;
+end
+$$;
+
+-- Los totales de la lista suman tambien un tipo. Cambian los parametros: se borra y se vuelve a
+-- crear.
+drop function if exists public.ventas_totales(date, date, text, text);
+create function public.ventas_totales(
+  desde date, hasta date, el_origen text default null, el_medio text default null,
+  el_canal uuid default null
+)
+returns table (
+  cobrado_centavos bigint, cobradas bigint, cancelado_centavos bigint, canceladas bigint,
+  anulado_centavos bigint, anuladas bigint
+)
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  with del_periodo as (
+    select v.estado, v.anulado,
+           case when el_medio is null then v.total_centavos
+                else (select coalesce(sum(p.monto_centavos), 0) from public.pagos_de_venta p
+                       where p.venta_id = v.id and p.medio::text = el_medio) end as monto
+      from public.ventas v
+     where v.fecha between desde and hasta
+       and (el_origen is null or v.origen::text = el_origen)
+       and (el_canal is null or v.canal_id = el_canal)
+       and (el_medio is null or exists (select 1 from public.pagos_de_venta p
+                                         where p.venta_id = v.id and p.medio::text = el_medio))
+  )
+  select coalesce(sum(monto) filter (where estado = 'cerrada' and not anulado), 0)::bigint,
+         count(*) filter (where estado = 'cerrada' and not anulado),
+         coalesce(sum(monto) filter (where estado = 'cancelada' and not anulado), 0)::bigint,
+         count(*) filter (where estado = 'cancelada' and not anulado),
+         coalesce(sum(monto) filter (where anulado), 0)::bigint,
+         count(*) filter (where anulado)
+    from del_periodo
+$$;
+
+revoke all on function public.reporte_ventas_por_tipo(date, date) from public, anon;
+revoke all on function public.ventas_totales(date, date, text, text, uuid) from public, anon;
+grant execute on function public.reporte_ventas_por_tipo(date, date) to authenticated;
+grant execute on function public.ventas_totales(date, date, text, text, uuid) to authenticated;
+
+-- 20261119130000_cierres_por_turno
+
+-- Cierres por turno (pedido 98): dos cierres por dia, Mediodia (1) y Noche (2). Cada venta guarda
+-- su turno al cobrarse y cada cierre compara lo contado con lo cobrado en su turno. Lo que ya
+-- existe queda como Noche: un dia viejo sigue cerrando igual. La traba a la hora del cierre va
+-- en la migracion siguiente.
+
+-- 1. El turno de cada venta y de cada cierre, y las horas de cierre de cada turno.
+alter table public.ventas
+  add column if not exists turno smallint not null default 2 check (turno in (1, 2));
+alter table public.cierres_de_caja
+  add column if not exists turno smallint not null default 2 check (turno in (1, 2));
+alter table public.configuracion_de_caja
+  add column if not exists hora_cierre_mediodia time not null default '16:00',
+  add column if not exists hora_cierre_noche time not null default '23:00';
+alter table public.configuracion_de_caja drop constraint if exists configuracion_de_caja_horas;
+alter table public.configuracion_de_caja
+  add constraint configuracion_de_caja_horas check (hora_cierre_mediodia < hora_cierre_noche);
+
+-- 2. Un cierre sin anular por turno, en lugar de uno por dia.
+drop index if exists public.cierres_de_caja_un_dia;
+create unique index if not exists cierres_de_caja_un_turno
+  on public.cierres_de_caja (local_id, fecha, turno) where not anulado;
+
+-- 3. El turno al que va una venta del mostrador: el Mediodia, hasta que tenga cierre.
+create or replace function public.caja_turno_de_la_venta(el_local uuid, la_fecha date)
+returns smallint
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select case when exists (
+    select 1 from public.cierres_de_caja c
+     where c.local_id = el_local and c.fecha = la_fecha and c.turno = 1 and not c.anulado
+  ) then 2 else 1 end::smallint;
+$$;
+
+create or replace function public.ventas_guardar_mostrador(datos jsonb)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  el_local uuid := public.local_del_usuario();
+  la_clave uuid := (datos ->> 'clave')::uuid;
+  hoy date := (now() at time zone 'America/Argentina/Buenos_Aires')::date;
+  el_total bigint;
+  nueva uuid;
+begin
+  if not (public.es_caja_activa() or public.es_admin_activo()) then
+    raise exception 'No tenes permiso para vender' using errcode = '42501';
+  end if;
+  -- La misma clave otra vez (un toque repetido, un reintento sin conexion): la que ya estaba.
+  select v.id, v.total_centavos into nueva, el_total
+    from public.ventas v where v.local_id = el_local and v.clave = la_clave;
+  if nueva is not null then
+    return jsonb_build_object('id', nueva, 'total_centavos', el_total);
+  end if;
+  el_total := public.ventas_validar_mostrador(el_local, datos);
+  insert into public.ventas (local_id, origen, fecha, estado, total_centavos, canal_id, clave,
+                             en_la_caja, turno)
+  values (el_local, 'mostrador', hoy, 'cerrada', el_total,
+          (select c.id from public.canales_de_venta c where c.local_id = el_local and c.de_sistema),
+          la_clave, true, public.caja_turno_de_la_venta(el_local, hoy))
+  returning id into nueva;
+  insert into public.renglones_de_venta (local_id, venta_id, producto_id, presentacion_id, descripcion,
+                                         cantidad, precio_unitario_centavos, subtotal_centavos)
+  select el_local, nueva, r.producto_id, r.presentacion_id, r.descripcion, r.cantidad,
+         r.precio_centavos, (r.cantidad * r.precio_centavos)::bigint
+    from public.ventas_renglones_del_mostrador(el_local, datos) r;
+  insert into public.pagos_de_venta (local_id, venta_id, medio, monto_centavos)
+  select el_local, nueva, (p ->> 'medio')::public.medio_de_caja, (p ->> 'monto_centavos')::bigint
+    from jsonb_array_elements(datos -> 'pagos') p;
+  return jsonb_build_object('id', nueva, 'total_centavos', el_total);
+end
+$$;
+
+-- 4. La venta a mano guarda el turno que se eligio; sin elegirlo, la Noche.
+create or replace function public.ventas_guardar_manual(datos jsonb)
+returns uuid
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  el_local uuid := public.local_del_usuario();
+  la_clave uuid := (datos ->> 'clave')::uuid;
+  el_total bigint;
+  nueva uuid;
+begin
+  perform public.ventas_validar_manual(el_local, datos);
+  select v.id into nueva from public.ventas v where v.local_id = el_local and v.clave = la_clave;
+  if nueva is not null then
+    return nueva;
+  end if;
+  -- Cada subtotal se redondea a centavos; el total es la suma de los subtotales.
+  select coalesce(sum(round((r ->> 'cantidad')::numeric * (r ->> 'precio_unitario_centavos')::bigint)), 0)
+    into el_total
+    from jsonb_array_elements(datos -> 'renglones') r;
+  insert into public.ventas (local_id, origen, fecha, estado, total_centavos, canal_id, comentario, clave,
+                             en_la_caja, turno)
+  values (el_local, 'manual', (datos ->> 'fecha')::date, 'cerrada', el_total,
+          (datos ->> 'canal_id')::uuid, nullif(trim(datos ->> 'comentario'), ''), la_clave,
+          coalesce((datos ->> 'en_la_caja')::boolean, false),
+          coalesce((datos ->> 'turno')::smallint, 2))
+  returning id into nueva;
+  insert into public.renglones_de_venta (local_id, venta_id, producto_id, presentacion_id, descripcion,
+                                         cantidad, precio_unitario_centavos, subtotal_centavos)
+  select el_local, nueva, p.id, pr.id, p.nombre || ' · ' || pr.nombre, (r ->> 'cantidad')::numeric,
+         (r ->> 'precio_unitario_centavos')::bigint,
+         round((r ->> 'cantidad')::numeric * (r ->> 'precio_unitario_centavos')::bigint)
+    from jsonb_array_elements(datos -> 'renglones') r
+    join public.productos p on p.id = (r ->> 'producto_id')::uuid
+    join public.presentaciones pr on pr.id = (r ->> 'presentacion_id')::uuid;
+  insert into public.pagos_de_venta (local_id, venta_id, medio, monto_centavos)
+  values (el_local, nueva, (datos ->> 'medio')::public.medio_de_caja, el_total);
+  return nueva;
+end
+$$;
+
+-- 5. Guardar el cierre de un turno. La Noche de hoy espera al Mediodia si el Mediodia vendio.
+create or replace function public.cierres_insertar(el_local uuid, datos jsonb)
+returns uuid
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  nuevo uuid;
+begin
+  insert into public.cierres_de_caja (local_id, fecha, turno, cargado_por, fondo_inicial_centavos,
+    efectivo_centavos, credito_centavos, debito_centavos, qr_centavos, transferencia_centavos,
+    queda_en_caja_centavos, comentario)
+  values (el_local, (datos ->> 'fecha')::date, coalesce((datos ->> 'turno')::smallint, 2),
+    (select auth.uid()),
+    (datos ->> 'fondo_inicial_centavos')::bigint, (datos ->> 'efectivo_centavos')::bigint,
+    coalesce((datos ->> 'credito_centavos')::bigint, 0), coalesce((datos ->> 'debito_centavos')::bigint, 0),
+    coalesce((datos ->> 'qr_centavos')::bigint, 0), coalesce((datos ->> 'transferencia_centavos')::bigint, 0),
+    (datos ->> 'queda_en_caja_centavos')::bigint, nullif(trim(datos ->> 'comentario'), ''))
+  returning id into nuevo;
+  return nuevo;
+exception
+  when unique_violation then
+    raise exception 'Ya hay un cierre de ese turno' using errcode = 'PC302';
+end
+$$;
+
+create or replace function public.caja_mediodia_sin_cerrar(el_local uuid, la_fecha date)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1 from public.ventas v
+     where v.local_id = el_local and v.fecha = la_fecha and v.turno = 1 and v.en_la_caja
+       and v.estado = 'cerrada' and not v.anulado
+  ) and not exists (
+    select 1 from public.cierres_de_caja c
+     where c.local_id = el_local and c.fecha = la_fecha and c.turno = 1 and not c.anulado
+  );
+$$;
+
+create or replace function public.cierres_guardar(datos jsonb)
+returns uuid
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  el_local uuid := public.local_del_usuario();
+  la_fecha date := (datos ->> 'fecha')::date;
+  hoy date := (now() at time zone 'America/Argentina/Buenos_Aires')::date;
+  nuevo uuid;
+begin
+  perform public.cierres_exigir_quien_carga();
+  if la_fecha > hoy then
+    raise exception 'No se carga el cierre de un dia que no llego' using errcode = 'PC301';
+  end if;
+  if la_fecha = hoy and coalesce((datos ->> 'turno')::smallint, 2) = 2
+     and public.caja_mediodia_sin_cerrar(el_local, hoy) then
+    raise exception 'Primero va el cierre del mediodia' using errcode = 'PC309';
+  end if;
+  nuevo := public.cierres_insertar(el_local, datos);
+  insert into public.retiros_de_caja (local_id, cierre_id, monto_centavos, quien)
+  select el_local, nuevo, (r ->> 'monto_centavos')::bigint, trim(r ->> 'quien')
+    from jsonb_array_elements(coalesce(datos -> 'retiros', '[]')) r;
+  insert into public.gastos (local_id, fecha, categoria_id, monto_centavos, descripcion,
+                             medio_de_pago, cierre_id)
+  select el_local, la_fecha, c.id, (g ->> 'monto_centavos')::bigint, trim(g ->> 'descripcion'),
+         'efectivo_caja', nuevo
+    from jsonb_array_elements(coalesce(datos -> 'gastos', '[]')) g
+   cross join public.categorias_de_gasto c
+   where c.local_id = el_local and c.de_sistema;
+  return nuevo;
+end
+$$;
+
+-- 6. El fondo sale del cierre anterior contando el turno: la Noche, del Mediodia del mismo dia.
+drop function if exists public.cierres_fondo_sugerido(date);
+create or replace function public.cierres_fondo_sugerido(la_fecha date, el_turno smallint default 2)
+returns bigint
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+begin
+  perform public.cierres_exigir_quien_carga();
+  return (select c.queda_en_caja_centavos from public.cierres_de_caja c
+           where c.local_id = public.local_del_usuario() and not c.anulado
+             and (c.fecha, c.turno) < (la_fecha, el_turno)
+           order by c.fecha desc, c.turno desc limit 1);
+end
+$$;
+
+drop function if exists public.cierres_fecha_del_fondo(date);
+create or replace function public.cierres_fecha_del_fondo(la_fecha date, el_turno smallint default 2)
+returns date
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+begin
+  perform public.cierres_exigir_quien_carga();
+  return (select c.fecha from public.cierres_de_caja c
+           where c.local_id = public.local_del_usuario() and not c.anulado
+             and (c.fecha, c.turno) < (la_fecha, el_turno)
+           order by c.fecha desc, c.turno desc limit 1);
+end
+$$;
+
+create or replace function public.cierres_fondos_anteriores(ids uuid[])
+returns table (id uuid, fondo_anterior_centavos bigint)
+language plpgsql
+stable
+security invoker
+set search_path = ''
+as $$
+#variable_conflict use_column
+begin
+  if not public.es_admin_activo() then
+    raise exception 'No tenes permiso para ver los cierres' using errcode = '42501';
+  end if;
+  return query
+    select c.id,
+           (select a.queda_en_caja_centavos from public.cierres_de_caja a
+             where a.local_id = c.local_id and not a.anulado and (a.fecha, a.turno) < (c.fecha, c.turno)
+             order by a.fecha desc, a.turno desc limit 1)
+      from public.cierres_de_caja c
+     where c.id = any(ids);
+end
+$$;
+
+-- 7. Lo esperado de cada cierre: lo cobrado en la caja en su fecha y en su turno. Cambia lo que
+--    devuelve (suma el turno): se borra y se vuelve a crear.
+drop function if exists public.cierres_con_resultado(date, date, uuid);
+create function public.cierres_con_resultado(desde date, hasta date, persona uuid default null)
+returns table (
+  id uuid, fecha date, turno smallint, cargado_por uuid, persona_nombre text, anulado boolean,
+  motivo_anulacion text, comentario text,
+  fondo_inicial_centavos bigint, efectivo_centavos bigint, credito_centavos bigint,
+  debito_centavos bigint, qr_centavos bigint, transferencia_centavos bigint,
+  queda_en_caja_centavos bigint, retiros_centavos bigint, gastos_centavos bigint,
+  ventas_efectivo_centavos bigint, ventas_credito_centavos bigint, ventas_debito_centavos bigint,
+  ventas_qr_centavos bigint, ventas_transferencia_centavos bigint, tolerancia_centavos bigint
+)
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+begin
+  perform public.cierres_exigir_quien_carga();
+  return query
+  select c.id, c.fecha, c.turno, c.cargado_por, p.nombre, c.anulado, c.motivo_anulacion, c.comentario,
+    c.fondo_inicial_centavos, c.efectivo_centavos, c.credito_centavos, c.debito_centavos,
+    c.qr_centavos, c.transferencia_centavos, c.queda_en_caja_centavos,
+    coalesce((select sum(r.monto_centavos) from public.retiros_de_caja r where r.cierre_id = c.id), 0)::bigint,
+    coalesce((select sum(g.monto_centavos) from public.gastos g where g.cierre_id = c.id and not g.anulado), 0)::bigint,
+    coalesce(v.efectivo, 0)::bigint, coalesce(v.credito, 0)::bigint, coalesce(v.debito, 0)::bigint,
+    coalesce(v.qr, 0)::bigint, coalesce(v.transferencia, 0)::bigint,
+    coalesce((select k.tolerancia_centavos from public.configuracion_de_caja k where k.local_id = c.local_id), 50000)
+  from public.cierres_de_caja c
+  join public.perfiles p on p.id = c.cargado_por
+  left join lateral (
+    select sum(pv.monto_centavos) filter (where pv.medio = 'efectivo') as efectivo,
+           sum(pv.monto_centavos) filter (where pv.medio = 'credito') as credito,
+           sum(pv.monto_centavos) filter (where pv.medio = 'debito') as debito,
+           sum(pv.monto_centavos) filter (where pv.medio = 'qr') as qr,
+           sum(pv.monto_centavos) filter (where pv.medio = 'transferencia') as transferencia
+      from public.ventas ve
+      join public.pagos_de_venta pv on pv.venta_id = ve.id
+     where ve.local_id = c.local_id and ve.fecha = c.fecha and ve.turno = c.turno
+       and ve.estado = 'cerrada' and not ve.anulado and ve.en_la_caja
+  ) v on true
+  where c.fecha between desde and hasta
+    and (persona is null or c.cargado_por = persona)
+    and ((public.es_admin_activo() and c.local_id = public.local_del_usuario())
+         or (c.cargado_por = (select auth.uid()) and public.es_caja_activa()))
+  order by c.fecha desc, c.turno desc, c.fecha_creacion desc;
+end
+$$;
+
+-- Permisos
+revoke all on function
+  public.caja_turno_de_la_venta(uuid, date),
+  public.caja_mediodia_sin_cerrar(uuid, date)
+  from public, anon, authenticated;
+revoke all on function public.cierres_fondo_sugerido(date, smallint) from public, anon;
+revoke all on function public.cierres_fecha_del_fondo(date, smallint) from public, anon;
+revoke all on function public.cierres_con_resultado(date, date, uuid) from public, anon;
+grant execute on function public.cierres_fondo_sugerido(date, smallint) to authenticated;
+grant execute on function public.cierres_fecha_del_fondo(date, smallint) to authenticated;
+grant execute on function public.cierres_con_resultado(date, date, uuid) to authenticated;
+
+-- 20261119130100_traba_del_cierre
+
+-- La traba a la hora del cierre (pedido 98): pasada la hora de un turno con ventas y sin cierre,
+-- o con la caja de ayer sin cerrar, el mostrador no vende hasta cargar el cierre o postergarlo 10
+-- minutos. Despues del cierre de la noche no se vende hasta el dia siguiente. Suma los turnos
+-- pendientes para el control y deja que el admin cambie las horas de cierre.
+
+-- 1. Cada postergacion es una fila: no se cambia ni se borra.
+create table if not exists public.postergaciones_de_cierre (
+  id uuid primary key default gen_random_uuid(),
+  local_id uuid not null default public.local_del_usuario() references public.locales (id),
+  fecha date not null,
+  turno smallint not null check (turno in (1, 2)),
+  postergado_por uuid not null references public.perfiles (id) default auth.uid(),
+  desde timestamptz not null,
+  hasta timestamptz not null check (hasta > desde),
+  fecha_creacion timestamptz not null default now(),
+  fecha_actualizacion timestamptz not null default now()
+);
+create index if not exists postergaciones_de_cierre_turno
+  on public.postergaciones_de_cierre (local_id, fecha, turno, hasta desc);
+
+drop trigger if exists auditar on public.postergaciones_de_cierre;
+create trigger auditar after insert on public.postergaciones_de_cierre
+  for each row execute function public.auditar();
+
+alter table public.postergaciones_de_cierre enable row level security;
+revoke all on table public.postergaciones_de_cierre from anon, authenticated;
+grant select on table public.postergaciones_de_cierre to authenticated;
+
+drop policy if exists "postergaciones: el admin activo ve las de su local" on public.postergaciones_de_cierre;
+create policy "postergaciones: el admin activo ve las de su local" on public.postergaciones_de_cierre
+  for select to authenticated
+  using (public.es_admin_activo() and local_id = public.local_del_usuario());
+
+drop policy if exists "postergaciones: caja activa ve las suyas" on public.postergaciones_de_cierre;
+create policy "postergaciones: caja activa ve las suyas" on public.postergaciones_de_cierre
+  for select to authenticated
+  using (public.es_caja_activa() and postergado_por = (select auth.uid()));
+
+-- 2. Lo que se pregunta de un turno.
+create or replace function public.caja_turno_con_ventas(el_local uuid, la_fecha date, el_turno smallint)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1 from public.ventas v
+     where v.local_id = el_local and v.fecha = la_fecha and v.turno = el_turno and v.en_la_caja
+       and v.estado = 'cerrada' and not v.anulado
+  );
+$$;
+
+create or replace function public.caja_turno_con_cierre(el_local uuid, la_fecha date, el_turno smallint)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1 from public.cierres_de_caja c
+     where c.local_id = el_local and c.fecha = la_fecha and c.turno = el_turno and not c.anulado
+  );
+$$;
+
+create or replace function public.caja_dia_sin_abrir(el_local uuid, la_fecha date)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1 from public.dias_sin_abrir d
+     where d.local_id = el_local and d.fecha = la_fecha and d.activo
+  );
+$$;
+
+create or replace function public.caja_hora_del_turno(el_local uuid, el_turno smallint)
+returns time
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select case when el_turno = 1 then k.hora_cierre_mediodia else k.hora_cierre_noche end
+    from public.configuracion_de_caja k where k.local_id = el_local;
+$$;
+
+-- El turno de ayer que traba hoy: el ultimo con ventas, si no tiene cierre y ayer abrio.
+create or replace function public.caja_turno_de_ayer_sin_cerrar(el_local uuid, ayer date)
+returns smallint
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+declare
+  el_turno smallint;
+begin
+  if public.caja_dia_sin_abrir(el_local, ayer) then
+    return null;
+  end if;
+  el_turno := case when public.caja_turno_con_ventas(el_local, ayer, 2::smallint) then 2
+                   when public.caja_turno_con_ventas(el_local, ayer, 1::smallint) then 1 end;
+  if el_turno is null or public.caja_turno_con_cierre(el_local, ayer, el_turno) then
+    return null;
+  end if;
+  return el_turno;
+end
+$$;
+
+-- 3. El estado del mostrador en un momento: a que turno va una venta y si esta trabado. Sin
+--    montos: Caja lo lee y no ve lo vendido.
+create or replace function public.caja_estado_del_turno(momento timestamptz)
+returns table (
+  fecha date, turno smallint, trabado boolean, motivo text, fecha_trabada date,
+  turno_trabado smallint, postergado_hasta timestamptz, proxima_hora timestamptz,
+  hora_de_corte time
+)
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+declare
+  zona constant text := 'America/Argentina/Buenos_Aires';
+  el_local uuid := public.local_del_usuario();
+  hoy date := (momento at time zone zona)::date;
+  ahora time := (momento at time zone zona)::time;
+  el_turno smallint;
+  la_hora time;
+  de_ayer smallint;
+  el_motivo text;
+  la_fecha date;
+  el_trabado smallint;
+  hasta timestamptz;
+begin
+  if not (public.es_caja_activa() or public.es_admin_activo()) then
+    raise exception 'No tenes permiso para vender' using errcode = '42501';
+  end if;
+  el_turno := case
+    when public.caja_turno_con_cierre(el_local, hoy, 1::smallint) then 2
+    when ahora >= public.caja_hora_del_turno(el_local, 1::smallint)
+         and not public.caja_turno_con_ventas(el_local, hoy, 1::smallint) then 2
+    else 1 end;
+  la_hora := public.caja_hora_del_turno(el_local, el_turno);
+  de_ayer := public.caja_turno_de_ayer_sin_cerrar(el_local, hoy - 1);
+  if de_ayer is not null then
+    el_motivo := 'ayer'; la_fecha := hoy - 1; el_trabado := de_ayer;
+  elsif public.caja_turno_con_cierre(el_local, hoy, 2::smallint) then
+    el_motivo := 'cerrada'; la_fecha := hoy; el_trabado := 2;
+  elsif ahora >= la_hora and public.caja_turno_con_ventas(el_local, hoy, el_turno) then
+    el_motivo := 'hora'; la_fecha := hoy; el_trabado := el_turno;
+  end if;
+  select max(p.hasta) into hasta from public.postergaciones_de_cierre p
+   where p.local_id = el_local and p.fecha = la_fecha and p.turno = el_trabado and p.hasta > momento;
+  return query select hoy, el_turno,
+    el_motivo is not null and (el_motivo = 'cerrada' or hasta is null),
+    el_motivo, la_fecha, el_trabado, hasta,
+    case when ahora < la_hora then (hoy + la_hora) at time zone zona end,
+    la_hora;
+end
+$$;
+
+create or replace function public.caja_estado_del_mostrador()
+returns table (
+  fecha date, turno smallint, trabado boolean, motivo text, fecha_trabada date,
+  turno_trabado smallint, postergado_hasta timestamptz, proxima_hora timestamptz,
+  hora_de_corte time
+)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select * from public.caja_estado_del_turno(now());
+$$;
+
+-- 4. Postergar 10 minutos desde ahora, sin pasar del fin del dia.
+create or replace function public.caja_postergar_cierre()
+returns timestamptz
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  zona constant text := 'America/Argentina/Buenos_Aires';
+  e record;
+  fin_del_dia timestamptz;
+  el_hasta timestamptz;
+begin
+  select * into e from public.caja_estado_del_turno(now());
+  if e.motivo is null or e.motivo = 'cerrada' then
+    raise exception 'No hay ningun cierre para postergar' using errcode = 'PC310';
+  end if;
+  fin_del_dia := ((e.fecha + 1)::timestamp at time zone zona) - interval '1 second';
+  el_hasta := least(now() + interval '10 minutes', fin_del_dia);
+  insert into public.postergaciones_de_cierre (local_id, fecha, turno, desde, hasta)
+  values (public.local_del_usuario(), e.fecha_trabada, e.turno_trabado, now(), el_hasta);
+  return el_hasta;
+end
+$$;
+
+-- 5. El mostrador vende solo sin traba, y la venta va al turno del estado.
+create or replace function public.ventas_guardar_mostrador(datos jsonb)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  el_local uuid := public.local_del_usuario();
+  la_clave uuid := (datos ->> 'clave')::uuid;
+  e record;
+  el_total bigint;
+  nueva uuid;
+begin
+  if not (public.es_caja_activa() or public.es_admin_activo()) then
+    raise exception 'No tenes permiso para vender' using errcode = '42501';
+  end if;
+  -- La misma clave otra vez (un toque repetido, un reintento sin conexion): la que ya estaba.
+  select v.id, v.total_centavos into nueva, el_total
+    from public.ventas v where v.local_id = el_local and v.clave = la_clave;
+  if nueva is not null then
+    return jsonb_build_object('id', nueva, 'total_centavos', el_total);
+  end if;
+  select * into e from public.caja_estado_del_turno(now());
+  if e.motivo = 'cerrada' then
+    raise exception 'La caja de hoy ya cerro' using errcode = 'PV315';
+  elsif e.trabado then
+    raise exception 'Es hora del cierre de caja' using errcode = 'PV314';
+  end if;
+  el_total := public.ventas_validar_mostrador(el_local, datos);
+  insert into public.ventas (local_id, origen, fecha, estado, total_centavos, canal_id, clave,
+                             en_la_caja, turno)
+  values (el_local, 'mostrador', e.fecha, 'cerrada', el_total,
+          (select c.id from public.canales_de_venta c where c.local_id = el_local and c.de_sistema),
+          la_clave, true, e.turno)
+  returning id into nueva;
+  insert into public.renglones_de_venta (local_id, venta_id, producto_id, presentacion_id, descripcion,
+                                         cantidad, precio_unitario_centavos, subtotal_centavos)
+  select el_local, nueva, r.producto_id, r.presentacion_id, r.descripcion, r.cantidad,
+         r.precio_centavos, (r.cantidad * r.precio_centavos)::bigint
+    from public.ventas_renglones_del_mostrador(el_local, datos) r;
+  insert into public.pagos_de_venta (local_id, venta_id, medio, monto_centavos)
+  select el_local, nueva, (p ->> 'medio')::public.medio_de_caja, (p ->> 'monto_centavos')::bigint
+    from jsonb_array_elements(datos -> 'pagos') p;
+  return jsonb_build_object('id', nueva, 'total_centavos', el_total);
+end
+$$;
+
+-- 6. Los turnos pendientes: con ventas en la caja, sin cierre, de un dia que abrio y con la
+--    hora ya pasada. Solo el admin.
+create or replace function public.cierres_turnos_pendientes(desde date, hasta date,
+                                                            momento timestamptz default now())
+returns table (fecha date, turno smallint)
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+declare
+  zona constant text := 'America/Argentina/Buenos_Aires';
+  el_local uuid := public.local_del_usuario();
+begin
+  if not public.es_admin_activo() then
+    raise exception 'No tenes permiso para ver los cierres' using errcode = '42501';
+  end if;
+  return query
+  select distinct v.fecha, v.turno
+    from public.ventas v
+   where v.local_id = el_local and v.fecha between desde and hasta and v.en_la_caja
+     and v.estado = 'cerrada' and not v.anulado
+     and not public.caja_turno_con_cierre(el_local, v.fecha, v.turno)
+     and not public.caja_dia_sin_abrir(el_local, v.fecha)
+     and (v.fecha + public.caja_hora_del_turno(el_local, v.turno)) at time zone zona <= momento
+   order by v.fecha desc, v.turno desc;
+end
+$$;
+
+-- 7. El admin cambia las horas de cierre como la tolerancia: con su policy y con auditoria.
+grant update (hora_cierre_mediodia, hora_cierre_noche) on table public.configuracion_de_caja to authenticated;
+
+-- Permisos
+revoke all on function
+  public.caja_turno_con_ventas(uuid, date, smallint),
+  public.caja_turno_con_cierre(uuid, date, smallint),
+  public.caja_dia_sin_abrir(uuid, date),
+  public.caja_hora_del_turno(uuid, smallint),
+  public.caja_turno_de_ayer_sin_cerrar(uuid, date)
+  from public, anon, authenticated;
+revoke all on function public.caja_estado_del_turno(timestamptz) from public, anon;
+revoke all on function public.caja_estado_del_mostrador() from public, anon;
+revoke all on function public.caja_postergar_cierre() from public, anon;
+revoke all on function public.cierres_turnos_pendientes(date, date, timestamptz) from public, anon;
+grant execute on function public.caja_estado_del_turno(timestamptz) to authenticated;
+grant execute on function public.caja_estado_del_mostrador() to authenticated;
+grant execute on function public.caja_postergar_cierre() to authenticated;
+grant execute on function public.cierres_turnos_pendientes(date, date, timestamptz) to authenticated;

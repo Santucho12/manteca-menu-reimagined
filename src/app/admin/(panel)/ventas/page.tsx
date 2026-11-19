@@ -1,8 +1,6 @@
-import { VentasCargadasHasta } from '@/components/panel/VentasCargadasHasta';
-import { FileSpreadsheet, Plus, Store } from 'lucide-react';
+import { Plus, ShoppingCart, Store } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { FranjaDeAviso } from '@/components/panel/Avisos';
 import {
   ACCESO_SECUNDARIO,
   ACCESO_VERDE,
@@ -14,7 +12,7 @@ import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
 import { cantidadDePaginas } from '@/lib/usuarios/presentacion';
-import { listarVentas } from '@/lib/ventas/consultas';
+import { canalesDeVenta, listarVentas } from '@/lib/ventas/consultas';
 import { enlaceDeVentas, filtrosDeVentas, type ParametrosDeVentas } from '@/lib/ventas/pantalla';
 import { FiltrosDeVentas } from './FiltrosDeVentas';
 import { ListaDeVentas } from './ListaDeVentas';
@@ -25,17 +23,17 @@ export const metadata: Metadata = { title: 'Ventas' };
 function Accesos() {
   return (
     <>
+      <Link href="/admin/vender" className={ACCESO_VERDE}>
+        <span className={ICONO_DE_ACCESO_SOBRE_VERDE}>
+          <ShoppingCart size={15} aria-hidden="true" />
+        </span>
+        Vender
+      </Link>
       <Link href="/admin/ventas/nueva" className={ACCESO_SECUNDARIO}>
         <span className={ICONO_DE_ACCESO_SUAVE}>
           <Plus size={16} strokeWidth={2.6} aria-hidden="true" />
         </span>
         Cargar venta
-      </Link>
-      <Link href="/admin/ventas/subir" className={ACCESO_VERDE}>
-        <span className={ICONO_DE_ACCESO_SOBRE_VERDE}>
-          <FileSpreadsheet size={15} aria-hidden="true" />
-        </span>
-        Subir Excel de Fudo
       </Link>
       <Link href="/admin/ventas/canales" className={ACCESO_SECUNDARIO}>
         <span className={ICONO_DE_ACCESO_SUAVE}>
@@ -54,9 +52,10 @@ export default async function PaginaDeVentas({
 }) {
   const hoy = diaEnArgentina(new Date());
   const filtros = filtrosDeVentas(await searchParams, hoy);
-  const { datos: lista } = await exigirPaginaYLeer('admin', (cliente) =>
-    listarVentas(cliente, filtros),
+  const { datos } = await exigirPaginaYLeer('admin', (cliente) =>
+    Promise.all([listarVentas(cliente, filtros), canalesDeVenta(cliente)]),
   );
+  const [lista, tipos] = datos;
   return (
     <Pantalla
       titulo="Ventas"
@@ -64,14 +63,7 @@ export default async function PaginaDeVentas({
       acciones={<Accesos />}
       ayuda="ventas"
     >
-      <FranjaDeAviso>
-        <p>
-          Fudo todavía no está conectado: sus ventas entran subiendo el Excel de Fudo, y se ven
-          junto con las cargadas a mano.
-        </p>
-      </FranjaDeAviso>
-      <VentasCargadasHasta />
-      <FiltrosDeVentas filtros={filtros} />
+      <FiltrosDeVentas filtros={filtros} tipos={tipos} />
       <TarjetasDeVentas totales={lista.totales} />
       <ListaDeVentas filas={lista.filas} total={lista.total} />
       <Paginas

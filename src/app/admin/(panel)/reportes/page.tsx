@@ -5,6 +5,7 @@ import {
   Layers,
   PieChart,
   Receipt,
+  Store,
   TrendingUp,
   type LucideIcon,
 } from 'lucide-react';
@@ -21,6 +22,7 @@ const ICONOS: Record<string, LucideIcon> = {
   '/admin/reportes/ventas': TrendingUp,
   '/admin/reportes/productos': BarChart3,
   '/admin/reportes/categorias': Layers,
+  '/admin/reportes/tipos': Store,
   '/admin/reportes/gastos': PieChart,
   '/admin/reportes/gastos-por-periodo': CalendarDays,
   '/admin/reportes/caja': Banknote,

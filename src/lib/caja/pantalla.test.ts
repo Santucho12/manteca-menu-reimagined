@@ -61,18 +61,16 @@ describe('nombres', () => {
     expect(nombreDeEstado('pendiente')).toBe('Pendiente');
     expect(nombreDeEstado('cierra')).toBe('Cierra');
     expect(nombreDeEstado('con_diferencia')).toBe('Con diferencia');
-    expect(nombreDeEstado('esperando_ventas')).toBe('Esperando ventas');
     expect(nombreDeEstado('no_abrio')).toBe('No abrió');
     expect(nombreDeMedio('credito')).toBe('Tarjeta de crédito');
   });
 });
 
 describe('opcionesDeEstado', () => {
-  it('son cinco: cierra, con diferencia, esperando ventas, pendiente y no abrió', () => {
+  it('son cuatro: cierra, con diferencia, pendiente y no abrió (sin esperar ventas)', () => {
     expect(opcionesDeEstado().map((o) => o.valor)).toEqual([
       'cierra',
       'con_diferencia',
-      'esperando_ventas',
       'pendiente',
       'no_abrio',
     ]);
@@ -104,7 +102,6 @@ describe('tonoDelCierre', () => {
     [{ estado: 'cierra', anulado: false }, 'esmeralda'],
     [{ estado: 'con_diferencia', anulado: false }, 'rosa'],
     [{ estado: 'pendiente', anulado: false }, 'ambar'],
-    [{ estado: 'esperando_ventas', anulado: false }, 'ambar'],
     [{ estado: 'no_abrio', anulado: false }, 'pizarra'],
     [{ estado: 'cierra', anulado: true }, 'pizarra'],
   ] as const)('%j se pinta %s', (cierre, tono) => {

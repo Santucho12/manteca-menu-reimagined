@@ -56,13 +56,13 @@ describe('avisos del inicio', () => {
     expect(despues.desde! <= fecha).toBe(true);
   });
 
-  it('un cierre que espera las ventas no cuenta como con diferencia', async () => {
-    // Despues del ultimo dia con ventas de Fudo: el dia no tiene ventas cargadas.
+  it('un cierre de un dia sin ventas ya no espera: cuenta como con diferencia', async () => {
+    // Las ventas se cargan al cobrar (pedido 89): sin ventas, lo esperado es lo de la caja.
     const fecha = '2099-05-20';
     const antes = (await avisos(diaSiguiente(fecha))).conDiferencia.cantidad;
     cierres.push((await sembrarCierre({ fecha })).id);
     const despues = (await avisos(diaSiguiente(fecha))).conDiferencia.cantidad;
-    expect(despues).toBe(antes);
+    expect(despues).toBe(antes + 1);
   });
 
   it('cuenta los gastos sin clasificar, no los anulados', async () => {
@@ -76,21 +76,28 @@ describe('avisos del inicio', () => {
     expect(despues.desde! <= fecha).toBe(true);
   });
 
-  it('avisa si ayer no tiene cierre, y no si lo tiene', async () => {
+  async function ventaDeLaCaja(fecha: string, turno: 1 | 2) {
+    ventas.push(await sembrarVentaConPago({ fecha, turno, medio: 'qr', centavos: 1000 }));
+  }
+
+  it('avisa los turnos de ayer con ventas y sin cierre, y no los que tienen cierre', async () => {
     const fecha = diaLibre();
-    cierres.push((await sembrarCierre({ fecha })).id);
+    await ventaDeLaCaja(fecha, 1);
+    await ventaDeLaCaja(fecha, 2);
+    cierres.push((await sembrarCierre({ fecha, turno: 2 })).id);
+    expect((await avisos(diaSiguiente(fecha))).ayerSinCierre).toEqual({ fecha, turnos: [1] });
+    cierres.push((await sembrarCierre({ fecha, turno: 1 })).id);
     expect((await avisos(diaSiguiente(fecha))).ayerSinCierre).toBeNull();
-    expect((await avisos(diaSiguiente(fecha, 2))).ayerSinCierre).toBe(diaSiguiente(fecha));
   });
 
-  it('sin ningun cierre anterior, ayer no se avisa', async () => {
-    expect((await avisos('1990-01-02')).ayerSinCierre).toBeNull();
+  it('un día sin ventas no se avisa: el local no abrió', async () => {
+    expect((await avisos(diaSiguiente(diaLibre()))).ayerSinCierre).toBeNull();
   });
 
   it('si ayer esta marcado como que el local no abrio, no avisa', async () => {
     const fecha = diaLibre();
-    cierres.push((await sembrarCierre({ fecha })).id);
     const ayer = diaSiguiente(fecha);
+    await ventaDeLaCaja(ayer, 2);
     await sembrarDiaSinAbrir({ fecha: ayer });
     diasSinAbrir.push(ayer);
     expect((await avisos(diaSiguiente(fecha, 2))).ayerSinCierre).toBeNull();
@@ -138,17 +145,16 @@ describe('datos del inicio', () => {
     }
   });
 
-  it('aunque ayer no tenga ventas cargadas, avisa que falta el cierre', async () => {
+  // Desde el pedido 98 las ventas se cargan al cobrar: ayer sin ventas es que no abrió.
+  it('avisa qué turno de ayer falta, y no avisa si ayer no vendió', async () => {
     const fecha = diaLibre();
-    cierres.push((await sembrarCierre({ fecha })).id);
-    const datos = await datosDelInicio(await clienteComo('admin'), diaSiguiente(fecha, 2));
-    expect(datos.avisos.some((a) => a.texto.startsWith('Ayer no se cargó'))).toBe(true);
-  });
-
-  it('cuenta las ventas del mes que no tienen productos, las del Excel de Fudo', async () => {
     const admin = await clienteComo('admin');
-    const antes = (await datosDelInicio(admin, '2016-03-20')).sinDetalle;
-    ventas.push(await sembrarVentaConPago({ fecha: '2016-03-10', medio: 'qr', centavos: 100000 }));
-    expect((await datosDelInicio(admin, '2016-03-20')).sinDetalle).toBe(antes + 1);
+    const sinVentas = await datosDelInicio(admin, diaSiguiente(fecha));
+    expect(sinVentas.avisos.some((a) => a.texto.startsWith('Ayer quedó sin cargar'))).toBe(false);
+    ventas.push(await sembrarVentaConPago({ fecha, turno: 2, medio: 'qr', centavos: 1000 }));
+    const conVentas = await datosDelInicio(admin, diaSiguiente(fecha));
+    expect(conVentas.avisos.map((a) => a.texto)).toContain(
+      'Ayer quedó sin cargar el cierre de la noche.',
+    );
   });
 });

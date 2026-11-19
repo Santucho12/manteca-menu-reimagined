@@ -1,10 +1,10 @@
-import { diferenciaConocida, type FilaConVentas } from '../caja/resultadoDeFila';
+import { resultadoDeFila, type FilaConVentas } from '../caja/resultadoDeFila';
 import type { Cliente } from '../supabase/cliente';
 import type { CierreDelReporte } from './caja';
 import type { GastoDelDia } from './gastos';
 import type { Periodo } from './periodos';
 import { resultadoDelPeriodo } from './resultado';
-import type { RenglonDeProducto, SinDetalle, VentaDeCategoria, VentaDelDia } from './ventas';
+import type { RenglonDeProducto, VentaDeCategoria, VentaDeTipo, VentaDelDia } from './ventas';
 
 type Respuesta = { data: unknown; error: { message: string } | null };
 
@@ -33,6 +33,7 @@ type Reporte =
   | 'reporte_ventas_por_dia'
   | 'reporte_ventas_por_producto'
   | 'reporte_ventas_por_categoria'
+  | 'reporte_ventas_por_tipo'
   | 'reporte_gastos';
 
 const reporte = <T>(cliente: Cliente, funcion: Reporte, p: Periodo) =>
@@ -44,15 +45,17 @@ export const ventasPorProducto = (cliente: Cliente, p: Periodo) =>
   reporte<RenglonDeProducto>(cliente, 'reporte_ventas_por_producto', p);
 export const ventasPorCategoria = (cliente: Cliente, p: Periodo) =>
   reporte<VentaDeCategoria>(cliente, 'reporte_ventas_por_categoria', p);
-/** Lo vendido sin renglones (el Excel de Fudo no trae productos), para cerrar con el total. */
-export async function ventasSinDetalle(cliente: Cliente, p: Periodo): Promise<SinDetalle> {
-  const filas = leido<SinDetalle>(await cliente.rpc('reporte_ventas_sin_detalle', p));
-  return filas[0] ?? { ventas: 0, monto_centavos: 0 };
-}
+export const ventasPorTipo = (cliente: Cliente, p: Periodo) =>
+  reporte<VentaDeTipo>(cliente, 'reporte_ventas_por_tipo', p);
 export const gastosPorDia = (cliente: Cliente, p: Periodo) =>
   reporte<GastoDelDia>(cliente, 'reporte_gastos', p);
 
-type CierreLeido = FilaConVentas & { fecha: string; anulado: boolean; persona_nombre: string };
+type CierreLeido = FilaConVentas & {
+  fecha: string;
+  turno: number;
+  anulado: boolean;
+  persona_nombre: string;
+};
 
 function aCierre(c: CierreLeido): CierreDelReporte {
   const declaradoCentavos =
@@ -63,10 +66,10 @@ function aCierre(c: CierreLeido): CierreDelReporte {
     c.transferencia_centavos;
   return {
     fecha: c.fecha,
+    turno: c.turno === 1 ? 1 : 2,
     persona: c.persona_nombre,
     declaradoCentavos,
-    // Un cierre que espera las ventas no tiene diferencia todavia: no suma por empleado.
-    diferenciaCentavos: diferenciaConocida(c),
+    diferenciaCentavos: resultadoDeFila(c).diferenciaTotalCentavos,
   };
 }
 

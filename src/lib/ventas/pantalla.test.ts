@@ -18,17 +18,30 @@ describe('filtrosDeVentas', () => {
       hasta: '2026-10-31',
       origen: null,
       medio: null,
+      tipo: null,
       estado: null,
       pagina: 1,
     });
+  });
+
+  it('lee el tipo de venta solo si es un id', () => {
+    const tipo = '6f1c1e0a-2b1d-4c1e-9a6b-1f2e3d4c5b6a';
+    expect(filtrosDeVentas({ tipo }, HOY).tipo).toBe(tipo);
+    expect(filtrosDeVentas({ tipo: 'Local' }, HOY).tipo).toBeNull();
   });
 
   it('lee origen, medio y estado; ignora lo inventado', () => {
     expect(
       filtrosDeVentas({ origen: 'manual', medio: 'qr', estado: 'anulada' }, HOY),
     ).toMatchObject({ origen: 'manual', medio: 'qr', estado: 'anulada' });
+    expect(filtrosDeVentas({ origen: 'mostrador' }, HOY).origen).toBe('mostrador');
     const raro = filtrosDeVentas({ origen: 'web', medio: 'cheque', estado: 'borrada' }, HOY);
     expect([raro.origen, raro.medio, raro.estado]).toEqual([null, null, null]);
+  });
+
+  it('sin Fudo, ni su origen ni sus canceladas son un filtro', () => {
+    const viejo = filtrosDeVentas({ origen: 'fudo', estado: 'cancelada' }, HOY);
+    expect([viejo.origen, viejo.estado]).toEqual([null, null]);
   });
 });
 
@@ -36,12 +49,17 @@ describe('enlaceDeVentas', () => {
   it('solo con lo que cambio', () => {
     const filtros = { ...filtrosDeVentas({}, HOY), medio: 'efectivo' as const, pagina: 2 };
     expect(enlaceDeVentas(filtros, HOY)).toBe('/admin/ventas?medio=efectivo&pagina=2');
+    const tipo = '6f1c1e0a-2b1d-4c1e-9a6b-1f2e3d4c5b6a';
+    expect(enlaceDeVentas({ ...filtrosDeVentas({}, HOY), tipo }, HOY)).toBe(
+      `/admin/ventas?tipo=${tipo}`,
+    );
     expect(enlaceDeVentas(filtrosDeVentas({}, HOY), HOY)).toBe('/admin/ventas');
   });
 });
 
 describe('nombres', () => {
   it('del origen y del estado, con lo anulado primero', () => {
+    expect(nombreDeOrigen('mostrador')).toBe('Mostrador');
     expect(nombreDeOrigen('manual')).toBe('A mano');
     expect(nombreDeOrigen('fudo')).toBe('Fudo');
     expect(estadoDeVenta({ estado: 'cerrada', anulado: true })).toBe('Anulada');
@@ -69,16 +87,10 @@ describe('tarjetasDelResumen', () => {
     anuladas: 1,
   };
 
-  it('cuatro tarjetas: cobrado, ticket promedio, canceladas y anuladas', () => {
+  it('tres tarjetas: cobrado, ticket promedio y anuladas (las canceladas eran de Fudo)', () => {
     expect(tarjetasDelResumen(totales)).toEqual([
       { etiqueta: 'Cobrado', valor: '$6.000,00', detalle: '2 ventas' },
       { etiqueta: 'Ticket promedio', valor: '$3.000,00', detalle: 'por venta cobrada' },
-      {
-        etiqueta: 'Canceladas',
-        valor: '$1.000,00',
-        detalle: '1 venta',
-        ayuda: 'Pedidos cancelados en Fudo: no se cobraron.',
-      },
       {
         etiqueta: 'Anuladas',
         valor: '$3.000,00',

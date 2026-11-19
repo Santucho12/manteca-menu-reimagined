@@ -1,6 +1,6 @@
 import { sumarMeses } from '../gastos/vencimientos';
 import type { Periodo } from '../reportes/periodos';
-import { SIN_DETALLE, SIN_VINCULAR, type ProductoDelReporte } from '../reportes/ventas';
+import { SIN_VINCULAR, type ProductoDelReporte } from '../reportes/ventas';
 import { cantidadParaMostrar } from '../ventas/renglones';
 
 const primeroDelMes = (fecha: string) => `${fecha.slice(0, 8)}01`;
@@ -20,9 +20,9 @@ export const ultimosDoceMeses = (hoy: string): Periodo => ({
 export const mesesVisibles = <T>(meses: T[], ampliado: boolean): T[] =>
   ampliado ? meses : meses.slice(-4);
 
-/** Los 5 que mas plata dejaron; lo no vinculado y lo sin detalle no son productos y no entran. */
+/** Los 5 que mas plata dejaron; lo no vinculado no es un producto y no entra. */
 export const masVendidos = (productos: ProductoDelReporte[]) =>
-  productos.filter((p) => p.clave !== SIN_VINCULAR && p.clave !== SIN_DETALLE).slice(0, 5);
+  productos.filter((p) => p.clave !== SIN_VINCULAR).slice(0, 5);
 
 export const textoDePresentaciones = (producto: ProductoDelReporte) =>
   producto.presentaciones.map((p) => `${cantidadParaMostrar(p.cantidad)} ${p.nombre}`).join(' · ');

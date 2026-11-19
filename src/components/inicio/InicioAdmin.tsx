@@ -1,7 +1,6 @@
 import { BotonDeAyuda } from '@/components/panel/Ayuda';
 import { EncabezadoDePantalla } from '@/components/panel/EncabezadoDePantalla';
 import { EntradaDePantalla } from '@/components/panel/Entradas';
-import { VentasCargadasHasta } from '@/components/panel/VentasCargadasHasta';
 import type { datosDelInicio } from '@/lib/inicio/consultas';
 import { mesDeHoy } from '@/lib/inicio/meses';
 import { numerosDelMes } from '@/lib/inicio/numeros';
@@ -29,7 +28,6 @@ export function InicioAdmin({ datos, hoy }: { datos: DatosDelInicio; hoy: string
       />
       <EntradaDePantalla className="space-y-8">
         <section aria-label="Este mes" className="space-y-3">
-          <VentasCargadasHasta />
           <TarjetasDelMes items={numerosDelMes(datos.actual, datos.anterior)} />
         </section>
         <div className="grid grid-cols-1 xl:grid-cols-5 gap-8 xl:h-[24rem]">
@@ -45,7 +43,7 @@ export function InicioAdmin({ datos, hoy }: { datos: DatosDelInicio; hoy: string
             <MesAMes datos={datos.meses} mesEnCurso={mesDeHoy(hoy)} />
           </div>
           <div className="xl:col-span-2">
-            <MasVendidos productos={datos.masVendidos} sinDetalle={datos.sinDetalle} />
+            <MasVendidos productos={datos.masVendidos} />
           </div>
         </div>
         <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">

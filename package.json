@@ -15,7 +15,8 @@
     "test": "vitest run",
     "verificar": "npm run lint && npm run tipos && npm test && npm run build",
     "e2e": "playwright test",
-    "sembrar:pruebas": "tsx scripts/sembrar-pruebas.ts"
+    "sembrar:pruebas": "tsx scripts/sembrar-pruebas.ts",
+    "sembrar:ejemplos": "tsx scripts/sembrar-ejemplos.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "5.9.1",
@@ -32,7 +33,6 @@
     "react-day-picker": "10.0.2",
     "react-dom": "19.3.0",
     "react-hook-form": "7.89.0",
-    "read-excel-file": "9.3.13",
     "recharts": "3.10.1",
     "sonner": "1.7.4",
     "zod": "4.6.5"

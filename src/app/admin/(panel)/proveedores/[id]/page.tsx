@@ -11,7 +11,8 @@ import { Pantalla } from '@/components/panel/Pantalla';
 import { Dato, Datos, Seccion } from '@/components/panel/Seccion';
 import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
-import { recurrentesActivosDelProveedor } from '@/lib/gastos/proveedores';
+import { porPagarPorProveedor, recurrentesActivosDelProveedor } from '@/lib/gastos/proveedores';
+import { textoDePorPagar } from '@/lib/proveedores/pantalla';
 import { proveedorPorId, type Proveedor } from '@/lib/proveedores/consultas';
 import { telefonoParaMostrar, urlDeWhatsApp } from '@/lib/proveedores/telefono';
 import { BotonDeEstado } from '../BotonDeEstado';
@@ -75,10 +76,16 @@ function Acciones({ proveedor }: { proveedor: Proveedor }) {
 export default async function FichaDeProveedor({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { cliente, datos } = await exigirPaginaYLeer('admin', (cliente) =>
-    Promise.all([proveedorPorId(cliente, id), recurrentesActivosDelProveedor(cliente, id)]),
+    Promise.all([
+      proveedorPorId(cliente, id),
+      recurrentesActivosDelProveedor(cliente, id),
+      porPagarPorProveedor(cliente),
+    ]),
   );
-  const [proveedor, recurrentes] = datos;
+  const [proveedor, recurrentes, deudas] = datos;
   if (!proveedor) notFound();
+  const porPagarCentavos = deudas.get(id) ?? 0;
+  const avisoDePorPagar = proveedor.activo ? textoDePorPagar(porPagarCentavos) : null;
   return (
     <Pantalla
       titulo={proveedor.nombre}
@@ -95,8 +102,14 @@ export default async function FichaDeProveedor({ params }: { params: Promise<{ i
       <DatosDelProveedor proveedor={proveedor} />
       <BotonDeEstado id={proveedor.id} activo={proveedor.activo} />
       {proveedor.activo && recurrentes > 0 ? <AvisoDeRecurrentes cantidad={recurrentes} /> : null}
+      {avisoDePorPagar ? (
+        <FranjaDeAviso>
+          <p>{avisoDePorPagar}</p>
+        </FranjaDeAviso>
+      ) : null}
       <PagosDelProveedor
         cliente={cliente}
+        porPagarCentavos={porPagarCentavos}
         proveedorId={proveedor.id}
         hoy={diaEnArgentina(new Date())}
       />

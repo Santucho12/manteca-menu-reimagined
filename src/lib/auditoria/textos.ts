@@ -131,6 +131,7 @@ const RUTAS: Record<string, (registro: RegistroDeAuditoria) => string | null> = 
   },
   configuracion_de_caja: () => '/admin/caja/control',
   dias_sin_abrir: () => '/admin/caja/control?estado=no_abrio',
+  postergaciones_de_cierre: () => '/admin/caja/control',
   perfiles: () => '/admin/usuarios',
   productos: (r) => `/admin/menu/productos/${r.registro_id}`,
   precios: (r) => {

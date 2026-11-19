@@ -2,50 +2,77 @@ import type { Ayuda, ClaveDeAyuda } from './ayudasDeLaBase';
 
 /** Las ayudas de los modulos del negocio: ventas, caja y menu. */
 export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
+  vender: {
+    titulo: 'Cómo funciona Vender',
+    introduccion:
+      'Es el mostrador: cada venta se carga acá en el momento de cobrar, con los productos y los precios del menú.',
+    temas: [
+      {
+        titulo: 'Armar el ticket',
+        puntos: [
+          'Elegí la categoría y tocá cada forma de venta que lleva el cliente: Docena, Unidad, Grande. Tocá de nuevo para sumar otra.',
+          'Con − y + cambiás la cantidad de un renglón. Restar el último lo saca del ticket.',
+          'Cada producto va con el precio del menú, que acá no se cambia. Si cambió mientras armabas el ticket, la venta no se guarda y aparece el precio nuevo.',
+        ],
+      },
+      {
+        titulo: 'Cobrar',
+        puntos: [
+          'Elegí el medio: efectivo, débito, crédito, QR o transferencia.',
+          'Con Pagar con dos medios elegís el segundo y escribís cuánto va con el primero: el resto va con el segundo.',
+          'Con efectivo podés escribir con cuánto paga el cliente y la pantalla te muestra el vuelto.',
+          'Al cobrar queda guardada la venta, de hoy y cobrada en la caja, y el ticket queda vacío para la próxima.',
+        ],
+      },
+      {
+        titulo: 'Qué tenés que saber',
+        puntos: [
+          'Acá no ves lo vendido en el día: así contás la caja a ciegas al cerrar.',
+          'A la hora de cierre de cada turno, Vender se traba hasta que cargues el cierre. Si hay gente esperando, tocá Postergar 10 min: lo vendido mientras tanto queda en el turno que vas a cerrar. Podés postergar las veces que haga falta, y cada vez queda registrada.',
+          'Después del cierre de la noche no se vende hasta el día siguiente.',
+          'Si te equivocaste en una venta, avisale a un admin: él la anula con un motivo.',
+          'Si se corta internet, la venta no se guarda y el ticket queda como estaba. Si no vuelve, anotala y el admin la carga después.',
+        ],
+      },
+    ],
+  },
   ventas: {
     titulo: 'Cómo funciona Ventas',
     introduccion:
-      'Todo lo que se vendió, con su total: las ventas de Fudo y las que cargás a mano. Fudo todavía no está conectado: sus ventas entran subiendo el reporte de ventas de Fudo (Excel), que trae totales por día y medio de pago, sin productos.',
+      'Todo lo que se vendió, con su total: lo cobrado en el mostrador desde Vender y lo que cargás a mano.',
     temas: [
       {
         titulo: 'La lista',
         puntos: [
-          'Arranca en el mes de hoy, de a 25 por página. Filtrá por fechas, origen (Fudo o a mano), medio de pago y estado.',
-          'El total de arriba suma lo cobrado, sin lo cancelado ni lo anulado. Lo cancelado se muestra aparte, con cuánto fue.',
-          'Las tarjetas de arriba muestran lo cobrado, el ticket promedio, las canceladas y las anuladas del período filtrado.',
+          'Arranca en el mes de hoy, de a 25 por página. Filtrá por fechas, medio de pago, tipo de venta y estado: los totales de arriba siguen al filtro.',
+          'El origen dice si la venta se cobró en el Mostrador o la cargaste A mano, y quién la cargó.',
+          'El total de arriba suma lo cobrado, sin lo anulado.',
+          'Las tarjetas de arriba muestran lo cobrado, el ticket promedio y las anuladas del período filtrado.',
           'Con un medio de pago elegido, el total suma solo lo que se pagó con ese medio.',
           'Abrí una venta para ver sus productos, sus pagos y quién la cargó.',
         ],
       },
       {
-        titulo: 'Subir el Excel de Fudo',
+        titulo: 'Las del mostrador',
         puntos: [
-          'Con Subir Excel de Fudo elegís el reporte de ventas que bajás de Fudo. Antes de guardar ves una vista previa de lo que va a entrar.',
-          'Cada día y medio de pago entra como tantas ventas como diga el Excel, sin productos: por eso Más vendidos no las cuenta.',
-          'Si subís dos veces el mismo período no se duplica: se actualiza lo de cada día y medio.',
-        ],
-      },
-      {
-        titulo: 'Las de Fudo',
-        puntos: [
-          'Cuando Fudo esté conectado, sus ventas van a entrar solas y no se van a duplicar aunque se traigan dos veces.',
-          'Una venta de Fudo no se edita ni se anula acá: se corrige en Fudo y el cambio llega solo.',
+          'Se cargan en Vender, en el momento de cobrar, con los productos y los precios del menú.',
+          'Se pueden pagar con uno o dos medios. Cuentan siempre en lo que debería haber en la caja de ese día.',
         ],
       },
       {
         titulo: 'Cargar una venta a mano',
         puntos: [
-          'Es para lo que no pasa por Fudo: Cheaf, encargos, ventas a comercios. El tipo de venta se elige de la lista que armás en Tipos de venta.',
+          'Es para lo que no se cobró en el mostrador: encargos, ventas a comercios, Cheaf, o lo que se vendió sin conexión. El tipo de venta se elige de la lista que armás en Tipos de venta.',
           'Sumá uno o varios productos. Cada uno trae el precio del menú, y lo podés cambiar. El total se calcula mientras escribís.',
           'La fecha viene con hoy; puede ser un día anterior, pero no uno futuro.',
-          'Si se cobró en efectivo, suma a lo que debería haber en la caja de ese día.',
+          'Marcá Se cobró en la caja del local si la plata entró a la caja, y elegí el turno: así suma a lo que debería haber en el cierre de ese turno.',
         ],
       },
       {
         titulo: 'Anular',
         puntos: [
-          'Una venta a mano no se edita ni se borra: se anula con un motivo, deja de contar y queda en el historial.',
-          'Si te equivocaste en un monto, anulala y cargala de nuevo.',
+          'Una venta no se edita ni se borra: se anula con un motivo, deja de contar y queda en el historial.',
+          'Si te equivocaste en un monto, anulala y cargala de nuevo. Caja no anula: te avisa a vos.',
         ],
       },
     ],
@@ -53,7 +80,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
   canales: {
     titulo: 'Cómo funciona Tipos de venta',
     introduccion:
-      'Por dónde entran las ventas que no pasan por Fudo. Arrancan Cheaf, Encargo, Venta a comercios y Otro.',
+      'Por dónde se vende lo que cargás a mano. Arrancan Cheaf, Encargo, Venta a comercios y Otro.',
     temas: [
       {
         titulo: 'Qué tenés que saber',
@@ -68,7 +95,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
   caja: {
     titulo: 'Cómo funciona el cierre de caja',
     introduccion:
-      'Al terminar el turno, contá lo que hay en la caja y cargalo acá. El cierre queda a tu nombre.',
+      'Hay dos cierres por día, uno al mediodía y otro a la noche. Al terminar tu turno, contá lo que hay en la caja y cargalo acá. El cierre queda a tu nombre.',
     temas: [
       {
         titulo: 'Qué se carga',
@@ -89,7 +116,8 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
       {
         titulo: 'Reglas',
         puntos: [
-          'Hay un cierre por día: un segundo cierre del mismo día no se guarda.',
+          'Hay un cierre por turno: un segundo cierre del mismo turno no se guarda. Arriba elegís si es el del mediodía o el de la noche; viene elegido el que toca.',
+          'La noche de hoy se carga después del mediodía, si al mediodía se vendió.',
           'Podés cargar el de un día anterior que quedó sin cargar, pero no uno de un día futuro.',
           'Un cierre guardado no lo cambiás vos. ¿Algo está mal? Avisale a un administrador: lo corrige o lo anula desde el control de cierres.',
         ],
@@ -97,7 +125,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
       {
         titulo: 'Después de guardar',
         puntos: [
-          'Ves el resultado enseguida: Cierra si lo que contaste coincide con las ventas del día, o Con diferencia si no.',
+          'Ves el resultado enseguida: Cierra si lo que contaste coincide con las ventas del turno, o Con diferencia si no.',
           'En Mis cierres ves los que cargaste vos, con su estado. Los de otros no se ven.',
         ],
       },
@@ -105,12 +133,13 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
   },
   control: {
     titulo: 'Cómo funciona el control de cierres',
-    introduccion: 'Acá revisás los cierres de cada día: quién los cargó, qué declaró y si cierran.',
+    introduccion:
+      'Acá revisás los cierres de cada turno: quién los cargó, qué declaró y si cierran.',
     temas: [
       {
         titulo: 'Los estados',
         puntos: [
-          'Pendiente: el día todavía no tiene cierre cargado.',
+          'Pendiente: un turno que vendió en la caja y todavía no tiene cierre. Un turno sin ventas no queda pendiente.',
           'No abrió: el día que el local no abrió, marcado a mano. No cuenta como pendiente ni avisa en Inicio; con Deshacer vuelve a pendiente.',
           'Cierra: lo contado coincide con las ventas del día, o la diferencia es menor que la tolerancia.',
           'Con diferencia: en algún medio de pago falta o sobra más que la tolerancia. Se mira cada medio por separado: un faltante en efectivo y un sobrante en tarjeta no se compensan.',
@@ -121,8 +150,16 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'La lista',
         puntos: [
           'Filtrá por fechas, persona y estado.',
-          'Los días pendientes aparecen en una franja que se abre, con el botón para cargar cada uno. El estado Pendiente los lista.',
+          'Los turnos pendientes aparecen en una franja que se abre, con el botón para cargar cada uno. El estado Pendiente los lista.',
+          'Cada cierre dice su turno, Mediodía o Noche. Al abrirlo ves si se postergó y cuántas veces.',
           'Fondo distinto avisa que la caja arrancó con otro monto del que quedó el día anterior: puede tapar un faltante. El detalle dice cuánto.',
+        ],
+      },
+      {
+        titulo: 'Las horas de cierre',
+        puntos: [
+          'Con el botón Horas de cierre, arriba, elegís a qué hora se traba Vender para el cierre del mediodía y para el de la noche.',
+          'Lo vendido de cada turno se compara con su propio cierre.',
         ],
       },
       {
@@ -136,6 +173,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'Cómo se calcula si cierra',
         puntos: [
           'El efectivo esperado es el fondo inicial, más las ventas en efectivo, menos los retiros y los gastos de caja. En los demás medios, lo esperado son las ventas de ese medio.',
+          'Solo cuentan las ventas cobradas en la caja del local: las del mostrador y las cargadas a mano con esa casilla marcada.',
           'Efectivo contado es todo el efectivo que había en la caja, fondo incluido. Queda en la caja no puede ser más que lo contado.',
           'Lo que queda en la caja de un día es el fondo inicial del siguiente cierre. Si no coincide, el detalle lo avisa.',
           'Para cargar un cierre que falta, usá el botón Cargar cierre o tocá el día pendiente.',
@@ -171,7 +209,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
           'Cada producto tiene nombre, descripción, categoría, precios y una etiqueta opcional: Más vendido, Artesanal o Nuevo.',
           'Carga el precio de cada forma de venta que ofrece: un café puede tener solo Grande. La pantalla dice de dónde sale el precio que ves.',
           'Si le ponés un precio propio donde la categoría tiene uno para todos, antes de guardar te avisa que el producto está tomando el de la categoría y te pregunta si querés pisarlo.',
-          'Un producto que se vende en Fudo pero no va en la carta (una botella de agua) se carga igual, sin marcar que se muestre.',
+          'Un producto que se vende en el mostrador pero no va en la carta (una botella de agua) se carga igual, sin marcar que se muestre.',
           'Si lo pasás a una categoría que se vende de otra forma, queda sin precio y se oculta hasta que le cargues uno.',
         ],
       },
@@ -192,10 +230,10 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         ],
       },
       {
-        titulo: 'Precios y Fudo',
+        titulo: 'Precios',
         puntos: [
           'Los precios van en pesos enteros.',
-          'Cambiar un precio acá no lo cambia en Fudo, porque todavía no estamos integrados: cambialo también allá.',
+          'Son los mismos con los que se cobra en Vender: un cambio vale desde la próxima venta.',
           'Cada cambio de precio queda en la Auditoría, con el anterior y el nuevo.',
         ],
       },
@@ -223,7 +261,6 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
           'En una categoría con el mismo precio para todos, cambia ese precio y no el de cada producto: en la tabla figura como precio para todos.',
           'Si al redondear dos precios quedan iguales, se muestran así: corregilos a mano si hace falta.',
           'No hay deshacer: un error se corrige con otro aumento o editando el precio.',
-          'Acordate de cambiar los precios también en Fudo.',
         ],
       },
     ],

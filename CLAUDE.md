@@ -1,7 +1,7 @@
 # Sistema Manteca
 
-Sistema a medida para Manteca: proveedores, costos, stock, producción, ventas (importadas
-de Fudo), cierres de caja, gastos, menú web, reportes y auditoría. Qué hace cada módulo
+Sistema a medida para Manteca: proveedores, costos, stock, producción, ventas (cargadas en
+el mostrador), cierres de caja, gastos, menú web, reportes y auditoría. Qué hace cada módulo
 está en `PROPUESTA.md`.
 
 `PROPUESTA.md` es un documento **para el cliente**. El sistema se construye preparado para
@@ -10,7 +10,7 @@ varios locales, pero eso no se menciona en ningún texto que le llegue al client
 ## Alcance actual: primera fase
 
 Se construye solo la primera fase de `PROPUESTA.md`: usuarios y permisos, proveedores, menú
-digital, ventas importadas de Fudo, cierres de caja, gastos, dashboard, reportes y
+digital, ventas en el mostrador, cierres de caja, gastos, dashboard, reportes y
 auditoría. El mapa de rutas, los recortes de cada módulo y el orden están en
 `docs/superpowers/specs/2026-10-06-mapa-fase-1-design.md`.
 
@@ -24,10 +24,10 @@ auditoría. El mapa de rutas, los recortes de cada módulo y el orden están en
   construirlo. Donde ese archivo y `PROPUESTA.md` digan cosas distintas, vale el archivo.
 - Menú y Ventas usan un catálogo mínimo de productos: nombre, variantes y precio, sin
   composición ni costo.
-- Las ventas de Fudo van a entrar solas por su API, pero esa sincronización está postergada
-  (Santiago, 2026-11-05). Mientras tanto se sube el Excel "Reporte-Ventas" de Fudo (pedido 59).
-  Subir dos veces el mismo período no duplica ventas, y con la API valdrá lo mismo: traer dos
-  veces la misma venta no la duplica.
+- Manteca dejó Fudo (Santiago, 2026-11-18, pedido 89): cada venta se carga en el sistema, en
+  el mostrador, en el momento de cobrar. Solo mostrador, sin mesas. Se arrancó de cero, sin traer
+  el historial de Fudo. La facturación sigue fuera del sistema. Las ventas que hayan entrado
+  antes desde Fudo quedan como están.
 - La compra de mercadería se carga como un gasto, con su proveedor. La regla de
   `PROPUESTA.md` de que las compras no son gastos vale desde que exista el módulo Compras.
 - Lo de la segunda fase (materia prima, composición y costos, compras, producción, stock,
@@ -162,7 +162,9 @@ resultado, y se anota cómo.
     después de verificar en el servidor que lo pide un admin.
 - No se confía en lo que manda el navegador: usuario y local salen de la sesión; precios,
   costos y totales, de la base o del cálculo en el servidor.
-- **Caja** carga el cierre de su turno y ve sus propios cierres, nada más. **Encargado**
+- **Caja** vende en el mostrador, carga el cierre de su turno y ve sus propios cierres, nada
+  más: no ve las ventas ni lo vendido en el día, para contar la caja a ciegas, y no anula
+  (Santiago, 2026-11-18, pedido 89). **Encargado**
   queda fuera de la primera fase: el rol existe, pero no se puede asignar desde la pantalla
   y no tiene acceso a nada. Todo lo demás que no sea el menú público es solo para Admin, y
   los tests comprueban que invitado, caja y encargado reciben rechazo fuera de lo que les
@@ -205,8 +207,6 @@ El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
 - Next.js trae la documentación de la versión instalada en `node_modules/next/dist/docs/`.
   Se consulta antes de usar una API de Next.js, porque cambian entre versiones. `AGENTS.md`
   lo escribe `next dev` y apunta a esa misma carpeta.
-- Las ventas de Fudo se leen de su API (`https://api.fu.do/v1alpha1/openapi.yml`), con un
-  proceso automático. Las credenciales salen de variables de entorno del servidor.
 - `.env.local` apunta a la base de pruebas. Los valores de la real se cargan solo en Vercel.
 
 ### Comandos
@@ -219,6 +219,7 @@ El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
 | `npm run verificar` | Lint, tipos, todos los tests y build, en ese orden; se corta en el primer error |
 | `npm run e2e` | Las pruebas de Playwright, sin abrir ventana (con `E2E_A_LA_VISTA=1`, a la vista) |
 | `npm run sembrar:pruebas` | Crea en la base de pruebas los usuarios de prueba que falten y repara la contraseña de los que ya estaban; a todos les deja su rol, su local y su estado |
+| `npm run sembrar:ejemplos` | Arma (o vuelve a armar) en la base de pruebas el "Local de ejemplo", aparte del principal: su menú copiado, las cuentas `ejemplo.admin@manteca.test` y `ejemplo.caja@manteca.test` (con la contraseña de las de prueba) y 60 días de ventas, cierres, gastos y proveedores inventados (pedido 93). Nunca en la real |
 
 El lint es ESLint más el control de formato de Prettier. Si falla por formato, lo corrige
 `npx prettier --write .`.

@@ -29,12 +29,13 @@ function fila(page: Page, nombre: string) {
   return page.getByRole('listitem').filter({ hasText: nombre });
 }
 
-test('el panel avisa de Fudo y muestra los precios con su origen', async ({ page }) => {
+test('el panel muestra los precios con su origen, sin hablar de Fudo', async ({ page }) => {
   const categoria = await sembrar({ compartidos: [300000] });
   const hereda = await sembrarProducto(categoria, { precios: [null] });
   const propio = await sembrarProducto(categoria, { precios: [350000] });
   await page.goto('/admin/menu');
-  await expect(page.getByText('Cambiar un precio acá no lo cambia en Fudo')).toBeVisible();
+  await expect(fila(page, hereda.nombre)).toBeVisible();
+  await expect(page.getByText(/Fudo/)).toHaveCount(0);
   await expect(fila(page, hereda.nombre)).toContainText(`Unidad $3.000 (de ${categoria.nombre})`);
   await expect(fila(page, propio.nombre)).toContainText('Unidad $3.500 (propio)');
 });

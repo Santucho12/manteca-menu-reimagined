@@ -23,7 +23,7 @@ llega acá como un gasto sin clasificar.
 | Monto | Obligatorio, mayor que cero |
 | Descripción | Opcional |
 | Proveedor | Solo en las categorías que lo piden (Mercadería arranca pidiéndolo), y ahí es obligatorio |
-| Medio de pago | Efectivo de la caja, transferencia, tarjeta u otro |
+| Medio de pago | Efectivo de la caja (solo desde un cierre), efectivo fuera de la caja, transferencia, tarjeta, cheque u otro |
 | Número de comprobante | Texto, opcional. No se adjuntan fotos |
 
 ## Categorías
@@ -127,6 +127,11 @@ Editar, "Próximo pago" con el calendario, pausar y reactivar, y los últimos se
 15. Lo pagado no se quita con "No se paga": se anula el pago. Lo quitado no se paga.
 16. Un fijo deja un solo por pagar por vencimiento, aunque se haya quitado. Pagarlo antes de
     que venza vale solo para un vencimiento del fijo posterior a hoy.
+17. Un gasto pagado con proveedor, si ya hay otro sin anular del mismo proveedor, monto y día,
+    no se carga de una: avisa "Ya hay un gasto igual" y ofrece "Cargar igual" (pedido 86). El
+    mismo formulario mandado dos veces no cuenta como repetido. Sin proveedor no avisa.
+18. "Efectivo" se muestra "Efectivo (fuera de la caja)": plata que no salió de la caja del
+    día (pedido 86).
 
 ## Casos de borde
 

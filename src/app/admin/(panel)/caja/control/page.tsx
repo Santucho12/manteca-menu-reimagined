@@ -7,10 +7,10 @@ import {
   fondosDelRango,
   listarCierres,
   personasDeCaja,
-  primerDiaConCierre,
   toleranciaDeCaja,
 } from '@/lib/caja/consultas';
-import { diasQueNoAbrio, diasSinCierre } from '@/lib/caja/dias';
+import { horasDeCierreDelLocal, turnosPendientes } from '@/lib/caja/consultasDeTurnos';
+import { diasQueNoAbrio } from '@/lib/caja/dias';
 import {
   enlaceDeControl,
   filtrosDeControl,
@@ -19,6 +19,7 @@ import {
   type ParametrosDeControl,
 } from '@/lib/caja/pantalla';
 import { diasSinAbrir } from '@/lib/caja/sinAbrir';
+import type { HorasDeCierre } from '@/lib/caja/turnos';
 import { diaEnArgentina } from '@/lib/fechas';
 import { montoParaEditar } from '@/lib/gastos/plata';
 import type { Cliente } from '@/lib/supabase/cliente';
@@ -27,6 +28,7 @@ import { AccesoACargarCierre } from '../AccesoACargarCierre';
 import { ListaDeCierres } from '../ListaDeCierres';
 import { DiasQueNoAbrio } from './DiasQueNoAbrio';
 import { DiasSinCierre, FiltrosDelControl } from './FiltrosDelControl';
+import { HorasEnTuerca } from './HorasEnTuerca';
 import { ToleranciaEnTuerca } from './ToleranciaEnTuerca';
 
 export const metadata: Metadata = { title: 'Control de cierres' };
@@ -38,20 +40,19 @@ const leerElControl = (cliente: Cliente, filtros: FiltrosDeControl) =>
     personasDeCaja(cliente),
     toleranciaDeCaja(cliente),
     diasConCierre(cliente, filtros.desde, filtros.hasta),
-    primerDiaConCierre(cliente),
+    turnosPendientes(cliente, filtros.desde, filtros.hasta),
     fondosDelRango(cliente, filtros.desde, filtros.hasta),
     diasSinAbrir(cliente, filtros.desde, filtros.hasta),
+    horasDeCierreDelLocal(cliente),
   ]);
 
 async function datosDelControl(searchParams: Promise<ParametrosDeControl>) {
   const hoy = diaEnArgentina(new Date());
   const filtros = filtrosDeControl(await searchParams, hoy);
   const { datos } = await exigirPaginaYLeer('admin', (cliente) => leerElControl(cliente, filtros));
-  const [lista, personas, tolerancia, conCierre, primero, fondos, sinAbrir] = datos;
-  const { desde, hasta } = filtros;
-  const faltan = diasSinCierre({ desde, hasta, conCierre, sinAbrir, primero, hoy });
+  const [lista, personas, tolerancia, conCierre, faltan, fondos, sinAbrir, horas] = datos;
   const noAbrio = diasQueNoAbrio({ conCierre, sinAbrir });
-  return { hoy, filtros, lista, personas, tolerancia, faltan, noAbrio, fondos };
+  return { hoy, filtros, lista, personas, tolerancia, faltan, noAbrio, fondos, horas };
 }
 
 // Los dias sin cierre no son de nadie: con una persona elegida no se muestran.
@@ -60,9 +61,12 @@ const verPendientes = (f: FiltrosDeControl) =>
 const verNoAbrio = (f: FiltrosDeControl) =>
   !f.personaId && (f.estado === null || f.estado === 'no_abrio');
 
-const Acciones = ({ tolerancia }: { tolerancia: string }) => (
+type PropsDeAcciones = { tolerancia: string; horas: HorasDeCierre };
+
+const Acciones = ({ tolerancia, horas }: PropsDeAcciones) => (
   <>
     <AccesoACargarCierre />
+    <HorasEnTuerca inicial={horas} />
     <ToleranciaEnTuerca inicial={tolerancia} />
   </>
 );
@@ -72,18 +76,18 @@ export default async function ControlDeCierres({
 }: {
   searchParams: Promise<ParametrosDeControl>;
 }) {
-  const { hoy, filtros, lista, personas, tolerancia, faltan, noAbrio, fondos } =
+  const { hoy, filtros, lista, personas, tolerancia, faltan, noAbrio, fondos, horas } =
     await datosDelControl(searchParams);
   return (
     <Pantalla
       titulo="Control de cierres"
-      subtitulo="Los cierres de cada día, quién los cargó y si cierran."
-      acciones={<Acciones tolerancia={montoParaEditar(tolerancia)} />}
+      subtitulo="Los cierres de cada turno, quién los cargó y si cierran."
+      acciones={<Acciones tolerancia={montoParaEditar(tolerancia)} horas={horas} />}
       ayuda="control"
     >
       <FiltrosDelControl filtros={filtros} personas={personas} />
       <DiasSinCierre
-        dias={verPendientes(filtros) ? faltan : []}
+        turnos={verPendientes(filtros) ? faltan : []}
         abierto={filtros.estado === 'pendiente'}
       />
       <DiasQueNoAbrio

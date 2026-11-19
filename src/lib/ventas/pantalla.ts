@@ -5,22 +5,29 @@ import { esFechaValida } from '../gastos/vencimientos';
 import { formatearPesos } from '../plata';
 import { numeroDePagina, unValor } from '../usuarios/presentacion';
 
-export const ORIGENES = ['manual', 'fudo'] as const;
-export const ESTADOS_DE_LISTA = ['cerrada', 'cancelada', 'anulada'] as const;
-export type Origen = (typeof ORIGENES)[number];
+// Lo que se filtra. Fudo quedó como origen de las ventas viejas, sin filtro (pedido 89).
+export const ORIGENES = ['mostrador', 'manual'] as const;
+export const ESTADOS_DE_LISTA = ['cerrada', 'anulada'] as const;
+export type Origen = (typeof ORIGENES)[number] | 'fudo';
 export type EstadoDeLista = (typeof ESTADOS_DE_LISTA)[number];
 
 export type FiltrosDeVentas = {
   desde: string;
   hasta: string;
-  origen: Origen | null;
+  origen: (typeof ORIGENES)[number] | null;
   medio: Medio | null;
+  /** El id del tipo de venta (pedido 90). */
+  tipo: string | null;
   estado: EstadoDeLista | null;
   pagina: number;
 };
 export type ParametrosDeVentas = Record<string, string | string[] | undefined>;
 
-const NOMBRES_DE_ORIGEN: Record<Origen, string> = { manual: 'A mano', fudo: 'Fudo' };
+const NOMBRES_DE_ORIGEN: Record<Origen, string> = {
+  mostrador: 'Mostrador',
+  manual: 'A mano',
+  fudo: 'Fudo',
+};
 const NOMBRES_DE_ESTADO: Record<string, string> = {
   cerrada: 'Cerrada',
   cancelada: 'Cancelada',
@@ -44,6 +51,8 @@ function unoDe<T extends string>(lista: readonly T[], texto: string | undefined)
   return lista.find((valor) => valor === texto) ?? null;
 }
 const fechaDe = (texto: string | undefined) => (texto && esFechaValida(texto) ? texto : null);
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const idDe = (texto: string | undefined) => (texto && UUID.test(texto) ? texto : null);
 
 /** Los filtros de la lista, leidos de la URL; sin fechas, el mes de hoy en Argentina. */
 export function filtrosDeVentas(parametros: ParametrosDeVentas, hoy: string): FiltrosDeVentas {
@@ -55,6 +64,7 @@ export function filtrosDeVentas(parametros: ParametrosDeVentas, hoy: string): Fi
     hasta: desde <= hasta ? hasta : desde,
     origen: unoDe(ORIGENES, unValor(parametros.origen)),
     medio: unoDe(MEDIOS, unValor(parametros.medio)),
+    tipo: idDe(unValor(parametros.tipo)),
     estado: unoDe(ESTADOS_DE_LISTA, unValor(parametros.estado)),
     pagina: numeroDePagina(unValor(parametros.pagina)),
   };
@@ -67,6 +77,7 @@ export function enlaceDeVentas(filtros: FiltrosDeVentas, hoy: string): string {
   if (filtros.hasta !== mes.hasta) parametros.set('hasta', filtros.hasta);
   if (filtros.origen) parametros.set('origen', filtros.origen);
   if (filtros.medio) parametros.set('medio', filtros.medio);
+  if (filtros.tipo) parametros.set('tipo', filtros.tipo);
   if (filtros.estado) parametros.set('estado', filtros.estado);
   if (filtros.pagina > 1) parametros.set('pagina', String(filtros.pagina));
   const texto = parametros.toString();
@@ -107,17 +118,11 @@ function tarjetaDeTicket({ cobradoCentavos, cobradas }: Totales): TarjetaDelResu
   return { etiqueta: 'Ticket promedio', valor, detalle: 'por venta cobrada' };
 }
 
-/** Las tarjetas de arriba de la lista: lo cobrado, el ticket promedio y lo que no cuenta. */
+/** Las tarjetas de arriba de la lista: lo cobrado, el ticket promedio y lo anulado. */
 export function tarjetasDelResumen(totales: Totales): TarjetaDelResumen[] {
   return [
     tarjeta('Cobrado', totales.cobradoCentavos, totales.cobradas),
     tarjetaDeTicket(totales),
-    tarjeta(
-      'Canceladas',
-      totales.canceladoCentavos,
-      totales.canceladas,
-      'Pedidos cancelados en Fudo: no se cobraron.',
-    ),
     tarjeta(
       'Anuladas',
       totales.anuladoCentavos,

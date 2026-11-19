@@ -22,7 +22,7 @@ function Renglones({ venta }: { venta: Venta }) {
   if (venta.renglones.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        Esta venta no tiene detalle de productos: Fudo trae solo el total.
+        Vino de Fudo sin detalle de productos: solo el total.
       </p>
     );
   }
@@ -61,12 +61,15 @@ function Resumen({ venta }: { venta: Venta }) {
           valor={<MediosDePago medios={venta.pagos.map((p) => p.medio)} />}
         />
       </Datos>
+      <p className="text-sm text-muted-foreground">
+        Se cobró en la caja del local: {venta.en_la_caja ? 'Sí' : 'No'}
+      </p>
       {venta.comentario ? <p className="text-sm whitespace-pre-line">{venta.comentario}</p> : null}
     </Seccion>
   );
 }
 
-// Lo que se puede hacer con la venta: anular la de a mano; la de Fudo se corrige alla.
+// Lo que se puede hacer con la venta: anularla. Las viejas de Fudo no se anulan (PV307).
 function Acciones({ venta }: { venta: Venta }) {
   if (venta.anulado)
     return (
@@ -77,7 +80,7 @@ function Acciones({ venta }: { venta: Venta }) {
   if (venta.origen === 'fudo') {
     return (
       <FranjaDeAviso>
-        <p>Las ventas de Fudo se corrigen en Fudo.</p>
+        <p>Vino de Fudo, antes de dejarlo: no se anula.</p>
       </FranjaDeAviso>
     );
   }

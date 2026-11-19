@@ -8,17 +8,22 @@ import {
   borrarCategoriasConSusGastos,
   pagarLoDelFijo,
   sembrarCategoriaDeGasto,
+  sembrarGasto,
   sembrarRecurrente,
 } from '../tests/gastos-de-prueba';
+import { borrarProveedores, sembrarProveedor } from '../tests/proveedores-de-prueba';
 import { SESIONES, esperarHidratacion } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
 const HOY = diaEnArgentina(new Date());
 let categorias: string[] = [];
+let proveedores: string[] = [];
 test.afterEach(async () => {
   await borrarCategoriasConSusGastos(categorias);
   categorias = [];
+  await borrarProveedores(proveedores);
+  proveedores = [];
 });
 
 async function categoria() {
@@ -147,3 +152,28 @@ for (const rol of ['caja', 'invitado'] as const) {
     });
   });
 }
+
+test('avisa un gasto posiblemente repetido y deja cargarlo igual', async ({ page }) => {
+  const { id, nombre } = await sembrarCategoriaDeGasto({ pideProveedor: true });
+  categorias.push(id);
+  const proveedor = await sembrarProveedor();
+  proveedores.push(proveedor.id);
+  await sembrarGasto({
+    categoriaId: id,
+    proveedorId: proveedor.id,
+    montoCentavos: 123450,
+    fecha: HOY,
+  });
+  await page.goto('/admin/gastos/nuevo');
+  await esperarHidratacion(page.getByLabel('Categoría'));
+  await completar(page, nombre);
+  await page.getByLabel('Proveedor').selectOption({ label: proveedor.nombre });
+  await page.getByRole('button', { name: 'Guardar' }).click();
+  await expect(
+    page.getByText('Ya hay un gasto igual: mismo proveedor, monto y día.'),
+  ).toBeVisible();
+  expect((await cargados(id)).gastos).toHaveLength(1);
+  await page.getByRole('button', { name: 'Cargar igual' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Gastos' })).toBeVisible();
+  expect((await cargados(id)).gastos).toHaveLength(2);
+});

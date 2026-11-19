@@ -131,7 +131,8 @@ test('en el celular todo se ve un poco más chico y con más aire', async ({ pag
       zoom: getComputedStyle(document.documentElement).zoom,
       costado: getComputedStyle(principal).paddingLeft,
       bajoElTitulo: getComputedStyle(encabezado).marginBottom,
-      entreBloques: getComputedStyle(bloques.firstElementChild!).marginBottom,
+      // Las tarjetas: el primer bloque, los filtros, lleva su propio margen (piezas.md).
+      entreBloques: getComputedStyle(bloques.children[1]!).marginBottom,
       entreTarjetas: getComputedStyle(tarjetas).columnGap,
     };
   });
@@ -147,7 +148,7 @@ test('en el celular todo se ve un poco más chico y con más aire', async ({ pag
 test('los botones de arriba bajan de renglón en vez de cortarse', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 780 });
   await page.goto('/admin/ventas');
-  for (const nombre of ['Cargar venta', 'Subir Excel de Fudo', 'Tipos de venta']) {
+  for (const nombre of ['Vender', 'Cargar venta', 'Tipos de venta']) {
     const boton = (await page.getByRole('link', { name: nombre }).boundingBox())!;
     expect(boton.x + boton.width).toBeLessThanOrEqual(360);
   }

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { diaEnArgentina } from '@/lib/fechas';
+import { estadoDelMostrador } from '@/lib/vender/consultas';
 import { canalesDeVenta, opcionesParaVender } from '@/lib/ventas/consultas';
 import type { DatosDeVenta } from '@/lib/ventas/esquemas';
 import { FormularioDeVenta } from './FormularioDeVenta';
@@ -10,9 +11,13 @@ export const metadata: Metadata = { title: 'Cargar venta' };
 
 export default async function NuevaVenta() {
   const { datos } = await exigirPaginaYLeer('admin', (cliente) =>
-    Promise.all([canalesDeVenta(cliente), opcionesParaVender(cliente)]),
+    Promise.all([
+      canalesDeVenta(cliente),
+      opcionesParaVender(cliente),
+      estadoDelMostrador(cliente),
+    ]),
   );
-  const [canales, opciones] = datos;
+  const [canales, opciones, estado] = datos;
   const activos = canales.filter((canal) => canal.activo);
   const enElLocal = activos.find((canal) => canal.nombre.trim().toLowerCase() === 'en el local');
   const inicial = {
@@ -23,13 +28,17 @@ export default async function NuevaVenta() {
     // Vacio a proposito: la persona elige como se cobro, el formulario no lo supone.
     medio: '' as DatosDeVenta['medio'],
     comentario: '',
+    // Sin marcar: lo que se carga a mano casi nunca pasó por la caja del mostrador.
+    enLaCaja: false,
+    // Si se marca, viene el turno abierto de la caja de hoy.
+    turno: estado.turno === 1 ? ('1' as const) : ('2' as const),
     // Ya viene una línea lista para elegir el producto: lo normal es vender al menos uno.
     renglones: [{ opcion: '', cantidad: '1', precio: '' }],
   };
   return (
     <Pantalla
       titulo="Cargar venta"
-      subtitulo="Para lo que no pasa por Fudo: Cheaf, encargos, ventas a comercios."
+      subtitulo="Para lo que no se cobró en el mostrador: encargos, ventas a comercios, Cheaf."
       ayuda="ventas"
     >
       <FormularioDeVenta inicial={inicial} canales={activos} opciones={opciones} />

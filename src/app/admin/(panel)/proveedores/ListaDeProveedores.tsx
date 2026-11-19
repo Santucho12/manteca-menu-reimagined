@@ -76,6 +76,18 @@ const COLUMNAS: Columna<FilaConPagado>[] = [
     ),
   },
   {
+    titulo: 'Por pagar',
+    alinear: 'der',
+    celda: (f) =>
+      f.porPagarCentavos > 0 ? (
+        <span className="text-sm font-bold whitespace-nowrap">
+          {formatearPesos(f.porPagarCentavos)}
+        </span>
+      ) : (
+        <span className={FALTA_EL_DATO}>Nada</span>
+      ),
+  },
+  {
     titulo: 'Acciones',
     alinear: 'der',
     celda: (f) => (
@@ -130,6 +142,9 @@ function Tarjeta({ fila }: { fila: FilaConPagado }) {
         <span className="sr-only">Teléfono: </span>
         {fila.telefono ? telefonoParaMostrar(fila.telefono) : 'Sin teléfono'}
       </p>
+      {fila.porPagarCentavos > 0 ? (
+        <p className="text-xs font-semibold">Por pagar: {formatearPesos(fila.porPagarCentavos)}</p>
+      ) : null}
       <div className="flex items-center gap-2">
         {fila.telefono ? (
           <a
