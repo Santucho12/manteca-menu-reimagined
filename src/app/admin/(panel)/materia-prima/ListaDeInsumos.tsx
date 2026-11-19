@@ -4,7 +4,10 @@ import { FALTA_EL_DATO, ICONO_EDITAR } from '@/components/panel/estilos';
 import { Avatar } from '@/components/panel/Insignias';
 import { ListaDelPanel, type Columna } from '@/components/panel/ListaDelPanel';
 import { SinResultados } from '@/components/panel/SinResultados';
-import type { FilaDeInsumo, FiltrosDeInsumos } from '@/lib/materia-prima/consultas';
+import type {
+  FilaDeLaLista as FilaDeInsumo,
+  FiltrosDeInsumos,
+} from '@/lib/materia-prima/consultas';
 import { costoParaMostrar, textoDelOrigen } from '@/lib/materia-prima/costo';
 import { textoDeUnidad, vacioDeInsumos } from '@/lib/materia-prima/pantalla';
 
@@ -56,6 +59,12 @@ const COLUMNAS: Columna<FilaDeInsumo>[] = [
   },
   { titulo: 'Costo hoy', alinear: 'der', celda: (f) => <Costo fila={f} /> },
   { titulo: 'De dónde sale', celda: (f) => <Origen fila={f} /> },
+  {
+    titulo: 'En recetas',
+    alinear: 'der',
+    desde: 'lg',
+    celda: (f) => <span className="text-xs font-medium">{f.recetas}</span>,
+  },
   {
     titulo: 'Acciones',
     alinear: 'der',

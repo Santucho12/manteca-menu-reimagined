@@ -15,6 +15,7 @@ import { costoParaMostrar, textoDelOrigen } from '@/lib/materia-prima/costo';
 import { textoDeUnidad } from '@/lib/materia-prima/pantalla';
 import { EstadoDelInsumo } from '../BotonesDeEstado';
 import { FormasDeCompra } from './FormasDeCompra';
+import { ComprasDelInsumo, RecetasDelInsumo } from './UsosDelInsumo';
 
 export const metadata: Metadata = { title: 'Insumo' };
 
@@ -65,6 +66,8 @@ export default async function FichaDeInsumo({ params }: { params: Promise<{ id: 
       <CargadoPor cliente={cliente} tabla="insumos" id={insumo.id} />
       <DatosDelInsumo insumo={insumo} />
       <FormasDeCompra insumo={insumo} precios={precios} />
+      <ComprasDelInsumo cliente={cliente} insumoId={insumo.id} />
+      <RecetasDelInsumo cliente={cliente} insumoId={insumo.id} />
       <EstadoDelInsumo id={insumo.id} activo={insumo.activo} />
       <EnlaceDeVolver href="/admin/materia-prima">Volver a materia prima</EnlaceDeVolver>
     </Pantalla>

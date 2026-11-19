@@ -2,6 +2,7 @@ import { escapado, patronDe } from '../proveedores/consultas';
 import type { Cliente } from '../supabase/cliente';
 import { POR_PAGINA, cantidadDePaginas } from '../usuarios/presentacion';
 import type { OrigenDelCosto, UnidadDeUso } from './costo';
+import { recetasPorInsumo, renglonesDeReceta } from './usos';
 
 export type FiltrosDeInsumos = { busqueda: string | null; desactivados: boolean; pagina: number };
 export type CostoDeInsumo = {
@@ -25,7 +26,8 @@ export type FormaDeCompra = {
   activo: boolean;
 };
 export type Insumo = FilaDeInsumo & { observaciones: string | null; formas: FormaDeCompra[] };
-export type ListaDeInsumos = { filas: FilaDeInsumo[]; total: number; pagina: number };
+export type FilaDeLaLista = FilaDeInsumo & { recetas: number };
+export type ListaDeInsumos = { filas: FilaDeLaLista[]; total: number; pagina: number };
 
 const SIN_COSTO: CostoDeInsumo = { costo_por_unidad: null, origen: null, fecha_origen: null };
 const COLUMNAS = 'id, nombre, unidad_de_uso, activo';
@@ -59,6 +61,16 @@ async function conCosto<T extends { id: string }>(cliente: Cliente, filas: T[]) 
   });
 }
 
+/** Cada fila con en cuantas recetas esta su insumo. */
+async function conRecetas(cliente: Cliente, filas: FilaDeInsumo[]): Promise<FilaDeLaLista[]> {
+  const renglones = await renglonesDeReceta(
+    cliente,
+    filas.map((f) => f.id),
+  );
+  const conteo = recetasPorInsumo(renglones);
+  return filas.map((f) => ({ ...f, recetas: conteo.get(f.id) ?? 0 }));
+}
+
 async function contar(cliente: Cliente, filtros: FiltrosDeInsumos): Promise<number> {
   const consulta = cliente.from('insumos').select('id', { count: 'exact', head: true });
   const { count, error } = await filtrar(consulta, filtros);
@@ -79,7 +91,7 @@ export async function listarInsumos(
     .order('id')
     .range(desde, desde + POR_PAGINA - 1);
   if (error) throw new Error(`No pudimos leer los insumos: ${error.message}`);
-  return { filas: await conCosto(cliente, data), total, pagina };
+  return { filas: await conRecetas(cliente, await conCosto(cliente, data)), total, pagina };
 }
 
 async function formasDe(cliente: Cliente, insumoId: string): Promise<FormaDeCompra[]> {
