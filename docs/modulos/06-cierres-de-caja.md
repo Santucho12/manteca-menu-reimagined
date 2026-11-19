@@ -102,7 +102,8 @@ cierre tiene resultado desde que se guarda.
 ## Reglas
 
 1. El empleado cuenta a ciegas: no ve lo esperado hasta guardar.
-2. Un cierre por día. El segundo intento se rechaza.
+2. Un cierre por turno: dos turnos por día, Mediodía y Noche (pedido 98). El segundo intento del
+   mismo turno se rechaza.
 3. El cierre queda a nombre de quien tiene la sesión iniciada. No se puede elegir a otro.
 4. Un cierre guardado lo edita solo el admin (pedido 85; antes Caja editaba el suyo). Caja ve
    "¿Algo está mal? Avisale a un administrador". Cada cambio queda
@@ -142,7 +143,8 @@ cierre tiene resultado desde que se guarda.
 
 ## Fuera de alcance
 
-- Más de un cierre por día (turnos).
+- Más de dos turnos por día, o un turno que cruza la medianoche.
+- La sección de PedidosYa y otras plataformas en el cierre: va con el pedido 91.
 - Que Caja edite un cierre guardado.
 - Arqueos parciales durante el día.
 - Conciliar con el resumen del banco o de la tarjeta.
@@ -158,7 +160,11 @@ cierre tiene resultado desde que se guarda.
 | Corregir un cierre | Lo edita el admin (pedido 85); desde el 2026-10-28 se editaba, antes se anulaba y se cargaba de nuevo |
 | Diferencias chicas | Tolerancia que define el admin |
 | Fondo de cambio | Se declara en cada cierre, precargado con lo que quedó en el último cierre anterior; si ese no es el de ayer, un aviso dice de qué día viene |
-| Turnos | Un cierre por día (Santiago, 2026-10-09) |
+| Turnos | Dos por día, Mediodía y Noche, cada uno con su cierre (Santiago, 2026-11-19, pedido 98; antes, uno por día) |
+| Hora del cierre | Una por turno, fija y configurable por el admin; arranca en 16:00 y 23:00 hasta saber las de Manteca |
+| A esa hora | Vender se traba hasta cargar el cierre, con «Postergar 10 min» sin límite y cada postergación registrada (Santiago, pedido 98) |
+| Qué ventas son de cada turno | Cada venta guarda su turno al cobrarse: lo vendido mientras se posterga queda en el turno que se está por cerrar (pedido 98) |
+| Turno sin ventas | No traba ni queda pendiente: el local no abrió ese turno (pedido 98) |
 | Tolerancia de arranque | $500; el admin la cambia |
 | Fecha del cierre | Se ve, con hoy por defecto; no acepta días futuros |
 | Quién retiró | Texto libre |
@@ -169,7 +175,7 @@ cierre tiene resultado desde que se guarda.
 
 | Qué | De qué depende |
 |---|---|
-| Si el cliente necesita un cierre por turno | Del cliente. Hoy es uno por día |
+| A qué hora cierra cada turno en Manteca | Del cliente. Arranca en 16:00 y 23:00, y el admin las cambia |
 
 ## Parte técnica
 

@@ -150,6 +150,11 @@ Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, 
 
 **Excepción (Santiago, 2026-10-21):** los colores del panel son los exactos de Plan Reminder Pro aunque no pasen el contraste AA que pide el pedido 21 (letra blanca sobre el verde, 2,6 a 1; el rojo de error, 3,6; el anillo de foco, 2,5; los grises chicos, 2,6). Las pruebas de contraste (`tests/contraste.test.ts`) siguen mirando solo la carta pública; no se extienden al panel. El panel no bloquea el zoom en el celular, a diferencia de Plan Reminder Pro (Santiago, 2026-10-22).
 
+### 98. Cierres de caja por turno, con traba a la hora del cierre
+Manteca hace dos cierres por día, uno al mediodía y otro a la noche (Santiago, 2026-11-19). Cada turno tiene su hora de cierre, que el admin configura. A esa hora Vender se traba hasta que se carga el cierre, con un botón para postergar 10 minutos, las veces que haga falta. Lo vendido mientras se posterga queda en el turno que se está por cerrar. Cada cierre compara lo contado con lo cobrado en ese turno. La sección de PedidosYa dentro del cierre va con el pedido 91.
+
+**Excepción (Santiago, 2026-11-19): en un worktree.** Para trabajar a la vez que la sesión de Materia prima, este pedido se hace en el worktree `orca/manteca-cierres-por-turno`, con su `.env.local` y su `npm install`, y la aplicación en el puerto 3220. Las dos sesiones comparten `mantecatest` y no corren `npm run e2e` a la vez. Sin `git push`: al terminar entra al `main` local con merge commit, y después se borran la rama y el worktree.
+
 ### 93. Datos de ejemplo en la base de pruebas
 Santiago pide inventar ejemplos y cargar la base con datos falsos (2026-11-18). Van solo a la base de pruebas, en un local aparte con sus propias cuentas, para que no cambien lo que miran los tests: ventas de mostrador, cierres (algunos con diferencia), gastos y proveedores de los últimos meses. Un comando los vuelve a armar. La base real arranca de cero. Se arma después del pedido 89 y crece con los pedidos 90 a 92.
 
@@ -357,6 +362,7 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 98 | Cierres de caja por turno, con traba a la hora del cierre | Todo: spec, plan, TDD y cierre |
 | 93 | Datos de ejemplo en la base de pruebas | Hecho en la rama `feat/datos-de-ejemplo` (sobre la del 89) y probado contra la base de Docker (excepción anotada en el pedido 89). `npm run sembrar:ejemplos` arma el Local de ejemplo con el menú copiado, sus cuentas y 60 días inventados; `scripts/ejemplos/sembrar.base.test.ts` pasó. Se sumó la prueba en vivo `e2e/ejemplos.spec.ts`: arma un local de ejemplo chico, entra con su admin (ve sus ventas, sus cierres y sus proveedores) y con su caja (vende con el menú copiado), y lo borra. Encontró que al local de ejemplo le faltaba la tolerancia de caja y su control de cierres no abría: se corrigió con TDD. Esa prueba pasó en la computadora y falta correrla en el celular. Lint, tipos, todos los tests y build pasaron en la cima de la pila (ver el pedido 89). Falta: correr `npm run sembrar:ejemplos` en la base de pruebas, después de aplicar ahí las migraciones del 89, entrar como `ejemplo.admin` y mirar Inicio, Ventas, Caja, Gastos y Reportes, y correr ahí `npm run verificar` y `npm run e2e` |
 | 92 | Liquidaciones de las plataformas | Todo: diseño, TDD y cierre. Hace falta una liquidación real de PedidosYa |
 | 91 | PedidosYa en el sistema | Todo: diseño, TDD y cierre. Hace falta un reporte real de PedidosYa |
