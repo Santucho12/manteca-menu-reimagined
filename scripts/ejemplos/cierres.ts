@@ -49,6 +49,13 @@ function efectivoDelDia(vendidoEnEfectivo: number, gastos: GastoDeCaja[]) {
   return { retiros, efectivo: enLaCaja - retiros.reduce((s, r) => s + r.monto_centavos, 0) };
 }
 
+const mediosDeclarados = (vendido: Record<Medio, number>) => ({
+  credito_centavos: vendido.credito,
+  debito_centavos: vendido.debito,
+  qr_centavos: vendido.qr,
+  transferencia_centavos: vendido.transferencia,
+});
+
 /** El cierre que cierra justo: cada medio declara lo que se vendió con él. */
 export function cierreCuadrado(
   fecha: string,
@@ -61,10 +68,7 @@ export function cierreCuadrado(
     fecha,
     fondo_inicial_centavos: FONDO_CENTAVOS,
     efectivo_centavos: efectivo,
-    credito_centavos: vendido.credito,
-    debito_centavos: vendido.debito,
-    qr_centavos: vendido.qr,
-    transferencia_centavos: vendido.transferencia,
+    ...mediosDeclarados(vendido),
     queda_en_caja_centavos: Math.min(FONDO_CENTAVOS, efectivo),
     comentario: null,
     retiros,
