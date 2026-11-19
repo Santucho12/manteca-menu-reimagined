@@ -49,6 +49,11 @@ describe('datoDe', () => {
     expect(datoDe('gastos_por_pagar')).toEqual({ modulo: 'Gastos', dato: 'Por pagar' });
     expect(datoDe('insumos')).toEqual({ modulo: 'Materia prima', dato: 'Insumo' });
     expect(datoDe('recetas')).toEqual({ modulo: 'Costos', dato: 'Receta' });
+    expect(datoDe('compras')).toEqual({ modulo: 'Compras', dato: 'Compra' });
+    expect(datoDe('renglones_de_compra')).toEqual({
+      modulo: 'Compras',
+      dato: 'Renglón de la compra',
+    });
     expect(datoDe('renglones_de_receta')).toEqual({
       modulo: 'Costos',
       dato: 'Insumo de la receta',
@@ -112,6 +117,12 @@ describe('cambiosDe', () => {
 });
 
 describe('enlaceDe', () => {
+  it('una compra lleva a su detalle, y un renglon a la compra', () => {
+    expect(enlaceDe(registro({ tabla: 'compras', registro_id: 'c1' }))).toBe('/admin/compras/c1');
+    const renglon = registro({ tabla: 'renglones_de_compra', despues: { compra_id: 'c1' } });
+    expect(enlaceDe(renglon)).toBe('/admin/compras/c1');
+  });
+
   it('una receta lleva a la del producto, y unidades y margenes a Ajustes', () => {
     const receta = registro({ tabla: 'recetas', despues: { producto_id: 'p1' } });
     expect(enlaceDe(receta)).toBe('/admin/costos/productos/p1');

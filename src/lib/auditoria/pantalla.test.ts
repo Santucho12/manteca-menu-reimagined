@@ -51,6 +51,7 @@ describe('tablasDe', () => {
     ]);
     expect(tablasDe('menu')).toContain('precios');
     expect(tablasDe('materia_prima')).toEqual(['insumos', 'formas_de_compra']);
+    expect(tablasDe('compras')).toEqual(['compras', 'renglones_de_compra']);
     expect(tablasDe('costos')).toEqual([
       'recetas',
       'renglones_de_receta',

@@ -56,6 +56,10 @@ describe('ayudas', () => {
       ],
     ],
     [
+      'compras',
+      ['Cargar compra', 'Armar pedido', 'WhatsApp', 'Es una compra', 'Otros cargos', 'anular'],
+    ],
+    [
       'costos',
       [
         'Margen objetivo',
@@ -279,6 +283,7 @@ describe('ayudas', () => {
       'cuenta',
       'proveedores',
       'materia-prima',
+      'compras',
       'costos',
       'gastos',
       'fijos',
