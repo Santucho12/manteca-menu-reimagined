@@ -1,14 +1,12 @@
 'use client';
 
-import { useWatch, type Control, type UseFormRegister } from 'react-hook-form';
+import type { Control, UseFormRegister } from 'react-hook-form';
 import type { DatosDeVenta } from '@/lib/ventas/esquemas';
 
 type Props = { control: Control<DatosDeVenta>; register: UseFormRegister<DatosDeVenta> };
 
-/** Con «Se cobró en la caja» marcada, en qué turno: suma a lo esperado del cierre de ese turno. */
-export function TurnoDeLaCaja({ control, register }: Props) {
-  const enLaCaja = useWatch({ control, name: 'enLaCaja' });
-  if (!enLaCaja) return null;
+/** En qué turno se vendió: cuenta para el cierre de ese turno, en la caja o en su tipo (pedido 99). */
+export function TurnoDeLaCaja({ register }: Props) {
   return (
     <label htmlFor="turno" className="flex flex-wrap items-center gap-3 text-sm font-semibold">
       Turno

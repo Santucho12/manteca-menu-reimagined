@@ -4,7 +4,7 @@ import { esFechaValida } from '../gastos/vencimientos';
 import { formatearPesos } from '../plata';
 import { numeroDePagina, unValor } from '../usuarios/presentacion';
 import type { Tono } from '../../components/panel/Insignias';
-import type { Medio, MedioDeVenta } from './resultado';
+import type { MedioDeVenta } from './resultado';
 
 // Pendiente y "no abrio" son dias sin cierre; los otros dos son el estado de un cierre cargado.
 export const ESTADOS = ['cierra', 'con_diferencia', 'pendiente', 'no_abrio'] as const;

@@ -4,7 +4,13 @@ import { InsigniaDeEstado } from '@/components/panel/Insignias';
 import { cn } from '@/lib/utils';
 import { AccionesDeCanal } from './AccionesDeCanal';
 
-type Canal = { id: string; nombre: string; activo: boolean };
+type Canal = {
+  id: string;
+  nombre: string;
+  activo: boolean;
+  de_sistema: boolean;
+  se_controla_en_el_cierre: boolean;
+};
 
 /** Los tipos de venta en una sola tarjeta: una fila por tipo, con editar, activar y borrar a la derecha. */
 export function TarjetasDeCanales({ canales }: { canales: Canal[] }) {
@@ -44,7 +50,12 @@ export function TarjetasDeCanales({ canales }: { canales: Canal[] }) {
                 <InsigniaDeEstado tono="pizarra">Desactivado</InsigniaDeEstado>
               )}
             </div>
-            <AccionesDeCanal id={canal.id} nombre={canal.nombre} activo={canal.activo} />
+            <AccionesDeCanal
+              id={canal.id}
+              nombre={canal.nombre}
+              activo={canal.activo}
+              controla={canal.de_sistema ? null : canal.se_controla_en_el_cierre}
+            />
           </li>
         ))}
       </ul>

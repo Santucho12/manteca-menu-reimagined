@@ -1,3 +1,4 @@
+import { formatearPesos } from '../plata';
 import type { EstadoDelCierre } from './resultado';
 
 /** Lo que devuelve cierres_controles: lo anotado de un tipo y lo cargado de ese tipo en el turno. */
@@ -59,4 +60,13 @@ export function controlesPorCierre(leidos: ControlLeido[], toleranciaCentavos: n
     grupos.set(leido.cierre_id, [...lista, resultadoDeControl(leido, toleranciaCentavos)]);
   }
   return grupos;
+}
+
+/** El resultado de un tipo en palabras: correcto, lo que falta cargar o lo que sobra. */
+export function textoDelControl(c: ResultadoDeControl): string {
+  if (!c.fuera) return 'Da correcto';
+  if (c.diferenciaCentavos > 0) return `Faltan cargar ${formatearPesos(c.diferenciaCentavos)}`;
+  if (c.diferenciaCentavos < 0)
+    return `Hay ${formatearPesos(-c.diferenciaCentavos)} cargados de más`;
+  return `Se anotaron ${c.cantidadAnotada} ventas y hay ${c.cantidadCargada} cargadas`;
 }

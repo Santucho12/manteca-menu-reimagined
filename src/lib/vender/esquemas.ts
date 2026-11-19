@@ -67,8 +67,10 @@ export function ventaDelMostradorParaLaBase(venta: VentaDelMostrador) {
 export function ventaDelTicket(
   ticket: RenglonDelTicket[],
   pagos: PagoDelMostrador[],
+  canalId: string | null = null,
 ): Omit<VentaDelMostrador, 'clave'> {
   return {
+    ...(canalId ? { canalId } : {}),
     renglones: ticket.map((r) => ({
       productoId: r.productoId,
       presentacionId: r.presentacionId,

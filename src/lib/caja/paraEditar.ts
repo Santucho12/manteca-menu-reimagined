@@ -25,6 +25,12 @@ const salidasParaEditar = ({ retiros, gastos }: Pick<DeUnCierre, 'retiros' | 'ga
     .map((g) => ({ monto: montoParaEditar(g.monto_centavos), descripcion: g.descripcion ?? '' })),
 });
 
+const controlParaEditar = (c: DeUnCierre['controles'][number]) => ({
+  canalId: c.canalId,
+  total: montoParaEditar(c.anotadoCentavos),
+  cantidad: c.cantidadAnotada === null ? '' : String(c.cantidadAnotada),
+});
+
 /** El formulario de un cierre ya guardado: lo declarado, sus retiros y sus gastos sin anular. */
 export function datosParaEditar(cierre: DeUnCierre): DatosDeCierre {
   const { declarados } = cierre;
@@ -40,10 +46,6 @@ export function datosParaEditar(cierre: DeUnCierre): DatosDeCierre {
     quedaEnCaja: montoParaEditar(cierre.quedaEnCajaCentavos),
     comentario: cierre.comentario ?? '',
     ...salidasParaEditar(cierre),
-    controles: cierre.controles.map((c) => ({
-      canalId: c.canalId,
-      total: montoParaEditar(c.anotadoCentavos),
-      cantidad: c.cantidadAnotada === null ? '' : String(c.cantidadAnotada),
-    })),
+    controles: cierre.controles.map(controlParaEditar),
   };
 }
