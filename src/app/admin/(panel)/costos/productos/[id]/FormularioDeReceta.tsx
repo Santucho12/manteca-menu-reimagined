@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import { useFieldArray, useForm, type UseFormReturn } from 'react-hook-form';
 import { AvisoDeError } from '@/components/formularios/AvisoDeError';
 import { AvisoDeExito } from '@/components/formularios/AvisoDeExito';
@@ -9,6 +10,7 @@ import { Campo } from '@/components/formularios/Campo';
 import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
 import { PieDelFormulario } from '@/components/formularios/PieDelFormulario';
 import { BOTON_CANCELAR, ICONO_EDITAR } from '@/components/panel/estilos';
+import { buscarInsumos } from '@/lib/costos/buscarInsumos';
 import type { InsumoParaReceta } from '@/lib/costos/consultas';
 import { esquemaReceta, type DatosDeReceta } from '@/lib/costos/esquemas';
 import { useGuardarConAviso } from '@/lib/costos/useGuardarConAviso';
@@ -71,6 +73,9 @@ export function FormularioDeReceta({ inicial, insumos }: Props) {
   const renglones = useFieldArray({ control: formulario.control, name: 'renglones' });
   const guardado = useGuardarConAviso(guardarRecetaDesdeElPanel, 'Guardamos la receta.');
   const errores = formulario.formState.errors;
+  const [busqueda, setBusqueda] = useState('');
+  const elegidos = formulario.watch('renglones').map((r) => r.insumoId);
+  const ofrecidos = buscarInsumos(insumos, busqueda, elegidos);
   return (
     <form onSubmit={formulario.handleSubmit(guardado.enviar)} noValidate className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -89,12 +94,18 @@ export function FormularioDeReceta({ inicial, insumos }: Props) {
           {...formulario.register('desperdicio')}
         />
       </div>
+      <Campo
+        id="buscar-insumo"
+        etiqueta="Buscar insumo"
+        value={busqueda}
+        onChange={(evento) => setBusqueda(evento.target.value)}
+      />
       {renglones.fields.map((campo, indice) => (
         <Renglon
           key={campo.id}
           formulario={formulario}
           indice={indice}
-          insumos={insumos}
+          insumos={ofrecidos}
           quitar={() => renglones.remove(indice)}
         />
       ))}
