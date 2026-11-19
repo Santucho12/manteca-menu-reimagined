@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { FormaParaComprar } from './formas';
 import {
+  cantidadDelRenglon,
+  enlaceDeCompras,
   enlaceDelPedido,
   formasDelProveedor,
   inicialDeLaCompra,
@@ -54,13 +56,64 @@ describe('estado y pago', () => {
   });
 });
 
+const PROVEEDOR = '0b8f3c2e-5d1a-4c7e-9f2b-1a2b3c4d5e6f';
+
 describe('filtrosDeCompras', () => {
-  it('lee el estado y el proveedor de la URL', () => {
-    expect(filtrosDeCompras({ estado: 'pedida', proveedor: 'p1' })).toEqual({
-      estado: 'pedida',
-      proveedor: 'p1',
+  it('por defecto, todas las del mes de hoy, de cualquier proveedor', () => {
+    expect(filtrosDeCompras({}, '2026-11-19')).toEqual({
+      estado: 'todas',
+      proveedor: null,
+      desde: '2026-11-01',
+      hasta: '2026-11-30',
     });
-    expect(filtrosDeCompras({ estado: 'otra' })).toEqual({ estado: 'todas', proveedor: null });
+  });
+
+  it('lee el estado, el proveedor y las fechas de la URL, y descarta lo que no entiende', () => {
+    const leidos = {
+      estado: 'pedida',
+      proveedor: PROVEEDOR,
+      desde: '2026-10-01',
+      hasta: '2026-10-15',
+    };
+    expect(filtrosDeCompras(leidos, '2026-11-19')).toEqual({
+      estado: 'pedida',
+      proveedor: PROVEEDOR,
+      desde: '2026-10-01',
+      hasta: '2026-10-15',
+    });
+    const malos = { estado: 'otra', proveedor: 'p1', desde: '2026-02-31' };
+    expect(filtrosDeCompras(malos, '2026-11-19')).toMatchObject({
+      estado: 'todas',
+      proveedor: null,
+      desde: '2026-11-01',
+    });
+  });
+});
+
+describe('enlaceDeCompras', () => {
+  it('lleva el estado, el proveedor y el periodo', () => {
+    const filtros = {
+      estado: 'recibida' as const,
+      proveedor: PROVEEDOR,
+      desde: '2026-10-01',
+      hasta: '2026-10-31',
+    };
+    expect(enlaceDeCompras(filtros)).toBe(
+      `/admin/compras?estado=recibida&proveedor=${PROVEEDOR}&desde=2026-10-01&hasta=2026-10-31`,
+    );
+  });
+});
+
+describe('cantidadDelRenglon', () => {
+  const renglon = { cantidadPedida: 2, cantidad: 0 };
+
+  it('en un pedido, lo pedido', () => {
+    expect(cantidadDelRenglon(renglon, 'pedida')).toBe('2');
+  });
+
+  it('recibida, lo que llego, o que no llego si se habia pedido', () => {
+    expect(cantidadDelRenglon({ cantidadPedida: 2, cantidad: 1.5 }, 'recibida')).toBe('1,5');
+    expect(cantidadDelRenglon(renglon, 'recibida')).toBe('No llegó');
   });
 });
 
