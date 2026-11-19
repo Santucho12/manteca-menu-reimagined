@@ -126,3 +126,21 @@ export async function nombreDeInsumoRepetido(
   if (error) throw new Error(`No pudimos revisar el nombre: ${error.message}`);
   return data.find((fila) => fila.nombre.toLowerCase() === buscado)?.nombre ?? null;
 }
+
+export type ProveedorParaElegir = { id: string; nombre: string };
+
+/** Los proveedores activos para elegir en una forma de compra, y el que ya tenia al editarla. */
+export async function proveedoresParaElegir(
+  cliente: Cliente,
+  actual: string | null,
+): Promise<ProveedorParaElegir[]> {
+  const filtro = actual && UUID.test(actual) ? `activo.eq.true,id.eq.${actual}` : 'activo.eq.true';
+  const { data, error } = await cliente
+    .from('proveedores')
+    .select('id, nombre')
+    .or(filtro)
+    .order('nombre')
+    .limit(1000);
+  if (error) throw new Error(`No pudimos leer los proveedores: ${error.message}`);
+  return data;
+}

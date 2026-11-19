@@ -9,6 +9,7 @@ export type ClaveDeAyuda =
   | 'inicio'
   | 'cuenta'
   | 'proveedores'
+  | 'materia-prima'
   | 'gastos'
   | 'fijos'
   | 'vender'
@@ -103,6 +104,44 @@ export const AYUDAS_DE_LA_BASE: Partial<Record<ClaveDeAyuda, Ayuda>> = {
           'Un proveedor no se borra: se desactiva y conserva sus gastos. Desactivado, no se ofrece al cargar un gasto nuevo.',
           'Si tiene gastos fijos activos, te avisa: sus pagos siguen apareciendo por pagar hasta que los pauses aparte, en Gastos.',
           'Con Ver desactivados los ves, y desde su ficha lo podés reactivar.',
+        ],
+      },
+    ],
+  },
+  'materia-prima': {
+    titulo: 'Cómo funciona Materia prima',
+    introduccion:
+      'Acá tenés los insumos que usás y lo que cuesta cada uno hoy. Con eso se calcula después cuánto te cuesta cada producto.',
+    temas: [
+      {
+        titulo: 'La lista',
+        puntos: [
+          'Muestra el nombre, en qué se mide y el costo de hoy. Va de a 25 por página.',
+          'Lo que se mide en gramos se muestra por kilo, y lo que se mide en mililitros, por litro: se lee mejor que por gramo.',
+          'De dónde sale el costo dice si viene del Precio de referencia o de la última compra. Sin precio, todavía no tiene costo.',
+          'En Buscar por nombre escribí parte del nombre y apretá Buscar.',
+        ],
+      },
+      {
+        titulo: 'Cargar un insumo',
+        puntos: [
+          'Va el nombre y En qué se mide: gramos, mililitros o unidades. Es como se cuenta en una receta.',
+          'Si ya hay uno con el mismo nombre, el sistema te avisa y te deja seguir.',
+        ],
+      },
+      {
+        titulo: 'Las formas de compra',
+        puntos: [
+          'Un insumo se compra de distintas formas y a distintos proveedores: la bolsa de 25 kg a uno y la de 50 kg a otro.',
+          'Cuánto trae se escribe en la unidad del insumo: una bolsa de 25 kg trae 25.000 gramos.',
+          'El Precio de referencia es lo que sale, cargado a mano. Vale el de la forma que cambiaste por última vez.',
+        ],
+      },
+      {
+        titulo: 'Desactivados',
+        puntos: [
+          'Un insumo o una forma de compra no se borran: se desactivan. Una forma desactivada no cuenta para el costo.',
+          'Con Ver desactivados los ves, y desde su ficha los podés reactivar.',
         ],
       },
     ],

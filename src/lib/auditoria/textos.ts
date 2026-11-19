@@ -90,6 +90,7 @@ const deFila = (registro: RegistroDeAuditoria, columna: string) => {
 const CON_NOMBRE = new Set([
   'perfiles',
   'proveedores',
+  'insumos',
   'productos',
   'categorias',
   'presentaciones',
@@ -124,6 +125,13 @@ const RUTAS: Record<string, (registro: RegistroDeAuditoria) => string | null> = 
   // Lo por pagar se ve y se paga en Próximos pagos.
   gastos_por_pagar: () => '/admin/gastos',
   proveedores: (r) => `/admin/proveedores/${r.registro_id}`,
+  insumos: (r) => `/admin/materia-prima/${r.registro_id}`,
+  formas_de_compra: (r) => {
+    const insumo = deFila(r, 'insumo_id');
+    return insumo
+      ? `/admin/materia-prima/${insumo}/formas/${r.registro_id}`
+      : '/admin/materia-prima';
+  },
   cierres_de_caja: (r) => `/admin/caja/cierres/${r.registro_id}`,
   retiros_de_caja: (r) => {
     const cierre = deFila(r, 'cierre_id');
