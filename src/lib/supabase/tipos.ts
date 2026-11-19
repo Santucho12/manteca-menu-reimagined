@@ -177,6 +177,7 @@ export type Database = {
           id: string
           local_id: string
           nombre: string
+          se_controla_en_el_cierre: boolean
         }
         Insert: {
           activo?: boolean
@@ -186,6 +187,7 @@ export type Database = {
           id?: string
           local_id?: string
           nombre: string
+          se_controla_en_el_cierre?: boolean
         }
         Update: {
           activo?: boolean
@@ -195,6 +197,7 @@ export type Database = {
           id?: string
           local_id?: string
           nombre?: string
+          se_controla_en_el_cierre?: boolean
         }
         Relationships: [
           {
@@ -384,6 +387,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      controles_de_cierre: {
+        Row: {
+          canal_id: string
+          cantidad: number | null
+          cierre_id: string
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          local_id: string
+          total_centavos: number
+        }
+        Insert: {
+          canal_id: string
+          cantidad?: number | null
+          cierre_id: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          total_centavos: number
+        }
+        Update: {
+          canal_id?: string
+          cantidad?: number | null
+          cierre_id?: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          total_centavos?: number
+        }
+        Relationships: []
       }
       configuracion_de_caja: {
         Row: {
@@ -1438,6 +1474,15 @@ export type Database = {
         }[]
       }
       caja_postergar_cierre: { Args: never; Returns: string }
+      caja_tipos_para_vender: {
+        Args: never
+        Returns: {
+          de_sistema: boolean
+          id: string
+          nombre: string
+          se_controla_en_el_cierre: boolean
+        }[]
+      }
       catalogo_para_vender: {
         Args: never
         Returns: {
@@ -1476,6 +1521,18 @@ export type Database = {
           ventas_efectivo_centavos: number
           ventas_qr_centavos: number
           ventas_transferencia_centavos: number
+        }[]
+      }
+      cierres_controles: {
+        Args: { desde: string; hasta: string }
+        Returns: {
+          canal_id: string
+          cantidad: number
+          cierre_id: string
+          tipo: string
+          total_centavos: number
+          ventas_cantidad: number
+          ventas_centavos: number
         }[]
       }
       cierres_editar: {
@@ -1740,7 +1797,13 @@ export type Database = {
       estado_de_venta: "cerrada" | "cancelada" | "en_curso"
       etiqueta_de_producto: "mas_vendido" | "artesanal" | "nuevo"
       frecuencia_de_gasto: "mensual" | "bimestral" | "anual"
-      medio_de_caja: "efectivo" | "credito" | "debito" | "qr" | "transferencia"
+      medio_de_caja:
+        | "efectivo"
+        | "credito"
+        | "debito"
+        | "qr"
+        | "transferencia"
+        | "fuera_de_caja"
       medio_de_pago:
         | "efectivo_caja"
         | "efectivo"
@@ -1880,7 +1943,7 @@ export const Constants = {
       estado_de_venta: ["cerrada", "cancelada", "en_curso"],
       etiqueta_de_producto: ["mas_vendido", "artesanal", "nuevo"],
       frecuencia_de_gasto: ["mensual", "bimestral", "anual"],
-      medio_de_caja: ["efectivo", "credito", "debito", "qr", "transferencia"],
+      medio_de_caja: ["efectivo", "credito", "debito", "qr", "transferencia", "fuera_de_caja"],
       medio_de_pago: [
         "efectivo_caja",
         "efectivo",
