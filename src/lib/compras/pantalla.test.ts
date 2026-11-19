@@ -3,6 +3,7 @@ import type { FormaParaComprar } from './formas';
 import {
   enlaceDelPedido,
   formasDelProveedor,
+  inicialDeLaCompra,
   opcionesDeFormas,
   precioPropuesto,
   estadoDeCompra,
@@ -99,5 +100,34 @@ describe('las formas de compra en el formulario', () => {
     expect(precioPropuesto(forma({ ultimoPrecioCentavos: 3_000_000 }))).toBe('30.000');
     expect(precioPropuesto(forma({}))).toBe('32.000');
     expect(precioPropuesto(forma({ referenciaCentavos: null }))).toBe('');
+  });
+});
+
+describe('inicialDeLaCompra', () => {
+  it('vacia, con la fecha de hoy y pagada por transferencia', () => {
+    expect(inicialDeLaCompra('2026-11-19', null, [])).toMatchObject({
+      compraId: '',
+      proveedorId: '',
+      fecha: '2026-11-19',
+      fechaDePago: '2026-11-19',
+      pago: 'pagada',
+      medio: 'transferencia',
+      renglones: [],
+    });
+  });
+
+  it('al recibir un pedido, trae sus renglones con lo pedido y el precio propuesto', () => {
+    const pedido = {
+      id: 'c1',
+      proveedorId: 'p1',
+      renglonesDeLaCompra: [{ formaId: 'f1', cantidadPedida: 2 }],
+    };
+    expect(
+      inicialDeLaCompra('2026-11-19', pedido, [forma({ ultimoPrecioCentavos: 3_000_000 })]),
+    ).toMatchObject({
+      compraId: 'c1',
+      proveedorId: 'p1',
+      renglones: [{ formaId: 'f1', cantidad: '2', precio: '30.000' }],
+    });
   });
 });
