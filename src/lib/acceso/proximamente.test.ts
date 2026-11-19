@@ -8,7 +8,14 @@ describe('esProximamente', () => {
 
   it('el resto de las secciones sí, también las ya construidas que estaban bloqueadas', () => {
     const claves = ['inicio', 'ventas', 'caja', 'gastos', 'menu', 'usuarios', 'cierres'];
-    for (const clave of [...claves, 'proveedores', 'reportes', 'auditoria', 'cuenta']) {
+    for (const clave of [
+      ...claves,
+      'proveedores',
+      'materia-prima',
+      'reportes',
+      'auditoria',
+      'cuenta',
+    ]) {
       expect(esProximamente(clave)).toBe(false);
     }
   });

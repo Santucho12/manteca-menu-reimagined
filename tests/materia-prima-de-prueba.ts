@@ -87,3 +87,12 @@ export async function borrarInsumos(ids: string[]): Promise<void> {
     .in('registro_id', [...ids, ...formas]);
   if (error) throw new Error(`No pude limpiar la auditoria: ${error.message}`);
 }
+
+/** Los ids de los insumos con estos nombres: los que crea una prueba en vivo. */
+export async function idsDeInsumosLlamados(nombres: string[]): Promise<string[]> {
+  const { data } = await clienteSecretoDePruebas()
+    .from('insumos')
+    .select('id')
+    .in('nombre', nombres);
+  return (data ?? []).map((fila) => fila.id);
+}

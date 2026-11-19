@@ -49,6 +49,7 @@ describe('tablasDe', () => {
       'dias_sin_abrir',
     ]);
     expect(tablasDe('menu')).toContain('precios');
+    expect(tablasDe('materia_prima')).toEqual(['insumos', 'formas_de_compra']);
     expect(tablasDe('gastos')).toContain('gastos_por_pagar');
     expect(tablasDe('ventas')).toEqual([
       'ventas',

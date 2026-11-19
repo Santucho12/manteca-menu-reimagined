@@ -2,6 +2,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import {
   insumoPorId,
   listarInsumos,
+  proveedoresParaElegir,
   type FiltrosDeInsumos,
 } from '../../src/lib/materia-prima/consultas';
 import {
@@ -189,5 +190,18 @@ describe('formas de compra', () => {
       ok: false,
       mensaje: 'Ese insumo o ese proveedor ya no está disponible. Recargá la página.',
     });
+  });
+});
+
+describe('proveedoresParaElegir', () => {
+  it('ofrece los activos y, al editar, tambien el que ya tenia aunque este desactivado', async () => {
+    const activo = await sembrarProveedor();
+    const apagado = await sembrarProveedor({ activo: false });
+    proveedores.push(activo.id, apagado.id);
+    const nuevos = (await proveedoresParaElegir(await admin(), null)).map((p) => p.id);
+    expect(nuevos).toContain(activo.id);
+    expect(nuevos).not.toContain(apagado.id);
+    const alEditar = await proveedoresParaElegir(await admin(), apagado.id);
+    expect(alEditar).toContainEqual({ id: apagado.id, nombre: apagado.nombre });
   });
 });
