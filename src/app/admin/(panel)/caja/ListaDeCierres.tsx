@@ -1,4 +1,5 @@
 import { Banknote, ChevronRight } from 'lucide-react';
+import { nombreDelTurno } from '@/lib/caja/turnos';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Chip, InsigniaDeEstado } from '@/components/panel/Insignias';
@@ -80,6 +81,9 @@ const Fecha = ({ cierre }: { cierre: FilaDeCierre }) => (
     >
       {fechaParaMostrar(cierre.fecha)}
     </Link>
+    <span className="text-xs font-semibold text-muted-foreground">
+      {nombreDelTurno(cierre.turno)}
+    </span>
   </span>
 );
 

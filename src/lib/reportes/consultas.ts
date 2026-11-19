@@ -50,7 +50,12 @@ export const ventasPorTipo = (cliente: Cliente, p: Periodo) =>
 export const gastosPorDia = (cliente: Cliente, p: Periodo) =>
   reporte<GastoDelDia>(cliente, 'reporte_gastos', p);
 
-type CierreLeido = FilaConVentas & { fecha: string; anulado: boolean; persona_nombre: string };
+type CierreLeido = FilaConVentas & {
+  fecha: string;
+  turno: number;
+  anulado: boolean;
+  persona_nombre: string;
+};
 
 function aCierre(c: CierreLeido): CierreDelReporte {
   const declaradoCentavos =
@@ -61,6 +66,7 @@ function aCierre(c: CierreLeido): CierreDelReporte {
     c.transferencia_centavos;
   return {
     fecha: c.fecha,
+    turno: c.turno === 1 ? 1 : 2,
     persona: c.persona_nombre,
     declaradoCentavos,
     diferenciaCentavos: resultadoDeFila(c).diferenciaTotalCentavos,

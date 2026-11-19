@@ -6,7 +6,8 @@ import { PantallaDeReporte } from '@/components/reportes/PantallaDeReporte';
 import { SinDatos } from '@/components/reportes/SinDatos';
 import { Celda, TablaDeDatos } from '@/components/reportes/TablaDeDatos';
 import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
-import { primerDiaConCierre } from '@/lib/caja/consultas';
+import { turnosPendientes } from '@/lib/caja/consultasDeTurnos';
+import { nombreDelTurno } from '@/lib/caja/turnos';
 import { textoDeDiferencia } from '@/lib/caja/pantalla';
 import { diasSinAbrir } from '@/lib/caja/sinAbrir';
 import { diaEnArgentina } from '@/lib/fechas';
@@ -39,6 +40,9 @@ function FilaDelDia({ fila }: { fila: FilaDeCaja }) {
     <tr>
       <Celda>
         <span className="font-medium whitespace-nowrap">{fechaParaMostrar(fila.fecha)}</span>
+        {fila.turno ? (
+          <span className="ml-2 text-xs text-muted-foreground">{nombreDelTurno(fila.turno)}</span>
+        ) : null}
       </Celda>
       <Celda>
         {cierre ? cierre.persona : <Chip>{fila.noAbrio ? 'No abrió' : 'Sin cierre'}</Chip>}
@@ -53,7 +57,7 @@ function CierresPorDia({ filas }: { filas: FilaDeCaja[] }) {
   return (
     <TablaDeDatos etiqueta="Cierres por día" titulos={TITULOS_DE_DIA}>
       {filas.map((fila) => (
-        <FilaDelDia key={fila.fecha} fila={fila} />
+        <FilaDelDia key={`${fila.fecha}-${fila.turno ?? 0}`} fila={fila} />
       ))}
     </TablaDeDatos>
   );
@@ -105,12 +109,12 @@ export default async function ReporteDeCaja({
   const { datos } = await exigirPaginaYLeer('admin', (cliente) =>
     Promise.all([
       cierresDelPeriodo(cliente, periodos.actual),
-      primerDiaConCierre(cliente),
+      turnosPendientes(cliente, desde, hasta),
       diasSinAbrir(cliente, desde, hasta),
     ]),
   );
-  const [cierres, primero, sinAbrir] = datos;
-  const filas = filasDeCaja(cierres, periodos.actual, primero, hoy, sinAbrir);
+  const [cierres, pendientes, sinAbrir] = datos;
+  const filas = filasDeCaja(cierres, pendientes, sinAbrir);
   const pagina = paginaDe(filas, periodos.pagina);
   return (
     <PantallaDeReporte

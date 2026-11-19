@@ -1,6 +1,6 @@
-import { diasConCierre, listarCierres, primerDiaConCierre } from '../caja/consultas';
+import { listarCierres } from '../caja/consultas';
+import { turnosPendientes } from '../caja/consultasDeTurnos';
 import type { FiltrosDeControl } from '../caja/pantalla';
-import { diasSinAbrir } from '../caja/sinAbrir';
 import { listarRecurrentes } from '../gastos/consultas';
 import { proximosPagos } from '../gastos/fijos';
 import { pagosPendientes, vencimientosTomados } from '../gastos/pagos';
@@ -65,16 +65,14 @@ export async function gastosSinClasificar(
   return { ...conFecha(gastos), categoriaId: gastos.data?.[0]?.categoria_id ?? null };
 }
 
-/** Ayer, si no tiene cierre ni esta marcado como dia sin abrir; nada si no habia ningun cierre. */
-async function ayerSinCierre(cliente: Cliente, hoy: string): Promise<string | null> {
+/** Los turnos de ayer con ventas en la caja y sin cierre (la base ya saca los dias sin abrir). */
+async function ayerSinCierre(
+  cliente: Cliente,
+  hoy: string,
+): Promise<DatosDeAvisos['ayerSinCierre']> {
   const ayer = sumarDias(hoy, -1);
-  const [primero, cargados, sinAbrir] = await Promise.all([
-    primerDiaConCierre(cliente),
-    diasConCierre(cliente, ayer, ayer),
-    diasSinAbrir(cliente, ayer, ayer),
-  ]);
-  const resuelto = cargados.length > 0 || sinAbrir.length > 0;
-  return !primero || primero > ayer || resuelto ? null : ayer;
+  const pendientes = await turnosPendientes(cliente, ayer, ayer);
+  return pendientes.length === 0 ? null : { fecha: ayer, turnos: pendientes.map((p) => p.turno) };
 }
 
 export async function datosDeAvisos(cliente: Cliente, hoy: string): Promise<DatosDeAvisos> {

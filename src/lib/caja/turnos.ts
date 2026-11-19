@@ -101,3 +101,10 @@ export function textoDeAyerSinCierre(turnos: number[]): string | null {
     turnos.length > 1 ? 'de los dos turnos' : turnos[0] === 1 ? 'del mediodía' : 'de la noche';
   return `Ayer quedó sin cargar el cierre ${cual}.`;
 }
+
+/** En el detalle del cierre: cuántas veces se postergó y por cuánto en total. */
+export function textoDePostergaciones(resumen: { veces: number; minutos: number } | null) {
+  if (!resumen) return null;
+  const veces = resumen.veces === 1 ? '1 vez' : `${resumen.veces} veces`;
+  return `Se postergó ${veces} (${resumen.minutos} min).`;
+}

@@ -1,7 +1,13 @@
 'use server';
 
 import { ejecutarAccion } from '@/lib/acceso/servidor';
-import { anularCierre, cambiarTolerancia, editarCierre, guardarCierre } from '@/lib/caja/escritura';
+import {
+  anularCierre,
+  cambiarHorasDeCierre,
+  cambiarTolerancia,
+  editarCierre,
+  guardarCierre,
+} from '@/lib/caja/escritura';
 import {
   centavosDeCaja,
   esquemaAnulacionDeCierre,
@@ -11,6 +17,7 @@ import {
   esquemaTolerancia,
 } from '@/lib/caja/esquemas';
 import { marcarSinAbrir } from '@/lib/caja/sinAbrir';
+import { esquemaDeHoras } from '@/lib/caja/turnos';
 
 // Caja y Admin: el cierre queda a nombre de quien tiene la sesion, la base no deja elegir.
 export async function guardarCierreDesdeElPanel(datos: unknown) {
@@ -42,5 +49,12 @@ export async function marcarSinAbrirDesdeElPanel(datos: unknown) {
 export async function cambiarToleranciaDesdeElPanel(datos: unknown) {
   return ejecutarAccion('admin', esquemaTolerancia, datos, ({ cliente }, { tolerancia }) =>
     cambiarTolerancia(cliente, centavosDeCaja(tolerancia)!),
+  );
+}
+
+// Solo el admin cambia a qué hora se traba el mostrador para cada cierre.
+export async function cambiarHorasDesdeElPanel(datos: unknown) {
+  return ejecutarAccion('admin', esquemaDeHoras, datos, ({ cliente }, horas) =>
+    cambiarHorasDeCierre(cliente, horas),
   );
 }
