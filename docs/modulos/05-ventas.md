@@ -59,6 +59,9 @@ en el celular.
 5. El tipo de venta es Local. Lo que se vende en el mostrador se cobra siempre en la caja del
    local.
 6. Un doble toque en Cobrar guarda una sola venta.
+6. bis. Cada venta guarda su turno de caja, Mediodía o Noche, y a la hora de cierre de un turno
+   el mostrador se traba hasta cargar su cierre o postergarlo (pedido 98, ver
+   `06-cierres-de-caja.md`).
 7. Caja no ve lo vendido en el día, ni en total ni por medio: si lo viera, dejaría de contar a
    ciegas al cerrar la caja (ver `06-cierres-de-caja.md`).
 8. Caja no anula. Si se equivocó, le avisa al admin, que anula la venta con motivo.
@@ -74,7 +77,7 @@ en el celular.
 | Precio | Trae el del menú y se puede cambiar |
 | Medio de pago | Efectivo, débito, crédito, QR o transferencia |
 | Tipo de venta (en el código, canal) | Cheaf, Encargo, Venta a comercios u Otro. El admin puede cambiar la lista |
-| Se cobró en la caja del local | Casilla, sin marcar. Marcada, la venta suma a lo esperado del cierre de ese día |
+| Se cobró en la caja del local | Casilla, sin marcar. Marcada, aparece el turno (viene el abierto de hoy) y la venta suma a lo esperado del cierre de ese turno |
 
 - Suma a los reportes y al resultado como cualquier venta.
 - Se anula con motivo obligatorio. No se edita: se anula y se carga de nuevo.
