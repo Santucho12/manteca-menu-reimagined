@@ -11,6 +11,11 @@ export const REPORTES = [
     pregunta: 'Qué productos dejaron más plata y cuántos se vendieron.',
   },
   {
+    ruta: '/admin/reportes/ganancia',
+    titulo: 'Ganancia por producto',
+    pregunta: 'Cuánto dejó cada producto después de lo que costó hacerlo.',
+  },
+  {
     ruta: '/admin/reportes/categorias',
     titulo: 'Ventas por categoría',
     pregunta: 'Cuánto dejó cada categoría del menú.',

@@ -1,6 +1,7 @@
 import { resultadoDeFila, type FilaConVentas } from '../caja/resultadoDeFila';
 import type { Cliente } from '../supabase/cliente';
 import type { CierreDelReporte } from './caja';
+import type { GananciaLeida } from './ganancia';
 import type { GastoDelDia } from './gastos';
 import type { Periodo } from './periodos';
 import { resultadoDelPeriodo } from './resultado';
@@ -34,7 +35,8 @@ type Reporte =
   | 'reporte_ventas_por_producto'
   | 'reporte_ventas_por_categoria'
   | 'reporte_ventas_por_tipo'
-  | 'reporte_gastos';
+  | 'reporte_gastos'
+  | 'ganancia_por_producto';
 
 const reporte = <T>(cliente: Cliente, funcion: Reporte, p: Periodo) =>
   todas<T>((desde, hasta) => cliente.rpc(funcion, p).range(desde, hasta));
@@ -47,6 +49,8 @@ export const ventasPorCategoria = (cliente: Cliente, p: Periodo) =>
   reporte<VentaDeCategoria>(cliente, 'reporte_ventas_por_categoria', p);
 export const ventasPorTipo = (cliente: Cliente, p: Periodo) =>
   reporte<VentaDeTipo>(cliente, 'reporte_ventas_por_tipo', p);
+export const gananciaPorProducto = (cliente: Cliente, p: Periodo) =>
+  reporte<GananciaLeida>(cliente, 'ganancia_por_producto', p);
 export const gastosPorDia = (cliente: Cliente, p: Periodo) =>
   reporte<GastoDelDia>(cliente, 'reporte_gastos', p);
 
