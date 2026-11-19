@@ -31,7 +31,9 @@ pero no se puede asignar y no accede a nada.
 
 - No procesa pagos ni factura: registra lo que se cobró.
 - No calcula cuánto cuesta ni cuánto deja cada producto.
-- No lleva stock, producción ni recetas.
+- No lleva stock ni producción. Materia prima tiene los insumos y lo que cuesta cada uno hoy,
+  sin stock (pedido 94, por excepción de Santiago); recetas, costos y compras llegan con los
+  pedidos 95 a 97.
 - No es contabilidad ni facturación.
 - No lleva la cuenta corriente de los proveedores.
 

@@ -84,3 +84,20 @@ anterior.
 
 Stock, stock mínimo y movimientos; preparaciones (una masa o una crema que se usa dentro de
 otras recetas).
+
+## Parte técnica (pedido 94)
+
+- Base: `supabase/migrations/20261119120000_materia_prima.sql`. Tablas `insumos` y
+  `formas_de_compra`; solo el admin activo de su local las ve y las cambia, nadie borra. El
+  trigger `formas_de_compra_reglas` rechaza un insumo o un proveedor de otro local (`PI301`) y
+  una forma nueva de un insumo desactivado (`PI302`).
+- `costo_de_insumos()` (`security invoker`) da por insumo el costo en centavos por unidad de
+  uso, con seis decimales, y su origen. Por ahora mira solo la referencia de la forma activa
+  cambiada por última vez; Compras (pedido 96) le suma la última compra.
+- La regla 3 (la unidad de uso no cambia si el insumo está en una receta o una compra) se
+  agrega con los pedidos 95 y 96: hoy no hay recetas ni compras.
+- Servidor: `src/lib/materia-prima/` (`consultas.ts`, `escritura.ts`, `esquemas.ts`,
+  `costo.ts`, `pantalla.ts`). Pantallas en `src/app/admin/(panel)/materia-prima/`: lista,
+  `nuevo`, `[id]` (ficha), `[id]/editar`, `[id]/formas/nueva` y `[id]/formas/[forma]`.
+- La ficha todavía no muestra el último precio pagado, las últimas compras ni las recetas que
+  lo usan: llegan con los pedidos 95 y 96.
