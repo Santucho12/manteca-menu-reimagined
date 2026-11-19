@@ -177,6 +177,7 @@ export type Database = {
           id: string
           local_id: string
           nombre: string
+          se_controla_en_el_cierre: boolean
         }
         Insert: {
           activo?: boolean
@@ -186,6 +187,7 @@ export type Database = {
           id?: string
           local_id?: string
           nombre: string
+          se_controla_en_el_cierre?: boolean
         }
         Update: {
           activo?: boolean
@@ -195,6 +197,7 @@ export type Database = {
           id?: string
           local_id?: string
           nombre?: string
+          se_controla_en_el_cierre?: boolean
         }
         Relationships: [
           {
@@ -419,6 +422,141 @@ export type Database = {
             columns: ["local_id"]
             isOneToOne: true
             referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      configuracion_de_costos: {
+        Row: {
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          local_id: string
+          margen_minimo_porcentaje: number
+          margen_objetivo_porcentaje: number
+        }
+        Insert: {
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          margen_minimo_porcentaje?: number
+          margen_objetivo_porcentaje?: number
+        }
+        Update: {
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          margen_minimo_porcentaje?: number
+          margen_objetivo_porcentaje?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "configuracion_de_costos_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: true
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      controles_de_cierre: {
+        Row: {
+          canal_id: string
+          cantidad: number | null
+          cierre_id: string
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          local_id: string
+          total_centavos: number
+        }
+        Insert: {
+          canal_id: string
+          cantidad?: number | null
+          cierre_id: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          total_centavos: number
+        }
+        Update: {
+          canal_id?: string
+          cantidad?: number | null
+          cierre_id?: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          total_centavos?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "controles_de_cierre_canal_id_fkey"
+            columns: ["canal_id"]
+            isOneToOne: false
+            referencedRelation: "canales_de_venta"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "controles_de_cierre_cierre_id_fkey"
+            columns: ["cierre_id"]
+            isOneToOne: false
+            referencedRelation: "cierres_de_caja"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "controles_de_cierre_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      costos_de_presentacion: {
+        Row: {
+          agregado_centavos: number
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          local_id: string
+          presentacion_id: string
+          unidades: number
+        }
+        Insert: {
+          agregado_centavos?: number
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          presentacion_id: string
+          unidades: number
+        }
+        Update: {
+          agregado_centavos?: number
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          presentacion_id?: string
+          unidades?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "costos_de_presentacion_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "costos_de_presentacion_presentacion_id_fkey"
+            columns: ["presentacion_id"]
+            isOneToOne: true
+            referencedRelation: "presentaciones"
             referencedColumns: ["id"]
           },
         ]
@@ -1283,6 +1421,126 @@ export type Database = {
           },
         ]
       }
+      recetas: {
+        Row: {
+          activo: boolean
+          desperdicio_porcentaje: number
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          local_id: string
+          presentacion_id: string | null
+          producto_id: string
+          rinde: number
+        }
+        Insert: {
+          activo?: boolean
+          desperdicio_porcentaje?: number
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          presentacion_id?: string | null
+          producto_id: string
+          rinde?: number
+        }
+        Update: {
+          activo?: boolean
+          desperdicio_porcentaje?: number
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          local_id?: string
+          presentacion_id?: string | null
+          producto_id?: string
+          rinde?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recetas_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recetas_presentacion_id_fkey"
+            columns: ["presentacion_id"]
+            isOneToOne: false
+            referencedRelation: "presentaciones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recetas_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "menu_publico"
+            referencedColumns: ["producto_id"]
+          },
+          {
+            foreignKeyName: "recetas_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      renglones_de_receta: {
+        Row: {
+          activo: boolean
+          cantidad: number
+          fecha_actualizacion: string
+          fecha_creacion: string
+          id: string
+          insumo_id: string
+          local_id: string
+          receta_id: string
+        }
+        Insert: {
+          activo?: boolean
+          cantidad: number
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          insumo_id: string
+          local_id: string
+          receta_id: string
+        }
+        Update: {
+          activo?: boolean
+          cantidad?: number
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          id?: string
+          insumo_id?: string
+          local_id?: string
+          receta_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "renglones_de_receta_insumo_id_fkey"
+            columns: ["insumo_id"]
+            isOneToOne: false
+            referencedRelation: "insumos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "renglones_de_receta_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "renglones_de_receta_receta_id_fkey"
+            columns: ["receta_id"]
+            isOneToOne: false
+            referencedRelation: "recetas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       renglones_de_venta: {
         Row: {
           cantidad: number
@@ -1567,6 +1825,15 @@ export type Database = {
         Returns: boolean
       }
       caja_postergar_cierre: { Args: never; Returns: string }
+      caja_tipos_para_vender: {
+        Args: never
+        Returns: {
+          de_sistema: boolean
+          id: string
+          nombre: string
+          se_controla_en_el_cierre: boolean
+        }[]
+      }
       caja_turno_con_cierre: {
         Args: { el_local: string; el_turno: number; la_fecha: string }
         Returns: boolean
@@ -1594,6 +1861,10 @@ export type Database = {
           producto: string
           producto_id: string
         }[]
+      }
+      cierres_anotar_controles: {
+        Args: { datos: Json; el_cierre: string; el_local: string }
+        Returns: undefined
       }
       cierres_con_resultado: {
         Args: { desde: string; hasta: string; persona?: string }
@@ -1623,7 +1894,23 @@ export type Database = {
           ventas_transferencia_centavos: number
         }[]
       }
+      cierres_controles: {
+        Args: { desde: string; hasta: string }
+        Returns: {
+          canal_id: string
+          cantidad: number
+          cierre_id: string
+          tipo: string
+          total_centavos: number
+          ventas_cantidad: number
+          ventas_centavos: number
+        }[]
+      }
       cierres_editar: {
+        Args: { datos: Json; el_id: string }
+        Returns: undefined
+      }
+      cierres_editar_caja: {
         Args: { datos: Json; el_id: string }
         Returns: undefined
       }
@@ -1644,6 +1931,7 @@ export type Database = {
         }[]
       }
       cierres_guardar: { Args: { datos: Json }; Returns: string }
+      cierres_guardar_caja: { Args: { datos: Json }; Returns: string }
       cierres_insertar: {
         Args: { datos: Json; el_local: string }
         Returns: string
@@ -1666,6 +1954,24 @@ export type Database = {
           fecha_origen: string
           insumo_id: string
           origen: string
+        }[]
+      }
+      costos_de_productos: {
+        Args: never
+        Returns: {
+          costo_centavos: number
+          estado: string
+          presentacion_id: string
+          producto_id: string
+        }[]
+      }
+      costos_de_productos_del_local: {
+        Args: { el_local: string }
+        Returns: {
+          costo_centavos: number
+          estado: string
+          presentacion_id: string
+          producto_id: string
         }[]
       }
       es_admin_activo: { Args: never; Returns: boolean }
@@ -1807,6 +2113,11 @@ export type Database = {
           vencimiento: string
         }[]
       }
+      recetas_controlar: {
+        Args: { datos: Json; el_local: string }
+        Returns: undefined
+      }
+      recetas_guardar: { Args: { datos: Json }; Returns: string }
       registrar_cambio_de_contrasena: {
         Args: { cuenta: string; por: string; tipo: string }
         Returns: undefined
@@ -1882,6 +2193,10 @@ export type Database = {
           producto_id: string
         }[]
       }
+      ventas_tipo_del_mostrador: {
+        Args: { datos: Json; el_local: string }
+        Returns: string
+      }
       ventas_totales: {
         Args: {
           desde: string
@@ -1916,7 +2231,13 @@ export type Database = {
       estado_de_venta: "cerrada" | "cancelada" | "en_curso"
       etiqueta_de_producto: "mas_vendido" | "artesanal" | "nuevo"
       frecuencia_de_gasto: "mensual" | "bimestral" | "anual"
-      medio_de_caja: "efectivo" | "credito" | "debito" | "qr" | "transferencia"
+      medio_de_caja:
+        | "efectivo"
+        | "credito"
+        | "debito"
+        | "qr"
+        | "transferencia"
+        | "fuera_de_caja"
       medio_de_pago:
         | "efectivo_caja"
         | "transferencia"
@@ -2057,7 +2378,14 @@ export const Constants = {
       estado_de_venta: ["cerrada", "cancelada", "en_curso"],
       etiqueta_de_producto: ["mas_vendido", "artesanal", "nuevo"],
       frecuencia_de_gasto: ["mensual", "bimestral", "anual"],
-      medio_de_caja: ["efectivo", "credito", "debito", "qr", "transferencia"],
+      medio_de_caja: [
+        "efectivo",
+        "credito",
+        "debito",
+        "qr",
+        "transferencia",
+        "fuera_de_caja",
+      ],
       medio_de_pago: [
         "efectivo_caja",
         "transferencia",
