@@ -13,6 +13,7 @@ const cierre = {
     { id: 'a', monto_centavos: 120000, descripcion: 'Hielo', anulado: false },
     { id: 'b', monto_centavos: 99000, descripcion: 'Viejo', anulado: true },
   ],
+  controles: [],
 };
 
 describe('datosParaEditar', () => {
@@ -30,6 +31,7 @@ describe('datosParaEditar', () => {
       comentario: '',
       retiros: [{ monto: '5.000', quien: 'Dueño' }],
       gastos: [{ monto: '1.200', descripcion: 'Hielo' }],
+      controles: [],
     });
   });
 });

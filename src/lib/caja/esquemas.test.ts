@@ -22,6 +22,7 @@ const datos: DatosDeCierre = {
   comentario: '  ',
   retiros: [{ monto: '5.000', quien: ' Dueño ' }],
   gastos: [{ monto: '1.200', descripcion: 'Hielo' }],
+  controles: [],
 };
 
 describe('centavosDeCaja', () => {
@@ -54,6 +55,7 @@ describe('esquemaCierre', () => {
       comentario: null,
       retiros: [{ monto_centavos: 500000, quien: 'Dueño' }],
       gastos: [{ monto_centavos: 120000, descripcion: 'Hielo' }],
+      controles: [],
     });
   });
 
@@ -105,5 +107,34 @@ describe('el turno del cierre', () => {
     expect(esquemaCierre.safeParse({ ...datos, turno: '3' }).error?.issues[0]?.message).toBe(
       'Elegí el turno.',
     );
+  });
+});
+
+describe('los controles por tipo (pedido 99)', () => {
+  const PY = '7a2d2f1b-3c2e-4d2f-8b7c-2a3b4c5d6e7f';
+
+  it('pasan a la base en centavos, con la cantidad opcional', () => {
+    const conControles = {
+      ...datos,
+      controles: [
+        { canalId: PY, total: '100.000', cantidad: '3' },
+        { canalId: IDENTIFICADOR, total: '0', cantidad: '' },
+      ],
+    };
+    expect(cierreParaLaBase(esquemaCierre.parse(conControles)).controles).toEqual([
+      { canal_id: PY, total_centavos: 10000000, cantidad: 3 },
+      { canal_id: IDENTIFICADOR, total_centavos: 0, cantidad: null },
+    ]);
+  });
+
+  it('el total es obligatorio y la cantidad, un entero', () => {
+    const sinTotal = { ...datos, controles: [{ canalId: PY, total: '', cantidad: '' }] };
+    expect(esquemaCierre.safeParse(sinTotal).success).toBe(false);
+    const malContado = { ...datos, controles: [{ canalId: PY, total: '10', cantidad: '1,5' }] };
+    expect(esquemaCierre.safeParse(malContado).success).toBe(false);
+  });
+
+  it('sin controles, la lista va vacía', () => {
+    expect(cierreParaLaBase(esquemaCierre.parse(datos)).controles).toEqual([]);
   });
 });
