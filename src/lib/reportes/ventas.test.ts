@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   categoriasDelReporte,
+  parteDelTotal,
   productosDelReporte,
   puntosDeVentas,
   ticketPromedio,
+  tiposDelReporte,
   totalesDeVentas,
 } from './ventas';
 
@@ -80,5 +82,25 @@ describe('ventas del reporte', () => {
       { clave: 'c1', nombre: 'Panadería', ventas: 3, montoCentavos: 1000 },
       { clave: 'sin-vincular', nombre: 'Sin vincular', ventas: 1, montoCentavos: 10 },
     ]);
+  });
+});
+
+describe('las ventas por tipo', () => {
+  it('una fila por tipo con sus ventas y su monto; sin tipo, las viejas de Fudo', () => {
+    expect(
+      tiposDelReporte([
+        { canal_id: 'local', tipo: 'Local', ventas: 40, monto_centavos: 900000 },
+        { canal_id: null, tipo: 'Sin tipo', ventas: 2, monto_centavos: 100000 },
+      ]),
+    ).toEqual([
+      { clave: 'local', nombre: 'Local', ventas: 40, montoCentavos: 900000 },
+      { clave: 'sin-tipo', nombre: 'Sin tipo', ventas: 2, montoCentavos: 100000 },
+    ]);
+  });
+
+  it('la parte del total va en por ciento redondeado; sin total no hay parte', () => {
+    expect(parteDelTotal(900000, 1000000)).toBe(90);
+    expect(parteDelTotal(1, 3)).toBe(33);
+    expect(parteDelTotal(0, 0)).toBeNull();
   });
 });
