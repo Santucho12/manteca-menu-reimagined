@@ -157,6 +157,8 @@ Manteca hace dos cierres por día, uno al mediodía y otro a la noche (Santiago,
 
 **Excepción (Santiago, 2026-11-19): sin superpowers instalado.** Como en el pedido 94, sus pasos se siguen a mano: revisión lógica, spec y plan en `docs/superpowers/`, TDD y cierre con `pre-finish`. Queda sin hacer la ejecución con subagentes.
 
+**Excepción (Santiago, 2026-11-19): la prueba en vivo entera, postergada.** «Las pruebas en vivo postergámoslas, porque si no será demasiado lento.» Se corrieron solas las pruebas en vivo nuevas del pedido (`e2e/caja-turnos.spec.ts` y `e2e/caja-turnos-control.spec.ts`, en computadora: primero fallaron y después pasaron las 12), y `npm run verificar` entero. Queda sin hacer: `npm run e2e` entero en los dos tamaños, con las pruebas que ya existían y que se pusieron al día (`e2e/caja.spec.ts`, `e2e/caja-control.spec.ts` y `e2e/reportes.spec.ts`), y la prueba nueva de la venta a mano (el turno sigue a la fecha). Hasta correrla, el pedido sigue en Pendientes.
+
 ### 93. Datos de ejemplo en la base de pruebas
 Santiago pide inventar ejemplos y cargar la base con datos falsos (2026-11-18). Van solo a la base de pruebas, en un local aparte con sus propias cuentas, para que no cambien lo que miran los tests: ventas de mostrador, cierres (algunos con diferencia), gastos y proveedores de los últimos meses. Un comando los vuelve a armar. La base real arranca de cero. Se arma después del pedido 89 y crece con los pedidos 90 a 92.
 
@@ -364,7 +366,7 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 
 | # | Pedido | Qué falta |
 |---|---|---|
-| 98 | Cierres de caja por turno, con traba a la hora del cierre | Todo: spec, plan, TDD y cierre |
+| 98 | Cierres de caja por turno, con traba a la hora del cierre | Hecho en la rama `feat/cierres-por-turno` (worktree `orca/manteca-cierres-por-turno`) y probado contra `mantecatest`: migraciones `20261119130000_cierres_por_turno` y `20261119130100_traba_del_cierre` aplicadas ahí, con sus reversas probadas en una transacción que se deshace. `npm run verificar` en verde (1.439 tests; uno del reporte se puso al día después y pasó solo). Las pruebas en vivo nuevas pasaron en computadora. Falta: `npm run e2e` entero en los dos tamaños, postergado por Santiago (ver la excepción en el pedido) |
 | 93 | Datos de ejemplo en la base de pruebas | Hecho en la rama `feat/datos-de-ejemplo` (sobre la del 89) y probado contra la base de Docker (excepción anotada en el pedido 89). `npm run sembrar:ejemplos` arma el Local de ejemplo con el menú copiado, sus cuentas y 60 días inventados; `scripts/ejemplos/sembrar.base.test.ts` pasó. Se sumó la prueba en vivo `e2e/ejemplos.spec.ts`: arma un local de ejemplo chico, entra con su admin (ve sus ventas, sus cierres y sus proveedores) y con su caja (vende con el menú copiado), y lo borra. Encontró que al local de ejemplo le faltaba la tolerancia de caja y su control de cierres no abría: se corrigió con TDD. Esa prueba pasó en la computadora y falta correrla en el celular. Lint, tipos, todos los tests y build pasaron en la cima de la pila (ver el pedido 89). Falta: correr `npm run sembrar:ejemplos` en la base de pruebas, después de aplicar ahí las migraciones del 89, entrar como `ejemplo.admin` y mirar Inicio, Ventas, Caja, Gastos y Reportes, y correr ahí `npm run verificar` y `npm run e2e` |
 | 92 | Liquidaciones de las plataformas | Todo: diseño, TDD y cierre. Hace falta una liquidación real de PedidosYa |
 | 91 | PedidosYa en el sistema | Todo: diseño, TDD y cierre. Hace falta un reporte real de PedidosYa |
