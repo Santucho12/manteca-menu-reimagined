@@ -1731,6 +1731,7 @@ export type Database = {
       renglones_de_venta: {
         Row: {
           cantidad: number
+          costo_unitario_centavos: number | null
           descripcion: string
           fecha_actualizacion: string
           fecha_creacion: string
@@ -1744,6 +1745,7 @@ export type Database = {
         }
         Insert: {
           cantidad: number
+          costo_unitario_centavos?: number | null
           descripcion: string
           fecha_actualizacion?: string
           fecha_creacion?: string
@@ -1757,6 +1759,7 @@ export type Database = {
         }
         Update: {
           cantidad?: number
+          costo_unitario_centavos?: number | null
           descripcion?: string
           fecha_actualizacion?: string
           fecha_creacion?: string
@@ -2198,6 +2201,18 @@ export type Database = {
           primero: string
         }
         Returns: boolean
+      }
+      ganancia_por_producto: {
+        Args: { desde: string; hasta: string }
+        Returns: {
+          costo_centavos: number
+          ganancia_centavos: number
+          producto: string
+          producto_id: string
+          sin_costo: number
+          unidades: number
+          ventas_centavos: number
+        }[]
       }
       gastos_exigir_medio: {
         Args: { anterior: string; nuevo: string }
