@@ -2348,6 +2348,10 @@ export type Database = {
         Returns: undefined
       }
       recetas_guardar: { Args: { datos: Json }; Returns: string }
+      recetas_usar_la_del_producto: {
+        Args: { el_producto: string; la_presentacion: string }
+        Returns: undefined
+      }
       registrar_cambio_de_contrasena: {
         Args: { cuenta: string; por: string; tipo: string }
         Returns: undefined
