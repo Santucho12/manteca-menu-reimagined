@@ -357,7 +357,7 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 
 | # | Pedido | Qué falta |
 |---|---|---|
-| 93 | Datos de ejemplo en la base de pruebas | Todo, después del pedido 89 |
+| 93 | Datos de ejemplo en la base de pruebas | Hecho en la rama `feat/datos-de-ejemplo` (sobre la del 89), sin correr contra la base: falta `.env.local`. `npm run sembrar:ejemplos` arma el Local de ejemplo con el menú copiado, sus cuentas y 60 días inventados. En verde los puros de `scripts/ejemplos` (21). Escrito y sin correr: `scripts/ejemplos/sembrar.base.test.ts`. Falta: aplicar la migración del 89, correr ese test (verlo fallar antes y pasar), correr el comando, entrar como `ejemplo.admin` y mirar Inicio, Ventas, Caja, Gastos y Reportes, y el cierre completo |
 | 92 | Liquidaciones de las plataformas | Todo: diseño, TDD y cierre. Hace falta una liquidación real de PedidosYa |
 | 91 | PedidosYa en el sistema | Todo: diseño, TDD y cierre. Hace falta un reporte real de PedidosYa |
 | 90 | Ventas por tipo de venta | Todo: diseño, TDD y cierre |

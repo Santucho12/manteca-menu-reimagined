@@ -219,6 +219,7 @@ El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
 | `npm run verificar` | Lint, tipos, todos los tests y build, en ese orden; se corta en el primer error |
 | `npm run e2e` | Las pruebas de Playwright, sin abrir ventana (con `E2E_A_LA_VISTA=1`, a la vista) |
 | `npm run sembrar:pruebas` | Crea en la base de pruebas los usuarios de prueba que falten y repara la contraseña de los que ya estaban; a todos les deja su rol, su local y su estado |
+| `npm run sembrar:ejemplos` | Arma (o vuelve a armar) en la base de pruebas el "Local de ejemplo", aparte del principal: su menú copiado, las cuentas `ejemplo.admin@manteca.test` y `ejemplo.caja@manteca.test` (con la contraseña de las de prueba) y 60 días de ventas, cierres, gastos y proveedores inventados (pedido 93). Nunca en la real |
 
 El lint es ESLint más el control de formato de Prettier. Si falla por formato, lo corrige
 `npx prettier --write .`.
