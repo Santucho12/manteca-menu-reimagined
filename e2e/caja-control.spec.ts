@@ -11,7 +11,7 @@ import {
   sembrarCierreConSalidas,
 } from '../tests/cierres-de-prueba';
 import { borrarVentas, sembrarVentaConPago } from '../tests/ventas-de-prueba';
-import { SESIONES } from './ayudas';
+import { SESIONES, terminarCierre } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -146,7 +146,7 @@ test('el admin edita un cierre y el resultado se vuelve a calcular', async ({ pa
   await expect(page.getByText('La caja cierra')).toBeVisible();
   await page.getByRole('link', { name: 'Editar cierre' }).click();
   await page.getByLabel('Efectivo contado').fill('24.000');
-  await page.getByRole('button', { name: 'Guardar cambios' }).click();
+  await terminarCierre(page);
   await expect(page.getByText('Con diferencia', { exact: true })).toBeVisible();
   await expect(page.getByText('Sobran $4.000,00').first()).toBeVisible();
 });

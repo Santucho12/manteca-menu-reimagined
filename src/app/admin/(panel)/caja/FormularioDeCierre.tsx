@@ -1,23 +1,23 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Banknote } from 'lucide-react';
+import { ArrowRight, Banknote } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import type { FormEvent } from 'react';
 import { useForm } from 'react-hook-form';
-import { AvisoDeError } from '@/components/formularios/AvisoDeError';
 import { Campo } from '@/components/formularios/Campo';
-import { CampoDeTextoLargo } from '@/components/formularios/CampoDeTextoLargo';
-import { PieDelFormulario } from '@/components/formularios/PieDelFormulario';
 import { FranjaDeAviso } from '@/components/panel/Avisos';
+import { BOTON_PRINCIPAL } from '@/components/panel/estilos';
 import { Seccion } from '@/components/panel/Seccion';
 import { esquemaCierre, type DatosDeCierre } from '@/lib/caja/esquemas';
 import { conValorInicial, type Registro } from '@/lib/formularios/valorInicial';
 import { useGuardar } from '@/lib/gastos/useGuardar';
+import { usePasosDelCierre } from '@/lib/caja/usePasosDelCierre';
 import { editarCierreDesdeElPanel, guardarCierreDesdeElPanel } from './acciones';
 import { CAMPO_CONTRASTADO } from './contraste';
-import { ControlesPorTipo, type TipoControlado } from './ControlesPorTipo';
 import { ElegirTurno } from './ElegirTurno';
 import { GastosDeCaja, Retiros } from './Salidas';
+import { VentanasDelCierre, type TipoControlado } from './VentanasDelCierre';
 
 type CamposDeMonto = 'fondoInicial' | 'efectivo' | 'credito' | 'debito' | 'qr' | 'transferencia';
 
@@ -70,15 +70,21 @@ export function FormularioDeCierre({ inicial, id, avisoDelFondo, tipos = [] }: P
   const guardado = useGuardar(guardar, (respuesta) =>
     verDetalle(id ?? (respuesta as { id: string }).id),
   );
-  const { register, control, handleSubmit, formState } = useForm<DatosDeCierre>({
+  const { register, control, handleSubmit, formState, trigger } = useForm<DatosDeCierre>({
     resolver: zodResolver(esquemaCierre),
     defaultValues: inicial,
   });
   const { errors } = formState;
   const registro = conValorInicial(register, inicial);
+  const pasos = usePasosDelCierre(tipos.length, (campos) => trigger(campos));
+  // Enter en la caja pasa al paso siguiente; guardar es el último paso, en su ventana.
+  const siguiente = (evento: FormEvent) => {
+    evento.preventDefault();
+    void pasos.avanzar();
+  };
   return (
     <Seccion icono={<Banknote className="text-primary" size={24} />}>
-      <form onSubmit={handleSubmit(guardado.enviar)} noValidate className="space-y-5">
+      <form onSubmit={siguiente} noValidate className="space-y-5">
         <ElegirTurno
           fecha={inicial.fecha}
           turno={Number(inicial.turno) as 1 | 2}
@@ -111,19 +117,20 @@ export function FormularioDeCierre({ inicial, id, avisoDelFondo, tipos = [] }: P
           error={errors.quedaEnCaja?.message}
           {...registro('quedaEnCaja')}
         />
-        <ControlesPorTipo tipos={tipos} registro={registro} errors={errors} />
-        <CampoDeTextoLargo
-          className={CAMPO_CONTRASTADO}
-          id="comentario"
-          etiqueta="Comentario"
-          error={errors.comentario?.message}
-          {...registro('comentario')}
-        />
-        {guardado.mensaje ? <AvisoDeError mensaje={guardado.mensaje} /> : null}
-        <PieDelFormulario
-          blanco
+        <button type="submit" className={BOTON_PRINCIPAL}>
+          Siguiente
+          <ArrowRight size={14} aria-hidden="true" />
+        </button>
+        <VentanasDelCierre
+          {...pasos}
+          cerrar={pasos.volverALaCaja}
+          tipos={tipos}
+          registro={registro}
+          errors={errors}
+          guardar={handleSubmit(guardado.enviar)}
           enviando={guardado.enviando}
-          texto={id ? 'Guardar cambios' : 'Guardar cierre'}
+          mensaje={guardado.mensaje}
+          textoDeGuardar={id ? 'Guardar cambios' : 'Guardar cierre'}
         />
       </form>
     </Seccion>

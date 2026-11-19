@@ -18,7 +18,7 @@ import {
   idsDeVentasDelProducto,
   sembrarVentaConPago,
 } from '../tests/ventas-de-prueba';
-import { SESIONES, esperarHidratacion } from './ayudas';
+import { SESIONES, esperarHidratacion, terminarCierre } from './ayudas';
 
 const HOY = diaEnArgentina(new Date());
 let categoria: CategoriaSembrada;
@@ -121,7 +121,7 @@ test.describe('con la sesión de caja', () => {
     await page.getByLabel('Fondo inicial').fill('10.000');
     await page.getByLabel('Efectivo contado').fill('10.010');
     await page.getByLabel('Queda en la caja').fill('10.000');
-    await page.getByRole('button', { name: 'Guardar cierre' }).click();
+    await terminarCierre(page);
     await expect(page).toHaveURL(/\/admin\/caja\/cierres\//);
     await abrirVender(page);
     await expect(ventana(page)).toBeHidden();

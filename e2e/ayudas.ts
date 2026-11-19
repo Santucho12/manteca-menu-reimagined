@@ -74,3 +74,24 @@ export async function enlaceDeSeccion(page: Page, nombre: string): Promise<Locat
 export async function abrirSeccion(page: Page, nombre: string): Promise<void> {
   await (await enlaceDeSeccion(page, nombre)).click();
 }
+
+type FinDelCierre = { facturado?: Record<string, string>; comentario?: string };
+
+/**
+ * Del formulario de la caja al guardado, por las ventanas del cierre: cada tipo de venta sin
+ * monto pedido va en cero. Termina con el clic en guardar (pedido 100).
+ */
+export async function terminarCierre(page: Page, fin: FinDelCierre = {}): Promise<void> {
+  await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
+  const paso = page.getByRole('dialog');
+  while (/¿Cuánto se hizo con/.test(await paso.getByRole('heading').innerText())) {
+    const nombre = (await paso.getByRole('heading').innerText()).replace(
+      /^¿Cuánto se hizo con (.*)\?$/,
+      '$1',
+    );
+    await paso.getByLabel(`Facturado en ${nombre}`).fill(fin.facturado?.[nombre] ?? '0');
+    await paso.getByRole('button', { name: 'Siguiente', exact: true }).click();
+  }
+  if (fin.comentario) await paso.getByLabel('Comentario (opcional)').fill(fin.comentario);
+  await paso.getByRole('button', { name: /^Guardar (cierre|cambios)$/ }).click();
+}
