@@ -8,7 +8,7 @@ import {
   sembrarCierre,
 } from '../tests/cierres-de-prueba';
 import { borrarVentas, sembrarVentaConPago } from '../tests/ventas-de-prueba';
-import { SESIONES, aviso, esperarHidratacion, esperarNoEncontrado } from './ayudas';
+import { SESIONES, aviso, esperarHidratacion, esperarNoEncontrado, terminarCierre } from './ayudas';
 
 test.use({ storageState: SESIONES.caja });
 
@@ -49,8 +49,7 @@ test('carga el cierre a ciegas y despues ve su resultado completo', async ({ pag
   await page.getByRole('button', { name: 'Sumar gasto' }).click();
   await page.getByLabel('Monto del gasto 1').fill('1.200');
   await page.getByLabel('En qué se gastó 1').fill('Hielo');
-  await page.getByLabel('Comentario').fill('Todo normal');
-  await page.getByRole('button', { name: 'Guardar cierre' }).click();
+  await terminarCierre(page, { comentario: 'Todo normal' });
   await expect(page).toHaveURL(/\/admin\/caja\/cierres\//);
   await expect(page.getByText('Con diferencia', { exact: true })).toBeVisible();
   await expect(page.getByText('$25.000,50').first()).toBeVisible();
@@ -79,7 +78,7 @@ test('avisa de que dia viene el fondo si ayer no se cargo cierre', async ({ page
 test('no deja cargar dos cierres del mismo dia', async ({ page }) => {
   const { fecha } = await sembrarCierre({ fecha: dia() });
   await completar(page, fecha);
-  await page.getByRole('button', { name: 'Guardar cierre' }).click();
+  await terminarCierre(page);
   await expect(aviso(page)).toHaveText(
     'Ya hay un cierre cargado para ese turno. Si está mal, lo corrige un administrador desde el control de cierres.',
   );
@@ -87,7 +86,7 @@ test('no deja cargar dos cierres del mismo dia', async ({ page }) => {
 
 test('explica lo que falta', async ({ page }) => {
   await page.goto('/admin/caja');
-  await page.getByRole('button', { name: 'Guardar cierre' }).click();
+  await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
   await expect(page.getByLabel('Efectivo contado')).toHaveAccessibleDescription(
     'Escribí cuánto efectivo hay en la caja.',
   );
@@ -96,7 +95,7 @@ test('explica lo que falta', async ({ page }) => {
 test('no deja que quede en la caja mas de lo que se conto', async ({ page }) => {
   await completar(page, dia());
   await page.getByLabel('Queda en la caja').fill('250.000');
-  await page.getByRole('button', { name: 'Guardar cierre' }).click();
+  await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
   await expect(page.getByLabel('Queda en la caja')).toHaveAccessibleDescription(
     'No puede quedar más efectivo del que contaste.',
   );
@@ -143,7 +142,7 @@ test('un cierre que coincide con las ventas del dia cierra', async ({ page }) =>
   ventas.push(await sembrarVentaConPago({ fecha, medio: 'efectivo', centavos: 1500000 }));
   await completar(page, fecha);
   await page.getByLabel('Efectivo contado').fill('25.000');
-  await page.getByRole('button', { name: 'Guardar cierre' }).click();
+  await terminarCierre(page);
   await expect(page.getByText('Cierra', { exact: true })).toBeVisible();
 });
 

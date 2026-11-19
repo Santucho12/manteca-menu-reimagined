@@ -8,7 +8,7 @@ import {
   type ProductoSembrado,
 } from '../tests/menu-de-prueba';
 import { borrarVentas, idsDeVentasDelProducto, sembrarCanal } from '../tests/ventas-de-prueba';
-import { SESIONES, esperarHidratacion } from './ayudas';
+import { SESIONES, esperarHidratacion, terminarCierre } from './ayudas';
 
 const HOY = diaEnArgentina(new Date());
 let categoria: CategoriaSembrada;
@@ -64,8 +64,7 @@ test.describe('con la sesión de caja', () => {
     await page.getByLabel('Fondo inicial').fill('0');
     await page.getByLabel('Efectivo contado').fill('0');
     await page.getByLabel('Queda en la caja').fill('0');
-    await page.getByLabel(`Facturado en ${plataforma.nombre}`).fill('40.000');
-    await page.getByRole('button', { name: 'Guardar cierre' }).click();
+    await terminarCierre(page, { facturado: { [plataforma.nombre]: '40.000' } });
     await expect(page).toHaveURL(/\/admin\/caja\/cierres\//);
     const seccion = page.getByRole('region', { name: plataforma.nombre });
     await expect(seccion).toContainText('Facturado $40.000,00');
