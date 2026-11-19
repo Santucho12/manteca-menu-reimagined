@@ -46,6 +46,16 @@ describe('sembrarEjemplos', () => {
     expect(caja).toEqual({ rol: 'caja', activo: true, local_id: resumen.localId });
   });
 
+  it('le deja la tolerancia de caja de arranque, que el control de cierres necesita', async () => {
+    const secreto = clienteSecretoDePruebas();
+    const resumen = await sembrarEjemplos(secreto, opciones());
+    const { data } = await secreto
+      .from('configuracion_de_caja')
+      .select('tolerancia_centavos')
+      .eq('local_id', resumen.localId);
+    expect(data).toEqual([{ tolerancia_centavos: 50000 }]);
+  });
+
   it('volver a armarlo deja lo mismo, sin duplicar', async () => {
     const secreto = clienteSecretoDePruebas();
     const primera = await sembrarEjemplos(secreto, opciones());
