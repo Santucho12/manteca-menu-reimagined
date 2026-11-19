@@ -15,7 +15,7 @@ pago está la diferencia.
 
 | Quién | Qué hace acá |
 |---|---|
-| Caja | Vende en el mostrador (ver `05-ventas.md`), carga el cierre del día y ve los suyos |
+| Caja | Vende en el mostrador (ver `05-ventas.md`), carga el cierre de su turno y ve los suyos |
 | Admin | Ve todos, los revisa y los anula. También puede cargar uno |
 
 ## Qué declara el empleado
@@ -40,7 +40,8 @@ Lo esperado lo calcula siempre el servidor.
 - **Diferencia:** lo declarado menos lo esperado, por cada medio. Negativa es faltante;
   positiva, sobrante.
 
-Las ventas son las de ese día cobradas en la caja del local: todas las del mostrador y las
+Hay dos turnos por día, Mediodía y Noche, cada uno con su cierre (pedido 98). Las ventas de un
+cierre son las de su día y su turno cobradas en la caja del local: todas las del mostrador y las
 cargadas a mano con "Se cobró en la caja del local" marcada (pedido 89). Una venta mayorista
 cobrada por transferencia a otra cuenta no cambia lo esperado de la caja. Con dos medios,
 cada parte suma a su medio.
@@ -56,7 +57,7 @@ guarda**: se calcula siempre al mostrar, contra las ventas del día en ese momen
 |---|---|
 | Cierra | La diferencia de cada medio con las ventas del día está dentro de la tolerancia |
 | Con diferencia | Algún medio supera la tolerancia (sin ventas ese día, lo esperado es $0) |
-| Pendiente | El día todavía no tiene cierre cargado |
+| Pendiente | Un turno que vendió en la caja, ya pasada su hora de cierre, todavía no tiene cierre (pedido 98). Un turno sin ventas no queda pendiente |
 | No abrió | El admin marcó que ese día el local no abrió: no es pendiente ni avisa en Inicio (pedido 85) |
 
 Un cierre anulado no es un estado: sigue en el historial con su motivo y se ve con «Ver anulados».
@@ -83,10 +84,10 @@ cierre tiene resultado desde que se guarda.
 
 ### Control de cierres, solo admin
 
-- Lista de todos los cierres con fecha, quién lo cargó, estado y la diferencia de cada medio
+- Lista de todos los cierres con fecha, turno, quién lo cargó, estado y la diferencia de cada medio
   (pedido 85: un faltante en un medio y un sobrante en otro no se compensan).
 - Filtros por fechas, persona y estado. La lista está paginada.
-- Los días sin cierre aparecen marcados. Cada uno tiene "No abrió", que lo saca de pendientes y
+- Los turnos pendientes aparecen marcados, cada uno con «Cargar cierre» (pedido 98). Cada uno tiene "No abrió", que lo saca de pendientes y
   lo pasa a la lista "Días que no abrió", con "Deshacer" (pedido 85). Un día con cierre sin
   anular o un día futuro no se marcan; si después se carga un cierre de un día marcado, la
   marca se desactiva sola.
@@ -99,10 +100,24 @@ cierre tiene resultado desde que se guarda.
 - El admin define un monto. Una diferencia menor figura como "cierra" y no genera aviso. La
   diferencia se ve igual.
 
+### Horas de cierre y traba (pedido 98)
+
+- El admin elige la hora de cierre de cada turno en Control de cierres («Horas de cierre»).
+- A esa hora, si el turno vendió en la caja y no tiene cierre, Vender se traba con la ventana
+  «Cierre de caja»: «Hacer el cierre» o «Postergar 10 min», sin límite de veces. Cada
+  postergación queda registrada y se ve en el detalle del cierre.
+- Lo vendido mientras se posterga queda en el turno que se está por cerrar: cada venta guarda
+  su turno al cobrarse.
+- También traba la caja de ayer sin cerrar (el último turno de ayer con ventas), y después del
+  cierre de la noche no se vende hasta el día siguiente.
+- La traba la decide la base: Caja la ve en todas sus pantallas salvo Cargar cierre; el admin,
+  solo en Vender.
+
 ## Reglas
 
 1. El empleado cuenta a ciegas: no ve lo esperado hasta guardar.
-2. Un cierre por día. El segundo intento se rechaza.
+2. Un cierre por turno: dos turnos por día, Mediodía y Noche (pedido 98). El segundo intento del
+   mismo turno se rechaza.
 3. El cierre queda a nombre de quien tiene la sesión iniciada. No se puede elegir a otro.
 4. Un cierre guardado lo edita solo el admin (pedido 85; antes Caja editaba el suyo). Caja ve
    "¿Algo está mal? Avisale a un administrador". Cada cambio queda
@@ -142,7 +157,8 @@ cierre tiene resultado desde que se guarda.
 
 ## Fuera de alcance
 
-- Más de un cierre por día (turnos).
+- Más de dos turnos por día, o un turno que cruza la medianoche.
+- La sección de PedidosYa y otras plataformas en el cierre: va con el pedido 91.
 - Que Caja edite un cierre guardado.
 - Arqueos parciales durante el día.
 - Conciliar con el resumen del banco o de la tarjeta.
@@ -158,7 +174,11 @@ cierre tiene resultado desde que se guarda.
 | Corregir un cierre | Lo edita el admin (pedido 85); desde el 2026-10-28 se editaba, antes se anulaba y se cargaba de nuevo |
 | Diferencias chicas | Tolerancia que define el admin |
 | Fondo de cambio | Se declara en cada cierre, precargado con lo que quedó en el último cierre anterior; si ese no es el de ayer, un aviso dice de qué día viene |
-| Turnos | Un cierre por día (Santiago, 2026-10-09) |
+| Turnos | Dos por día, Mediodía y Noche, cada uno con su cierre (Santiago, 2026-11-19, pedido 98; antes, uno por día) |
+| Hora del cierre | Una por turno, fija y configurable por el admin; arranca en 16:00 y 23:00 hasta saber las de Manteca |
+| A esa hora | Vender se traba hasta cargar el cierre, con «Postergar 10 min» sin límite y cada postergación registrada (Santiago, pedido 98) |
+| Qué ventas son de cada turno | Cada venta guarda su turno al cobrarse: lo vendido mientras se posterga queda en el turno que se está por cerrar (pedido 98) |
+| Turno sin ventas | No traba ni queda pendiente: el local no abrió ese turno (pedido 98) |
 | Tolerancia de arranque | $500; el admin la cambia |
 | Fecha del cierre | Se ve, con hoy por defecto; no acepta días futuros |
 | Quién retiró | Texto libre |
@@ -169,7 +189,7 @@ cierre tiene resultado desde que se guarda.
 
 | Qué | De qué depende |
 |---|---|
-| Si el cliente necesita un cierre por turno | Del cliente. Hoy es uno por día |
+| A qué hora cierra cada turno en Manteca | Del cliente. Arranca en 16:00 y 23:00, y el admin las cambia |
 
 ## Parte técnica
 
@@ -211,3 +231,22 @@ cierres. Pruebas: `tests/servicios/excel-en-el-sistema.base.test.ts`, los puros 
 `cierres_con_resultado` deja de devolver `ventas_cargadas` y suma solo las ventas con
 `en_la_caja`. `resultadoDeFila` compara siempre; el estado `esperando_ventas` ya no existe.
 Pruebas: `tests/servicios/caja-con-el-mostrador.base.test.ts` y los puros de `src/lib/caja`.
+
+**Cierres por turno (pedido 98).** Migraciones `20261119130000_cierres_por_turno` y
+`20261119130100_traba_del_cierre`:
+- `ventas.turno` y `cierres_de_caja.turno` (1 Mediodía, 2 Noche; lo anterior quedó en 2), y un
+  cierre sin anular por `(local_id, fecha, turno)`;
+- las horas en `configuracion_de_caja` (`hora_cierre_mediodia` y `hora_cierre_noche`, que cambia
+  el admin) y la tabla `postergaciones_de_cierre`, que solo se escribe por `caja_postergar_cierre`;
+- `caja_estado_del_turno(momento)` decide a qué turno va una venta y si el mostrador está trabado
+  (`PV314` hora o ayer, `PV315` caja cerrada), sin montos; `ventas_guardar_mostrador` lo usa;
+- `cierres_guardar` pide el turno (`PC302` por turno, `PC309` la noche antes que el mediodía) y
+  `cierres_turnos_pendientes` da los pendientes del control, de Inicio y del reporte.
+
+En la app: `src/lib/caja/turnos.ts` (textos y cuándo volver a preguntar),
+`src/lib/caja/consultasDeTurnos.ts`, la ventana en `src/components/caja/` (en el layout del panel)
+y `npm run sembrar:pruebas` deja las horas del local principal en 23:58 y 23:59 para que las
+pruebas que venden hoy no se traben. Pruebas: `tests/reglas/cierres-por-turno.base.test.ts`,
+`tests/reglas/traba-del-cierre.base.test.ts`, `tests/rls/postergaciones.base.test.ts`,
+`tests/servicios/cierres-por-turno.base.test.ts`, los puros de `src/lib/caja` y
+`e2e/caja-turnos.spec.ts` y `e2e/caja-turnos-control.spec.ts`.

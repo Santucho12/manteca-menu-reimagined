@@ -40,6 +40,8 @@ type SemillaDeCierre = {
   quedaEnCajaCentavos?: number;
   /** Lo declarado en tarjeta de credito (por defecto, nada). */
   creditoCentavos?: number;
+  /** 1 es el Mediodia y 2 la Noche (por defecto, la Noche). */
+  turno?: 1 | 2;
 };
 
 async function filaDeCierre(fecha: string, semilla: SemillaDeCierre) {
@@ -52,6 +54,7 @@ async function filaDeCierre(fecha: string, semilla: SemillaDeCierre) {
     efectivo_centavos: 2000000,
     credito_centavos: semilla.creditoCentavos ?? 0,
     queda_en_caja_centavos: semilla.quedaEnCajaCentavos ?? 1000000,
+    turno: semilla.turno ?? 2,
   };
 }
 
@@ -202,4 +205,34 @@ export async function restaurarTolerancia(): Promise<void> {
     .from('configuracion_de_caja')
     .update({ tolerancia_centavos: 50000 })
     .eq('local_id', await idDelLocalPrincipal(secreto));
+}
+
+/** Cambia las horas de cierre del local principal ('HH:MM'); restaurarlas al terminar. */
+export async function horasDeCierre(mediodia: string, noche: string): Promise<void> {
+  const secreto = clienteSecretoDePruebas();
+  const { error } = await secreto
+    .from('configuracion_de_caja')
+    .update({ hora_cierre_mediodia: mediodia, hora_cierre_noche: noche })
+    .eq('local_id', await idDelLocalPrincipal(secreto));
+  if (error) throw new Error(`No pude cambiar las horas de cierre: ${error.message}`);
+}
+
+/** Las horas que deja la preparacion: tan tarde que las pruebas que venden hoy no se traban. */
+export const HORAS_DE_PRUEBA = { mediodia: '23:58', noche: '23:59' } as const;
+
+export function restaurarHorasDeCierre(): Promise<void> {
+  return horasDeCierre(HORAS_DE_PRUEBA.mediodia, HORAS_DE_PRUEBA.noche);
+}
+
+/** Borra las postergaciones del local principal en esos dias, con su auditoria. */
+export async function borrarPostergaciones(fechas: string[]): Promise<void> {
+  const secreto = clienteSecretoDePruebas();
+  const { data } = await secreto
+    .from('postergaciones_de_cierre')
+    .delete()
+    .in('fecha', fechas)
+    .eq('local_id', await idDelLocalPrincipal(secreto))
+    .select('id');
+  const ids = (data ?? []).map((fila) => fila.id);
+  await secreto.from('auditoria').delete().in('registro_id', ids);
 }

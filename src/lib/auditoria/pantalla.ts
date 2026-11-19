@@ -21,7 +21,13 @@ export const MODULOS = {
   },
   caja: {
     nombre: 'Caja',
-    tablas: ['cierres_de_caja', 'retiros_de_caja', 'configuracion_de_caja', 'dias_sin_abrir'],
+    tablas: [
+      'cierres_de_caja',
+      'retiros_de_caja',
+      'configuracion_de_caja',
+      'dias_sin_abrir',
+      'postergaciones_de_cierre',
+    ],
   },
 } as const;
 

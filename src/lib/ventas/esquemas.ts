@@ -35,6 +35,8 @@ export const esquemaVenta = z.object({
   comentario: z.string().trim().max(500, 'Usá hasta 500 caracteres.'),
   // Marcada, suma a lo esperado del cierre de ese día (pedido 89).
   enLaCaja: z.boolean(),
+  // El turno de la caja en que se cobró; sin cobrar en la caja no se usa.
+  turno: z.enum(['1', '2'], 'Elegí el turno.'),
   renglones: z.array(renglon).min(1, 'Sumá al menos un producto.'),
 });
 
@@ -68,6 +70,7 @@ export function ventaParaLaBase(datos: DatosDeVenta) {
     medio: datos.medio,
     comentario: datos.comentario.trim() || null,
     en_la_caja: datos.enLaCaja,
+    turno: datos.enLaCaja ? Number(datos.turno) : 2,
     renglones: datos.renglones.map(renglonParaLaBase),
   };
 }

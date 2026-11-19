@@ -9,6 +9,9 @@ import { BotonDeAnular } from '@/components/panel/BotonDeAnular';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { cierreConFondoAnterior, type Cierre } from '@/lib/caja/consultas';
+import { postergacionesDelCierre } from '@/lib/caja/consultasDeTurnos';
+import { nombreDelTurno, textoDePostergaciones } from '@/lib/caja/turnos';
+import type { Cliente } from '@/lib/supabase/cliente';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import { anularCierreDesdeElPanel } from '../../acciones';
 import { DetalleDelCierre } from './DetalleDelCierre';
@@ -47,12 +50,19 @@ function AccionesDelCierre({ cierre, esAdmin }: { cierre: Cierre; esAdmin: boole
   );
 }
 
+// El cierre y, con su fecha y su turno, cuántas veces se postergó.
+async function leerLaFicha(cliente: Cliente, id: string) {
+  const datos = await cierreConFondoAnterior(cliente, id);
+  if (!datos) return null;
+  const { cierre } = datos;
+  const postergaciones = await postergacionesDelCierre(cliente, cierre.fecha, cierre.turno);
+  return { ...datos, postergaciones: textoDePostergaciones(postergaciones) };
+}
+
 export default async function FichaDeCierre({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   // RLS decide: Caja lee solo los suyos; uno ajeno no existe para ella.
-  const { estado, datos } = await exigirPaginaYLeer('caja', (cliente) =>
-    cierreConFondoAnterior(cliente, id),
-  );
+  const { estado, datos } = await exigirPaginaYLeer('caja', (cliente) => leerLaFicha(cliente, id));
   if (!datos) notFound();
   const { cierre } = datos;
   const esAdmin = estado === 'admin';
@@ -60,12 +70,15 @@ export default async function FichaDeCierre({ params }: { params: Promise<{ id: 
   const anterior = esAdmin ? datos.fondoAnteriorCentavos : null;
   return (
     <Pantalla
-      titulo={`Cierre del ${fechaParaMostrar(cierre.fecha)}`}
+      titulo={`Cierre del ${fechaParaMostrar(cierre.fecha)} · ${nombreDelTurno(cierre.turno)}`}
       subtitulo={`Cargado por ${cierre.persona}`}
       ayuda={esAdmin ? 'control' : 'caja'}
     >
       <ResumenDelCierre cierre={cierre} />
       <Marcas cierre={cierre} />
+      {datos.postergaciones ? (
+        <p className="text-sm font-semibold text-amber-800">{datos.postergaciones}</p>
+      ) : null}
       <DetalleDelCierre cierre={cierre} fondoAnterior={anterior} />
       {cierre.anulado ? null : <AccionesDelCierre cierre={cierre} esAdmin={esAdmin} />}
       <EnlaceDeVolver href={esAdmin ? '/admin/caja/control' : '/admin/caja/mis-cierres'}>

@@ -48,6 +48,7 @@ const datos = (fecha: string, cambios: Partial<DatosDeVenta> = {}): DatosDeVenta
   medio: 'transferencia',
   comentario: 'Encargo de la escuela',
   enLaCaja: false,
+  turno: '2',
   renglones: [
     {
       opcion: `${producto.productoId}|${producto.presentacionId}`,

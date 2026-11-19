@@ -5,7 +5,8 @@ import { useGuardar } from '../gastos/useGuardar';
 import { fallo, type Resultado } from '../resultado';
 import { preciosAlDia, type CategoriaParaVender } from './catalogo';
 import type { EleccionDeCobro } from './cobro';
-import { MENSAJES_DEL_MOSTRADOR, type VentaGuardada } from './escritura';
+import { EVENTO_DE_LA_TRABA } from '../caja/useEstadoDelTurno';
+import { esRechazoDeLaTraba, MENSAJES_DEL_MOSTRADOR, type VentaGuardada } from './escritura';
 import type { VentaDelMostrador } from './esquemas';
 import {
   cambiarCantidad,
@@ -75,8 +76,12 @@ export function useCobrar(vender: Vender, alCobrar: (venta: VentaGuardada) => vo
   async function intentar(datos: Omit<VentaDelMostrador, 'clave'>) {
     const generico = () => fallo(MENSAJES_DEL_MOSTRADOR.generico);
     const resultado = await vender({ ...datos, clave }).catch(generico);
-    // Si cambió un precio, vuelve a leer el catálogo: el ticket toma el nuevo.
+    // Si cambió un precio, vuelve a leer el catálogo: el ticket toma el nuevo. Si la traba del
+    // cierre rechazó la venta, la ventana del cierre se entera y aparece.
     if (!resultado.ok) router.refresh();
+    if (!resultado.ok && esRechazoDeLaTraba(resultado.mensaje)) {
+      window.dispatchEvent(new Event(EVENTO_DE_LA_TRABA));
+    }
     return resultado;
   }
   return useGuardar(intentar, (venta: VentaGuardada) => {

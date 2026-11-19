@@ -317,6 +317,7 @@ export type Database = {
           qr_centavos: number
           queda_en_caja_centavos: number
           transferencia_centavos: number
+          turno: number
         }
         Insert: {
           anulado?: boolean
@@ -337,6 +338,7 @@ export type Database = {
           qr_centavos?: number
           queda_en_caja_centavos: number
           transferencia_centavos?: number
+          turno?: number
         }
         Update: {
           anulado?: boolean
@@ -357,6 +359,7 @@ export type Database = {
           qr_centavos?: number
           queda_en_caja_centavos?: number
           transferencia_centavos?: number
+          turno?: number
         }
         Relationships: [
           {
@@ -386,6 +389,8 @@ export type Database = {
         Row: {
           fecha_actualizacion: string
           fecha_creacion: string
+          hora_cierre_mediodia: string
+          hora_cierre_noche: string
           id: string
           local_id: string
           tolerancia_centavos: number
@@ -393,6 +398,8 @@ export type Database = {
         Insert: {
           fecha_actualizacion?: string
           fecha_creacion?: string
+          hora_cierre_mediodia?: string
+          hora_cierre_noche?: string
           id?: string
           local_id: string
           tolerancia_centavos?: number
@@ -400,6 +407,8 @@ export type Database = {
         Update: {
           fecha_actualizacion?: string
           fecha_creacion?: string
+          hora_cierre_mediodia?: string
+          hora_cierre_noche?: string
           id?: string
           local_id?: string
           tolerancia_centavos?: number
@@ -995,6 +1004,57 @@ export type Database = {
           },
         ]
       }
+      postergaciones_de_cierre: {
+        Row: {
+          desde: string
+          fecha: string
+          fecha_actualizacion: string
+          fecha_creacion: string
+          hasta: string
+          id: string
+          local_id: string
+          postergado_por: string
+          turno: number
+        }
+        Insert: {
+          desde: string
+          fecha: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          hasta: string
+          id?: string
+          local_id?: string
+          postergado_por?: string
+          turno: number
+        }
+        Update: {
+          desde?: string
+          fecha?: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          hasta?: string
+          id?: string
+          local_id?: string
+          postergado_por?: string
+          turno?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "postergaciones_de_cierre_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "postergaciones_de_cierre_postergado_por_fkey"
+            columns: ["postergado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       precios: {
         Row: {
           activo: boolean
@@ -1367,6 +1427,7 @@ export type Database = {
           motivo_anulacion: string | null
           origen: Database["public"]["Enums"]["origen_de_venta"]
           total_centavos: number
+          turno: number
         }
         Insert: {
           anulado?: boolean
@@ -1388,6 +1449,7 @@ export type Database = {
           motivo_anulacion?: string | null
           origen?: Database["public"]["Enums"]["origen_de_venta"]
           total_centavos: number
+          turno?: number
         }
         Update: {
           anulado?: boolean
@@ -1409,6 +1471,7 @@ export type Database = {
           motivo_anulacion?: string | null
           origen?: Database["public"]["Enums"]["origen_de_venta"]
           total_centavos?: number
+          turno?: number
         }
         Relationships: [
           {
@@ -1463,6 +1526,63 @@ export type Database = {
       }
     }
     Functions: {
+      caja_dia_sin_abrir: {
+        Args: { el_local: string; la_fecha: string }
+        Returns: boolean
+      }
+      caja_estado_del_mostrador: {
+        Args: never
+        Returns: {
+          fecha: string
+          fecha_trabada: string
+          hora_de_corte: string
+          motivo: string
+          postergado_hasta: string
+          proxima_hora: string
+          trabado: boolean
+          turno: number
+          turno_trabado: number
+        }[]
+      }
+      caja_estado_del_turno: {
+        Args: { momento: string }
+        Returns: {
+          fecha: string
+          fecha_trabada: string
+          hora_de_corte: string
+          motivo: string
+          postergado_hasta: string
+          proxima_hora: string
+          trabado: boolean
+          turno: number
+          turno_trabado: number
+        }[]
+      }
+      caja_hora_del_turno: {
+        Args: { el_local: string; el_turno: number }
+        Returns: string
+      }
+      caja_mediodia_sin_cerrar: {
+        Args: { el_local: string; la_fecha: string }
+        Returns: boolean
+      }
+      caja_postergar_cierre: { Args: never; Returns: string }
+      caja_turno_con_cierre: {
+        Args: { el_local: string; el_turno: number; la_fecha: string }
+        Returns: boolean
+      }
+      caja_turno_con_ventas: {
+        Args: { el_local: string; el_turno: number; la_fecha: string }
+        Returns: boolean
+      }
+      caja_turno_de_ayer_sin_cerrar: {
+        Args: { ayer: string; el_local: string }
+        Returns: number
+      }
+      caja_turno_de_la_venta: {
+        Args: { el_local: string; la_fecha: string }
+        Returns: number
+      }
       catalogo_para_vender: {
         Args: never
         Returns: {
@@ -1495,6 +1615,7 @@ export type Database = {
           retiros_centavos: number
           tolerancia_centavos: number
           transferencia_centavos: number
+          turno: number
           ventas_credito_centavos: number
           ventas_debito_centavos: number
           ventas_efectivo_centavos: number
@@ -1507,8 +1628,14 @@ export type Database = {
         Returns: undefined
       }
       cierres_exigir_quien_carga: { Args: never; Returns: undefined }
-      cierres_fecha_del_fondo: { Args: { la_fecha: string }; Returns: string }
-      cierres_fondo_sugerido: { Args: { la_fecha: string }; Returns: number }
+      cierres_fecha_del_fondo: {
+        Args: { el_turno?: number; la_fecha: string }
+        Returns: string
+      }
+      cierres_fondo_sugerido: {
+        Args: { el_turno?: number; la_fecha: string }
+        Returns: number
+      }
       cierres_fondos_anteriores: {
         Args: { ids: string[] }
         Returns: {
@@ -1524,6 +1651,13 @@ export type Database = {
       cierres_marcar_sin_abrir: {
         Args: { la_fecha: string; marcar: boolean }
         Returns: undefined
+      }
+      cierres_turnos_pendientes: {
+        Args: { desde: string; hasta: string; momento?: string }
+        Returns: {
+          fecha: string
+          turno: number
+        }[]
       }
       costo_de_insumos: {
         Args: never

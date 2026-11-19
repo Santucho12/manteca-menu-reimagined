@@ -1,4 +1,5 @@
 import { AlertTriangle, ArrowRight, ChevronDown } from 'lucide-react';
+import { nombreDelTurno, type Turno } from '@/lib/caja/turnos';
 import Link from 'next/link';
 import { BarraAutomatica } from '@/components/panel/BarraAutomatica';
 import { FiltroDeFecha, FiltroDeSeleccion } from '@/components/panel/Filtros';
@@ -42,16 +43,19 @@ export function FiltrosDelControl({
   );
 }
 
-function DiaSinCierre({ dia }: { dia: string }) {
+type TurnoPendiente = { dia: string; turno: Turno };
+
+function DiaSinCierre({ dia, turno }: TurnoPendiente) {
   return (
     <li className="flex items-center">
-      <Link href={`/admin/caja?fecha=${dia}`} className={FILA_DEL_DIA}>
+      <Link href={`/admin/caja?fecha=${dia}&turno=${turno}`} className={FILA_DEL_DIA}>
         <span className="w-12 rounded-lg bg-amber-100 py-1 text-center text-[10px] font-black uppercase tracking-widest text-amber-800">
           {diaDeLaSemana(dia)}
         </span>
         <span className="font-display text-base font-bold tracking-tight text-foreground">
           {fechaParaMostrar(dia)}
         </span>
+        <span className="text-sm font-semibold text-muted-foreground">{nombreDelTurno(turno)}</span>
         <span className="ml-auto inline-flex items-center gap-1 text-xs font-bold text-primary opacity-70 group-hover/fila:opacity-100">
           Cargar cierre
           <ArrowRight
@@ -67,9 +71,11 @@ function DiaSinCierre({ dia }: { dia: string }) {
 }
 
 // Una sola franja con la cantidad; el desplegable lista los dias, cada uno lleva a cargar ese dia.
-export function DiasSinCierre({ dias, abierto = false }: { dias: string[]; abierto?: boolean }) {
-  if (dias.length === 0) return null;
-  const texto = `${dias.length} ${dias.length === 1 ? 'día pendiente' : 'días pendientes'}`;
+type PropsDePendientes = { turnos: { fecha: string; turno: Turno }[]; abierto?: boolean };
+
+export function DiasSinCierre({ turnos, abierto = false }: PropsDePendientes) {
+  if (turnos.length === 0) return null;
+  const texto = `${turnos.length} ${turnos.length === 1 ? 'turno pendiente' : 'turnos pendientes'}`;
   return (
     <details
       open={abierto}
@@ -79,7 +85,7 @@ export function DiasSinCierre({ dias, abierto = false }: { dias: string[]; abier
         <AlertTriangle size={18} className="shrink-0" aria-hidden="true" />
         <span className="text-sm font-semibold">{texto}</span>
         <span className="hidden text-xs text-amber-800/70 sm:inline">
-          Tocá un día para cargar su cierre
+          Tocá un turno para cargar su cierre
         </span>
         <ChevronDown
           size={18}
@@ -88,11 +94,11 @@ export function DiasSinCierre({ dias, abierto = false }: { dias: string[]; abier
         />
       </summary>
       <ul
-        aria-label="Días sin cierre"
+        aria-label="Turnos sin cierre"
         className="mx-4 mb-4 divide-y divide-amber-100 overflow-hidden rounded-xl border border-amber-200 bg-white/80"
       >
-        {dias.map((dia) => (
-          <DiaSinCierre key={dia} dia={dia} />
+        {turnos.map(({ fecha, turno }) => (
+          <DiaSinCierre key={`${fecha}-${turno}`} dia={fecha} turno={turno} />
         ))}
       </ul>
     </details>

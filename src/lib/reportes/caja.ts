@@ -1,43 +1,52 @@
 import { fechaParaMostrar } from '../gastos/pantalla';
-import { diasQueNoAbrio, diasSinCierre } from '../caja/dias';
-import { sumarDias, type Periodo } from './periodos';
+import { diasQueNoAbrio } from '../caja/dias';
+import type { Turno } from '../caja/turnos';
 
 export type CierreDelReporte = {
   fecha: string;
+  turno: Turno;
   persona: string;
   declaradoCentavos: number;
   diferenciaCentavos: number | null;
 };
-export type FilaDeCaja = { fecha: string; cierre: CierreDelReporte | null; noAbrio: boolean };
+export type FilaDeCaja = {
+  fecha: string;
+  turno: Turno | null;
+  cierre: CierreDelReporte | null;
+  noAbrio: boolean;
+};
 export type ResumenDeEmpleado = {
   persona: string;
   cierres: number;
   diferenciaCentavos: number | null;
 };
 
-const sinCierre = (fecha: string, noAbrio: boolean): FilaDeCaja => ({
+const orden = (fila: FilaDeCaja) => `${fila.fecha}|${fila.turno ?? 3}`;
+
+const noAbrio = (fecha: string): FilaDeCaja => ({
   fecha,
+  turno: null,
   cierre: null,
-  noAbrio,
+  noAbrio: true,
 });
 
-/** Los cierres, los dias sin cierre y los que el local no abrio, del mas nuevo al mas viejo. */
+/** Los cierres, los turnos pendientes y los dias que el local no abrio, del mas nuevo al mas viejo. */
 export function filasDeCaja(
   cierres: CierreDelReporte[],
-  periodo: Periodo,
-  primero: string | null,
-  hoy: string,
+  pendientes: { fecha: string; turno: Turno }[],
   sinAbrir: string[] = [],
 ): FilaDeCaja[] {
   const conCierre = cierres.map((c) => c.fecha);
-  // Hoy todavia no cuenta como dia sin cierre.
-  const ayer = sumarDias(hoy, -1);
-  const faltan = diasSinCierre({ ...periodo, conCierre, sinAbrir, primero, hoy: ayer });
   return [
-    ...cierres.map((cierre) => ({ fecha: cierre.fecha, cierre, noAbrio: false })),
-    ...faltan.map((fecha) => sinCierre(fecha, false)),
-    ...diasQueNoAbrio({ conCierre, sinAbrir }).map((fecha) => sinCierre(fecha, true)),
-  ].sort((a, b) => b.fecha.localeCompare(a.fecha));
+    ...cierres.map((cierre) => ({
+      fecha: cierre.fecha,
+      turno: cierre.turno,
+      cierre,
+      noAbrio: false,
+    })),
+    ...pendientes.map(({ fecha, turno }) => ({ fecha, turno, cierre: null, noAbrio: false })),
+    ...diasQueNoAbrio({ conCierre, sinAbrir }).map(noAbrio),
+  ].sort((a, b) => orden(b).localeCompare(orden(a)));
 }
 
 function sumarDiferencia(previa: number | null, nueva: number | null): number | null {

@@ -25,7 +25,7 @@ describe('avisosDeInicio', () => {
     expect(
       avisosDeInicio({
         conDiferencia: { cantidad: 2, desde: '2026-09-20' },
-        ayerSinCierre: '2026-10-11',
+        ayerSinCierre: { fecha: '2026-10-11', turnos: [2] },
         pendientes: 1,
         sinClasificar: { cantidad: 3, desde: '2026-08-02', categoriaId: 'sc' },
       }),
@@ -35,7 +35,7 @@ describe('avisosDeInicio', () => {
         enlace: '/admin/caja/control?estado=con_diferencia&desde=2026-09-20',
       },
       {
-        texto: 'Ayer no se cargó el cierre de caja.',
+        texto: 'Ayer quedó sin cargar el cierre de la noche.',
         enlace: '/admin/caja/control?desde=2026-10-11&hasta=2026-10-11',
       },
       { texto: 'Hay 1 persona esperando un rol.', enlace: '/admin/usuarios?estado=pendientes' },

@@ -150,6 +150,15 @@ Borrar todo el front del panel (`/admin`, con el login) y rehacerlo desde cero, 
 
 **Excepción (Santiago, 2026-10-21):** los colores del panel son los exactos de Plan Reminder Pro aunque no pasen el contraste AA que pide el pedido 21 (letra blanca sobre el verde, 2,6 a 1; el rojo de error, 3,6; el anillo de foco, 2,5; los grises chicos, 2,6). Las pruebas de contraste (`tests/contraste.test.ts`) siguen mirando solo la carta pública; no se extienden al panel. El panel no bloquea el zoom en el celular, a diferencia de Plan Reminder Pro (Santiago, 2026-10-22).
 
+### 98. Cierres de caja por turno, con traba a la hora del cierre
+Manteca hace dos cierres por día, uno al mediodía y otro a la noche (Santiago, 2026-11-19). Cada turno tiene su hora de cierre, que el admin configura. A esa hora Vender se traba hasta que se carga el cierre, con un botón para postergar 10 minutos, las veces que haga falta. Lo vendido mientras se posterga queda en el turno que se está por cerrar. Cada cierre compara lo contado con lo cobrado en ese turno. La sección de PedidosYa dentro del cierre va con el pedido 91.
+
+**Excepción (Santiago, 2026-11-19): en un worktree.** Para trabajar a la vez que la sesión de Materia prima, este pedido se hace en el worktree `orca/manteca-cierres-por-turno`, con su `.env.local` y su `npm install`, y la aplicación en el puerto 3220. Las dos sesiones comparten `mantecatest` y no corren `npm run e2e` a la vez. Sin `git push`: al terminar entra al `main` local con merge commit, y después se borran la rama y el worktree.
+
+**Excepción (Santiago, 2026-11-19): sin superpowers instalado.** Como en el pedido 94, sus pasos se siguen a mano: revisión lógica, spec y plan en `docs/superpowers/`, TDD y cierre con `pre-finish`. Queda sin hacer la ejecución con subagentes.
+
+**Excepción (Santiago, 2026-11-19): la prueba en vivo entera, postergada.** «Las pruebas en vivo postergámoslas, porque si no será demasiado lento.» Se corrieron solas las pruebas en vivo nuevas del pedido (`e2e/caja-turnos.spec.ts` y `e2e/caja-turnos-control.spec.ts`, en computadora: primero fallaron y después pasaron las 12), y `npm run verificar` entero. Queda sin hacer: `npm run e2e` entero en los dos tamaños, con las pruebas que ya existían y que se pusieron al día (`e2e/caja.spec.ts`, `e2e/caja-control.spec.ts` y `e2e/reportes.spec.ts`), y la prueba nueva de la venta a mano (el turno sigue a la fecha). Hasta correrla, el pedido sigue en Pendientes.
+
 ### 97. El costo de lo vendido y la ganancia por producto
 Cada renglón de una venta del mostrador guarda el costo de ese momento, y Reportes suma «Ganancia por producto»: unidades, ventas, costo y ganancia de cada producto en el período, ordenado por la plata que dejó (Santiago, 2026-11-19). Definido en `docs/modulos/11-costos.md`.
 
@@ -375,6 +384,7 @@ La pestaña del navegador no muestra ningún ícono. Va la medialuna 🥐, como 
 
 | # | Pedido | Qué falta |
 |---|---|---|
+| 98 | Cierres de caja por turno, con traba a la hora del cierre | Hecho en la rama `feat/cierres-por-turno` (worktree `orca/manteca-cierres-por-turno`) y probado contra `mantecatest`: migraciones `20261119130000_cierres_por_turno` y `20261119130100_traba_del_cierre` aplicadas ahí, con sus reversas probadas en una transacción que se deshace. `npm run verificar` en verde (1.439 tests; uno del reporte se puso al día después y pasó solo). Las pruebas en vivo nuevas pasaron en computadora. Falta: `npm run e2e` entero en los dos tamaños, postergado por Santiago (ver la excepción en el pedido) |
 | 97 | El costo de lo vendido y la ganancia por producto | Todo: plan, TDD y cierre. Diseño hecho |
 | 96 | Compras | Todo: plan, TDD y cierre. Diseño hecho |
 | 95 | Recetas y Costos | Todo: plan, TDD y cierre. Diseño hecho |

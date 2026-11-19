@@ -1,10 +1,12 @@
+import { textoDeAyerSinCierre } from '../caja/turnos';
 import { textoDePendientes } from '../usuarios/presentacion';
 import type { PagosParaAvisar } from './pagos';
 
 export type ConFecha = { cantidad: number; desde: string | null };
 export type DatosDeAvisos = {
   conDiferencia: ConFecha;
-  ayerSinCierre: string | null;
+  /** Los turnos de ayer con ventas y sin cierre; nulo si no falta ninguno. */
+  ayerSinCierre: { fecha: string; turnos: number[] } | null;
   pendientes: number;
   sinClasificar: ConFecha & { categoriaId: string | null };
   /** Sale de Próximos pagos de Gastos, que Inicio lee aparte de los avisos. */
@@ -26,14 +28,10 @@ function deCierres({ cantidad, desde }: ConFecha): Aviso[] {
   ];
 }
 
-function deAyer(ayer: string | null): Aviso[] {
-  if (!ayer) return [];
-  return [
-    {
-      texto: 'Ayer no se cargó el cierre de caja.',
-      enlace: `/admin/caja/control?desde=${ayer}&hasta=${ayer}`,
-    },
-  ];
+function deAyer(ayer: DatosDeAvisos['ayerSinCierre']): Aviso[] {
+  const texto = ayer ? textoDeAyerSinCierre(ayer.turnos) : null;
+  if (!ayer || !texto) return [];
+  return [{ texto, enlace: `/admin/caja/control?desde=${ayer.fecha}&hasta=${ayer.fecha}` }];
 }
 
 const dePendientes = (n: number): Aviso[] =>

@@ -64,16 +64,22 @@ test('anula el cierre con motivo y su gasto queda anulado', async ({ page }) => 
   await expect(fila(page, 'Gastos', 'Hielo').filter({ hasText: 'Anulado' }).first()).toBeVisible();
 });
 
+// Un día queda pendiente si vendió en la caja y no tiene cierre (pedido 98).
+async function ventaDelDia(fecha: string) {
+  ventas.push(await sembrarVentaConPago({ fecha, medio: 'qr', centavos: 1000 }));
+}
+
 test('marca los dias pendientes y filtra por estado', async ({ page }) => {
   const fecha = dia();
   await sembrarCierre({ fecha });
+  await ventaDelDia(diaSiguiente(fecha));
   const tercero = diaSiguiente(fecha, 2);
   fechas.push(tercero);
   await sembrarCierre({ fecha: tercero });
   await page.goto(`/admin/caja/control?desde=${fecha}&hasta=${tercero}`);
-  await expect(page.getByText(/días? pendientes?/)).toHaveCount(1);
-  await page.getByText(/días? pendientes?/).click();
-  const aviso = page.getByRole('list', { name: 'Días sin cierre' });
+  await expect(page.getByText(/turnos? pendientes?/)).toHaveCount(1);
+  await page.getByText(/turnos? pendientes?/).click();
+  const aviso = page.getByRole('list', { name: 'Turnos sin cierre' });
   await expect(
     aviso.getByRole('link', { name: fechaParaMostrar(diaSiguiente(fecha)) }),
   ).toBeVisible();
@@ -82,7 +88,7 @@ test('marca los dias pendientes y filtra por estado', async ({ page }) => {
   await expect(page).toHaveURL(/estado=pendiente/);
   await expect(
     page
-      .getByRole('list', { name: 'Días sin cierre' })
+      .getByRole('list', { name: 'Turnos sin cierre' })
       .getByRole('link', { name: fechaParaMostrar(diaSiguiente(fecha)) }),
   ).toBeVisible();
   await page.getByRole('combobox', { name: 'Estado' }).click();
@@ -104,18 +110,19 @@ test('marca un dia pendiente como que no abrio y lo deshace', async ({ page }) =
   fechas.push(pendiente, tercero);
   await sembrarCierre({ fecha });
   await sembrarCierre({ fecha: tercero });
+  await ventaDelDia(pendiente);
   await page.goto(`/admin/caja/control?desde=${fecha}&hasta=${tercero}`);
-  await page.getByText(/días? pendientes?/).click();
-  await fila(page, 'Días sin cierre', fechaParaMostrar(pendiente))
+  await page.getByText(/turnos? pendientes?/).click();
+  await fila(page, 'Turnos sin cierre', fechaParaMostrar(pendiente))
     .getByRole('button', { name: 'No abrió' })
     .click();
-  await expect(page.getByText(/días? pendientes?/)).toHaveCount(0);
+  await expect(page.getByText(/turnos? pendientes?/)).toHaveCount(0);
   await page.getByText(/días? que el local no abrió/).click();
   const marcados = page.getByRole('list', { name: 'Días que no abrió' });
   await expect(marcados).toContainText(fechaParaMostrar(pendiente));
   await marcados.getByRole('button', { name: 'Deshacer' }).click();
   await expect(page.getByText(/días? que el local no abrió/)).toHaveCount(0);
-  await expect(page.getByText(/días? pendientes?/)).toHaveCount(1);
+  await expect(page.getByText(/turnos? pendientes?/)).toHaveCount(1);
 });
 
 test('un faltante en efectivo y un sobrante igual en tarjeta no se compensan', async ({ page }) => {

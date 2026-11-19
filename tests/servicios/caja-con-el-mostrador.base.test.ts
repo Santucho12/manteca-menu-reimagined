@@ -32,16 +32,20 @@ afterAll(async () => {
 
 type Vendido = { ventas_efectivo_centavos: number; ventas_transferencia_centavos: number };
 
-/** Lo vendido que cuenta para la caja de ese día, según el cierre (lo siembra si no hay). */
-async function vendidoParaLaCaja(fecha: string): Promise<Vendido> {
+type Fila = Vendido & { anulado: boolean; turno: number };
+
+/** Lo vendido que cuenta para la caja de ese turno, según su cierre (lo siembra si no hay). */
+async function vendidoParaLaCaja(fecha: string, turno: 1 | 2 = 2): Promise<Vendido> {
   const admin = await clienteComo('admin');
-  const leer = () => admin.rpc('cierres_con_resultado', { desde: fecha, hasta: fecha });
-  let filas = ((await leer()).data ?? []) as unknown as (Vendido & { anulado: boolean })[];
-  if (!filas.some((f) => !f.anulado)) {
-    cierres.push((await sembrarCierre({ fecha })).id);
-    filas = ((await leer()).data ?? []) as unknown as (Vendido & { anulado: boolean })[];
-  }
-  return filas.find((f) => !f.anulado)!;
+  const leer = async () =>
+    (
+      ((await admin.rpc('cierres_con_resultado', { desde: fecha, hasta: fecha })).data ??
+        []) as unknown as Fila[]
+    ).find((f) => !f.anulado && f.turno === turno);
+  const fila = await leer();
+  if (fila) return fila;
+  cierres.push((await sembrarCierre({ fecha, turno })).id);
+  return (await leer())!;
 }
 
 // El producto de prueba sale $1.000 la unidad.
@@ -70,6 +74,7 @@ async function cargarAMano(fecha: string, enLaCaja: boolean) {
     medio: 'transferencia',
     comentario: '',
     enLaCaja,
+    turno: '2',
     renglones: [
       {
         opcion: `${producto.productoId}|${producto.presentacionId}`,
@@ -84,15 +89,16 @@ async function cargarAMano(fecha: string, enLaCaja: boolean) {
 }
 
 describe('lo esperado de la caja', () => {
-  it('suma las ventas del mostrador del día, en su medio', async () => {
-    const antes = await vendidoParaLaCaja(HOY);
+  it('suma las ventas del mostrador del turno, en su medio', async () => {
+    // Con el mediodía de hoy cerrado, lo que se vende va a la noche; su cierre se lee al final,
+    // porque con la noche cerrada ya no se vende.
+    await vendidoParaLaCaja(HOY, 1);
     await venderEnElMostrador('efectivo');
     await venderEnElMostrador('transferencia');
-    const despues = await vendidoParaLaCaja(HOY);
-    expect(despues.ventas_efectivo_centavos - antes.ventas_efectivo_centavos).toBe(300000);
-    expect(despues.ventas_transferencia_centavos - antes.ventas_transferencia_centavos).toBe(
-      300000,
-    );
+    expect(await vendidoParaLaCaja(HOY)).toMatchObject({
+      ventas_efectivo_centavos: 300000,
+      ventas_transferencia_centavos: 300000,
+    });
   });
 
   it('no suma una venta a mano que no se cobró en la caja', async () => {

@@ -56,4 +56,15 @@ describe('fondosAnterioresDe', () => {
     ];
     expect(Object.fromEntries(fondosAnterioresDe(cierres, 50))).toEqual({ a: 50, b: 100, c: 200 });
   });
+
+  it('la noche toma lo que quedó en el mediodía del mismo día', () => {
+    const cierres = [
+      { ...cierre('noche', '2026-10-01', 200), turno: 2 },
+      { ...cierre('mediodia', '2026-10-01', 100), turno: 1 },
+    ];
+    expect(Object.fromEntries(fondosAnterioresDe(cierres, 50))).toEqual({
+      mediodia: 50,
+      noche: 100,
+    });
+  });
 });

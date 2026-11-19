@@ -3,41 +3,41 @@ import { diferenciasDelGrafico, filasDeCaja, resumenPorEmpleado } from './caja';
 
 const cierre = (fecha: string, persona: string, diferenciaCentavos: number | null) => ({
   fecha,
+  turno: 2 as const,
   persona,
   declaradoCentavos: 2000000,
   diferenciaCentavos,
 });
 
 describe('reporte de caja', () => {
-  it('marca los dias sin cierre desde el primer cierre hasta ayer', () => {
+  it('suma los turnos pendientes y los días que no abrió, del más nuevo al más viejo', () => {
     const filas = filasDeCaja(
-      [cierre('2026-10-02', 'Ana', null), cierre('2026-10-04', 'Beto', -5000)],
-      { desde: '2026-09-30', hasta: '2026-10-31' },
-      '2026-10-02',
-      '2026-10-06',
+      [
+        { ...cierre('2026-10-02', 'Ana', null), turno: 2 },
+        { ...cierre('2026-10-04', 'Beto', -5000), turno: 1 },
+      ],
+      [
+        { fecha: '2026-10-04', turno: 2 },
+        { fecha: '2026-10-03', turno: 1 },
+      ],
+      ['2026-10-05'],
     );
-    expect(filas.map((f) => [f.fecha, f.cierre?.persona ?? null])).toEqual([
-      ['2026-10-05', null],
-      ['2026-10-04', 'Beto'],
-      ['2026-10-03', null],
-      ['2026-10-02', 'Ana'],
+    expect(filas.map((f) => [f.fecha, f.turno, f.cierre?.persona ?? null, f.noAbrio])).toEqual([
+      ['2026-10-05', null, null, true],
+      ['2026-10-04', 2, null, false],
+      ['2026-10-04', 1, 'Beto', false],
+      ['2026-10-03', 1, null, false],
+      ['2026-10-02', 2, 'Ana', false],
     ]);
   });
 
-  it('un dia marcado como que no abrio sale como tal y no como dia sin cierre', () => {
+  it('un día que no abrió pero tiene cierre no se marca', () => {
     const filas = filasDeCaja(
-      [cierre('2026-10-02', 'Ana', null)],
-      { desde: '2026-10-01', hasta: '2026-10-31' },
-      '2026-10-02',
-      '2026-10-06',
-      ['2026-10-04'],
+      [{ ...cierre('2026-10-02', 'Ana', null), turno: 2 }],
+      [],
+      ['2026-10-02'],
     );
-    expect(filas.map((f) => [f.fecha, f.cierre?.persona ?? null, f.noAbrio])).toEqual([
-      ['2026-10-05', null, false],
-      ['2026-10-04', null, true],
-      ['2026-10-03', null, false],
-      ['2026-10-02', 'Ana', false],
-    ]);
+    expect(filas).toHaveLength(1);
   });
 
   it('resume por empleado, sumando solo las diferencias que hay', () => {

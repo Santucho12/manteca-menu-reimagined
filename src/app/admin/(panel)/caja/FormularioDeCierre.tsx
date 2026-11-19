@@ -15,6 +15,7 @@ import { conValorInicial, type Registro } from '@/lib/formularios/valorInicial';
 import { useGuardar } from '@/lib/gastos/useGuardar';
 import { editarCierreDesdeElPanel, guardarCierreDesdeElPanel } from './acciones';
 import { CAMPO_CONTRASTADO } from './contraste';
+import { ElegirTurno } from './ElegirTurno';
 import { GastosDeCaja, Retiros } from './Salidas';
 
 type CamposDeMonto = 'fondoInicial' | 'efectivo' | 'credito' | 'debito' | 'qr' | 'transferencia';
@@ -72,6 +73,11 @@ export function FormularioDeCierre({ inicial, id, avisoDelFondo }: Props) {
   return (
     <Seccion icono={<Banknote className="text-primary" size={24} />}>
       <form onSubmit={handleSubmit(guardado.enviar)} noValidate className="space-y-5">
+        <ElegirTurno
+          fecha={inicial.fecha}
+          turno={Number(inicial.turno) as 1 | 2}
+          fijo={Boolean(id)}
+        />
         <Campo
           className={CAMPO_CONTRASTADO}
           id="fecha"

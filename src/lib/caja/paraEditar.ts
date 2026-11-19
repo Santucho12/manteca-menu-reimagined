@@ -5,6 +5,7 @@ import type { DatosDeCierre } from './esquemas';
 type DeUnCierre = Pick<
   Cierre,
   | 'fecha'
+  | 'turno'
   | 'fondoInicialCentavos'
   | 'quedaEnCajaCentavos'
   | 'comentario'
@@ -28,6 +29,7 @@ export function datosParaEditar(cierre: DeUnCierre): DatosDeCierre {
   const { declarados } = cierre;
   return {
     fecha: cierre.fecha,
+    turno: cierre.turno === 1 ? '1' : '2',
     fondoInicial: montoParaEditar(cierre.fondoInicialCentavos),
     efectivo: montoParaEditar(declarados.efectivo),
     credito: monto(declarados.credito),

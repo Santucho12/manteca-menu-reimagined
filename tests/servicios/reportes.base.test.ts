@@ -77,6 +77,7 @@ describe('consultas de los reportes', () => {
     expect(await cierresDelPeriodo(await clienteComo('admin'), PERIODO)).toEqual([
       {
         fecha: '2018-05-12',
+        turno: 2,
         persona: 'Prueba Caja',
         declaradoCentavos: 2000000,
         diferenciaCentavos: 1000000,
