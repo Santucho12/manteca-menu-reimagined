@@ -99,5 +99,6 @@ otras recetas).
 - Servidor: `src/lib/materia-prima/` (`consultas.ts`, `escritura.ts`, `esquemas.ts`,
   `costo.ts`, `pantalla.ts`). Pantallas en `src/app/admin/(panel)/materia-prima/`: lista,
   `nuevo`, `[id]` (ficha), `[id]/editar`, `[id]/formas/nueva` y `[id]/formas/[forma]`.
-- La ficha todavía no muestra el último precio pagado, las últimas compras ni las recetas que
-  lo usan: llegan con los pedidos 95 y 96.
+- La lista muestra en cuántas recetas está cada insumo y la ficha, el último precio pagado de
+  cada forma de compra, las últimas compras que lo trajeron y las recetas que lo usan
+  (`src/lib/materia-prima/usos.ts`, `src/lib/compras/delInsumo.ts`).
