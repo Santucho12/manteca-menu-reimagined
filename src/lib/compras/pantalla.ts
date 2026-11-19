@@ -97,3 +97,36 @@ export function precioPropuesto(forma: FormaParaComprar): string {
   const centavos = forma.ultimoPrecioCentavos ?? forma.referenciaCentavos;
   return centavos === null ? '' : montoParaEditar(centavos);
 }
+
+type Pedido = {
+  id: string;
+  proveedorId: string;
+  renglonesDeLaCompra: { formaId: string; cantidadPedida: number | null }[];
+};
+
+function renglonesDelPedido(pedido: Pedido, formas: FormaParaComprar[]) {
+  return pedido.renglonesDeLaCompra.map((r) => {
+    const forma = formas.find((f) => f.id === r.formaId);
+    return {
+      formaId: r.formaId,
+      cantidad: r.cantidadPedida === null ? '' : contenidoParaEditar(r.cantidadPedida),
+      precio: forma ? precioPropuesto(forma) : '',
+    };
+  });
+}
+
+/** El formulario de una compra: vacio, o con lo pedido para recibirlo. */
+export function inicialDeLaCompra(hoy: string, pedido: Pedido | null, formas: FormaParaComprar[]) {
+  return {
+    compraId: pedido?.id ?? '',
+    proveedorId: pedido?.proveedorId ?? '',
+    fecha: hoy,
+    renglones: pedido ? renglonesDelPedido(pedido, formas) : [],
+    otrosCargos: '',
+    factura: '',
+    pago: 'pagada' as const,
+    medio: 'transferencia' as const,
+    fechaDePago: hoy,
+    vencimiento: '',
+  };
+}
