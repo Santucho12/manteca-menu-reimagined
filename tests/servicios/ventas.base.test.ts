@@ -70,6 +70,7 @@ const filtros = (fecha: string, cambios: Partial<FiltrosDeVentas> = {}): Filtros
   hasta: fecha,
   origen: null,
   medio: null,
+  tipo: null,
   estado: null,
   pagina: 1,
   ...cambios,
