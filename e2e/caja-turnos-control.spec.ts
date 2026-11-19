@@ -79,3 +79,13 @@ test('el admin cambia las horas de cierre', async ({ page }) => {
   await ventana.getByRole('button', { name: 'Guardar horas' }).click();
   await expect(ventana).toContainText('Horas guardadas.');
 });
+
+test('en la venta a mano cobrada en la caja, un día anterior viene en la noche', async ({
+  page,
+}) => {
+  await page.goto('/admin/ventas/nueva');
+  await page.getByLabel('Se cobró en la caja del local').check();
+  await expect(page.getByLabel('Turno')).toBeVisible();
+  await page.getByLabel('Fecha').fill(DIA);
+  await expect(page.getByLabel('Turno')).toHaveValue('2');
+});
