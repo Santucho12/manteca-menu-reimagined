@@ -29,6 +29,7 @@ const DE_ABRIL = `desde=${PERIODO_E2E.desde}&hasta=${PERIODO_E2E.hasta}`;
 const TITULOS = [
   'Ventas por período',
   'Ventas por producto',
+  'Ganancia por producto',
   'Ventas por categoría',
   'Ventas por tipo de venta',
   'Gastos por categoría',
