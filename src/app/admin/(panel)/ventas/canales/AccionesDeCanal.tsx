@@ -61,6 +61,29 @@ function VentanaDeBorrar({
   );
 }
 
+type PropsDelControl = {
+  nombre: string;
+  controla: boolean | null;
+  deshabilitado: boolean;
+  alCambiar: () => void;
+};
+
+// En la misma fila que las acciones; Local deja el lugar vacío para que todo quede alineado.
+function ControlDelCierre({ nombre, controla, deshabilitado, alCambiar }: PropsDelControl) {
+  if (controla === null) return <span className="hidden w-[12.5rem] sm:block" aria-hidden="true" />;
+  return (
+    <label className="flex w-[12.5rem] items-center justify-end gap-2 whitespace-nowrap text-xs font-semibold text-muted-foreground">
+      Se controla en el cierre
+      <Interruptor
+        activo={controla}
+        etiqueta={`${nombre} se controla en el cierre`}
+        deshabilitado={deshabilitado}
+        alCambiar={alCambiar}
+      />
+    </label>
+  );
+}
+
 /** Editar, prender o apagar y borrar un canal. Apagarlo no toca las ventas que ya lo usan. */
 export function AccionesDeCanal({ id, nombre, activo, controla }: Props) {
   const router = useRouter();
@@ -82,41 +105,39 @@ export function AccionesDeCanal({ id, nombre, activo, controla }: Props) {
   };
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-1.5">
-        <Interruptor
-          activo={activo}
-          etiqueta={`Tipo de venta ${nombre} activo`}
+      <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-2">
+        <ControlDelCierre
+          nombre={nombre}
+          controla={controla}
           deshabilitado={enviando}
-          alCambiar={alternar}
+          alCambiar={alternarControl}
         />
-        <Link
-          href={`/admin/ventas/canales/${id}`}
-          aria-label={`Editar ${nombre}`}
-          className={EDITAR}
-        >
-          <Pencil size={16} aria-hidden="true" />
-        </Link>
-        <button
-          type="button"
-          disabled={enviando}
-          aria-label={`Borrar ${nombre}`}
-          onClick={() => setBorrando(true)}
-          className={BORRAR}
-        >
-          <Trash2 size={16} aria-hidden="true" />
-        </button>
-      </div>
-      {controla === null ? null : (
-        <label className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+        <span className="hidden h-6 w-px bg-border sm:block" aria-hidden="true" />
+        <div className="flex items-center gap-1.5">
           <Interruptor
-            activo={controla}
-            etiqueta={`${nombre} se controla en el cierre`}
+            activo={activo}
+            etiqueta={`Tipo de venta ${nombre} activo`}
             deshabilitado={enviando}
-            alCambiar={alternarControl}
+            alCambiar={alternar}
           />
-          Se controla en el cierre
-        </label>
-      )}
+          <Link
+            href={`/admin/ventas/canales/${id}`}
+            aria-label={`Editar ${nombre}`}
+            className={EDITAR}
+          >
+            <Pencil size={16} aria-hidden="true" />
+          </Link>
+          <button
+            type="button"
+            disabled={enviando}
+            aria-label={`Borrar ${nombre}`}
+            onClick={() => setBorrando(true)}
+            className={BORRAR}
+          >
+            <Trash2 size={16} aria-hidden="true" />
+          </button>
+        </div>
+      </div>
       {mensaje && !borrando ? <AvisoDeError mensaje={mensaje} /> : null}
       {borrando ? (
         <VentanaDeBorrar
