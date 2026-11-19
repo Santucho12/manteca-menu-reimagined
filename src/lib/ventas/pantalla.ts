@@ -1,4 +1,4 @@
-import { MEDIOS, type Medio } from '../caja/resultado';
+import { MEDIOS_DE_VENTA as MEDIOS, type MedioDeVenta as Medio } from '../caja/resultado';
 import { mesDe } from '../gastos/pantalla';
 import { diaEnArgentina } from '../fechas';
 import { esFechaValida } from '../gastos/vencimientos';

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { MEDIOS } from '../caja/resultado';
+import { MEDIOS_DE_VENTA as MEDIOS } from '../caja/resultado';
 import type { PagoDelMostrador } from './pagos';
 import type { RenglonDelTicket } from './ticket';
 
@@ -32,6 +32,8 @@ export const esquemaVentaDelMostrador = z
   .object({
     // La pone la pantalla al armar el ticket: la misma venta mandada dos veces no se duplica.
     clave: z.uuid(),
+    // El tipo de venta elegido; sin elegir, la base pone Local (pedido 99).
+    canalId: z.uuid().optional(),
     renglones: z.array(renglon).min(1, 'Sumá al menos un producto.'),
     pagos: z
       .array(pago)
@@ -50,6 +52,7 @@ export type VentaDelMostrador = z.infer<typeof esquemaVentaDelMostrador>;
 export function ventaDelMostradorParaLaBase(venta: VentaDelMostrador) {
   return {
     clave: venta.clave,
+    ...(venta.canalId ? { canal_id: venta.canalId } : {}),
     renglones: venta.renglones.map((r) => ({
       producto_id: r.productoId,
       presentacion_id: r.presentacionId,
@@ -64,8 +67,10 @@ export function ventaDelMostradorParaLaBase(venta: VentaDelMostrador) {
 export function ventaDelTicket(
   ticket: RenglonDelTicket[],
   pagos: PagoDelMostrador[],
+  canalId: string | null = null,
 ): Omit<VentaDelMostrador, 'clave'> {
   return {
+    ...(canalId ? { canalId } : {}),
     renglones: ticket.map((r) => ({
       productoId: r.productoId,
       presentacionId: r.presentacionId,

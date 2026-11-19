@@ -1,6 +1,6 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import type { Medio } from '../caja/resultado';
+import type { MedioDeVenta as Medio } from '../caja/resultado';
 import { useGuardar } from '../gastos/useGuardar';
 import { fallo, type Resultado } from '../resultado';
 import { preciosAlDia, type CategoriaParaVender } from './catalogo';

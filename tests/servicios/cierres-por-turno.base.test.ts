@@ -50,6 +50,7 @@ const datos = (fecha: string, turno: '1' | '2'): DatosDeCierre => ({
   comentario: '',
   retiros: [],
   gastos: [],
+  controles: [],
 });
 
 async function guardar(fecha: string, turno: '1' | '2') {

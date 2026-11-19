@@ -1,4 +1,5 @@
 import type { Cliente } from '../supabase/cliente';
+import type { ControlLeido } from './controles';
 import type { HorasDeCierre, Turno } from './turnos';
 
 function comprobar<T>(
@@ -52,4 +53,14 @@ export async function postergacionesDelCierre(
   if (filas.length === 0) return null;
   const ms = filas.reduce((suma, f) => suma + Date.parse(f.hasta) - Date.parse(f.desde), 0);
   return { veces: filas.length, minutos: Math.round(ms / 60_000), primera: filas[0]!.desde };
+}
+
+/** Lo anotado por tipo en los cierres del rango y lo cargado de cada tipo en su turno. */
+export async function controlesDelRango(
+  cliente: Cliente,
+  desde: string,
+  hasta: string,
+): Promise<ControlLeido[]> {
+  const respuesta = await cliente.rpc('cierres_controles', { desde, hasta });
+  return comprobar(respuesta, 'los controles por tipo') as ControlLeido[];
 }

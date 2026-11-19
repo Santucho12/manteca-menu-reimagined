@@ -46,6 +46,7 @@ const datos = (fecha: string, cambios: Partial<DatosDeCierre> = {}): DatosDeCier
   comentario: 'Todo normal',
   retiros: [{ monto: '5.000', quien: 'Dueño' }],
   gastos: [{ monto: '1.200', descripcion: 'Hielo' }],
+  controles: [],
   ...cambios,
 });
 

@@ -14,6 +14,7 @@ import { nombreDelTurno, textoDePostergaciones } from '@/lib/caja/turnos';
 import type { Cliente } from '@/lib/supabase/cliente';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import { anularCierreDesdeElPanel } from '../../acciones';
+import { ControlesDelCierre } from './ControlesDelCierre';
 import { DetalleDelCierre } from './DetalleDelCierre';
 import { ResumenDelCierre } from './ResumenDelCierre';
 
@@ -80,6 +81,7 @@ export default async function FichaDeCierre({ params }: { params: Promise<{ id: 
         <p className="text-sm font-semibold text-amber-800">{datos.postergaciones}</p>
       ) : null}
       <DetalleDelCierre cierre={cierre} fondoAnterior={anterior} />
+      <ControlesDelCierre controles={cierre.controles} />
       {cierre.anulado ? null : <AccionesDelCierre cierre={cierre} esAdmin={esAdmin} />}
       <EnlaceDeVolver href={esAdmin ? '/admin/caja/control' : '/admin/caja/mis-cierres'}>
         {esAdmin ? 'Volver al control' : 'Volver a mis cierres'}

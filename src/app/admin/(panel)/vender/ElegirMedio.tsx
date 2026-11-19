@@ -1,5 +1,5 @@
 import { nombreDeMedio } from '@/lib/caja/pantalla';
-import { MEDIOS, type Medio } from '@/lib/caja/resultado';
+import { MEDIOS_DE_VENTA as MEDIOS, type MedioDeVenta as Medio } from '@/lib/caja/resultado';
 import { cn } from '@/lib/utils';
 
 type Props = {

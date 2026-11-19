@@ -1,5 +1,5 @@
 import { centavosDeCaja } from '../caja/esquemas';
-import type { Medio } from '../caja/resultado';
+import type { MedioDeVenta as Medio } from '../caja/resultado';
 import { formatearPesos } from '../plata';
 import { pagosDelCobro, vueltoDe, type Cobro, type PagoDelMostrador } from './pagos';
 

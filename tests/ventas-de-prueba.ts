@@ -196,7 +196,7 @@ export async function idsDeCanalesLlamados(nombres: string[]): Promise<string[]>
 
 type VentaConPago = {
   fecha: string;
-  medio: 'efectivo' | 'credito' | 'debito' | 'qr' | 'transferencia';
+  medio: 'efectivo' | 'credito' | 'debito' | 'qr' | 'transferencia' | 'fuera_de_caja';
   centavos: number;
   estado?: 'cerrada' | 'cancelada';
   anulada?: boolean;

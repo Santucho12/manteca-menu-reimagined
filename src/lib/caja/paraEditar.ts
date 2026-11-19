@@ -12,6 +12,7 @@ type DeUnCierre = Pick<
   | 'declarados'
   | 'retiros'
   | 'gastos'
+  | 'controles'
 >;
 
 // Un medio sin ventas se deja vacio, como lo escribe la persona.
@@ -22,6 +23,12 @@ const salidasParaEditar = ({ retiros, gastos }: Pick<DeUnCierre, 'retiros' | 'ga
   gastos: gastos
     .filter((g) => !g.anulado)
     .map((g) => ({ monto: montoParaEditar(g.monto_centavos), descripcion: g.descripcion ?? '' })),
+});
+
+const controlParaEditar = (c: DeUnCierre['controles'][number]) => ({
+  canalId: c.canalId,
+  total: montoParaEditar(c.anotadoCentavos),
+  cantidad: c.cantidadAnotada === null ? '' : String(c.cantidadAnotada),
 });
 
 /** El formulario de un cierre ya guardado: lo declarado, sus retiros y sus gastos sin anular. */
@@ -39,5 +46,6 @@ export function datosParaEditar(cierre: DeUnCierre): DatosDeCierre {
     quedaEnCaja: montoParaEditar(cierre.quedaEnCajaCentavos),
     comentario: cierre.comentario ?? '',
     ...salidasParaEditar(cierre),
+    controles: cierre.controles.map(controlParaEditar),
   };
 }

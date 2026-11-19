@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { centavosDeCaja } from '../caja/esquemas';
-import { MEDIOS } from '../caja/resultado';
+import { MEDIOS_DE_VENTA as MEDIOS } from '../caja/resultado';
 import { esFechaValida } from '../gastos/vencimientos';
 import { cantidadDe } from './renglones';
 
@@ -35,7 +35,7 @@ export const esquemaVenta = z.object({
   comentario: z.string().trim().max(500, 'Usá hasta 500 caracteres.'),
   // Marcada, suma a lo esperado del cierre de ese día (pedido 89).
   enLaCaja: z.boolean(),
-  // El turno de la caja en que se cobró; sin cobrar en la caja no se usa.
+  // El turno en que se vendió: cuenta para la caja y para el control de su tipo (pedido 99).
   turno: z.enum(['1', '2'], 'Elegí el turno.'),
   renglones: z.array(renglon).min(1, 'Sumá al menos un producto.'),
 });
@@ -70,7 +70,7 @@ export function ventaParaLaBase(datos: DatosDeVenta) {
     medio: datos.medio,
     comentario: datos.comentario.trim() || null,
     en_la_caja: datos.enLaCaja,
-    turno: datos.enLaCaja ? Number(datos.turno) : 2,
+    turno: Number(datos.turno),
     renglones: datos.renglones.map(renglonParaLaBase),
   };
 }

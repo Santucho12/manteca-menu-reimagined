@@ -54,9 +54,9 @@ describe('esquemaVenta', () => {
     });
   });
 
-  it('cobrada en la caja, guarda el turno; sin cobrar en la caja, queda en la noche', () => {
+  it('cobrada en la caja o no, guarda el turno elegido', () => {
     expect(ventaParaLaBase(esquemaVenta.parse({ ...venta, turno: '1' })).turno).toBe(1);
-    expect(ventaParaLaBase(esquemaVenta.parse({ ...venta, enLaCaja: false })).turno).toBe(2);
+    expect(ventaParaLaBase(esquemaVenta.parse({ ...venta, enLaCaja: false })).turno).toBe(1);
     expect(esquemaVenta.safeParse({ ...venta, turno: '0' }).success).toBe(false);
   });
 
@@ -98,5 +98,17 @@ describe('otros esquemas', () => {
     expect(esquemaAnulacionDeVenta.safeParse({ id: CANAL, motivo: ' ' }).success).toBe(false);
     expect(esquemaCanal.safeParse({ nombre: '' }).success).toBe(false);
     expect(esquemaCanal.parse({ nombre: ' Feria ' }).nombre).toBe('Feria');
+  });
+});
+
+describe('la venta a mano lleva turno siempre (pedido 99)', () => {
+  it('aunque no se haya cobrado en la caja, y acepta Fuera de la caja', () => {
+    const datos = esquemaVenta.parse({
+      ...venta,
+      enLaCaja: false,
+      turno: '1',
+      medio: 'fuera_de_caja',
+    });
+    expect(ventaParaLaBase(datos)).toMatchObject({ turno: 1, medio: 'fuera_de_caja' });
   });
 });

@@ -1,5 +1,8 @@
 export const MEDIOS = ['efectivo', 'credito', 'debito', 'qr', 'transferencia'] as const;
 export type Medio = (typeof MEDIOS)[number];
+/** Los medios con que se cobra una venta: los de la caja y lo que no entra al cajón (pedido 99). */
+export const MEDIOS_DE_VENTA = [...MEDIOS, 'fuera_de_caja'] as const;
+export type MedioDeVenta = (typeof MEDIOS_DE_VENTA)[number];
 export type PorMedio = Record<Medio, number>;
 
 export type CierreDeclarado = {

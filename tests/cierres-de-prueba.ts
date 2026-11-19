@@ -98,6 +98,7 @@ export async function borrarCierres(ids: string[]) {
     (await secreto.from('retiros_de_caja').select('id').in('cierre_id', ids)).data ?? [];
   await secreto.from('gastos').delete().in('cierre_id', ids);
   await secreto.from('retiros_de_caja').delete().in('cierre_id', ids);
+  await secreto.from('controles_de_cierre').delete().in('cierre_id', ids);
   await secreto.from('cierres_de_caja').delete().in('id', ids);
   const todos = [...ids, ...gastos.map((g) => g.id), ...retiros.map((r) => r.id)];
   await secreto.from('auditoria').delete().in('registro_id', todos);

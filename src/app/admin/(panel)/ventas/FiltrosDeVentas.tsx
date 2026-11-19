@@ -1,7 +1,7 @@
 import { BarraAutomatica } from '@/components/panel/BarraAutomatica';
 import { FiltroDeFecha, FiltroDeSeleccion } from '@/components/panel/Filtros';
 import { nombreDeMedio } from '@/lib/caja/pantalla';
-import { MEDIOS } from '@/lib/caja/resultado';
+import { MEDIOS_DE_VENTA as MEDIOS } from '@/lib/caja/resultado';
 import { ESTADOS_DE_LISTA, type FiltrosDeVentas as Filtros } from '@/lib/ventas/pantalla';
 
 const NOMBRES_DE_ESTADO = { cerrada: 'Cerradas', anulada: 'Anuladas' };

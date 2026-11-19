@@ -5,6 +5,8 @@ import { fondosAnterioresDe } from './fondosAnteriores';
 import type { FiltrosDeControl } from './pantalla';
 import type { EstadoDelCierre, Medio, ResultadoDeMedio } from './resultado';
 import { resultadoDeFila, type FilaConVentas } from './resultadoDeFila';
+import { controlesPorCierre, estadoConControles, type ResultadoDeControl } from './controles';
+import { controlesDelRango } from './consultasDeTurnos';
 import type { Turno } from './turnos';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -19,6 +21,8 @@ type Leida = FilaConVentas & {
   motivo_anulacion: string | null;
   comentario: string | null;
   queda_en_caja_centavos: number;
+  /** Los tipos de venta controlados en este cierre (pedido 99). */
+  controles: ResultadoDeControl[];
 };
 
 export type FilaDeCierre = {
@@ -31,6 +35,7 @@ export type FilaDeCierre = {
   persona: string;
   /** Los medios que no dan exacto; vacio si da todo justo o si espera las ventas. */
   diferencias: DiferenciaDeMedio[];
+  controles: ResultadoDeControl[];
   fondoInicialCentavos: number;
   retirosCentavos: number;
 };
@@ -50,18 +55,26 @@ function aFila(leida: Leida): FilaDeCierre {
     id: leida.id,
     fecha: leida.fecha,
     turno: leida.turno as Turno,
-    estado: resultado.estado,
+    estado: estadoConControles(resultado.estado, leida.controles),
     anulado: leida.anulado,
     persona: leida.persona_nombre,
     diferencias: diferenciasPorMedio(resultado.medios),
+    controles: leida.controles,
     fondoInicialCentavos: leida.fondo_inicial_centavos,
     retirosCentavos: leida.retiros_centavos,
   };
 }
 
+// Cada cierre con sus controles por tipo, leidos a la vez.
 async function leerCierres(cliente: Cliente, desde: string, hasta: string, persona?: string) {
-  const respuesta = await cliente.rpc('cierres_con_resultado', { desde, hasta, persona });
-  return comprobar(respuesta, 'los cierres') as unknown as Leida[];
+  const [respuesta, controles] = await Promise.all([
+    cliente.rpc('cierres_con_resultado', { desde, hasta, persona }),
+    controlesDelRango(cliente, desde, hasta),
+  ]);
+  const leidas = comprobar(respuesta, 'los cierres') as unknown as Omit<Leida, 'controles'>[];
+  const tolerancia = leidas[0]?.tolerancia_centavos ?? 0;
+  const grupos = controlesPorCierre(controles, tolerancia);
+  return leidas.map((l) => ({ ...l, controles: grupos.get(l.id) ?? [] })) as Leida[];
 }
 
 const coincide = (fila: FilaDeCierre, filtros: FiltrosDeControl) =>
