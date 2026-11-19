@@ -1,4 +1,6 @@
-import { fechaParaMostrar } from '../gastos/pantalla';
+import { z } from 'zod';
+import { fechaParaMostrar, mesDe } from '../gastos/pantalla';
+import { esFechaValida } from '../gastos/vencimientos';
 import { montoParaEditar } from '../gastos/plata';
 import { formatearPesos } from '../plata';
 import type { FormaParaComprar } from './formas';
@@ -6,7 +8,12 @@ import { contenidoParaEditar } from '../materia-prima/esquemas';
 import { unValor } from '../usuarios/presentacion';
 
 export type EstadoDeLista = 'todas' | 'pedida' | 'recibida' | 'anulada';
-export type FiltrosDeCompras = { estado: EstadoDeLista; proveedor: string | null };
+export type FiltrosDeCompras = {
+  estado: EstadoDeLista;
+  proveedor: string | null;
+  desde: string;
+  hasta: string;
+};
 export type ParametrosDeCompras = Record<string, string | string[] | undefined>;
 type RenglonDelPedido = { insumo: string; comoSeCompra: string; cantidad: number };
 
@@ -50,21 +57,40 @@ export function pagoDeCompra({
   return vencimiento ? `Por pagar, vence el ${fechaParaMostrar(vencimiento)}` : '—';
 }
 
-/** El estado y el proveedor de la lista, leidos de la URL. */
-export function filtrosDeCompras(parametros: ParametrosDeCompras): FiltrosDeCompras {
+const fechaO = (texto: string | undefined, porDefecto: string) =>
+  texto && esFechaValida(texto) ? texto : porDefecto;
+const proveedorDe = (texto: string | undefined) =>
+  z.uuid().safeParse(texto).success ? texto! : null;
+
+/** El estado, el proveedor y el periodo de la lista, leidos de la URL: por defecto, el mes. */
+export function filtrosDeCompras(parametros: ParametrosDeCompras, hoy: string): FiltrosDeCompras {
   const estado = unValor(parametros.estado) as EstadoDeLista;
+  const mes = mesDe(hoy);
   return {
     estado: ESTADOS.includes(estado) ? estado : 'todas',
-    proveedor: unValor(parametros.proveedor) || null,
+    proveedor: proveedorDe(unValor(parametros.proveedor)),
+    desde: fechaO(unValor(parametros.desde), mes.desde),
+    hasta: fechaO(unValor(parametros.hasta), mes.hasta),
   };
 }
 
-export function enlaceDeCompras({ estado, proveedor }: FiltrosDeCompras): string {
+export function enlaceDeCompras({ estado, proveedor, desde, hasta }: FiltrosDeCompras): string {
   const parametros = new URLSearchParams();
   if (estado !== 'todas') parametros.set('estado', estado);
   if (proveedor) parametros.set('proveedor', proveedor);
-  const texto = parametros.toString();
-  return texto ? `/admin/compras?${texto}` : '/admin/compras';
+  parametros.set('desde', desde);
+  parametros.set('hasta', hasta);
+  return `/admin/compras?${parametros.toString()}`;
+}
+
+/** Cuanto se ve de un renglon: lo pedido en un pedido; recibida, lo que llego o que no llego. */
+export function cantidadDelRenglon(
+  renglon: { cantidadPedida: number | null; cantidad: number },
+  estado: 'pedida' | 'recibida',
+): string {
+  if (estado === 'pedida') return contenidoParaEditar(renglon.cantidadPedida ?? 0);
+  if (renglon.cantidad === 0 && renglon.cantidadPedida !== null) return 'No llegó';
+  return contenidoParaEditar(renglon.cantidad);
 }
 
 /** Las formas que se le compran a este proveedor, y las que no tienen proveedor. */

@@ -143,6 +143,13 @@ export type Gasto = {
   cierre_id: string | null;
   /** Lo por pagar que pagó: anulado el gasto, vuelve a Próximos pagos. */
   por_pagar_id: string | null;
+  /** La compra que lo generó, directo o por lo por pagar que pagó (pedido 96). */
+  compra_id: string | null;
+};
+
+type GastoLeido = Omit<Gasto, 'compra_id'> & {
+  compra_id: string | null;
+  pago: { compra_id: string | null } | null;
 };
 
 /** Un id mal escrito en la URL no es un error: no hay gasto, y la pantalla da 404. */
@@ -152,11 +159,15 @@ export async function gastoPorId(cliente: Cliente, id: string): Promise<Gasto | 
     .from('gastos')
     .select(
       'id, fecha, categoria_id, monto_centavos, descripcion, proveedor_id, medio_de_pago, ' +
-        'comprobante, anulado, motivo_anulacion, recurrente_id, cierre_id, por_pagar_id',
+        'comprobante, anulado, motivo_anulacion, recurrente_id, cierre_id, por_pagar_id, ' +
+        'compra_id, pago:gastos_por_pagar(compra_id)',
     )
     .eq('id', id)
     .maybeSingle();
-  return comprobar(respuesta, 'el gasto') as unknown as Gasto | null;
+  const leido = comprobar(respuesta, 'el gasto') as unknown as GastoLeido | null;
+  if (!leido) return null;
+  const { pago, ...gasto } = leido;
+  return { ...gasto, compra_id: gasto.compra_id ?? pago?.compra_id ?? null };
 }
 
 /** Categorias (sin las del sistema) y proveedores, activos o no: el formulario elige. */

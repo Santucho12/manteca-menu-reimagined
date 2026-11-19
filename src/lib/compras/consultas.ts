@@ -85,11 +85,17 @@ function filaDe(c: CompraDeLaBase): FilaDeCompra {
   };
 }
 
-type Filtrable<T> = { eq(columna: string, valor: unknown): T };
+type Filtrable<T> = { eq(columna: string, valor: unknown): T; or(filtros: string): T };
 
-function filtrar<T extends Filtrable<T>>(consulta: T, { estado, proveedor }: FiltrosDeCompras): T {
+// Un pedido sin recibir no tiene fecha: se ve siempre, arriba, hasta que llega.
+const delPeriodo = (desde: string, hasta: string) =>
+  `fecha.is.null,and(fecha.gte.${desde},fecha.lte.${hasta})`;
+
+function filtrar<T extends Filtrable<T>>(consulta: T, filtros: FiltrosDeCompras): T {
+  const { estado, proveedor, desde, hasta } = filtros;
+  const enElPeriodo = consulta.or(delPeriodo(desde, hasta));
   const delProveedor = proveedor && UUID.test(proveedor);
-  const porProveedor = delProveedor ? consulta.eq('proveedor_id', proveedor) : consulta;
+  const porProveedor = delProveedor ? enElPeriodo.eq('proveedor_id', proveedor) : enElPeriodo;
   if (estado === 'anulada') return porProveedor.eq('anulado', true);
   if (estado === 'todas') return porProveedor;
   return porProveedor.eq('anulado', false).eq('estado', estado);
@@ -147,7 +153,12 @@ export async function compraPorId(cliente: Cliente, id: string): Promise<Compra 
 
 /** Las ultimas compras de un proveedor, para su ficha. */
 export async function comprasDelProveedor(cliente: Cliente, proveedorId: string) {
-  const todas = await listarCompras(cliente, { estado: 'todas', proveedor: proveedorId });
+  const siempre = { desde: '2000-01-01', hasta: '2999-12-31' };
+  const todas = await listarCompras(cliente, {
+    estado: 'todas',
+    proveedor: proveedorId,
+    ...siempre,
+  });
   return todas.slice(0, 10);
 }
 

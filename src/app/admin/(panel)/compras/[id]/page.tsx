@@ -12,13 +12,13 @@ import { Dato, Datos, Seccion } from '@/components/panel/Seccion';
 import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { compraPorId, type Compra } from '@/lib/compras/consultas';
 import {
+  cantidadDelRenglon,
   enlaceDelPedido,
   estadoDeCompra,
   pagoDeCompra,
   textoDelPedido,
 } from '@/lib/compras/pantalla';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
-import { contenidoParaEditar } from '@/lib/materia-prima/esquemas';
 import { formatearPesos } from '@/lib/plata';
 import { anularCompraDesdeElPanel } from '../acciones';
 
@@ -61,10 +61,9 @@ function Renglones({ compra }: { compra: Compra }) {
         {compra.renglonesDeLaCompra.map((r) => (
           <li key={r.formaId} className="flex flex-wrap justify-between gap-3 py-3 text-sm">
             <span className="wrap-break-word">
-              {contenidoParaEditar(pedida ? (r.cantidadPedida ?? 0) : r.cantidad)} × {r.insumo} (
-              {r.comoSeCompra})
+              {cantidadDelRenglon(r, compra.estado)} × {r.insumo} ({r.comoSeCompra})
             </span>
-            {pedida ? null : (
+            {pedida || r.cantidad === 0 ? null : (
               <span className="font-bold whitespace-nowrap">
                 {formatearPesos(r.precioCentavos)} c/u · {formatearPesos(r.subtotalCentavos)}
               </span>
@@ -97,6 +96,11 @@ function DatosDeLaCompra({ compra }: { compra: Compra }) {
       {compra.gastoId ? (
         <Link href={`/admin/gastos/${compra.gastoId}`} className={ENLACE_EN_TEXTO}>
           Ver el gasto de esta compra
+        </Link>
+      ) : null}
+      {compra.vencimiento && !compra.anulado ? (
+        <Link href="/admin/gastos" className={ENLACE_EN_TEXTO}>
+          Ver lo por pagar en Gastos
         </Link>
       ) : null}
     </Seccion>

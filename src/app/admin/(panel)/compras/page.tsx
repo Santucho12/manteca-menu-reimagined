@@ -2,31 +2,25 @@ import { ClipboardList, Plus } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BOTON_DE_ENCABEZADO, BOTON_DE_ENCABEZADO_NEUTRO } from '@/components/panel/estilos';
-import { FiltroEnlace } from '@/components/panel/Filtros';
 import { InsigniaDeEstado } from '@/components/panel/Insignias';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { SinResultados } from '@/components/panel/SinResultados';
 import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { listarCompras, type FilaDeCompra } from '@/lib/compras/consultas';
 import {
-  enlaceDeCompras,
   estadoDeCompra,
   filtrosDeCompras,
   pagoDeCompra,
-  type EstadoDeLista,
   type ParametrosDeCompras,
 } from '@/lib/compras/pantalla';
+import { diaEnArgentina } from '@/lib/fechas';
+import { proveedoresParaElegir } from '@/lib/materia-prima/consultas';
+import { FiltrosDeCompras } from './FiltrosDeCompras';
 import { fechaParaMostrar } from '@/lib/gastos/pantalla';
 import { formatearPesos } from '@/lib/plata';
 
 export const metadata: Metadata = { title: 'Compras' };
 
-const ESTADOS: [EstadoDeLista, string][] = [
-  ['todas', 'Todas'],
-  ['pedida', 'Pedidas'],
-  ['recibida', 'Recibidas'],
-  ['anulada', 'Anuladas'],
-];
 const TONOS = { Pedida: 'ambar', Recibida: 'esmeralda', Anulada: 'pizarra' } as const;
 
 function Compra({ fila }: { fila: FilaDeCompra }) {
@@ -72,8 +66,11 @@ export default async function PaginaDeCompras({
 }: {
   searchParams: Promise<ParametrosDeCompras>;
 }) {
-  const filtros = filtrosDeCompras(await searchParams);
-  const { datos: filas } = await exigirPaginaYLeer('admin', (c) => listarCompras(c, filtros));
+  const filtros = filtrosDeCompras(await searchParams, diaEnArgentina(new Date()));
+  const { datos } = await exigirPaginaYLeer('admin', (c) =>
+    Promise.all([listarCompras(c, filtros), proveedoresParaElegir(c, filtros.proveedor)]),
+  );
+  const [filas, proveedores] = datos;
   return (
     <Pantalla
       titulo="Compras"
@@ -81,21 +78,11 @@ export default async function PaginaDeCompras({
       acciones={<Acciones />}
       ayuda="compras"
     >
-      <div className="flex flex-wrap gap-2 md:gap-3">
-        {ESTADOS.map(([estado, texto]) => (
-          <FiltroEnlace
-            key={estado}
-            href={enlaceDeCompras({ ...filtros, estado })}
-            prendido={filtros.estado === estado}
-          >
-            {texto}
-          </FiltroEnlace>
-        ))}
-      </div>
+      <FiltrosDeCompras filtros={filtros} proveedores={proveedores} />
       {filas.length === 0 ? (
         <SinResultados
-          titulo="Todavía no hay compras"
-          texto="Cargá la primera con Cargar compra."
+          titulo="No hay compras en este período"
+          texto="Cambiá el período o el proveedor, o cargá una con Cargar compra."
         />
       ) : (
         <ul aria-label="Compras" className="space-y-3">

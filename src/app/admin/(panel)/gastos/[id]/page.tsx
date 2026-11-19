@@ -117,6 +117,16 @@ export default async function FichaDeGasto({ params }: { params: Promise<{ id: s
   return (
     <Pantalla titulo="Gasto" subtitulo="Corregilo o anulalo con un motivo." ayuda="gastos">
       <CargadoPor cliente={cliente} tabla="gastos" id={gasto.id} />
+      {gasto.compra_id ? (
+        <FranjaDeAviso>
+          <p>
+            Este gasto es de una compra.{' '}
+            <Link href={`/admin/compras/${gasto.compra_id}`} className={ENLACE_EN_TEXTO}>
+              Ver la compra
+            </Link>
+          </p>
+        </FranjaDeAviso>
+      ) : null}
       {gasto.anulado ? (
         <GastoAnulado gasto={gasto} />
       ) : (
