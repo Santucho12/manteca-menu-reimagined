@@ -159,9 +159,7 @@ export async function opcionesParaVender(cliente: Cliente): Promise<OpcionDeVent
   return opcionesDeVenta(await leerPanel(cliente));
 }
 
-export async function canalesDeVenta(
-  cliente: Cliente,
-): Promise<
+export async function canalesDeVenta(cliente: Cliente): Promise<
   {
     id: string;
     nombre: string;

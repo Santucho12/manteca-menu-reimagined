@@ -388,6 +388,112 @@ export type Database = {
           },
         ]
       }
+      compras: {
+        Row: {
+          anulado: boolean
+          anulado_por: string | null
+          clave: string | null
+          creado_por: string | null
+          estado: Database["public"]["Enums"]["estado_de_compra"]
+          factura: string | null
+          fecha: string | null
+          fecha_actualizacion: string
+          fecha_anulacion: string | null
+          fecha_creacion: string
+          gasto_id: string | null
+          id: string
+          local_id: string
+          motivo_anulacion: string | null
+          otros_cargos_centavos: number
+          por_pagar_id: string | null
+          proveedor_id: string
+          total_centavos: number
+        }
+        Insert: {
+          anulado?: boolean
+          anulado_por?: string | null
+          clave?: string | null
+          creado_por?: string | null
+          estado: Database["public"]["Enums"]["estado_de_compra"]
+          factura?: string | null
+          fecha?: string | null
+          fecha_actualizacion?: string
+          fecha_anulacion?: string | null
+          fecha_creacion?: string
+          gasto_id?: string | null
+          id?: string
+          local_id?: string
+          motivo_anulacion?: string | null
+          otros_cargos_centavos?: number
+          por_pagar_id?: string | null
+          proveedor_id: string
+          total_centavos?: number
+        }
+        Update: {
+          anulado?: boolean
+          anulado_por?: string | null
+          clave?: string | null
+          creado_por?: string | null
+          estado?: Database["public"]["Enums"]["estado_de_compra"]
+          factura?: string | null
+          fecha?: string | null
+          fecha_actualizacion?: string
+          fecha_anulacion?: string | null
+          fecha_creacion?: string
+          gasto_id?: string | null
+          id?: string
+          local_id?: string
+          motivo_anulacion?: string | null
+          otros_cargos_centavos?: number
+          por_pagar_id?: string | null
+          proveedor_id?: string
+          total_centavos?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compras_anulado_por_fkey"
+            columns: ["anulado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compras_creado_por_fkey"
+            columns: ["creado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compras_gasto_id_fkey"
+            columns: ["gasto_id"]
+            isOneToOne: false
+            referencedRelation: "gastos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compras_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compras_por_pagar_id_fkey"
+            columns: ["por_pagar_id"]
+            isOneToOne: false
+            referencedRelation: "gastos_por_pagar"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compras_proveedor_id_fkey"
+            columns: ["proveedor_id"]
+            isOneToOne: false
+            referencedRelation: "proveedores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       configuracion_de_caja: {
         Row: {
           fecha_actualizacion: string
@@ -674,6 +780,7 @@ export type Database = {
           categoria_id: string
           cierre_id: string | null
           clave: string | null
+          compra_id: string | null
           comprobante: string | null
           creado_por: string | null
           descripcion: string | null
@@ -697,6 +804,7 @@ export type Database = {
           categoria_id: string
           cierre_id?: string | null
           clave?: string | null
+          compra_id?: string | null
           comprobante?: string | null
           creado_por?: string | null
           descripcion?: string | null
@@ -720,6 +828,7 @@ export type Database = {
           categoria_id?: string
           cierre_id?: string | null
           clave?: string | null
+          compra_id?: string | null
           comprobante?: string | null
           creado_por?: string | null
           descripcion?: string | null
@@ -757,6 +866,13 @@ export type Database = {
             columns: ["cierre_id"]
             isOneToOne: false
             referencedRelation: "cierres_de_caja"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_compra_id_fkey"
+            columns: ["compra_id"]
+            isOneToOne: false
+            referencedRelation: "compras"
             referencedColumns: ["id"]
           },
           {
@@ -802,6 +918,7 @@ export type Database = {
           anulado_por: string | null
           categoria_id: string
           clave: string | null
+          compra_id: string | null
           comprobante: string | null
           creado_por: string | null
           descripcion: string | null
@@ -822,6 +939,7 @@ export type Database = {
           anulado_por?: string | null
           categoria_id: string
           clave?: string | null
+          compra_id?: string | null
           comprobante?: string | null
           creado_por?: string | null
           descripcion?: string | null
@@ -842,6 +960,7 @@ export type Database = {
           anulado_por?: string | null
           categoria_id?: string
           clave?: string | null
+          compra_id?: string | null
           comprobante?: string | null
           creado_por?: string | null
           descripcion?: string | null
@@ -870,6 +989,13 @@ export type Database = {
             columns: ["categoria_id"]
             isOneToOne: false
             referencedRelation: "categorias_de_gasto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_por_pagar_compra_id_fkey"
+            columns: ["compra_id"]
+            isOneToOne: false
+            referencedRelation: "compras"
             referencedColumns: ["id"]
           },
           {
@@ -1486,6 +1612,67 @@ export type Database = {
           },
         ]
       }
+      renglones_de_compra: {
+        Row: {
+          cantidad: number
+          cantidad_pedida: number | null
+          compra_id: string
+          fecha_actualizacion: string
+          fecha_creacion: string
+          forma_de_compra_id: string
+          id: string
+          local_id: string
+          precio_unitario_centavos: number
+          subtotal_centavos: number
+        }
+        Insert: {
+          cantidad?: number
+          cantidad_pedida?: number | null
+          compra_id: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          forma_de_compra_id: string
+          id?: string
+          local_id: string
+          precio_unitario_centavos?: number
+          subtotal_centavos?: number
+        }
+        Update: {
+          cantidad?: number
+          cantidad_pedida?: number | null
+          compra_id?: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          forma_de_compra_id?: string
+          id?: string
+          local_id?: string
+          precio_unitario_centavos?: number
+          subtotal_centavos?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "renglones_de_compra_compra_id_fkey"
+            columns: ["compra_id"]
+            isOneToOne: false
+            referencedRelation: "compras"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "renglones_de_compra_forma_de_compra_id_fkey"
+            columns: ["forma_de_compra_id"]
+            isOneToOne: false
+            referencedRelation: "formas_de_compra"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "renglones_de_compra_local_id_fkey"
+            columns: ["local_id"]
+            isOneToOne: false
+            referencedRelation: "locales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       renglones_de_receta: {
         Row: {
           activo: boolean
@@ -1947,6 +2134,34 @@ export type Database = {
           turno: number
         }[]
       }
+      compras_anular: {
+        Args: { la_compra: string; motivo: string }
+        Returns: undefined
+      }
+      compras_cargar_renglones: {
+        Args: { el_local: string; la_compra: string; renglones: Json }
+        Returns: undefined
+      }
+      compras_categoria: {
+        Args: { el_local: string; el_nombre: string }
+        Returns: string
+      }
+      compras_controlar: {
+        Args: { el_local: string; el_proveedor: string; renglones: Json }
+        Returns: undefined
+      }
+      compras_desde_gasto: { Args: { datos: Json }; Returns: string }
+      compras_exigir_admin: { Args: never; Returns: undefined }
+      compras_generar_pago: {
+        Args: { la_compra: string; pago: Json }
+        Returns: undefined
+      }
+      compras_pedir: { Args: { datos: Json }; Returns: string }
+      compras_recibir: { Args: { datos: Json }; Returns: string }
+      compras_ya_cargada: {
+        Args: { datos: Json; el_local: string }
+        Returns: string
+      }
       costo_de_insumos: {
         Args: never
         Returns: {
@@ -2228,6 +2443,7 @@ export type Database = {
       }
     }
     Enums: {
+      estado_de_compra: "pedida" | "recibida"
       estado_de_venta: "cerrada" | "cancelada" | "en_curso"
       etiqueta_de_producto: "mas_vendido" | "artesanal" | "nuevo"
       frecuencia_de_gasto: "mensual" | "bimestral" | "anual"
@@ -2375,6 +2591,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      estado_de_compra: ["pedida", "recibida"],
       estado_de_venta: ["cerrada", "cancelada", "en_curso"],
       etiqueta_de_producto: ["mas_vendido", "artesanal", "nuevo"],
       frecuencia_de_gasto: ["mensual", "bimestral", "anual"],
