@@ -90,7 +90,6 @@ export const CAMPOS: Record<string, string> = {
   rol: 'Rol',
   estado: 'Estado',
   fudo_id: 'Código de Fudo',
-  hasta: 'Hasta',
   hora_cierre_mediodia: 'Cierre del mediodía',
   hora_cierre_noche: 'Cierre de la noche',
   subtotal_centavos: 'Subtotal',
