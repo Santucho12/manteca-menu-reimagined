@@ -201,6 +201,7 @@ describe('ayudas', () => {
         'mismo largo',
         'Comparar',
         'Ventas por tipo de venta',
+        'Ganancia por producto',
         'Balance',
         'por mes',
         'Inicio',
