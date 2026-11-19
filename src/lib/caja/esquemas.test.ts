@@ -11,6 +11,7 @@ const IDENTIFICADOR = '6f1c1e0a-2b1d-4c1e-9a6b-1f2e3d4c5b6a';
 
 const datos: DatosDeCierre = {
   fecha: '2026-10-08',
+  turno: '1',
   fondoInicial: '10.000',
   efectivo: '25.000,50',
   credito: '3.000',
@@ -42,6 +43,7 @@ describe('esquemaCierre', () => {
   it('pasa a la base en centavos, con los medios vacios en cero', () => {
     expect(cierreParaLaBase(esquemaCierre.parse(datos))).toEqual({
       fecha: '2026-10-08',
+      turno: 1,
       fondo_inicial_centavos: 1000000,
       efectivo_centavos: 2500050,
       credito_centavos: 300000,
@@ -94,5 +96,14 @@ describe('esquemaEdicion', () => {
     expect(esquemaEdicion.safeParse(datos).success).toBe(false);
     const id = '6f1c1e0a-2b1d-4c1e-9a6b-1f2e3d4c5b6a';
     expect(esquemaEdicion.safeParse({ ...datos, id }).success).toBe(true);
+  });
+});
+
+describe('el turno del cierre', () => {
+  it('es el mediodía (1) o la noche (2)', () => {
+    expect(esquemaCierre.safeParse({ ...datos, turno: '2' }).success).toBe(true);
+    expect(esquemaCierre.safeParse({ ...datos, turno: '3' }).error?.issues[0]?.message).toBe(
+      'Elegí el turno.',
+    );
   });
 });

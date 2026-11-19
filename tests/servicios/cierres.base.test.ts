@@ -35,6 +35,7 @@ afterAll(async () => {
 
 const datos = (fecha: string, cambios: Partial<DatosDeCierre> = {}): DatosDeCierre => ({
   fecha,
+  turno: '2',
   fondoInicial: '10.000',
   efectivo: '25.000,50',
   credito: '3.000',
@@ -87,7 +88,7 @@ describe('guardar un cierre', () => {
     const caja = await clienteComo('caja');
     expect(await guardarCierre(caja, datos(fecha))).toEqual({
       ok: false,
-      mensaje: MENSAJES_DE_CAJA.diaRepetido,
+      mensaje: MENSAJES_DE_CAJA.turnoRepetido,
     });
     const futuro = sumarMeses(diaEnArgentina(new Date()), 1);
     expect(await guardarCierre(caja, datos(futuro))).toEqual({

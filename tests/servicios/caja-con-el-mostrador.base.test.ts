@@ -74,6 +74,7 @@ async function cargarAMano(fecha: string, enLaCaja: boolean) {
     medio: 'transferencia',
     comentario: '',
     enLaCaja,
+    turno: '2',
     renglones: [
       {
         opcion: `${producto.productoId}|${producto.presentacionId}`,

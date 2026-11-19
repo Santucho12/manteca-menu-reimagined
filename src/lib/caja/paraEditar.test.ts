@@ -3,6 +3,7 @@ import { datosParaEditar } from './paraEditar';
 
 const cierre = {
   fecha: '2026-10-28',
+  turno: 1 as const,
   fondoInicialCentavos: 1000000,
   quedaEnCajaCentavos: 800000,
   comentario: null,
@@ -18,6 +19,7 @@ describe('datosParaEditar', () => {
   it('vuelve los centavos al texto del formulario y deja afuera los gastos anulados', () => {
     expect(datosParaEditar(cierre)).toEqual({
       fecha: '2026-10-28',
+      turno: '1',
       fondoInicial: '10.000',
       efectivo: '25.000,50',
       credito: '',
