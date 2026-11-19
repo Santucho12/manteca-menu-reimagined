@@ -123,13 +123,13 @@ test('más vendidos tiene un botón Ver costos, que avisa Próximamente', async 
   await expect(page).toHaveURL(/\/admin$/);
 });
 
-test('la semana tiene un botón a Reportes, que avisa Próximamente', async ({ page }) => {
+// Abre el detalle de su gráfico, el reporte de ventas, como antes del pedido 48.
+test('la semana tiene un botón que abre el reporte de ventas', async ({ page }) => {
   await page.goto('/admin');
   const semana = page.getByRole('region', { name: 'Esta semana vs la anterior' });
   await semana.getByRole('link', { name: /Ver reportes/ }).click();
-  await expect(page.getByText('Próximamente').first()).toBeVisible();
-  await expect(page.getByRole('status')).toContainText('Reportes todavía no está disponible');
-  await expect(page).toHaveURL(/\/admin$/);
+  await expect(page).toHaveURL(/\/admin\/reportes\/ventas$/);
+  await expect(page.getByRole('heading', { level: 1, name: 'Ventas por período' })).toBeVisible();
 });
 
 test('el mes a mes marca el mes de hoy como en curso', async ({ page }) => {
