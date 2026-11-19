@@ -109,3 +109,21 @@ pedido), mandar por WhatsApp (un pedido), anular.
 
 Stock y su recepción, pagos parciales o a cuenta, pagar varias facturas con un solo pago,
 adjuntar la foto de la factura, y el costo de lo vendido calculado con stock.
+
+## Parte técnica (pedido 96)
+
+- Base: `supabase/migrations/20261119160000_compras.sql`. Tablas `compras` y
+  `renglones_de_compra`, que se leen solo como admin activo de su local y se escriben solo con
+  funciones: `compras_recibir` (compra directa o recepción de un pedido, con su gasto pagado o
+  su por pagar), `compras_pedir`, `compras_desde_gasto` (sobre un gasto de caja "Sin
+  clasificar") y `compras_anular`. Errores `PU300` a `PU312`. La clave de carga hace que el
+  doble envío no duplique.
+- `gastos.compra_id` y `gastos_por_pagar.compra_id` llevan a la compra. `reglas_de_gastos`
+  suma una salida (`manteca.desde_compras`) para devolver un gasto de caja a "Sin clasificar"
+  al anular su compra.
+- `costo_de_insumos()` toma el último renglón con precio de una compra recibida y no anulada
+  (por fecha de la compra y después por carga) y, si no hay, la referencia.
+- Servidor en `src/lib/compras/`; pantallas en `src/app/admin/(panel)/compras/` (lista,
+  `nueva`, `pedido`, `[id]`, `desde-gasto/[gasto]`). Suma a Gastos el enlace "Es una compra"
+  y el aviso de la Mercadería a mano; a Proveedores, sus compras; a Materia prima, el último
+  precio pagado de cada forma de compra.
