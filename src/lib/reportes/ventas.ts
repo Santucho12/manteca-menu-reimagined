@@ -91,3 +91,26 @@ export const categoriasDelReporte = (filas: VentaDeCategoria[]): CategoriaDelRep
     ventas: f.ventas,
     montoCentavos: f.monto_centavos,
   }));
+
+/** Lo que devuelve reporte_ventas_por_tipo: sin tipo son las ventas viejas de Fudo. */
+export type VentaDeTipo = {
+  canal_id: string | null;
+  tipo: string;
+  ventas: number;
+  monto_centavos: number;
+};
+export type TipoDelReporte = CategoriaDelReporte;
+
+const SIN_TIPO = 'sin-tipo';
+
+export const tiposDelReporte = (filas: VentaDeTipo[]): TipoDelReporte[] =>
+  filas.map((f) => ({
+    clave: f.canal_id ?? SIN_TIPO,
+    nombre: f.tipo,
+    ventas: f.ventas,
+    montoCentavos: f.monto_centavos,
+  }));
+
+/** Cuánto es del total, en por ciento redondeado; sin total, no hay parte. */
+export const parteDelTotal = (montoCentavos: number, totalCentavos: number): number | null =>
+  totalCentavos === 0 ? null : Math.round((montoCentavos * 100) / totalCentavos);

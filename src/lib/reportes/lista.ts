@@ -16,6 +16,11 @@ export const REPORTES = [
     pregunta: 'Cuánto dejó cada categoría del menú.',
   },
   {
+    ruta: '/admin/reportes/tipos',
+    titulo: 'Ventas por tipo de venta',
+    pregunta: 'Cuánto entró por el mostrador y cuánto por encargos, comercios y los demás.',
+  },
+  {
     ruta: '/admin/reportes/gastos',
     titulo: 'Gastos por categoría',
     pregunta: 'En qué se fue la plata.',
