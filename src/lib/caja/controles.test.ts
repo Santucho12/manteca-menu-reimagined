@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { controlesPorCierre, estadoConControles, resultadoDeControl } from './controles';
+import {
+  controlesPorCierre,
+  estadoConControles,
+  resultadoDeControl,
+  textoDelControl,
+} from './controles';
 
 const leido = {
   cierre_id: 'c1',
@@ -58,5 +63,25 @@ describe('controlesPorCierre', () => {
     const grupos = controlesPorCierre([leido, otro, { ...leido, canal_id: 'ch' }], 0);
     expect(grupos.get('c1')).toHaveLength(2);
     expect(grupos.get('c2')).toHaveLength(1);
+  });
+});
+
+describe('textoDelControl', () => {
+  const control = resultadoDeControl(leido, 50000);
+
+  it('dice si da correcto o cuánto falta cargar o sobra', () => {
+    expect(textoDelControl(control)).toBe('Da correcto');
+    expect(textoDelControl({ ...control, diferenciaCentavos: 2500000, fuera: true })).toBe(
+      'Faltan cargar $25.000,00',
+    );
+    expect(textoDelControl({ ...control, diferenciaCentavos: -100000, fuera: true })).toBe(
+      'Hay $1.000,00 cargados de más',
+    );
+  });
+
+  it('si solo no coincide la cantidad, lo dice', () => {
+    expect(textoDelControl({ ...control, cantidadCargada: 2, fuera: true })).toBe(
+      'Se anotaron 3 ventas y hay 2 cargadas',
+    );
   });
 });
