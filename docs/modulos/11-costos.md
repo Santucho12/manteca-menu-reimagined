@@ -132,3 +132,12 @@ Stock, producción, preparaciones dentro de otras recetas y el centro de avisos.
   `src/app/admin/(panel)/costos/`. El aviso de Inicio sale de `cuantosDebajoDelMinimo`.
 - Queda sin hacer: volver una presentación a "usa la receta del producto" una vez que tiene la
   suya, y el buscador de insumos (hoy es una lista para elegir).
+
+### El costo de lo vendido (pedido 97)
+
+- `supabase/migrations/20261119170000_costo_de_lo_vendido.sql`: la columna
+  `renglones_de_venta.costo_unitario_centavos` y el disparador `costo_al_vender`, que la
+  completa al cargar el renglón con `costos_de_productos_del_local` (sin costo calculable,
+  queda nula). Caja no lee la columna: no ve las ventas.
+- `ganancia_por_producto(desde, hasta)`: unidades, ventas, costo, ganancia (sobre lo que tiene
+  costo) y cuántos renglones no lo tienen. El reporte está en `/admin/reportes/ganancia`.
