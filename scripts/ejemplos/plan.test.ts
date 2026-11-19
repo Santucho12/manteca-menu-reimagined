@@ -37,6 +37,11 @@ describe('planDeEjemplo', () => {
     expect(plan.cierres.map((c) => c.fecha)).toEqual(conCierre);
   });
 
+  it('las ventas a mano no pasan por la caja: los cierres cuadran solo con las del mostrador', () => {
+    expect(plan.aMano.length).toBeGreaterThan(0);
+    for (const venta of plan.aMano) expect(plan.sinAbrir).not.toContain(venta.fecha);
+  });
+
   it('los gastos son del período, y con la misma semilla sale el mismo plan', () => {
     for (const gasto of plan.gastos) expect(plan.dias).toContain(gasto.fecha);
     expect(planDeEjemplo(89, HOY, formas, 30)).toEqual(plan);
