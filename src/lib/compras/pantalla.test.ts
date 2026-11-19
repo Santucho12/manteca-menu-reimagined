@@ -5,6 +5,7 @@ import {
   formasDelProveedor,
   inicialDeLaCompra,
   opcionesDeFormas,
+  precioAlElegir,
   precioPropuesto,
   estadoDeCompra,
   filtrosDeCompras,
@@ -129,5 +130,18 @@ describe('inicialDeLaCompra', () => {
       proveedorId: 'p1',
       renglones: [{ formaId: 'f1', cantidad: '2', precio: '30.000' }],
     });
+  });
+});
+
+describe('precioAlElegir', () => {
+  const formas = [forma({ ultimoPrecioCentavos: 3_000_000 })];
+
+  it('al elegir que llego propone su precio si el renglon no tenia', () => {
+    expect(precioAlElegir(formas, 'f1', '')).toBe('30.000');
+  });
+
+  it('no pisa un precio ya escrito ni inventa uno para lo que no conoce', () => {
+    expect(precioAlElegir(formas, 'f1', '29.000')).toBeNull();
+    expect(precioAlElegir(formas, 'otra', '')).toBeNull();
   });
 });
