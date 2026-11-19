@@ -1,5 +1,6 @@
 import { afterAll, describe, expect, it } from 'vitest';
 import {
+  cuantosDebajoDelMinimo,
   listarCostos,
   margenesDelLocal,
   presentacionesParaAjustar,
@@ -78,6 +79,13 @@ describe('listarCostos', () => {
     expect(await filaDe(barato.producto.id, 'debajo')).toBeDefined();
     expect(await filaDe(sinReceta.producto.id, 'debajo')).toBeUndefined();
     expect(await filaDe(sinReceta.producto.id, 'sin_receta')).toBeDefined();
+  });
+
+  it('cuenta los productos debajo del minimo, para el aviso de Inicio', async () => {
+    const antes = await cuantosDebajoDelMinimo(await admin());
+    await productoConCosto([50_000, null]);
+    expect(await cuantosDebajoDelMinimo(await admin())).toBe(antes + 1);
+    expect(await cuantosDebajoDelMinimo(await clienteComo('caja'))).toBe(0);
   });
 
   it('caja no ve costos', async () => {

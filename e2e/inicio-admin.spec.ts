@@ -114,13 +114,12 @@ test('la torta de gastos tiene un botón que lleva a Gastos', async ({ page }) =
   await expect(page).toHaveURL(/\/admin\/gastos$/);
 });
 
-test('más vendidos tiene un botón Ver costos, que avisa Próximamente', async ({ page }) => {
+test('más vendidos tiene un botón Ver costos, que abre Costos', async ({ page }) => {
   await page.goto('/admin');
   const lista = page.getByRole('region', { name: 'Más vendidos' });
   await lista.getByRole('link', { name: /Ver costos/ }).click();
-  const cartel = page.getByRole('status').filter({ hasText: 'Próximamente' });
-  await expect(cartel).toContainText('Costos todavía no está disponible');
-  await expect(page).toHaveURL(/\/admin$/);
+  await expect(page).toHaveURL(/\/admin\/costos$/);
+  await expect(page.getByRole('heading', { level: 1, name: 'Costos' })).toBeVisible();
 });
 
 // Abre el detalle de su gráfico, el reporte de ventas, como antes del pedido 48.

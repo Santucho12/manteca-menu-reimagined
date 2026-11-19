@@ -17,6 +17,17 @@ const textosDe = (datos: Partial<DatosDeAvisos>) =>
   avisosDeInicio({ ...NADA, ...datos }).map((aviso) => aviso.texto);
 
 describe('avisosDeInicio', () => {
+  it('avisa los productos debajo del margen minimo y lleva a Costos con ese filtro', () => {
+    expect(avisosDeInicio({ ...NADA, debajoDelMinimo: 3 })).toEqual([
+      {
+        texto: '3 productos están debajo del margen mínimo.',
+        enlace: '/admin/costos?filtro=debajo',
+      },
+    ]);
+    expect(textosDe({ debajoDelMinimo: 1 })).toEqual(['1 producto está debajo del margen mínimo.']);
+    expect(textosDe({ debajoDelMinimo: 0 })).toEqual([]);
+  });
+
   it('sin nada pendiente no hay avisos', () => {
     expect(avisosDeInicio(NADA)).toEqual([]);
   });
