@@ -39,6 +39,10 @@ describe('datoDe', () => {
     expect(datoDe('gastos')).toEqual({ modulo: 'Gastos', dato: 'Gasto' });
     expect(datoDe('retiros_de_caja')).toEqual({ modulo: 'Caja', dato: 'Retiro' });
     expect(datoDe('dias_sin_abrir')).toEqual({ modulo: 'Caja', dato: 'Día sin abrir' });
+    expect(datoDe('postergaciones_de_cierre')).toEqual({
+      modulo: 'Caja',
+      dato: 'Postergación del cierre',
+    });
     expect(datoDe('perfiles')).toEqual({ modulo: 'Usuarios', dato: 'Usuario' });
     expect(datoDe('ventas')).toEqual({ modulo: 'Ventas', dato: 'Venta' });
     expect(datoDe('renglones_de_venta')).toEqual({ modulo: 'Ventas', dato: 'Producto vendido' });
@@ -109,6 +113,7 @@ describe('enlaceDe', () => {
       '/admin/caja/cierres/c1',
     );
     expect(enlaceDe(registro({ tabla: 'configuracion_de_caja' }))).toBe('/admin/caja/control');
+    expect(enlaceDe(registro({ tabla: 'postergaciones_de_cierre' }))).toBe('/admin/caja/control');
     expect(enlaceDe(registro({ tabla: 'dias_sin_abrir' }))).toBe(
       '/admin/caja/control?estado=no_abrio',
     );

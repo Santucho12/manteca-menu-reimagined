@@ -47,6 +47,7 @@ describe('tablasDe', () => {
       'retiros_de_caja',
       'configuracion_de_caja',
       'dias_sin_abrir',
+      'postergaciones_de_cierre',
     ]);
     expect(tablasDe('menu')).toContain('precios');
     expect(tablasDe('gastos')).toContain('gastos_por_pagar');

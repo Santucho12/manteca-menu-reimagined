@@ -122,7 +122,7 @@ describe('ayudas', () => {
         'a ciegas',
         'Retiros',
         'Sin clasificar',
-        'un cierre por día',
+        'un cierre por turno',
         'día anterior',
         'Avisale a un administrador',
         'Mis cierres',
@@ -235,6 +235,15 @@ describe('ayudas', () => {
     for (const parte of ['Tocá', 'dos medios', 'vuelto', 'precio del menú', 'a ciegas', 'admin']) {
       expect(texto).toContain(parte);
     }
+  });
+
+  it('Vender, Caja y el control cuentan los turnos y la traba del cierre (pedido 98)', () => {
+    const texto = (clave: 'vender' | 'caja' | 'control') =>
+      AYUDAS[clave].temas.flatMap((t) => t.puntos).join(' ');
+    expect(texto('vender')).toContain('Postergar 10 min');
+    expect(texto('caja')).toContain('un cierre por turno');
+    expect(texto('caja')).not.toContain('un cierre por día');
+    expect(texto('control')).toContain('Horas de cierre');
   });
 
   it('ninguna ayuda habla de Fudo: Manteca lo dejó (pedido 89)', () => {
