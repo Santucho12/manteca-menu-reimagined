@@ -7,7 +7,7 @@ import { Campo } from '@/components/formularios/Campo';
 import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
 import { BOTON_CANCELAR, ICONO_EDITAR } from '@/components/panel/estilos';
 import type { FormaParaComprar } from '@/lib/compras/consultas';
-import { opcionesDeFormas } from '@/lib/compras/pantalla';
+import { opcionesDeFormas, precioAlElegir } from '@/lib/compras/pantalla';
 
 type ConRenglones = { renglones: { formaId: string; cantidad: string; precio: string }[] };
 type Props = {
@@ -35,7 +35,14 @@ function Renglon({
         etiqueta={`Qué llegó ${indice + 1}`}
         opciones={opcionesDeFormas(formas)}
         error={errores?.formaId?.message}
-        {...formulario.register(`renglones.${indice}.formaId`)}
+        {...formulario.register(`renglones.${indice}.formaId`, {
+          onChange: (evento: { target: { value: string } }) => {
+            if (!conPrecio) return;
+            const actual = formulario.getValues(`renglones.${indice}.precio`) ?? '';
+            const precio = precioAlElegir(formas, evento.target.value, actual);
+            if (precio) formulario.setValue(`renglones.${indice}.precio`, precio);
+          },
+        })}
       />
       <Campo
         id={`cantidad-${indice}`}

@@ -130,3 +130,15 @@ export function inicialDeLaCompra(hoy: string, pedido: Pedido | null, formas: Fo
     vencimiento: '',
   };
 }
+
+/** Al elegir que llego, el precio que se completa solo; nada si ya habia uno escrito. */
+export function precioAlElegir(
+  formas: FormaParaComprar[],
+  formaId: string,
+  precioActual: string,
+): string | null {
+  if (precioActual.trim() !== '') return null;
+  const forma = formas.find((f) => f.id === formaId);
+  const propuesto = forma ? precioPropuesto(forma) : '';
+  return propuesto === '' ? null : propuesto;
+}
