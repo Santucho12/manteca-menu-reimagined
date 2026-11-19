@@ -21,6 +21,7 @@ Solo Admin.
 | Ventas por período | Ventas de cada día, con cantidad de ventas y ticket promedio |
 | Ventas por producto | Cantidad y monto de cada producto |
 | Ventas por categoría | Cantidad y monto de cada categoría |
+| Ventas por tipo de venta | Cantidad, monto y parte del total de cada tipo: Local (el mostrador) y los que se cargan a mano (pedido 90) |
 | Gastos por categoría | Monto de cada categoría |
 | Gastos por período | Gastos de cada día o de cada mes |
 | Caja | Diferencia de cada cierre, por día y por empleado |

@@ -91,7 +91,9 @@ Vender de arriba de Ventas, porque su barra lateral tiene que entrar entera en u
 
 - Lista de ventas con fecha, origen (Mostrador o A mano), quién la cargó, total, medios de pago
   y estado.
-- Filtros por fechas, origen, medio de pago y estado. La lista está paginada.
+- Filtros por fechas, origen, medio de pago, tipo de venta (pedido 90) y estado. La lista está
+  paginada.
+- Los totales de arriba siguen a los filtros, también al tipo de venta.
 - Total de lo filtrado.
 - Al abrir una venta se ven sus productos y sus pagos, y se anula con motivo.
 
