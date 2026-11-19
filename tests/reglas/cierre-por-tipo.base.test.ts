@@ -241,3 +241,45 @@ describe('los tipos para vender', () => {
     expect(tipos.find((t) => t.nombre === 'Local')).toBeDefined();
   });
 });
+
+describe('todos los tipos se controlan, salvo Local (Santiago, 2026-11-19)', () => {
+  it('un tipo nuevo nace controlado', async () => {
+    const nuevo = await sembrarCanal();
+    canales.push(nuevo.id);
+    const { data } = await clienteSecretoDePruebas()
+      .from('canales_de_venta')
+      .select('se_controla_en_el_cierre')
+      .eq('id', nuevo.id)
+      .single();
+    expect(data?.se_controla_en_el_cierre).toBe(true);
+  });
+
+  it('los que ya existían se controlan, y Local no', async () => {
+    const { data } = await clienteSecretoDePruebas()
+      .from('canales_de_venta')
+      .select('nombre, de_sistema, se_controla_en_el_cierre')
+      .eq(
+        'local_id',
+        (
+          await clienteSecretoDePruebas()
+            .from('locales')
+            .select('id')
+            .eq('nombre', 'Manteca')
+            .single()
+        ).data!.id,
+      );
+    for (const tipo of data ?? []) expect(tipo.se_controla_en_el_cierre).toBe(!tipo.de_sistema);
+  });
+
+  it('el admin no lo apaga', async () => {
+    const nuevo = await sembrarCanal();
+    canales.push(nuevo.id);
+    const { error } = await (
+      await clienteComo('admin')
+    )
+      .from('canales_de_venta')
+      .update({ se_controla_en_el_cierre: false })
+      .eq('id', nuevo.id);
+    expect(error?.code).toBe('42501');
+  });
+});

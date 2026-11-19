@@ -4,7 +4,6 @@ import { guardarCierre } from '../../src/lib/caja/escritura';
 import type { DatosDeCierre } from '../../src/lib/caja/esquemas';
 import { filtrosDeControl } from '../../src/lib/caja/pantalla';
 import { tiposParaVender } from '../../src/lib/vender/consultas';
-import { cambiarControlDeCanal } from '../../src/lib/ventas/escritura';
 import { borrarCierres, diaLibre } from '../cierres-de-prueba';
 import { clienteComo } from '../sesiones';
 import { borrarVentas, idDeCanal, sembrarCanal, sembrarVentaConPago } from '../ventas-de-prueba';
@@ -19,11 +18,10 @@ afterEach(async () => {
 });
 afterAll(() => borrarVentas([], { canales }));
 
+// Todo tipo nuevo nace controlado en el cierre.
 async function plataformaControlada() {
   const canal = await sembrarCanal();
   canales.push(canal.id);
-  const resultado = await cambiarControlDeCanal(await clienteComo('admin'), canal.id, true);
-  if (!resultado.ok) throw new Error(resultado.mensaje);
   return canal.id;
 }
 
@@ -93,11 +91,5 @@ describe('los tipos para vender', () => {
     const tipos = await tiposParaVender(await clienteComo('caja'));
     expect(tipos[0]).toMatchObject({ id: await idDeCanal('Local'), deSistema: true });
     expect(tipos).toContainEqual(expect.objectContaining({ id: canal, seControla: true }));
-  });
-
-  it('caja no cambia qué se controla', async () => {
-    const canal = await sembrarCanal();
-    canales.push(canal.id);
-    expect((await cambiarControlDeCanal(await clienteComo('caja'), canal.id, true)).ok).toBe(false);
   });
 });
