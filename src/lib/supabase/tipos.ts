@@ -1584,6 +1584,15 @@ export type Database = {
           ventas: number
         }[]
       }
+      reporte_ventas_por_tipo: {
+        Args: { desde: string; hasta: string }
+        Returns: {
+          canal_id: string
+          monto_centavos: number
+          tipo: string
+          ventas: number
+        }[]
+      }
       reporte_ventas_por_dia: {
         Args: { desde: string; hasta: string }
         Returns: {
@@ -1620,6 +1629,7 @@ export type Database = {
       ventas_totales: {
         Args: {
           desde: string
+          el_canal?: string
           el_medio?: string
           el_origen?: string
           hasta: string

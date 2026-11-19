@@ -4,7 +4,7 @@ import type { CierreDelReporte } from './caja';
 import type { GastoDelDia } from './gastos';
 import type { Periodo } from './periodos';
 import { resultadoDelPeriodo } from './resultado';
-import type { RenglonDeProducto, VentaDeCategoria, VentaDelDia } from './ventas';
+import type { RenglonDeProducto, VentaDeCategoria, VentaDeTipo, VentaDelDia } from './ventas';
 
 type Respuesta = { data: unknown; error: { message: string } | null };
 
@@ -33,6 +33,7 @@ type Reporte =
   | 'reporte_ventas_por_dia'
   | 'reporte_ventas_por_producto'
   | 'reporte_ventas_por_categoria'
+  | 'reporte_ventas_por_tipo'
   | 'reporte_gastos';
 
 const reporte = <T>(cliente: Cliente, funcion: Reporte, p: Periodo) =>
@@ -44,6 +45,8 @@ export const ventasPorProducto = (cliente: Cliente, p: Periodo) =>
   reporte<RenglonDeProducto>(cliente, 'reporte_ventas_por_producto', p);
 export const ventasPorCategoria = (cliente: Cliente, p: Periodo) =>
   reporte<VentaDeCategoria>(cliente, 'reporte_ventas_por_categoria', p);
+export const ventasPorTipo = (cliente: Cliente, p: Periodo) =>
+  reporte<VentaDeTipo>(cliente, 'reporte_ventas_por_tipo', p);
 export const gastosPorDia = (cliente: Cliente, p: Periodo) =>
   reporte<GastoDelDia>(cliente, 'reporte_gastos', p);
 

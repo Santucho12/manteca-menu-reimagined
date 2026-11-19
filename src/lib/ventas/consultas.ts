@@ -59,6 +59,7 @@ function consultaDe(cliente: Cliente, filtros: FiltrosDeVentas, contar = false) 
     .lte('fecha', filtros.hasta);
   if (filtros.origen) consulta = consulta.eq('origen', filtros.origen);
   if (filtros.medio) consulta = consulta.eq('pagos.medio', filtros.medio);
+  if (filtros.tipo) consulta = consulta.eq('canal_id', filtros.tipo);
   if (filtros.estado === 'anulada') consulta = consulta.eq('anulado', true);
   else if (filtros.estado) consulta = consulta.eq('estado', filtros.estado).eq('anulado', false);
   return consulta;
@@ -70,6 +71,7 @@ async function totalesDe(cliente: Cliente, filtros: FiltrosDeVentas): Promise<To
     hasta: filtros.hasta,
     ...(filtros.origen ? { el_origen: filtros.origen } : {}),
     ...(filtros.medio ? { el_medio: filtros.medio } : {}),
+    ...(filtros.tipo ? { el_canal: filtros.tipo } : {}),
   });
   const [fila] = comprobar(respuesta, 'los totales');
   return {
