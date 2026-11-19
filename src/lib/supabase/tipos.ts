@@ -964,6 +964,42 @@ export type Database = {
           },
         ]
       }
+      postergaciones_de_cierre: {
+        Row: {
+          desde: string
+          fecha: string
+          fecha_actualizacion: string
+          fecha_creacion: string
+          hasta: string
+          id: string
+          local_id: string
+          postergado_por: string
+          turno: number
+        }
+        Insert: {
+          desde: string
+          fecha: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          hasta: string
+          id?: string
+          local_id?: string
+          postergado_por?: string
+          turno: number
+        }
+        Update: {
+          desde?: string
+          fecha?: string
+          fecha_actualizacion?: string
+          fecha_creacion?: string
+          hasta?: string
+          id?: string
+          local_id?: string
+          postergado_por?: string
+          turno?: number
+        }
+        Relationships: []
+      }
       presentaciones: {
         Row: {
           activo: boolean
@@ -1373,6 +1409,35 @@ export type Database = {
       }
     }
     Functions: {
+      caja_estado_del_mostrador: {
+        Args: never
+        Returns: {
+          fecha: string
+          fecha_trabada: string
+          hora_de_corte: string
+          motivo: string
+          postergado_hasta: string
+          proxima_hora: string
+          trabado: boolean
+          turno: number
+          turno_trabado: number
+        }[]
+      }
+      caja_estado_del_turno: {
+        Args: { momento: string }
+        Returns: {
+          fecha: string
+          fecha_trabada: string
+          hora_de_corte: string
+          motivo: string
+          postergado_hasta: string
+          proxima_hora: string
+          trabado: boolean
+          turno: number
+          turno_trabado: number
+        }[]
+      }
+      caja_postergar_cierre: { Args: never; Returns: string }
       catalogo_para_vender: {
         Args: never
         Returns: {
@@ -1508,6 +1573,10 @@ export type Database = {
       menu_escribir_precios_del_producto: {
         Args: { el_local: string; el_producto: string; lista: Json }
         Returns: undefined
+      }
+      cierres_turnos_pendientes: {
+        Args: { desde: string; hasta: string; momento?: string }
+        Returns: { fecha: string; turno: number }[]
       }
       menu_escribir_presentaciones: {
         Args: { el_local: string; la_categoria: string; lista: Json }
