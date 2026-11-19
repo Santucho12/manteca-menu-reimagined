@@ -166,6 +166,8 @@ Para los pedidos 94 a 97, decidido con Santiago el 2026-11-19: se diseñan junto
 
 **Excepción (Santiago, 2026-11-19):** Materia prima, Recetas, Costos y Compras son de la segunda fase y se construyen ahora, aunque `CLAUDE.md` dice que lo de la segunda fase no se construye por adelantado. Queda sin hacer de esos módulos: stock, producción, preparaciones dentro de otras recetas y el centro de avisos.
 
+**Excepción (Santiago, 2026-11-19): sin superpowers instalado.** En esta sesión no están las skills de superpowers. Se siguen sus pasos a mano: revisión lógica, diseño y plan por pedido en `docs/superpowers/`, TDD y cierre con `pre-finish`. Queda sin hacer la ejecución con subagentes.
+
 ### 93. Datos de ejemplo en la base de pruebas
 Santiago pide inventar ejemplos y cargar la base con datos falsos (2026-11-18). Van solo a la base de pruebas, en un local aparte con sus propias cuentas, para que no cambien lo que miran los tests: ventas de mostrador, cierres (algunos con diferencia), gastos y proveedores de los últimos meses. Un comando los vuelve a armar. La base real arranca de cero. Se arma después del pedido 89 y crece con los pedidos 90 a 92.
 
