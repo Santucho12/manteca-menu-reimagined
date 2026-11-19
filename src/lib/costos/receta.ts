@@ -104,3 +104,17 @@ export async function recetaDelProducto(
   ]);
   return armarTodo(producto, recetas, costos);
 }
+
+export type InsumoParaReceta = { id: string; nombre: string; unidad: Unidad };
+
+/** Los insumos activos para elegir en una receta, por nombre. */
+export async function insumosParaReceta(cliente: Cliente): Promise<InsumoParaReceta[]> {
+  const { data, error } = await cliente
+    .from('insumos')
+    .select('id, nombre, unidad_de_uso')
+    .eq('activo', true)
+    .order('nombre')
+    .limit(1000);
+  if (error) throw new Error(`No pudimos leer los insumos: ${error.message}`);
+  return data.map((i) => ({ id: i.id, nombre: i.nombre, unidad: i.unidad_de_uso }));
+}

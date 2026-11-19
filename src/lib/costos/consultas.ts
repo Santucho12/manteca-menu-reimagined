@@ -3,7 +3,13 @@ import { filaDeCosto, type EstadoDelCosto, type FilaDeCosto, type Margenes } fro
 import { porPorcentaje, type FiltrosDeCostos } from './lista';
 
 export { presentacionesParaAjustar, type CategoriaParaAjustar } from './ajustes';
-export { recetaDelProducto, type Receta, type RecetaDelProducto } from './receta';
+export {
+  insumosParaReceta,
+  recetaDelProducto,
+  type InsumoParaReceta,
+  type Receta,
+  type RecetaDelProducto,
+} from './receta';
 
 export type PresentacionConCosto = FilaDeCosto & {
   presentacionId: string;
