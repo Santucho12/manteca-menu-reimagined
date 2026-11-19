@@ -89,16 +89,15 @@ async function cargarAMano(fecha: string, enLaCaja: boolean) {
 
 describe('lo esperado de la caja', () => {
   it('suma las ventas del mostrador del turno, en su medio', async () => {
-    // Con el mediodía de hoy cerrado, lo que se vende va a la noche.
+    // Con el mediodía de hoy cerrado, lo que se vende va a la noche; su cierre se lee al final,
+    // porque con la noche cerrada ya no se vende.
     await vendidoParaLaCaja(HOY, 1);
-    const antes = await vendidoParaLaCaja(HOY);
     await venderEnElMostrador('efectivo');
     await venderEnElMostrador('transferencia');
-    const despues = await vendidoParaLaCaja(HOY);
-    expect(despues.ventas_efectivo_centavos - antes.ventas_efectivo_centavos).toBe(300000);
-    expect(despues.ventas_transferencia_centavos - antes.ventas_transferencia_centavos).toBe(
-      300000,
-    );
+    expect(await vendidoParaLaCaja(HOY)).toMatchObject({
+      ventas_efectivo_centavos: 300000,
+      ventas_transferencia_centavos: 300000,
+    });
   });
 
   it('no suma una venta a mano que no se cobró en la caja', async () => {

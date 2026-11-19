@@ -223,3 +223,16 @@ export const HORAS_DE_PRUEBA = { mediodia: '23:58', noche: '23:59' } as const;
 export function restaurarHorasDeCierre(): Promise<void> {
   return horasDeCierre(HORAS_DE_PRUEBA.mediodia, HORAS_DE_PRUEBA.noche);
 }
+
+/** Borra las postergaciones del local principal en esos dias, con su auditoria. */
+export async function borrarPostergaciones(fechas: string[]): Promise<void> {
+  const secreto = clienteSecretoDePruebas();
+  const { data } = await secreto
+    .from('postergaciones_de_cierre')
+    .delete()
+    .in('fecha', fechas)
+    .eq('local_id', await idDelLocalPrincipal(secreto))
+    .select('id');
+  const ids = (data ?? []).map((fila) => fila.id);
+  await secreto.from('auditoria').delete().in('registro_id', ids);
+}
