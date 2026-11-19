@@ -81,7 +81,7 @@ test('no deja cargar dos cierres del mismo dia', async ({ page }) => {
   await completar(page, fecha);
   await page.getByRole('button', { name: 'Guardar cierre' }).click();
   await expect(aviso(page)).toHaveText(
-    'Ya hay un cierre cargado para ese día. Si está mal, lo corrige un administrador desde el control de cierres.',
+    'Ya hay un cierre cargado para ese turno. Si está mal, lo corrige un administrador desde el control de cierres.',
   );
 });
 

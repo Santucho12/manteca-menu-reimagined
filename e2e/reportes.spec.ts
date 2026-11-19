@@ -1,7 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
 import { borrarDiasSinAbrir, sembrarDiaSinAbrir } from '../tests/cierres-de-prueba';
 import { sembrarVentaConRenglones } from '../tests/reportes-de-prueba';
-import { borrarVentas, idDeCanal, productoParaVender } from '../tests/ventas-de-prueba';
+import {
+  borrarVentas,
+  idDeCanal,
+  productoParaVender,
+  sembrarVentaConPago,
+} from '../tests/ventas-de-prueba';
 import { SESIONES } from './ayudas';
 import {
   borrarReportes,
@@ -140,8 +145,11 @@ test('resultado: sin gastos cargados no lo calcula', async ({ page }) => {
 test('caja: cada cierre con su diferencia, el dia sin cierre y el resumen por empleado', async ({
   page,
 }) => {
+  // El día sin cierre tiene que haber vendido en la caja: sin ventas, el local no abrió.
+  const venta = await sembrarVentaConPago({ fecha: '2018-04-11', medio: 'qr', centavos: 1000 });
   await page.goto('/admin/reportes/caja?desde=2018-04-10&hasta=2018-04-12');
   await expect(page.getByRole('row', { name: /11\/04\/2018/ })).toContainText('Sin cierre');
+  await borrarVentas([venta]);
   const cierre = page.getByRole('row', { name: /10\/04\/2018/ });
   await expect(cierre).toContainText('Prueba Caja');
   await expect(cierre).toContainText('$20.000,00');
