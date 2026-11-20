@@ -11,7 +11,7 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 |---|---|---|---|
 | Vender en el mostrador | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 1, 2 |
 | Cierres de caja | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 3, 4, 5 |
-| Ventas — lista y carga a mano | ⬜ pendiente | — | — |
+| Ventas — lista y carga a mano | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 6 |
 | Gastos | ⬜ pendiente | — | — |
 | Compras | ⬜ pendiente | — | — |
 | Costos | ⬜ pendiente | — | — |
@@ -76,6 +76,15 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   (b) la compra queda y pasa a «sin pago», con aviso; (c) no se anula un cierre con un gasto
   pasado a compra sin anular antes la compra.
 
+- [ ] **6 · 🟡 Una prueba en vivo depende de un dato que no siembra y lo borra.**
+  `e2e/ventas-canales.spec.ts:69` toca «Borrar Cheaf» suponiendo que Cheaf tiene ventas y
+  que entonces pide desactivarlo. En una base donde Cheaf no tiene ventas (mantecatest), lo
+  borra de verdad: el 2026-11-19 se borró el Cheaf de Manteca y hubo que volver a crearlo,
+  porque otros tests lo buscan por nombre (`idDeCanal('Cheaf')`).
+  repro: correr `e2e/ventas-canales.spec.ts` en una base sin ventas de Cheaf (rojo en la
+  línea 80, y Cheaf desaparece).
+  Test · fix propuesto: que la prueba siembre su propio tipo con una venta y borre ese.
+
 ## Verificado y sano
 
 - **Vender en el mostrador:** venta idempotente por clave (el doble toque guarda una sola);
@@ -91,6 +100,11 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   (`tests/verificacion/cierres-esperado.base.test.ts`); anular un cierre anula sus gastos
   y pide motivo; un turno por cierre; la noche no va antes que el mediodía de hoy; todos
   los tipos se controlan salvo Local.
+
+- **Ventas, lista y carga a mano:** 7 archivos de base (47 en verde: reglas, RLS, totales
+  por tipo, quién la cargó, borrar un tipo) y 23 de 24 pruebas en vivo de Ventas y Tipos de
+  venta. Anular una venta la saca de todos los números (la misma prueba que el mostrador,
+  `tests/verificacion/vender-anular.base.test.ts`).
 
 ## Descartado — NO re-proponer
 
@@ -119,3 +133,14 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 | 5 | Lógica por actor + auto-revisión | caja carga a ciegas; el día sin abrir que falló pasa aislado (datos compartidos, no hallazgo) | — |
 | 6 | Reversa y propagación | anular un cierre con un gasto pasado a compra (rojo) | 5 |
 | 7 | Lente nueva: los 2 rojos de la prueba en vivo, uno por uno con sus capturas | ambos son el #4, no fallas aparte | — → **cierra** |
+
+## Ventas — lista y carga a mano · pasadas
+
+| # | Lente | Qué ejercité | Hallazgos |
+|---|---|---|---|
+| 1 | Cadena | carga a mano (fecha no futura, en la caja con su turno), anular con motivo, tipos de venta | — |
+| 2 | Ejecución | 7 archivos de base (47 en verde) y `e2e/ventas.spec.ts` + `e2e/ventas-canales.spec.ts` en computadora (23 de 24) | 6 |
+| 3 | Números y bordes | totales que siguen al filtro de tipo (`ventas-por-tipo.base.test.ts`), total = renglones = pagos en las 3812 ventas | — |
+| 4 | Criterios | «una venta» y lo esperado de la caja, iguales a Vender y Cierres | — |
+| 5 | Lógica por actor + auto-revisión | el rojo de la prueba en vivo era la prueba, no la pantalla: con ventas, Cheaf pide desactivar | — |
+| 6 | Reversa y propagación | anular saca la venta de reportes, ganancia, totales y caja (ver Vender) | — → **cierra** |
