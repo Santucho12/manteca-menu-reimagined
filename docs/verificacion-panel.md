@@ -17,7 +17,7 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 | Costos | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 9 |
 | Materia prima | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 9 (de Costos) |
 | Inicio | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 10 |
-| Reportes | ⬜ pendiente | — | — |
+| Reportes | ✅ verificado 2026-11-19 — **sin hallazgos** | 6 | — |
 | Auditoría | ⬜ pendiente | — | — |
 | Proveedores | ⬜ pendiente | — | — |
 | Menú | ⬜ pendiente | — | — |
@@ -170,6 +170,11 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   probado en `tests/servicios/costos.base.test.ts`); el resultado del mes usa el mismo
   cálculo que Reportes.
 
+- **Reportes:** 7 archivos de base (32 en verde, con la ganancia de lo vendido y los
+  reportes largos que se piden de a tandas) y 20 pruebas en vivo; el reporte Ganancia por
+  producto abre y muestra ganancia y porcentaje
+  (`e2e/verificacion-reporte-de-ganancia.spec.ts`).
+
 ## Descartado — NO re-proponer
 
 | # | Qué se propuso | Por qué NO | Cuándo |
@@ -263,3 +268,14 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 | 4 | Criterios | «ventas del mes» igual a Reportes (`datosDelResultado`); «debajo del mínimo» igual a Costos | — |
 | 5 | Lógica por actor | caja no ve Inicio de admin; cada aviso lleva a donde se resuelve | — |
 | 6 | Reversa y propagación | una venta anulada sale de los números que comparte con Reportes (ver Vender) | — → **cierra** |
+
+## Reportes · pasadas
+
+| # | Lente | Qué ejercité | Hallazgos |
+|---|---|---|---|
+| 1 | Cadena | cada reporte y su función, `reportes_exigir_admin`, la lista y el período | — |
+| 2 | Ejecución | 7 archivos de base (32) y `e2e/reportes.spec.ts` (20), más el reporte de ganancia abierto en la pantalla | — |
+| 3 | Números y bordes | ganancia sobre lo que tiene costo y lo que no aparte; 2 × $1.000 con costo $350 da $1.300 y 65 % | — |
+| 4 | Criterios | «una venta» igual en todos los reportes, Inicio, Ventas y Cierres | — |
+| 5 | Lógica por actor | caja no ve reportes (`42501`) | — |
+| 6 | Reversa y propagación | la venta anulada sale de por día, por producto y ganancia (ver Vender) | — → **cierra** |
