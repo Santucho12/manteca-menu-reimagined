@@ -12,7 +12,7 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 | Vender en el mostrador | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 1, 2 |
 | Cierres de caja | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 3, 4, 5 |
 | Ventas — lista y carga a mano | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 6 |
-| Gastos | ⬜ pendiente | — | — |
+| Gastos | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 7 |
 | Compras | ⬜ pendiente | — | — |
 | Costos | ⬜ pendiente | — | — |
 | Materia prima | ⬜ pendiente | — | — |
@@ -85,6 +85,15 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   línea 80, y Cheaf desaparece).
   Test · fix propuesto: que la prueba siembre su propio tipo con una venta y borre ese.
 
+- [ ] **7 · 🟠 Desde Gastos se anula el gasto de una compra y la compra sigue viva.**
+  `reglas_de_gastos` no mira `compra_id`: el gasto pagado que generó una compra se anula
+  (o se le cambia el monto) suelto, y la compra queda «Pagada», recibida, y el insumo sigue
+  tomando su precio. Igual con «No se paga» sobre lo por pagar de una compra.
+  repro: `tests/verificacion/gasto-de-compra-anulado.base.test.ts` → `it.skip('#7 · …')`
+  (rojo sin el skip: el gasto se anula y la compra queda `anulado = false`).
+  Bug · fix propuesto: el gasto y lo por pagar de una compra no se anulan ni cambian el
+  monto sueltos (un código nuevo, «anulá la compra»); o anularlos anula la compra.
+
 ## Verificado y sano
 
 - **Vender en el mostrador:** venta idempotente por clave (el doble toque guarda una sola);
@@ -105,6 +114,10 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   por tipo, quién la cargó, borrar un tipo) y 23 de 24 pruebas en vivo de Ventas y Tipos de
   venta. Anular una venta la saca de todos los números (la misma prueba que el mostrador,
   `tests/verificacion/vender-anular.base.test.ts`).
+
+- **Gastos:** 10 archivos de base (106 en verde: reglas, RLS, recurrentes, por pagar,
+  repetidos, por categoría) y 40 pruebas en vivo de Gastos, Fijos, Por pagar y Categorías
+  en computadora, todas en verde.
 
 ## Descartado — NO re-proponer
 
@@ -144,3 +157,14 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 | 4 | Criterios | «una venta» y lo esperado de la caja, iguales a Vender y Cierres | — |
 | 5 | Lógica por actor + auto-revisión | el rojo de la prueba en vivo era la prueba, no la pantalla: con ventas, Cheaf pide desactivar | — |
 | 6 | Reversa y propagación | anular saca la venta de reportes, ganancia, totales y caja (ver Vender) | — → **cierra** |
+
+## Gastos · pasadas
+
+| # | Lente | Qué ejercité | Hallazgos |
+|---|---|---|---|
+| 1 | Cadena | `reglas_de_gastos` (anulado, de caja, medio, categoría y proveedor, la salida de Compras), lo por pagar y su pago | 7 |
+| 2 | Ejecución | 10 archivos de base (106 en verde) y 4 pruebas en vivo en computadora (40 en verde) | — |
+| 3 | Números y bordes | totales por categoría y por mes, por pagar, repetidos (`gastos-por-categoria`, `gastos-por-pagar`, `gasto-repetido`) | — |
+| 4 | Criterios | «un gasto cuenta el día que se paga» y lo anulado fuera, iguales en Reportes y Compras | — |
+| 5 | Lógica por actor | Mercadería a mano avisa que no cambia precios; un gasto de caja se clasifica, no se anula suelto | — |
+| 6 | Reversa y propagación | anular el gasto de una compra (rojo) | 7 → **cierra** |
