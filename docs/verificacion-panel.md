@@ -13,7 +13,7 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 | Cierres de caja | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 3, 4, 5 |
 | Ventas — lista y carga a mano | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 6 |
 | Gastos | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 7 |
-| Compras | ⬜ pendiente | — | — |
+| Compras | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 5, 7, 8 |
 | Costos | ⬜ pendiente | — | — |
 | Materia prima | ⬜ pendiente | — | — |
 | Inicio | ⬜ pendiente | — | — |
@@ -94,6 +94,12 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   Bug · fix propuesto: el gasto y lo por pagar de una compra no se anulan ni cambian el
   monto sueltos (un código nuevo, «anulá la compra»); o anularlos anula la compra.
 
+- [ ] **8 · 🔵 Un pedido anulado aparece arriba de la lista, con los pedidos por recibir.**
+  `src/lib/compras/consultas.ts` ordena por `estado` y la anulación no es un estado: en
+  «Todas», un pedido anulado queda junto a los que esperan recibirse.
+  repro: armar un pedido, anularlo y abrir `/admin/compras`: queda primero, «Anulada».
+  Mejora · fix propuesto: ordenar primero los pedidos sin anular.
+
 ## Verificado y sano
 
 - **Vender en el mostrador:** venta idempotente por clave (el doble toque guarda una sola);
@@ -118,6 +124,12 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 - **Gastos:** 10 archivos de base (106 en verde: reglas, RLS, recurrentes, por pagar,
   repetidos, por categoría) y 40 pruebas en vivo de Gastos, Fijos, Por pagar y Categorías
   en computadora, todas en verde.
+
+- **Compras:** 27 de base en verde (recibir con total, gasto y por pagar; pedir y recibir;
+  bonificación; doble envío; anular y volver al precio anterior; armar sobre un gasto de caja
+  y devolverlo a Sin clasificar; RLS) y las 9 pruebas en vivo en computadora, después de
+  que la prueba esperara la carga de la página (`e2e/compras.spec.ts`: se eligía el
+  proveedor antes de que React cargara; la prueba se corrigió, la pantalla no tenía nada).
 
 ## Descartado — NO re-proponer
 
@@ -168,3 +180,14 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 | 4 | Criterios | «un gasto cuenta el día que se paga» y lo anulado fuera, iguales en Reportes y Compras | — |
 | 5 | Lógica por actor | Mercadería a mano avisa que no cambia precios; un gasto de caja se clasifica, no se anula suelto | — |
 | 6 | Reversa y propagación | anular el gasto de una compra (rojo) | 7 → **cierra** |
+
+## Compras · pasadas
+
+| # | Lente | Qué ejercité | Hallazgos |
+|---|---|---|---|
+| 1 | Cadena | `compras_recibir`, `compras_pedir`, `compras_desde_gasto`, `compras_anular`, las acciones y los esquemas | — |
+| 2 | Ejecución | 27 de base y `e2e/compras.spec.ts` en computadora (9 en verde tras corregir la espera de la prueba) | — |
+| 3 | Números y bordes | total = renglones + otros cargos, gasto y por pagar con el total, bonificación a $0, renglones de más en un gasto de caja (`PU307`) | — |
+| 4 | Criterios | el precio del insumo: la última compra recibida por fecha de compra, contra Costos y Materia prima | — |
+| 5 | Lógica por actor | la lista del mes con pedidos arriba | 8 |
+| 6 | Reversa y propagación | anular un cierre con su gasto de caja pasado a compra (#5) y anular desde Gastos el gasto de una compra (#7) | 5, 7 → **cierra** |
