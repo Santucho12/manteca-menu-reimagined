@@ -10,7 +10,7 @@ test.use({ storageState: SESIONES.admin });
 const siembra = new SiembraDeCostos();
 test.afterAll(() => siembra.borrar());
 
-test.skip('#9 · una receta con un insumo desactivado lo muestra marcado y se puede volver a guardar', async ({
+test('#9 · una receta con un insumo desactivado lo muestra marcado y se puede volver a guardar', async ({
   page,
 }) => {
   const { categoria, producto } = await siembra.menu();
@@ -33,7 +33,9 @@ test.skip('#9 · una receta con un insumo desactivado lo muestra marcado y se pu
   const elegido = page.getByLabel('Insumo 1', { exact: true });
   await esperarHidratacion(elegido);
   await expect(elegido).toHaveValue(insumo.id);
-  await expect(page.getByText(/desactivado/i).first()).toBeVisible();
+  await expect(
+    page.getByText('Desactivado en Materia prima: la receta lo sigue usando.'),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Guardar' }).click();
   await expect(page.getByText('Guardamos la receta.')).toBeVisible();
 });

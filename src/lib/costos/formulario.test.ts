@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { RecetaDelProducto } from './consultas';
-import { datosDeLaReceta } from './formulario';
+import { datosDeLaReceta, insumosDeLaReceta } from './formulario';
 
 const renglon = (insumoId: string, cantidad: number) => ({
   insumoId,
@@ -59,5 +59,28 @@ describe('datosDeLaReceta', () => {
       desperdicio: '0',
       renglones: [],
     });
+  });
+});
+
+describe('insumosDeLaReceta', () => {
+  const activos = [{ id: 'i1', nombre: 'Harina', unidad: 'g' as const }];
+
+  it('suma los desactivados que ya estan en la receta, marcados', () => {
+    const conApagado = receta({
+      base: {
+        id: 'r1',
+        rinde: 1,
+        desperdicio: 0,
+        renglones: [{ ...renglon('i9', 2), nombre: 'Leche', activoElInsumo: false }],
+      },
+    });
+    expect(insumosDeLaReceta(activos, conApagado)).toEqual({
+      insumos: [...activos, { id: 'i9', nombre: 'Leche (desactivado)', unidad: 'g' }],
+      desactivados: ['i9'],
+    });
+  });
+
+  it('sin desactivados, los activos tal cual', () => {
+    expect(insumosDeLaReceta(activos, receta())).toEqual({ insumos: activos, desactivados: [] });
   });
 });
