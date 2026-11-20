@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { SiembraDeCostos, sembrarUnidades } from '../tests/costos-de-prueba';
-import { SESIONES } from './ayudas';
+import { esperarHidratacion, SESIONES } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -22,9 +22,10 @@ test('carga la receta de un producto y ve su costo, su ganancia y el sugerido', 
   await sembrarUnidades(categoria, 0, 1);
   await page.goto('/admin/costos?filtro=sin_receta');
   await filaDe(page, producto.nombre).getByRole('link', { name: producto.nombre }).click();
+  await esperarHidratacion(page.getByRole('button', { name: 'Agregar insumo' }));
   await page.getByRole('button', { name: 'Agregar insumo' }).click();
-  await page.getByLabel('Insumo 1').selectOption({ label: insumo.nombre });
-  await page.getByLabel('Cantidad 1').fill('35');
+  await page.getByLabel('Insumo 1', { exact: true }).selectOption(insumo.id);
+  await page.getByLabel('Cantidad 1', { exact: true }).fill('35');
   await page.getByRole('button', { name: 'Guardar' }).click();
   await expect(page.getByText('Guardamos la receta.')).toBeVisible();
   await page.goto('/admin/costos');
@@ -41,9 +42,10 @@ test('debajo del minimo se marca y se filtra', async ({ page }) => {
   await sembrarUnidades(categoria, 0, 1);
   await page.goto(`/admin/costos`);
   await filaDe(page, producto.nombre).getByRole('link', { name: producto.nombre }).click();
+  await esperarHidratacion(page.getByRole('button', { name: 'Agregar insumo' }));
   await page.getByRole('button', { name: 'Agregar insumo' }).click();
-  await page.getByLabel('Insumo 1').selectOption({ label: insumo.nombre });
-  await page.getByLabel('Cantidad 1').fill('35');
+  await page.getByLabel('Insumo 1', { exact: true }).selectOption(insumo.id);
+  await page.getByLabel('Cantidad 1', { exact: true }).fill('35');
   await page.getByRole('button', { name: 'Guardar' }).click();
   await expect(page.getByText('Guardamos la receta.')).toBeVisible();
   await page.goto('/admin/costos?filtro=debajo');
@@ -53,6 +55,7 @@ test('debajo del minimo se marca y se filtra', async ({ page }) => {
 test('en Ajustes cambia los margenes y las unidades de una presentacion', async ({ page }) => {
   const { categoria } = await siembra.menu();
   await page.goto('/admin/costos/ajustes');
+  await esperarHidratacion(page.getByLabel('Margen objetivo'));
   await page.getByLabel('Margen objetivo').fill('70');
   await page.getByLabel('Margen mínimo').fill('55');
   await page.getByRole('button', { name: 'Guardar márgenes' }).click();
