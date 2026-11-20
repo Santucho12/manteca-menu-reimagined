@@ -15,7 +15,7 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 | Gastos | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 7 |
 | Compras | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 5, 7, 8 |
 | Costos | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 9 |
-| Materia prima | ⬜ pendiente | — | — |
+| Materia prima | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 9 (de Costos) |
 | Inicio | ⬜ pendiente | — | — |
 | Reportes | ⬜ pendiente | — | — |
 | Auditoría | ⬜ pendiente | — | — |
@@ -149,6 +149,10 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   elegir el insumo por su id); el costo con desperdicio, rinde, unidades y agregado; la
   receta propia; el precio del menú igual que el del mostrador.
 
+- **Materia prima:** 52 de base en verde (RLS, reglas, costo por referencia y por compra,
+  servicio); 12 pruebas en vivo y `e2e/verificacion-insumo-en-recetas.spec.ts` (la columna
+  «En recetas» y las recetas en la ficha) en verde.
+
 ## Descartado — NO re-proponer
 
 | # | Qué se propuso | Por qué NO | Cuándo |
@@ -220,3 +224,14 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 | 4 | Criterios | precio del menú (propio o de la categoría) igual en Costos y en el mostrador; el costo de la venta sale de la misma función | — |
 | 5 | Lógica por actor | Ajustes avisa que cambiar una presentación cambia toda la categoría; el margen fuera de rango se explica | — |
 | 6 | Reversa y propagación | desactivar un insumo que está en una receta (rojo en la pantalla) | 9 → **cierra** |
+
+## Materia prima · pasadas
+
+| # | Lente | Qué ejercité | Hallazgos |
+|---|---|---|---|
+| 1 | Cadena | insumos y formas de compra, `formas_de_compra_reglas` (`PI301`, `PI302`), `insumos_reglas` (`PI303`), `costo_de_insumos` | — |
+| 2 | Ejecución | 3 archivos de base (52 en verde), `e2e/materia-prima.spec.ts` (12) y la prueba nueva de recetas en la ficha | — |
+| 3 | Números y bordes | costo por kilo, litro y unidad, redondeo, la forma cambiada por última vez, la forma desactivada fuera | — |
+| 4 | Criterios | el precio del insumo, igual en Materia prima, Costos y Compras | — |
+| 5 | Lógica por actor | el nombre repetido avisa y deja seguir; la unidad no cambia si está en una receta | — |
+| 6 | Reversa y propagación | desactivar un insumo que está en una receta: su receta lo pierde de vista (es el #9, de Costos) | 9 → **cierra** |
