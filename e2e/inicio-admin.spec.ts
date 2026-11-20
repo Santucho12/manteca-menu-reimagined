@@ -13,6 +13,7 @@ import {
 import { sembrarVentaConRenglones } from '../tests/reportes-de-prueba';
 import { borrarVentas, productoParaVender, type ParaVender } from '../tests/ventas-de-prueba';
 import { SESIONES } from './ayudas';
+import { borrarHistorial, sembrarHistorial } from '../tests/historial-de-prueba';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -293,6 +294,8 @@ test('el bloque de ventas del mes muestra el monto y cuantas ventas van', async 
 });
 
 test('el mes a mes arranca con 4 meses y se amplia a todo el año', async ({ page }) => {
+  // Seis meses con ventas y gastos: un mes en cero no dibuja barras.
+  const historial = await sembrarHistorial(diaEnArgentina(new Date()), 6);
   await page.goto('/admin');
   const barras = page.locator('[aria-label="Gráfico por mes"] .recharts-bar-rectangle');
   await expect(barras).toHaveCount(12); // 4 meses x 3 series
@@ -302,6 +305,7 @@ test('el mes a mes arranca con 4 meses y se amplia a todo el año', async ({ pag
     'true',
   );
   expect(await barras.count()).toBeGreaterThan(12);
+  await borrarHistorial(historial);
 });
 
 test('abajo de todo, las ventas de los ultimos 7 dias contra los 7 anteriores', async ({

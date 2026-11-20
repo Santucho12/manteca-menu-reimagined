@@ -1,9 +1,13 @@
 import { expect, test } from '@playwright/test';
+import { diaEnArgentina } from '../src/lib/fechas';
+import { borrarHistorial, sembrarHistorial } from '../tests/historial-de-prueba';
 import { SESIONES } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
 test('las tarjetas del mes muestran los montos sin centavos', async ({ page }) => {
+  // La variacion necesita el mes anterior: se siembra, no se espera de la base.
+  const historial = await sembrarHistorial(diaEnArgentina(new Date()));
   await page.goto('/admin');
   for (const etiqueta of ['Ventas', 'Gastos', 'Ticket promedio']) {
     const tarjeta = page.getByRole('term').filter({ hasText: etiqueta }).locator('xpath=../../..');
@@ -11,6 +15,7 @@ test('las tarjetas del mes muestran los montos sin centavos', async ({ page }) =
     // La coma del porcentaje sigue: lo que no va son los centavos del monto.
     await expect(tarjeta.getByText(/^[+-]\$/)).toHaveText(/^[+-]\$[\d.]+( \(.*\))?$/);
   }
+  await borrarHistorial(historial);
 });
 
 test('la ventanita del mes a mes muestra cada serie con su punto y su monto', async ({ page }) => {
