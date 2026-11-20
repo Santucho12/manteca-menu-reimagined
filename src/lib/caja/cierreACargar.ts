@@ -20,3 +20,13 @@ export function cierreACargar(pedido: Pedido, hoy: string, estado: EstadoDelTurn
   }
   return { fecha: hoy, turno: turno ?? estado.turnoTrabado ?? estado.turno };
 }
+
+/**
+ * Al cambiar la fecha del cierre se vuelve a pedir la pagina: el servidor elige el turno (un
+ * dia anterior, la noche) y el fondo sugerido de ese dia. Nada si la fecha no cambia, no
+ * existe o es futura.
+ */
+export function destinoDeLaFecha(nueva: string, actual: string, hoy: string): string | null {
+  if (nueva === actual || !esFechaValida(nueva) || nueva > hoy) return null;
+  return `/admin/caja?fecha=${nueva}`;
+}

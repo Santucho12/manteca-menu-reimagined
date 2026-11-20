@@ -76,6 +76,8 @@ export default async function CargarCierre({ searchParams }: { searchParams: Par
     >
       <QuienCarga nombre={perfil.nombre} />
       <FormularioDeCierre
+        key={`${fecha}-${turno}`}
+        hoy={hoy}
         inicial={inicial}
         avisoDelFondo={avisoDelFondo(diaDelFondo, fecha)}
         tipos={controlados}

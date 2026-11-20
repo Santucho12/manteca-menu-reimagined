@@ -12,6 +12,7 @@ import { Seccion } from '@/components/panel/Seccion';
 import { esquemaCierre, type DatosDeCierre } from '@/lib/caja/esquemas';
 import { conValorInicial, type Registro } from '@/lib/formularios/valorInicial';
 import { useGuardar } from '@/lib/gastos/useGuardar';
+import { destinoDeLaFecha } from '@/lib/caja/cierreACargar';
 import { usePasosDelCierre } from '@/lib/caja/usePasosDelCierre';
 import { editarCierreDesdeElPanel, guardarCierreDesdeElPanel } from './acciones';
 import { CAMPO_CONTRASTADO } from './contraste';
@@ -56,13 +57,15 @@ function Montos({ registro, errors }: PropsDeMontos) {
 
 type Props = {
   inicial: DatosDeCierre;
+  /** Al cargar, cambiar la fecha vuelve a pedir el turno y el fondo de ese dia. */
+  hoy?: string;
   id?: string;
   avisoDelFondo?: string | null;
   tipos?: TipoControlado[];
 };
 
 /** Cargar un cierre nuevo o, con el id, editar uno existente; al terminar abre su resultado. */
-export function FormularioDeCierre({ inicial, id, avisoDelFondo, tipos = [] }: Props) {
+export function FormularioDeCierre({ inicial, hoy, id, avisoDelFondo, tipos = [] }: Props) {
   const router = useRouter();
   const verDetalle = (cierre: string) => router.push(`/admin/caja/cierres/${cierre}`);
   const guardar = (datos: DatosDeCierre) =>
@@ -77,6 +80,12 @@ export function FormularioDeCierre({ inicial, id, avisoDelFondo, tipos = [] }: P
   const { errors } = formState;
   const registro = conValorInicial(register, inicial);
   const pasos = usePasosDelCierre(tipos.length, (campos) => trigger(campos));
+  const campoFecha = registro('fecha');
+  const cambiarFecha = (evento: { target: { value: string } }) => {
+    void campoFecha.onChange(evento as never);
+    const destino = !id && hoy ? destinoDeLaFecha(evento.target.value, inicial.fecha, hoy) : null;
+    if (destino) router.push(destino);
+  };
   // Enter en la caja pasa al paso siguiente; guardar es el último paso, en su ventana.
   const siguiente = (evento: FormEvent) => {
     evento.preventDefault();
@@ -97,7 +106,8 @@ export function FormularioDeCierre({ inicial, id, avisoDelFondo, tipos = [] }: P
           type="date"
           readOnly={Boolean(id)}
           error={errors.fecha?.message}
-          {...registro('fecha')}
+          {...campoFecha}
+          onChange={cambiarFecha}
         />
         {avisoDelFondo ? (
           <FranjaDeAviso>
