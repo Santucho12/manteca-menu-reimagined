@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { PantallaDeReporte } from '@/components/reportes/PantallaDeReporte';
+import { COLOR_DE_REPORTE } from '@/lib/reportes/coloresDeGraficos';
 import { GraficoDeBarras } from '@/components/reportes/GraficoDeBarras';
 import { PaginasDeReporte } from '@/components/reportes/PaginasDeReporte';
 import { SinDatos } from '@/components/reportes/SinDatos';
@@ -74,7 +75,7 @@ export default async function ReporteDeProductos({
               },
             ]}
           />
-          <GraficoDeBarras datos={actual} />
+          <GraficoDeBarras datos={actual} color={COLOR_DE_REPORTE.productos} />
           <TablaComparada
             titulo="Producto"
             filas={pagina.filas.map(({ fila, variacion }) => ({

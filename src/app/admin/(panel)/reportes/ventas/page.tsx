@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { PantallaDeReporte } from '@/components/reportes/PantallaDeReporte';
+import { COLOR_DE_REPORTE } from '@/lib/reportes/coloresDeGraficos';
 import { GraficoDeLineas } from '@/components/reportes/GraficoDeLineas';
 import { PaginasDeReporte } from '@/components/reportes/PaginasDeReporte';
 import { SinDatos } from '@/components/reportes/SinDatos';
@@ -69,7 +70,7 @@ export default async function ReporteDeVentas({
       ) : (
         <>
           <TotalesDeVentas actual={actual} anterior={anterior} />
-          <GraficoDeLineas datos={serie} />
+          <GraficoDeLineas datos={serie} color={COLOR_DE_REPORTE.ventas} />
           <TablaPorPeriodo filas={pagina.filas} escala={escala} conVentas />
           <PaginasDeReporte
             ruta={RUTA}

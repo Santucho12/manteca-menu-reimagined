@@ -14,6 +14,7 @@ import { formatearPesos } from '@/lib/plata';
 import { pesosCortos } from '@/lib/reportes/ejeCorto';
 import { TOOLTIP_DE_LINEAS } from './estiloDelTooltip';
 import type { PuntoSuperpuesto } from '@/lib/reportes/agrupar';
+import { COLOR_DE_COMPARACION } from '@/lib/reportes/coloresDeGraficos';
 
 const EJE = { stroke: '#94a3b8', fontSize: 10, fontWeight: 700 };
 const pesos = (valor: unknown) => formatearPesos(Math.round(Number(valor)));
@@ -23,7 +24,7 @@ const pesosDelEje = (valor: unknown) => pesosCortos(Number(valor));
 const MARGEN = { left: 8, right: 20 };
 
 /** El periodo y su comparacion uno sobre otro, posicion con posicion. */
-export function GraficoDeLineas({ datos }: { datos: PuntoSuperpuesto[] }) {
+export function GraficoDeLineas({ datos, color }: { datos: PuntoSuperpuesto[]; color: string }) {
   return (
     <figure
       aria-label="Gráfico del período"
@@ -45,7 +46,7 @@ export function GraficoDeLineas({ datos }: { datos: PuntoSuperpuesto[] }) {
           <Line
             name="Período"
             dataKey="actual"
-            stroke="#bfa042"
+            stroke={color}
             strokeWidth={3}
             dot={false}
             isAnimationActive={false}
@@ -53,7 +54,7 @@ export function GraficoDeLineas({ datos }: { datos: PuntoSuperpuesto[] }) {
           <Line
             name="Comparación"
             dataKey="comparacion"
-            stroke="#94a3b8"
+            stroke={COLOR_DE_COMPARACION}
             strokeWidth={2}
             strokeDasharray="4 4"
             dot={false}

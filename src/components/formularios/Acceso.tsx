@@ -8,7 +8,7 @@ type PropsDelTitulo = {
   subtitulo: string;
 };
 
-/** El titulo de la tarjeta de ingreso, con la ultima palabra en dorado. */
+/** El titulo de la tarjeta de ingreso, con la ultima palabra en el color de marca. */
 export function TituloDeAcceso({ inicio, resaltado, subtitulo }: PropsDelTitulo) {
   return (
     <div className="mb-5">
@@ -20,13 +20,13 @@ export function TituloDeAcceso({ inicio, resaltado, subtitulo }: PropsDelTitulo)
   );
 }
 
-/** El boton principal del ingreso: degrade dorado con letra blanca. */
+/** El boton principal del ingreso: el azul de marca con letra blanca. */
 export function BotonDeAcceso({ enviando, children }: { enviando: boolean; children: ReactNode }) {
   return (
     <button
       type="submit"
       disabled={enviando}
-      className="w-full h-11 rounded-full bg-gradient-to-r from-[#d6b75c] to-[#a8862f] text-white font-bold text-sm shadow-lg shadow-primary/25 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-primary/30 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50"
+      className="w-full h-11 rounded-full bg-primary text-primary-foreground font-bold text-sm shadow-lg shadow-primary/25 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-primary/30 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50"
     >
       {enviando ? <Loader2 size={16} className="animate-spin" aria-hidden /> : null}
       {children}

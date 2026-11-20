@@ -15,7 +15,7 @@ type Props = {
 };
 
 const DISPARADOR =
-  'flex h-11 w-full min-w-0 items-center justify-between gap-2 rounded-xl border border-border bg-secondary/30 px-3 text-left text-sm font-semibold outline-hidden transition-colors hover:bg-secondary/60 focus-visible:border-[#d8cdb6] data-[abierto=true]:border-[#d8cdb6] data-[abierto=true]:bg-white';
+  'flex h-11 w-full min-w-0 items-center justify-between gap-2 rounded-xl border border-border bg-secondary/30 px-3 text-left text-sm font-semibold outline-hidden transition-colors hover:bg-secondary/60 focus-visible:border-slate-300 data-[abierto=true]:border-slate-300 data-[abierto=true]:bg-white';
 const OPCION =
   'flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-secondary/70 data-[elegida=true]:bg-secondary';
 

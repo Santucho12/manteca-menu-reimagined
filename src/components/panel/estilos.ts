@@ -93,14 +93,14 @@ export const ICONO_DE_ACCION =
 
 /** El botón de las tarjetas de Inicio (Ver reportes, Ver gastos, Ver todo el año): una sola pieza. */
 export const BOTON_DE_TARJETA =
-  'group inline-flex h-10 pointer-coarse:h-11 shrink-0 items-center gap-2.5 whitespace-nowrap rounded-full border border-border bg-white pl-4 pr-1.5 text-xs font-bold text-foreground shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#d8cdb6] hover:shadow-xl active:translate-y-0';
+  'group inline-flex h-10 pointer-coarse:h-11 shrink-0 items-center gap-2.5 whitespace-nowrap rounded-full border border-border bg-white pl-4 pr-1.5 text-xs font-bold text-foreground shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-xl active:translate-y-0';
 
-/** Los accesos de arriba de Ventas: la acción principal dorada y las demás en píldora blanca con su icono en círculo. */
+/** Los accesos de arriba de Ventas: la acción principal en el azul de marca y las demás en píldora blanca con su icono en círculo. */
 export const ACCESO_PRINCIPAL =
   'group flex-1 lg:flex-none inline-flex h-11 items-center justify-center gap-2.5 whitespace-nowrap rounded-full bg-primary pl-3 pr-5 text-sm font-bold text-primary-foreground shadow-md shadow-primary/25 transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg active:translate-y-0 active:scale-[0.98]';
 
 export const ACCESO_SECUNDARIO =
-  'group flex-1 lg:flex-none inline-flex h-11 items-center justify-center gap-2.5 whitespace-nowrap rounded-full border border-border bg-white pl-3 pr-5 text-sm font-semibold text-foreground shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-[#d8cdb6] hover:shadow-lg active:translate-y-0 active:scale-[0.98]';
+  'group flex-1 lg:flex-none inline-flex h-11 items-center justify-center gap-2.5 whitespace-nowrap rounded-full border border-border bg-white pl-3 pr-5 text-sm font-semibold text-foreground shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg active:translate-y-0 active:scale-[0.98]';
 
 /** El acceso que confirma plata o lleva a la acción principal: verde, como el resto del panel. */
 export const ACCESO_VERDE =
@@ -119,10 +119,10 @@ export const ICONO_DE_ACCESO =
   'flex h-7 w-7 items-center justify-center rounded-full bg-black/10 transition-transform duration-200 group-hover:scale-110';
 
 export const ICONO_DE_ACCESO_SUAVE =
-  'flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-muted-foreground transition-all duration-200 group-hover:scale-110 group-hover:bg-[#e6dcc8] group-hover:text-foreground';
+  'flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-muted-foreground transition-all duration-200 group-hover:scale-110 group-hover:bg-slate-200 group-hover:text-foreground';
 
 export const CIRCULO_DE_BOTON =
-  'flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-muted-foreground transition-all duration-200 group-hover:scale-110 group-hover:bg-[#e6dcc8] group-hover:text-foreground';
+  'flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-muted-foreground transition-all duration-200 group-hover:scale-110 group-hover:bg-slate-200 group-hover:text-foreground';
 
 export const FLECHA_DE_BOTON =
   'transition-transform duration-200 group-hover:translate-x-px group-hover:-translate-y-px';

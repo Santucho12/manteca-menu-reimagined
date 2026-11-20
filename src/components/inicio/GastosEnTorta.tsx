@@ -39,7 +39,7 @@ export function GastosEnTorta({ gastos }: { gastos: GastoDelDia[] }) {
                   dataKey="montoCentavos"
                   nameKey="nombre"
                   outerRadius="100%"
-                  stroke="#fbf9f3"
+                  stroke="#ffffff"
                   strokeWidth={2}
                   isAnimationActive={false}
                 >

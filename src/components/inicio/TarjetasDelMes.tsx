@@ -18,14 +18,13 @@ import {
 import { textoDeVariacion } from '@/lib/reportes/comparacion';
 import { formatearPesosRedondeados } from '@/lib/plata';
 import type { NumeroDelMes } from '@/lib/inicio/numeros';
+import { colorDeTarjeta } from '@/lib/inicio/coloresDeTarjetas';
 
-// El azul de Balance es decision de Santiago (2026-10-26, pedido 45). Va literal: en el panel,
-// la familia blue esta remapeada al dorado.
-const ICONOS: Record<string, { icono: LucideIcon; tono: string }> = {
-  Ventas: { icono: ShoppingBag, tono: 'text-foreground' },
-  Gastos: { icono: Receipt, tono: 'text-foreground' },
-  Balance: { icono: TrendingUp, tono: 'text-[#2563eb]' },
-  'Ticket promedio': { icono: Ticket, tono: 'text-foreground' },
+const ICONOS: Record<string, LucideIcon> = {
+  Ventas: ShoppingBag,
+  Gastos: Receipt,
+  Balance: TrendingUp,
+  'Ticket promedio': Ticket,
 };
 
 // Verde si mejora y rojo si empeora (Santiago, 2026-10-27, pedido 47).
@@ -74,16 +73,17 @@ export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
       className="grid grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-3 md:gap-4"
     >
       {items.map((item) => {
-        const { icono: Icono, tono } = ICONOS[item.etiqueta]!;
+        const Icono = ICONOS[item.etiqueta]!;
+        const { raya, icono } = colorDeTarjeta(item.etiqueta);
         return (
           <motion.div
             key={item.etiqueta}
             variants={TARJETA}
-            className="relative overflow-hidden rounded-2xl border border-border bg-card p-3 md:px-6 md:pt-7 md:pb-6 flex flex-col shadow-[0_2px_10px_-4px_rgba(43,29,20,0.08)] hover:shadow-xl transition-all duration-300"
+            className="relative overflow-hidden rounded-2xl border border-border bg-card p-3 md:px-6 md:pt-7 md:pb-6 flex flex-col shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl transition-all duration-300"
           >
             <span
               aria-hidden="true"
-              className="absolute top-0 left-6 right-6 h-1 rounded-b-full bg-primary"
+              className={`absolute top-0 left-6 right-6 h-1 rounded-b-full ${raya}`}
             />
             <div className="flex justify-between items-start gap-2 relative z-10">
               <div className="space-y-1 min-w-0">
@@ -94,7 +94,7 @@ export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
                   {item.valor}
                 </dd>
               </div>
-              <div className={`shrink-0 rounded-xl p-1.5 md:p-2 bg-secondary ${tono}`}>
+              <div className={`shrink-0 rounded-xl p-1.5 md:p-2 ${icono}`}>
                 <Icono size={18} aria-hidden="true" />
               </div>
             </div>

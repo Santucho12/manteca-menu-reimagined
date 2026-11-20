@@ -17,14 +17,17 @@ type Props = {
   /** Cuántas barras dibuja; por defecto, las diez primeras. */
   limite?: number;
   altoDeBarra?: number;
+  /** El color del reporte (`COLOR_DE_REPORTE`). */
+  color: string;
 };
 
-/** Las primeras barras, de mayor a menor, en el dorado de la marca. */
+/** Las primeras barras, de mayor a menor, en el color del reporte. */
 export function GraficoDeBarras({
   datos,
   etiqueta = 'Gráfico de los diez primeros',
   limite = 10,
   altoDeBarra = 36,
+  color,
 }: Props) {
   const primeros = datos.slice(0, limite);
   return (
@@ -42,7 +45,7 @@ export function GraficoDeBarras({
           <Bar
             name="Monto"
             dataKey="montoCentavos"
-            fill="#bfa042"
+            fill={color}
             radius={[0, 6, 6, 0]}
             isAnimationActive={false}
           />

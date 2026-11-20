@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { PantallaDeReporte } from '@/components/reportes/PantallaDeReporte';
+import { COLOR_DE_REPORTE } from '@/lib/reportes/coloresDeGraficos';
 import { GraficoDeBarras } from '@/components/reportes/GraficoDeBarras';
 import { PaginasDeReporte } from '@/components/reportes/PaginasDeReporte';
 import { SinDatos } from '@/components/reportes/SinDatos';
@@ -57,7 +58,7 @@ export default async function ReporteDeGastos({
               },
             ]}
           />
-          <GraficoDeBarras datos={categorias} />
+          <GraficoDeBarras datos={categorias} color={COLOR_DE_REPORTE.gastos} />
           <TablaComparada
             titulo="Categoría"
             filas={pagina.filas.map(({ fila, variacion }) => ({ ...fila, variacion }))}

@@ -18,17 +18,24 @@ PRP es la app "FiestaCobra", en
 React 18, Tailwind 3). Esta skill ya trae todo pasado a Manteca: el código de PRP se consulta
 solo para algo que acá no esté. No se entra a su base real: tiene datos de sus clientes.
 
-**El dorado de Manteca en vez del verde de PRP (Santiago, pedido 45).** El verde de marca
-(`primary`, `accent`, `ring`) pasa a ser el dorado `#bfa042`, con letra marrón oscuro
-`#2b1d14` encima (el blanco sobre el dorado no se lee). Los fondos son crema (`#f4efe5`) y los
-grises de `slate` van en tonos cálidos: todo está en `panel.css`. Donde esta skill o `piezas.md`
-digan "verde" de la marca, se lee "dorado"; `emerald` sigue con su significado (confirma plata o
-exporta). El azul marino `#1e3a8a` de antes quedó descartado.
+**Los colores de FiestaCobra con el azul de marca (Santiago, 2026-11-19, pedido 101).** El fondo
+(`#f9fafb`), las tarjetas blancas, los bordes y los grises fríos de `slate` son los de PRP. El verde
+de marca (`primary`, `accent`, `ring`) pasa a ser el azul `#1e40af`, con letra blanca encima.
+Todo está en `panel.css`. Donde esta skill o `piezas.md` digan "verde" de la marca, se lee "azul";
+`emerald` sigue con su significado (confirma plata o exporta). El logo de Manteca sigue dorado. El
+dorado y el crema del pedido 45 quedaron descartados, y Gastos ya no es una sección sin color de
+marca. El bloque oscuro del mes de Inicio es el de PRP (`#0F172A`, con sus detalles en `emerald`):
+el azul de marca no se vería sobre ese fondo.
+
+**Más colores, no solo el azul (Santiago, pedido 101).** Para diferenciar en gráficos y piezas se
+usan las familias de la paleta. Cada reporte tiene su color en `src/lib/reportes/coloresDeGraficos.ts`,
+por lo que muestra y no por su puesto: verde lo que entra, rojo lo que sale y un color propio para
+el resto.
 
 Decisiones de Santiago (2026-10-21):
 
 - **Los rojos y grises de PRP**, aunque no pasen el contraste AA (el rojo de error, 3,6; los grises
-  chicos, 2,6). El dorado con su letra marrón sí lo pasa. Es una excepción anotada en `PEDIDOS.md` (pedido 43): `tests/contraste.test.ts`
+  chicos, 2,6). El azul con su letra blanca sí lo pasa. Es una excepción anotada en `PEDIDOS.md` (pedido 43): `tests/contraste.test.ts`
   mira solo la carta y no se extiende al panel.
 - **Las tres librerías de PRP, con su versión exacta**: `framer-motion` 12.36.0, `sonner` 1.7.4 y
   `lenis` 1.1.20.
@@ -129,7 +136,7 @@ Y lo que cambia por ser Next y no una sola página:
 - **Colores**: los del tema (`primary`, `secondary`, `muted`, `border`…) y solo estas familias de
   la paleta: `slate`, `emerald`, `rose`, `amber`, `violet`, `blue` y `sky`. Más `#25D366` para
   WhatsApp y `#0F172A` para el bloque oscuro. Ninguno más.
-- **Qué color dice qué**: dorado (`primary`) la marca, lo activo y la acción principal;
+- **Qué color dice qué**: azul (`primary`) la marca, lo activo y la acción principal;
   `emerald-600` lo que confirma plata o exporta; `rose` lo urgente y lo que se borra o anula;
   `amber` lo que viene y las advertencias; `slate` lo vencido, neutro o apagado; `violet` lo
   secundario (grupos, seguimiento); `blue` solo en el hover de editar.
@@ -155,10 +162,10 @@ en componentes de hasta 80 líneas, con la lógica en `.ts` y nombres en españo
 
 - Sacar capturas de la pantalla nueva con Playwright a **1440×900, 1180×820 y 390×844** y ponerlas
   al lado de las de `referencias/` del mismo tamaño. Se miran la letra de los títulos (Outfit),
-  el verde, los radios, las sombras, los espacios y las mayúsculas de las etiquetas.
+  el azul de marca, los radios, las sombras, los espacios y las mayúsculas de las etiquetas.
 - En la consola del navegador: `getComputedStyle(document.querySelector('h1')).fontFamily`
   empieza con la Outfit de next/font; el `body` mide `14px`; un botón principal tiene fondo
-  `rgb(191, 160, 66)` y letra `rgb(43, 29, 20)`.
+  `rgb(30, 64, 175)` y letra `rgb(255, 255, 255)`.
 - Una pieza que no está en las capturas se compara contra su archivo de PRP, citado en
   `piezas.md`.
 

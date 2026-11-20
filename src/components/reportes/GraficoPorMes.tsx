@@ -36,7 +36,7 @@ function TickDelMes({ x = 0, y = 0, payload, enCurso }: PropsDelTick) {
         {etiqueta}
       </text>
       {etiqueta === enCurso ? (
-        <text dy={25} textAnchor="middle" fill="#8a7330" fontSize={9} fontWeight={700}>
+        <text dy={25} textAnchor="middle" fill="#d97706" fontSize={9} fontWeight={700}>
           en curso
         </text>
       ) : null}

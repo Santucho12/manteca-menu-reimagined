@@ -77,7 +77,7 @@ function GraficoAcumulado({ puntos }: { puntos: PuntoAcumulado[] }) {
         cy={cy}
         r={6}
         fill={COLORES.actual}
-        stroke="#fbf9f3"
+        stroke="#ffffff"
         strokeWidth={3}
       />
     ) : (

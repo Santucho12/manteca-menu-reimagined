@@ -1,6 +1,7 @@
 import { Ban, Ticket, Wallet, XCircle, type LucideIcon } from 'lucide-react';
 import type { Totales } from '@/lib/ventas/consultas';
 import { tarjetasDelResumen } from '@/lib/ventas/pantalla';
+import { colorDeTarjeta } from '@/lib/inicio/coloresDeTarjetas';
 
 const ICONOS: Record<string, LucideIcon> = {
   Cobrado: Wallet,
@@ -16,14 +17,15 @@ export function TarjetasDeVentas({ totales }: { totales: Totales }) {
       <ul className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-3 md:gap-4">
         {tarjetasDelResumen(totales).map(({ etiqueta, valor, detalle, ayuda }) => {
           const Icono = ICONOS[etiqueta]!;
+          const { raya, icono } = colorDeTarjeta(etiqueta);
           return (
             <li
               key={etiqueta}
-              className="relative overflow-hidden rounded-2xl border border-border bg-card p-3 md:px-6 md:pt-7 md:pb-5 shadow-[0_2px_10px_-4px_rgba(43,29,20,0.08)]"
+              className="relative overflow-hidden rounded-2xl border border-border bg-card p-3 md:px-6 md:pt-7 md:pb-5 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]"
             >
               <span
                 aria-hidden="true"
-                className="absolute top-0 left-6 right-6 h-1 rounded-b-full bg-primary"
+                className={`absolute top-0 left-6 right-6 h-1 rounded-b-full ${raya}`}
               />
               <dl className="flex items-start justify-between gap-2">
                 <div className="space-y-1 min-w-0">
@@ -40,7 +42,7 @@ export function TarjetasDeVentas({ totales }: { totales: Totales }) {
                     </p>
                   ) : null}
                 </div>
-                <div className="shrink-0 rounded-xl p-1.5 md:p-2 bg-secondary text-foreground">
+                <div className={`shrink-0 rounded-xl p-1.5 md:p-2 ${icono}`}>
                   <Icono size={18} aria-hidden="true" />
                 </div>
               </dl>

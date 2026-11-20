@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { PaginasDeReporte } from '@/components/reportes/PaginasDeReporte';
 import { Chip } from '@/components/panel/Insignias';
+import { COLOR_DE_REPORTE } from '@/lib/reportes/coloresDeGraficos';
 import { GraficoDeBarras } from '@/components/reportes/GraficoDeBarras';
 import { PantallaDeReporte } from '@/components/reportes/PantallaDeReporte';
 import { SinDatos } from '@/components/reportes/SinDatos';
@@ -92,6 +93,7 @@ function Diferencias({ datos }: { datos: ReturnType<typeof diferenciasDelGrafico
     <GraficoDeBarras
       datos={datos}
       etiqueta="Gráfico de la diferencia de cada cierre"
+      color={COLOR_DE_REPORTE.caja}
       limite={datos.length}
       altoDeBarra={24}
     />

@@ -28,7 +28,7 @@ type Props = {
 const COLUMNAS =
   'grid grid-cols-[1fr_1fr_2.25rem] pointer-coarse:grid-cols-[1fr_1fr_2.75rem] items-center gap-2 sm:grid-cols-[1fr_5.5rem_8rem_2.25rem] sm:pointer-coarse:grid-cols-[1fr_5.5rem_8rem_2.75rem]';
 const CAMPO =
-  'h-11 w-full min-w-0 rounded-xl border border-border bg-secondary/30 px-3 text-sm font-semibold outline-hidden transition-colors focus:border-[#d8cdb6] focus:bg-white';
+  'h-11 w-full min-w-0 rounded-xl border border-border bg-secondary/30 px-3 text-sm font-semibold outline-hidden transition-colors focus:border-slate-300 focus:bg-white';
 const TITULO = 'px-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground';
 const QUITAR =
   'flex h-9 w-9 pointer-coarse:h-11 pointer-coarse:w-11 items-center justify-center rounded-full text-slate-400 transition-all duration-200 hover:bg-rose-50 hover:text-rose-600 active:scale-95';
