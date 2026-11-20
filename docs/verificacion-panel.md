@@ -16,7 +16,7 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 | Compras | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 5, 7, 8 |
 | Costos | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 9 |
 | Materia prima | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 9 (de Costos) |
-| Inicio | ⬜ pendiente | — | — |
+| Inicio | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 10 |
 | Reportes | ⬜ pendiente | — | — |
 | Auditoría | ⬜ pendiente | — | — |
 | Proveedores | ⬜ pendiente | — | — |
@@ -112,6 +112,17 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   Bug · fix propuesto: sumar a las opciones los insumos que ya están en la receta, con
   «(desactivado)» en el texto.
 
+- [ ] **10 · 🟡 Dos pruebas en vivo de Inicio dependen de un historial de ventas que no
+  siembran.** `e2e/inicio-admin.spec.ts:295` espera 12 barras (4 meses × 3 series) y
+  `e2e/inicio-montos.spec.ts:6` espera la variación contra el mes anterior. En una base sin
+  meses anteriores en el local (mantecatest: las ventas inventadas están en el Local de
+  ejemplo) dan 6 barras y ninguna variación. La pantalla está bien: un mes en cero no tiene
+  barra y sin mes anterior no hay variación.
+  repro: correr esas dos pruebas en mantecatest (rojo: «Expected 12, Received 6» y la
+  variación sin encontrar).
+  Test · fix propuesto: que cada prueba siembre los meses que necesita, o que corra con la
+  sesión del Local de ejemplo.
+
 ## Verificado y sano
 
 - **Vender en el mostrador:** venta idempotente por clave (el doble toque guarda una sola);
@@ -152,6 +163,12 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 - **Materia prima:** 52 de base en verde (RLS, reglas, costo por referencia y por compra,
   servicio); 12 pruebas en vivo y `e2e/verificacion-insumo-en-recetas.spec.ts` (la columna
   «En recetas» y las recetas en la ficha) en verde.
+
+- **Inicio:** `tests/servicios/inicio.base.test.ts` (10 en verde: avisos, resultado, más
+  vendidos, semana) y 30 de 32 pruebas en vivo de Inicio en computadora; el aviso de
+  productos debajo del mínimo sale de la misma lista que Costos (`cuantosDebajoDelMinimo`,
+  probado en `tests/servicios/costos.base.test.ts`); el resultado del mes usa el mismo
+  cálculo que Reportes.
 
 ## Descartado — NO re-proponer
 
@@ -235,3 +252,14 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 | 4 | Criterios | el precio del insumo, igual en Materia prima, Costos y Compras | — |
 | 5 | Lógica por actor | el nombre repetido avisa y deja seguir; la unidad no cambia si está en una receta | — |
 | 6 | Reversa y propagación | desactivar un insumo que está en una receta: su receta lo pierde de vista (es el #9, de Costos) | 9 → **cierra** |
+
+## Inicio · pasadas
+
+| # | Lente | Qué ejercité | Hallazgos |
+|---|---|---|---|
+| 1 | Cadena | `datosDelInicio` y cada consulta que junta, con el aviso de margen nuevo | — |
+| 2 | Ejecución | `tests/servicios/inicio.base.test.ts` (10) y 4 pruebas en vivo de Inicio en computadora (30 de 32) | 10 |
+| 3 | Números y bordes | los 2 rojos uno por uno: el mes en cero sin barra y sin mes anterior sin variación es lo correcto | — |
+| 4 | Criterios | «ventas del mes» igual a Reportes (`datosDelResultado`); «debajo del mínimo» igual a Costos | — |
+| 5 | Lógica por actor | caja no ve Inicio de admin; cada aviso lleva a donde se resuelve | — |
+| 6 | Reversa y propagación | una venta anulada sale de los números que comparte con Reportes (ver Vender) | — → **cierra** |
