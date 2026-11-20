@@ -10,7 +10,7 @@ const siembra = new SiembraDeCompras();
 afterAll(() => siembra.borrar());
 
 describe('verificacion · cierre anulado con un gasto que era una compra', () => {
-  it.skip('#5 · anular el cierre tambien saca del costo la compra armada sobre su gasto', async () => {
+  it('#5 · anular el cierre tambien saca del costo la compra armada sobre su gasto', async () => {
     const proveedor = await siembra.proveedor();
     const forma = await siembra.forma(proveedor.id);
     const gasto = await siembra.gastoDeCaja(5_000, diaEnArgentina(new Date()));
