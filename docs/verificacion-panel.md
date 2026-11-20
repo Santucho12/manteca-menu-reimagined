@@ -18,10 +18,10 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 | Materia prima | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 9 (de Costos) |
 | Inicio | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 10 |
 | Reportes | ✅ verificado 2026-11-19 — **sin hallazgos** | 6 | — |
-| Auditoría | ⬜ pendiente | — | — |
-| Proveedores | ⬜ pendiente | — | — |
-| Menú | ⬜ pendiente | — | — |
-| Usuarios y permisos | ⬜ pendiente | — | — |
+| Auditoría | ✅ verificado 2026-11-19 — **sin hallazgos** | 6 | — |
+| Proveedores | ✅ verificado 2026-11-19 — **sin hallazgos** | 6 | — |
+| Menú | ✅ verificado 2026-11-19 — **sin hallazgos** | 6 | — |
+| Usuarios y permisos | ✅ verificado 2026-11-19 — **sin hallazgos** | 6 | — |
 
 ## Registro de criterios
 
@@ -175,6 +175,13 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   producto abre y muestra ganancia y porcentaje
   (`e2e/verificacion-reporte-de-ganancia.spec.ts`).
 
+- **Auditoría, Proveedores, Menú y Usuarios:** 25 archivos de base (249 en verde: RLS de
+  cada tabla, roles, contraseñas temporales, primera cuenta, menú público, fotos, aumentos,
+  auditoría con valor anterior y nuevo, nombres de las tablas nuevas) y 96 pruebas en vivo
+  en computadora (auditoría, proveedores, menú, usuarios, cuenta, registro y acceso), todas
+  en verde. Ya estaban verificados en octubre; esta pasada confirma que lo de noviembre no
+  los rompió.
+
 ## Descartado — NO re-proponer
 
 | # | Qué se propuso | Por qué NO | Cuándo |
@@ -279,3 +286,14 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 | 4 | Criterios | «una venta» igual en todos los reportes, Inicio, Ventas y Cierres | — |
 | 5 | Lógica por actor | caja no ve reportes (`42501`) | — |
 | 6 | Reversa y propagación | la venta anulada sale de por día, por producto y ganancia (ver Vender) | — → **cierra** |
+
+## Auditoría, Proveedores, Menú y Usuarios · pasadas
+
+| # | Lente | Qué ejercité | Hallazgos |
+|---|---|---|---|
+| 1 | Cadena | las acciones de cada módulo y sus RLS, con lo que les sumaron Compras y Costos | — |
+| 2 | Ejecución | 25 archivos de base (249) y 96 pruebas en vivo en computadora | — |
+| 3 | Números y bordes | aumentos de precios, totales pagados por proveedor, primera cuenta | — |
+| 4 | Criterios | «desactivado» oculto en lo nuevo y visible en el historial (proveedor, insumo) | — |
+| 5 | Lógica por actor | invitado, caja, encargado y desactivado reciben rechazo; admin de otro local no ve nada | — |
+| 6 | Reversa y propagación | desactivar un proveedor deja sus compras y gastos; desactivar un producto lo saca de Vender | — → **cierra** |
