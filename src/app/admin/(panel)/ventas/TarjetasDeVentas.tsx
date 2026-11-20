@@ -17,32 +17,30 @@ export function TarjetasDeVentas({ totales }: { totales: Totales }) {
       <ul className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-3 md:gap-4">
         {tarjetasDelResumen(totales).map(({ etiqueta, valor, detalle, ayuda }) => {
           const Icono = ICONOS[etiqueta]!;
-          const { raya, icono } = colorDeTarjeta(etiqueta);
+          const { borde, icono } = colorDeTarjeta(etiqueta);
           return (
             <li
               key={etiqueta}
-              className="relative overflow-hidden rounded-2xl border border-border bg-card p-3 md:px-6 md:pt-7 md:pb-5 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]"
+              className={`relative overflow-hidden rounded-xl border ${borde} bg-white p-4 md:p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300`}
             >
-              <span
-                aria-hidden="true"
-                className={`absolute top-0 left-6 right-6 h-1 rounded-b-full ${raya}`}
-              />
               <dl className="flex items-start justify-between gap-2">
                 <div className="space-y-1 min-w-0">
-                  <dt className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">
+                  <dt className="text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
                     {etiqueta}
                   </dt>
-                  <dd className="text-sm md:text-lg xl:text-base 2xl:text-xl font-bold tracking-tight text-foreground break-all">
+                  <dd className="font-display text-xl sm:text-2xl 2xl:text-3xl font-bold tracking-tight text-slate-900 break-all">
                     {valor}
                   </dd>
-                  <p className="text-xs text-muted-foreground">{detalle}</p>
+                  <p className="pt-3 text-[9px] font-bold text-slate-400 uppercase leading-snug">
+                    {detalle}
+                  </p>
                   {ayuda ? (
                     <p className="pt-1 text-[11px] leading-snug text-muted-foreground/80">
                       {ayuda}
                     </p>
                   ) : null}
                 </div>
-                <div className={`shrink-0 rounded-xl p-1.5 md:p-2 ${icono}`}>
+                <div className={`shrink-0 rounded-lg p-1.5 md:p-2 ${icono} border ${borde}`}>
                   <Icono size={18} aria-hidden="true" />
                 </div>
               </dl>

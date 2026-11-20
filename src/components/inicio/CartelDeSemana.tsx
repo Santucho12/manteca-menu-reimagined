@@ -1,11 +1,12 @@
 import { TOOLTIP } from '@/components/reportes/estiloDelTooltip';
 import type { PuntoAcumulado } from '@/lib/inicio/semanaAcumulada';
 import { formatearPesos } from '@/lib/plata';
+import { COLORES_DE_LA_SEMANA } from '@/lib/inicio/coloresDeInicio';
 
 type Props = { active?: boolean; payload?: { payload: PuntoAcumulado }[] };
 
-const AZUL = '#2563eb';
-const ROJO = '#f43f5e';
+const AZUL = COLORES_DE_LA_SEMANA.actual;
+const GRIS = COLORES_DE_LA_SEMANA.anterior;
 
 type FilaProps = { color: string; nombre: string; cantidad: number };
 
@@ -26,7 +27,7 @@ function Bloque({ titulo, esta, anterior }: { titulo: string; esta: number; ante
         {titulo}
       </p>
       <Fila color={AZUL} nombre="Esta semana" cantidad={esta} />
-      <Fila color={ROJO} nombre="Semana pasada" cantidad={anterior} />
+      <Fila color={GRIS} nombre="Semana pasada" cantidad={anterior} />
     </div>
   );
 }

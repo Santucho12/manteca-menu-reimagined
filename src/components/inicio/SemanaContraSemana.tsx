@@ -23,9 +23,10 @@ import {
   resumenDeLaSemana,
   type PuntoAcumulado,
 } from '@/lib/inicio/semanaAcumulada';
+import { COLORES_DE_LA_SEMANA } from '@/lib/inicio/coloresDeInicio';
 
 // La semana actual en azul y la anterior en rojo, punteada (Santiago, 2026-10-25).
-const COLORES = { actual: '#2563eb', anterior: '#f43f5e' };
+const COLORES = COLORES_DE_LA_SEMANA;
 const EJE = { stroke: '#94a3b8', fontSize: 10, fontWeight: 700 };
 const CHIP: Record<EstadoDeVariacion, string> = {
   mejora: 'bg-emerald-100 text-emerald-800',
