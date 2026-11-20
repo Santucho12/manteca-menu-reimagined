@@ -18,7 +18,7 @@ test.describe('con la sesion del admin', () => {
     await expect(page.getByText('Lo que pagaste y lo que viene.')).toBeVisible();
   });
 
-  test('el panel usa el dorado de Manteca sobre crema', async ({ page }, info) => {
+  test('el panel usa el azul de marca sobre el fondo de FiestaCobra', async ({ page }, info) => {
     await page.goto('/admin');
     const tema = await page.evaluate(() => {
       const raiz = getComputedStyle(document.documentElement);
@@ -29,15 +29,15 @@ test.describe('con la sesion del admin', () => {
       };
     });
     expect(tema).toEqual({
-      principal: '#bfa042',
-      letraSobrePrincipal: '#2b1d14',
-      fondo: '#f4efe5',
+      principal: '#1e40af',
+      letraSobrePrincipal: '#ffffff',
+      fondo: '#f9fafb',
     });
     // La barra de abajo del celular marca la activa con el color principal.
     if (info.project.name !== 'computadora') return;
-    // En la lateral va en marrón oscuro, con la rayita dorada al costado.
+    // En la lateral va en el color del texto, con la rayita azul al costado.
     const inicio = panel(page).getByRole('link', { name: /^Inicio/ });
-    await expect(inicio).toHaveCSS('color', 'rgb(43, 29, 20)');
+    await expect(inicio).toHaveCSS('color', 'rgb(18, 27, 43)');
   });
 
   test('Proveedores, Materia prima, Costos, Reportes, Auditoría y Mi cuenta abren desde la navegación', async ({

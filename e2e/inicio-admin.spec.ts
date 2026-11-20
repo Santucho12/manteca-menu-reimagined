@@ -156,10 +156,10 @@ test('más vendidos aclara que se ordena por plata', async ({ page }) => {
   await expect(lista).toContainText('Por lo que dejaron en el mes, no por unidades.');
 });
 
-test('los avisos van en una tarjeta crema', async ({ page }) => {
+test('los avisos van en una tarjeta blanca', async ({ page }) => {
   await page.goto('/admin');
   const avisos = page.getByRole('region', { name: /Para atender/ });
-  await expect(avisos).toHaveCSS('background-color', 'rgb(251, 249, 243)');
+  await expect(avisos).toHaveCSS('background-color', 'rgb(255, 255, 255)');
 });
 
 test('las leyendas de los gráficos llevan círculos', async ({ page }) => {
