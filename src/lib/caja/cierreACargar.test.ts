@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cierreACargar } from './cierreACargar';
+import { cierreACargar, destinoDeLaFecha } from './cierreACargar';
 import type { EstadoDelTurno } from './turnos';
 
 const HOY = '2026-11-19';
@@ -50,5 +50,19 @@ describe('cierreACargar', () => {
       fecha: '2026-11-10',
       turno: 2,
     });
+  });
+});
+
+describe('destinoDeLaFecha', () => {
+  it('otra fecha valida y no futura lleva a cargar el cierre de ese dia', () => {
+    expect(destinoDeLaFecha('2026-11-18', '2026-11-19', '2026-11-19')).toBe(
+      '/admin/caja?fecha=2026-11-18',
+    );
+  });
+
+  it('la misma fecha, una futura o una a medio escribir no lleva a ningun lado', () => {
+    expect(destinoDeLaFecha('2026-11-19', '2026-11-19', '2026-11-19')).toBeNull();
+    expect(destinoDeLaFecha('2026-11-20', '2026-11-19', '2026-11-19')).toBeNull();
+    expect(destinoDeLaFecha('', '2026-11-19', '2026-11-19')).toBeNull();
   });
 });

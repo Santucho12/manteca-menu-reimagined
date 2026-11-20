@@ -32,6 +32,9 @@ async function completar(page: Page, fecha: string) {
   await page.goto('/admin/caja');
   await esperarHidratacion(page.getByLabel('Fecha'));
   await page.getByLabel('Fecha').fill(fecha);
+  // Otra fecha vuelve a pedir la pagina, con el turno y el fondo de ese dia.
+  await expect(page).toHaveURL(new RegExp(`fecha=${fecha}`));
+  await esperarHidratacion(page.getByLabel('Fondo inicial'));
   await page.getByLabel('Fondo inicial').fill('10.000');
   await page.getByLabel('Efectivo contado').fill('25.000,50');
   await page.getByLabel('Queda en la caja').fill('8.000');
