@@ -16,7 +16,7 @@ import { esquemaReceta, type DatosDeReceta } from '@/lib/costos/esquemas';
 import { useGuardarConAviso } from '@/lib/costos/useGuardarConAviso';
 import { guardarRecetaDesdeElPanel } from '../../acciones';
 
-type Props = { inicial: DatosDeReceta; insumos: InsumoParaReceta[] };
+type Props = { inicial: DatosDeReceta; insumos: InsumoParaReceta[]; desactivados: string[] };
 type Formulario = UseFormReturn<DatosDeReceta>;
 
 const opcionesDe = (insumos: InsumoParaReceta[]) => [
@@ -29,11 +29,13 @@ function Renglon({
   indice,
   insumos,
   quitar,
+  desactivado,
 }: {
   formulario: Formulario;
   indice: number;
   insumos: InsumoParaReceta[];
   quitar: () => void;
+  desactivado: boolean;
 }) {
   const errores = formulario.formState.errors.renglones?.[indice];
   return (
@@ -60,12 +62,17 @@ function Renglon({
       >
         <Trash2 size={16} aria-hidden="true" />
       </button>
+      {desactivado ? (
+        <p className="text-xs font-semibold text-amber-700 sm:col-span-3">
+          Desactivado en Materia prima: la receta lo sigue usando.
+        </p>
+      ) : null}
     </div>
   );
 }
 
 /** Los insumos de la receta con su cantidad, cuanto rinde y el desperdicio. */
-export function FormularioDeReceta({ inicial, insumos }: Props) {
+export function FormularioDeReceta({ inicial, insumos, desactivados }: Props) {
   const formulario = useForm<DatosDeReceta>({
     resolver: zodResolver(esquemaReceta),
     defaultValues: inicial,
@@ -75,6 +82,7 @@ export function FormularioDeReceta({ inicial, insumos }: Props) {
   const errores = formulario.formState.errors;
   const [busqueda, setBusqueda] = useState('');
   const elegidos = formulario.watch('renglones').map((r) => r.insumoId);
+  const apagado = (indice: number) => desactivados.includes(elegidos[indice] ?? '');
   const ofrecidos = buscarInsumos(insumos, busqueda, elegidos);
   return (
     <form onSubmit={formulario.handleSubmit(guardado.enviar)} noValidate className="space-y-5">
@@ -107,6 +115,7 @@ export function FormularioDeReceta({ inicial, insumos }: Props) {
           indice={indice}
           insumos={ofrecidos}
           quitar={() => renglones.remove(indice)}
+          desactivado={apagado(indice)}
         />
       ))}
       {errores.renglones?.message ? <AvisoDeError mensaje={errores.renglones.message} /> : null}

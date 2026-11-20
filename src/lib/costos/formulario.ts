@@ -1,5 +1,5 @@
 import { contenidoParaEditar } from '../materia-prima/esquemas';
-import type { Receta, RecetaDelProducto } from './consultas';
+import type { InsumoParaReceta, Receta, RecetaDelProducto } from './consultas';
 import type { DatosDeReceta } from './esquemas';
 
 function comoSeEscribe(receta: Receta | null, conRinde: boolean) {
@@ -26,5 +26,28 @@ export function datosDeLaReceta(receta: RecetaDelProducto, presentacion: string)
     productoId,
     presentacionId: elegida.id,
     ...comoSeEscribe(desde, Boolean(elegida.propia)),
+  };
+}
+
+/**
+ * Los insumos para elegir en la receta: los activos y, marcados, los desactivados que ya
+ * estaban en ella, que la receta sigue usando (regla 2 de Materia prima).
+ */
+export function insumosDeLaReceta(insumos: InsumoParaReceta[], receta: RecetaDelProducto) {
+  const recetas = [receta.base, ...receta.presentaciones.map((p) => p.propia)];
+  const apagados = recetas
+    .flatMap((r) => r?.renglones ?? [])
+    .filter((r) => !r.activoElInsumo && !insumos.some((i) => i.id === r.insumoId));
+  const unicos = [...new Map(apagados.map((r) => [r.insumoId, r])).values()];
+  return {
+    insumos: [
+      ...insumos,
+      ...unicos.map((r) => ({
+        id: r.insumoId,
+        nombre: `${r.nombre} (desactivado)`,
+        unidad: r.unidad,
+      })),
+    ],
+    desactivados: unicos.map((r) => r.insumoId),
   };
 }

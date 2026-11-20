@@ -12,7 +12,7 @@ import {
   recetaDelProducto,
   type RecetaDelProducto,
 } from '@/lib/costos/consultas';
-import { datosDeLaReceta } from '@/lib/costos/formulario';
+import { datosDeLaReceta, insumosDeLaReceta } from '@/lib/costos/formulario';
 import { Presentaciones } from '../../Presentaciones';
 import { BotonDeLaRecetaDelProducto } from './BotonDeLaRecetaDelProducto';
 import { FormularioDeReceta } from './FormularioDeReceta';
@@ -73,6 +73,7 @@ export default async function PaginaDeReceta({ params, searchParams }: Parametro
   const [receta, insumos] = datos;
   if (!receta) notFound();
   const inicial = datosDeLaReceta(receta, presentacion);
+  const opciones = insumosDeLaReceta(insumos, receta);
   return (
     <Pantalla
       titulo={receta.producto.producto}
@@ -80,7 +81,12 @@ export default async function PaginaDeReceta({ params, searchParams }: Parametro
       ayuda="costos"
     >
       <Seccion icono={<ChefHat className="text-primary" size={24} />}>
-        <FormularioDeReceta key={presentacion} inicial={inicial} insumos={insumos} />
+        <FormularioDeReceta
+          key={presentacion}
+          inicial={inicial}
+          insumos={opciones.insumos}
+          desactivados={opciones.desactivados}
+        />
       </Seccion>
       <RecetasPropias receta={receta} elegida={inicial.presentacionId} />
       <Seccion titulo="Lo que cuesta y deja" forma="lista">
