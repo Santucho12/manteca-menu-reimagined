@@ -36,6 +36,7 @@ export const MENSAJES_DE_GASTOS = {
   yaPagado: 'Ese pago ya estaba anotado.',
   yaNoPorPagar: 'Eso ya no está por pagar. Recargá la página.',
   yaEstaPagado: 'Ya está pagado: si no corresponde, anulá el pago desde Pagados.',
+  deUnaCompra: 'Es el gasto de una compra: anulá la compra desde Compras.',
   noEsDelFijo: 'Esa fecha no es un próximo pago del fijo.',
   posibleRepetido: MENSAJE_DE_REPETIDO,
   generico: 'No pudimos guardarlo. Revisá los datos e intentá de nuevo.',
@@ -57,6 +58,7 @@ const POR_CODIGO: Record<string, string> = {
   PG209: MENSAJES_DE_GASTOS.yaNoPorPagar,
   PG210: MENSAJES_DE_GASTOS.yaEstaPagado,
   PG211: MENSAJES_DE_GASTOS.noEsDelFijo,
+  PG212: MENSAJES_DE_GASTOS.deUnaCompra,
 };
 
 type Respuesta = {
