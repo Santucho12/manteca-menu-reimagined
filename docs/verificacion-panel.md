@@ -36,13 +36,14 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 
 ## Hallazgos
 
-- [ ] **1 · 🔵 La definición dice que en el mostrador el tipo de venta es siempre Local, y
+- [x] **1 · 🔵 La definición dice que en el mostrador el tipo de venta es siempre Local, y
   la pantalla deja elegirlo.** `docs/modulos/05-ventas.md`, regla 5 del mostrador, contra
   `src/app/admin/(panel)/vender/ElegirTipo.tsx` y `ventas_tipo_del_mostrador`, que acepta el
   tipo que manda la pantalla. Se eligió así en el pedido 90.
   repro: abrir `/admin/vender` con más de un tipo activo: aparece «Tipo de venta».
   Documentación · fix propuesto: actualizar la regla 5 («viene Local y se puede cambiar»).
-- [ ] **2 · 🟡 Una venta del mostrador con otro tipo (por ejemplo PedidosYa) igual cuenta
+  **Arreglado el 2026-11-19: la regla 5 de `docs/modulos/05-ventas.md` dice que el tipo viene Local y se puede cambiar.**
+- [x] **2 · 🟡 Una venta del mostrador con otro tipo (por ejemplo PedidosYa) igual cuenta
   como cobrada en la caja.** `ventas_guardar_mostrador` guarda siempre `en_la_caja = true`.
   Si un pedido de PedidosYa se pagó por la aplicación, la plata no entró a la caja y el
   cierre lo esperaría igual.
@@ -51,13 +52,14 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   en la caja; (b) el mostrador pregunta si se cobró en la caja cuando el tipo no es Local;
   (c) cada tipo dice si se cobra en la caja.
 
-- [ ] **3 · 🔵 Un test de la base quedó viejo y deja la suite en rojo.**
+- [x] **3 · 🔵 Un test de la base quedó viejo y deja la suite en rojo.**
   `tests/reglas/cierre-por-tipo.base.test.ts:203` («un tipo que no se controla no se anota»)
   usa Encargo, que desde `20261119150000_todos_los_tipos_se_controlan` se controla: ya no da
   `PC311`. La regla anda; el test no.
   repro: `npx vitest run tests/reglas/cierre-por-tipo.base.test.ts` (rojo).
   Test · fix propuesto: probar el rechazo con Local, el único tipo que no se controla.
-- [ ] **4 · 🟠 Al cargar un cierre atrasado cambiando la fecha en el formulario, el turno no
+  **Arreglado el 2026-11-19: el test prueba el rechazo con Local; `tests/reglas/cierre-por-tipo.base.test.ts` en verde (13).**
+- [x] **4 · 🟠 Al cargar un cierre atrasado cambiando la fecha en el formulario, el turno no
   la sigue: queda el turno de hoy.** `src/app/admin/(panel)/caja/page.tsx:35` elige el turno
   (y el fondo sugerido) con `cierreACargar` según la fecha de la dirección; para un día
   anterior, la noche. El campo Fecha cambia la fecha en el cliente sin volver a pedir el
@@ -67,7 +69,8 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   en vez de «Cierra».
   Bug · fix propuesto: al cambiar la fecha, navegar a `?fecha=` (como ya hace
   `ElegirTurno` con el turno) para que el servidor elija turno y fondo.
-- [ ] **5 · 🟠 Anular un cierre deja viva la compra armada sobre su gasto de caja.** Al anular
+  **Arreglado el 2026-11-19 (`063179d`): cambiar la fecha va a `?fecha=` (`destinoDeLaFecha`, con test puro) y el formulario se rearma con la fecha y el turno (`key`); `e2e/caja.spec.ts` en verde (16) y las otras 4 pruebas en vivo de cierres (25).**
+- [x] **5 · 🟠 Anular un cierre deja viva la compra armada sobre su gasto de caja.** Al anular
   el cierre, su gasto se anula (`manteca.anulando_cierre`), pero la compra que se armó con
   «Es una compra» sigue recibida y el insumo sigue tomando su precio.
   repro: `tests/verificacion/cierre-anulado-con-compra.base.test.ts` → `it.skip('#5 · …')`
@@ -76,7 +79,8 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   (b) la compra queda y pasa a «sin pago», con aviso; (c) no se anula un cierre con un gasto
   pasado a compra sin anular antes la compra.
 
-- [ ] **6 · 🟡 Una prueba en vivo depende de un dato que no siembra y lo borra.**
+  **Arreglado el 2026-11-19 (`4371870`), con la opción (a), por decisión de Claude («lo que creas mejor»): si el gasto de una compra se anula por su cierre (al anularlo o editarlo), la compra se anula con él (`anular_compra_del_gasto`). La prueba quedó sin skip y en verde.**
+- [x] **6 · 🟡 Una prueba en vivo depende de un dato que no siembra y lo borra.**
   `e2e/ventas-canales.spec.ts:69` toca «Borrar Cheaf» suponiendo que Cheaf tiene ventas y
   que entonces pide desactivarlo. En una base donde Cheaf no tiene ventas (mantecatest), lo
   borra de verdad: el 2026-11-19 se borró el Cheaf de Manteca y hubo que volver a crearlo,
@@ -85,7 +89,8 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   línea 80, y Cheaf desaparece).
   Test · fix propuesto: que la prueba siembre su propio tipo con una venta y borre ese.
 
-- [ ] **7 · 🟠 Desde Gastos se anula el gasto de una compra y la compra sigue viva.**
+  **Arreglado el 2026-11-19: la prueba siembra un tipo propio con una venta y borra ese; 9 en verde y Cheaf intacto.**
+- [x] **7 · 🟠 Desde Gastos se anula el gasto de una compra y la compra sigue viva.**
   `reglas_de_gastos` no mira `compra_id`: el gasto pagado que generó una compra se anula
   (o se le cambia el monto) suelto, y la compra queda «Pagada», recibida, y el insumo sigue
   tomando su precio. Igual con «No se paga» sobre lo por pagar de una compra.
@@ -94,13 +99,15 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   Bug · fix propuesto: el gasto y lo por pagar de una compra no se anulan ni cambian el
   monto sueltos (un código nuevo, «anulá la compra»); o anularlos anula la compra.
 
-- [ ] **8 · 🔵 Un pedido anulado aparece arriba de la lista, con los pedidos por recibir.**
+  **Arreglado el 2026-11-19 (`4371870`): el gasto y lo por pagar de una compra no se anulan ni cambian el monto sueltos (`PG212`, «Es el gasto de una compra: anulá la compra desde Compras.»); `compras_anular` los anula. Prueba sin skip y en verde, con el mensaje.**
+- [x] **8 · 🔵 Un pedido anulado aparece arriba de la lista, con los pedidos por recibir.**
   `src/lib/compras/consultas.ts` ordena por `estado` y la anulación no es un estado: en
   «Todas», un pedido anulado queda junto a los que esperan recibirse.
   repro: armar un pedido, anularlo y abrir `/admin/compras`: queda primero, «Anulada».
   Mejora · fix propuesto: ordenar primero los pedidos sin anular.
 
-- [ ] **9 · 🟠 Una receta con un insumo desactivado lo muestra vacío y no se puede volver a
+  **Arreglado el 2026-11-19: lo anulado va al final; `tests/verificacion/compras-orden.base.test.ts` (rojo antes, verde después).**
+- [x] **9 · 🟠 Una receta con un insumo desactivado lo muestra vacío y no se puede volver a
   guardar.** `src/lib/costos/receta.ts` (`insumosParaReceta`) ofrece solo los insumos
   activos y `FormularioDeReceta` arma el desplegable con esa lista: el renglón del insumo
   desactivado queda en «Elegí un insumo», sin marca, y al guardar pide elegir uno. La regla 2
@@ -112,7 +119,8 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   Bug · fix propuesto: sumar a las opciones los insumos que ya están en la receta, con
   «(desactivado)» en el texto.
 
-- [ ] **10 · 🟡 Dos pruebas en vivo de Inicio dependen de un historial de ventas que no
+  **Arreglado el 2026-11-19 (`ed01548`): la receta suma el insumo desactivado que ya tenía, con «(desactivado)» y el aviso «Desactivado en Materia prima»; la prueba en vivo quedó sin skip y en verde, y se puede volver a guardar.**
+- [x] **10 · 🟡 Dos pruebas en vivo de Inicio dependen de un historial de ventas que no
   siembran.** `e2e/inicio-admin.spec.ts:295` espera 12 barras (4 meses × 3 series) y
   `e2e/inicio-montos.spec.ts:6` espera la variación contra el mes anterior. En una base sin
   meses anteriores en el local (mantecatest: las ventas inventadas están en el Local de
@@ -123,6 +131,7 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   Test · fix propuesto: que cada prueba siembre los meses que necesita, o que corra con la
   sesión del Local de ejemplo.
 
+  **Arreglado en parte el 2026-11-19: las dos pruebas siembran sus meses (`tests/historial-de-prueba.ts`); el mes a mes pasa. La de las tarjetas sigue en rojo por otra causa: el rediseño de estética sacó de las tarjetas la variación contra el mes anterior, y esa prueba la tiene que poner al día el rediseño.**
 ## Verificado y sano
 
 - **Vender en el mostrador:** venta idempotente por clave (el doble toque guarda una sola);
@@ -186,6 +195,7 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 
 | # | Qué se propuso | Por qué NO | Cuándo |
 |---|---|---|---|
+| 2 | Que el mostrador pregunte si se cobró en la caja cuando el tipo no es Local | Decidido por Claude («lo que creas mejor»): en el mostrador todo entra por la caja, y el cierre por tipo de venta (pedido 99) ya controla aparte cada tipo que no es Local. Santiago puede reabrirlo | 2026-11-19 |
 
 ## Vender en el mostrador · pasadas
 

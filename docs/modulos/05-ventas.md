@@ -56,8 +56,9 @@ en el celular.
    los precios nuevos.
 3. Se paga con uno o dos medios distintos, cada uno mayor que cero, que suman el total.
 4. La fecha es hoy en Argentina y no se elige.
-5. El tipo de venta es Local. Lo que se vende en el mostrador se cobra siempre en la caja del
-   local.
+5. El tipo de venta viene Local y se puede cambiar, por ejemplo a PedidosYa o Mayorista
+   (pedido 90). Lo que se vende en el mostrador se cobra siempre en la caja del local: los
+   tipos que no son Local se controlan aparte en el cierre (pedido 99).
 6. Un doble toque en Cobrar guarda una sola venta.
 6. bis. Cada venta guarda su turno de caja, Mediodía o Noche, y a la hora de cierre de un turno
    el mostrador se traba hasta cargar su cierre o postergarlo (pedido 98, ver
