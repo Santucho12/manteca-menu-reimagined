@@ -200,12 +200,13 @@ describe('el cierre por tipo', () => {
     expect((await controles(fecha))[0]?.total_centavos).toBe(900);
   });
 
+  // Desde 20261119150000 todos se controlan salvo Local, que es la caja: es el unico que no.
   it('un tipo que no se controla no se anota', async () => {
     const fecha = diaLibre();
     const { error } = await guardar(
       'caja',
       datosDeCierre(fecha, {
-        controles: [{ canal_id: await idDeCanal('Encargo'), total_centavos: 100 }],
+        controles: [{ canal_id: await idDeCanal('Local'), total_centavos: 100 }],
       }),
     );
     expect(error?.code).toBe('PC311');
