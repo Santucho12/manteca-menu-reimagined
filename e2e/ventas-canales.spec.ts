@@ -1,14 +1,21 @@
 import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
-import { borrarVentas, idsDeCanalesLlamados } from '../tests/ventas-de-prueba';
+import {
+  borrarVentas,
+  idsDeCanalesLlamados,
+  sembrarCanal,
+  sembrarVenta,
+} from '../tests/ventas-de-prueba';
 import { SESIONES, aviso } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
 let nombres: string[] = [];
+let ventas: string[] = [];
 test.afterEach(async () => {
-  await borrarVentas([], { canales: await idsDeCanalesLlamados(nombres) });
+  await borrarVentas(ventas, { canales: await idsDeCanalesLlamados(nombres) });
   nombres = [];
+  ventas = [];
 });
 
 function nuevoNombre(): string {
@@ -74,8 +81,13 @@ test('borra un canal sin ventas, y uno con ventas pide desactivarlo', async ({ p
     .click();
   await page.getByRole('button', { name: 'Confirmar' }).click();
   await expect(fila(page, nombre)).toHaveCount(0);
+  // Un tipo propio con una venta: no depende de que la base tenga ventas de Cheaf ni lo borra.
+  const conVentas = await sembrarCanal(true, nuevoNombre());
+  ventas.push((await sembrarVenta({ canalId: conVentas.id })).id);
   await page.goto('/admin/ventas/canales');
-  await fila(page, 'Cheaf').getByRole('button', { name: 'Borrar Cheaf' }).click();
+  await fila(page, conVentas.nombre)
+    .getByRole('button', { name: `Borrar ${conVentas.nombre}` })
+    .click();
   await page.getByRole('button', { name: 'Confirmar' }).click();
   await expect(page.getByRole('alertdialog')).toContainText('ya tiene ventas');
 });
