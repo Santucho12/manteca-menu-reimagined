@@ -107,7 +107,9 @@ export async function listarCompras(
   filtros: FiltrosDeCompras,
 ): Promise<FilaDeCompra[]> {
   const consulta = cliente.from('compras').select(COLUMNAS_DE_LISTA);
+  // Lo vigente primero (y ahi, los pedidos por recibir); lo anulado al final.
   const { data, error } = await filtrar(consulta, filtros)
+    .order('anulado')
     .order('estado')
     .order('fecha', { ascending: false, nullsFirst: true })
     .order('fecha_creacion', { ascending: false })
