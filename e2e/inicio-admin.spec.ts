@@ -178,7 +178,7 @@ test('los gráficos van en azul, verde y rojo', async ({ page }) => {
     ['Gráfico por mes', 'Balance', 'fill', '#2563eb'],
     ['Gráfico por mes', 'Gastos', 'fill', '#f43f5e'],
     ['Ventas por día', 'Esta semana', 'fill', '#2563eb'],
-    ['Ventas por día', 'Semana anterior', 'fill', '#f43f5e'],
+    ['Ventas por día', 'Semana anterior', 'fill', '#94a3b8'],
   ] as const;
   for (const [figura, serie, atributo, color] of esperados) {
     await expect(colorDeLaSerie(page, figura, serie)).toHaveAttribute(atributo, color);
@@ -194,19 +194,20 @@ test('la semana dice si vas arriba o abajo de la anterior, con un acumulado', as
   await expect(semana.locator('.recharts-bar-rectangle')).toHaveCount(0);
 });
 
-test('la variación de cada tarjeta va en verde si mejora y en rojo si empeora', async ({
+test('cada tarjeta de números lleva al pie una descripción mínima, como en FiestaCobra', async ({
   page,
 }) => {
   await page.goto('/admin');
-  const verde = 'rgb(5, 150, 105)';
-  const rojo = 'rgb(225, 29, 72)';
-  for (const etiqueta of ['Ventas', 'Gastos', 'Balance', 'Ticket promedio']) {
+  const pies = [
+    ['Ventas', 'Cobrado del 1 a hoy'],
+    ['Gastos', 'Pagado del 1 a hoy'],
+    ['Balance', 'Ventas menos gastos'],
+    ['Ticket promedio', 'Por venta cobrada'],
+  ] as const;
+  for (const [etiqueta, pie] of pies) {
     const tarjeta = page.getByRole('term').filter({ hasText: etiqueta }).locator('xpath=../../..');
-    const variacion = tarjeta.getByText(/^[+-]\$/);
-    const subio = (await variacion.textContent())!.startsWith('+');
-    const bueno = etiqueta === 'Gastos' ? !subio : subio;
-    await expect(variacion).toHaveCSS('color', bueno ? verde : rojo);
-    await expect(tarjeta.getByTestId(subio ? 'flecha-sube' : 'flecha-baja')).toBeVisible();
+    await expect(tarjeta).toContainText(pie);
+    await expect(tarjeta.getByText(/^[+-]\$/)).toHaveCount(0);
   }
 });
 
