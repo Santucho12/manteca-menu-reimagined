@@ -14,7 +14,7 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 | Ventas — lista y carga a mano | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 6 |
 | Gastos | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 7 |
 | Compras | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 5, 7, 8 |
-| Costos | ⬜ pendiente | — | — |
+| Costos | ✅ verificado 2026-11-19 | 6 (cerró en la 6) | 9 |
 | Materia prima | ⬜ pendiente | — | — |
 | Inicio | ⬜ pendiente | — | — |
 | Reportes | ⬜ pendiente | — | — |
@@ -100,6 +100,18 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   repro: armar un pedido, anularlo y abrir `/admin/compras`: queda primero, «Anulada».
   Mejora · fix propuesto: ordenar primero los pedidos sin anular.
 
+- [ ] **9 · 🟠 Una receta con un insumo desactivado lo muestra vacío y no se puede volver a
+  guardar.** `src/lib/costos/receta.ts` (`insumosParaReceta`) ofrece solo los insumos
+  activos y `FormularioDeReceta` arma el desplegable con esa lista: el renglón del insumo
+  desactivado queda en «Elegí un insumo», sin marca, y al guardar pide elegir uno. La regla 2
+  de `docs/modulos/10-materia-prima.md` dice que las recetas que ya lo tenían lo siguen
+  usando y lo muestran marcado. La base sí lo acepta (`recetas_guardar` deja seguir un
+  insumo desactivado que ya estaba).
+  repro: `e2e/verificacion-receta-con-insumo-desactivado.spec.ts` →
+  `test.skip('#9 · …')` (rojo sin el skip: el desplegable vale `""` en vez del insumo).
+  Bug · fix propuesto: sumar a las opciones los insumos que ya están en la receta, con
+  «(desactivado)» en el texto.
+
 ## Verificado y sano
 
 - **Vender en el mostrador:** venta idempotente por clave (el doble toque guarda una sola);
@@ -130,6 +142,12 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
   y devolverlo a Sin clasificar; RLS) y las 9 pruebas en vivo en computadora, después de
   que la prueba esperara la carga de la página (`e2e/compras.spec.ts`: se eligía el
   proveedor antes de que React cargara; la prueba se corrigió, la pantalla no tenía nada).
+
+- **Costos:** 46 de base en verde, con los dos que no habían corrido (volver a la receta
+  del producto, ganancia de lo vendido); 10 pruebas en vivo en computadora en verde, después
+  de corregir tres errores de la prueba (esperar la carga, la etiqueta exacta «Insumo 1» y
+  elegir el insumo por su id); el costo con desperdicio, rinde, unidades y agregado; la
+  receta propia; el precio del menú igual que el del mostrador.
 
 ## Descartado — NO re-proponer
 
@@ -191,3 +209,14 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 | 4 | Criterios | el precio del insumo: la última compra recibida por fecha de compra, contra Costos y Materia prima | — |
 | 5 | Lógica por actor | la lista del mes con pedidos arriba | 8 |
 | 6 | Reversa y propagación | anular un cierre con su gasto de caja pasado a compra (#5) y anular desde Gastos el gasto de una compra (#7) | 5, 7 → **cierra** |
+
+## Costos · pasadas
+
+| # | Lente | Qué ejercité | Hallazgos |
+|---|---|---|---|
+| 1 | Cadena | `recetas_guardar`, `recetas_usar_la_del_producto`, `costos_de_productos`, las acciones, el formulario de la receta y Ajustes | — |
+| 2 | Ejecución | 4 archivos de base (46 en verde) y `e2e/costos.spec.ts` (10 en verde tras corregir la prueba) | — |
+| 3 | Números y bordes | costo con desperdicio y rinde, redondeo a la mitad, receta propia más agregado, sugerido a $100, el mínimo justo | — |
+| 4 | Criterios | precio del menú (propio o de la categoría) igual en Costos y en el mostrador; el costo de la venta sale de la misma función | — |
+| 5 | Lógica por actor | Ajustes avisa que cambiar una presentación cambia toda la categoría; el margen fuera de rango se explica | — |
+| 6 | Reversa y propagación | desactivar un insumo que está en una receta (rojo en la pantalla) | 9 → **cierra** |
