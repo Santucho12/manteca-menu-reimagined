@@ -307,3 +307,14 @@ módulos»), en orden de riesgo: primero donde se mueve plata.
 | 4 | Criterios | «desactivado» oculto en lo nuevo y visible en el historial (proveedor, insumo) | — |
 | 5 | Lógica por actor | invitado, caja, encargado y desactivado reciben rechazo; admin de otro local no ve nada | — |
 | 6 | Reversa y propagación | desactivar un proveedor deja sus compras y gastos; desactivar un producto lo saca de Vender | — → **cierra** |
+
+## Reversas de las migraciones nuevas
+
+Probadas el 2026-11-20 en mantecatest, dentro de una transacción con `rollback`: los `drop`
+y `alter` de las reversas de `20261119190000_compras_y_sus_gastos`,
+`20261119180000_volver_a_la_receta_del_producto`, `20261119170000_costo_de_lo_vendido`,
+`20261119160000_compras` y `20261119140000_recetas_y_costos`, de la más nueva a la más vieja,
+corren sin errores de dependencias, y la base queda intacta (se comprobó después). Las
+funciones que las reversas vuelven a crear son copias de versiones que ya estuvieron
+aplicadas en esta base. La de `20261119120000_materia_prima` se probó el 2026-11-19, con la
+migración vuelta a aplicar.
