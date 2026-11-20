@@ -1,5 +1,12 @@
 import { expect, test, type Locator } from '@playwright/test';
+import { diaEnArgentina } from '../src/lib/fechas';
+import { sumarDias } from '../src/lib/reportes/periodos';
 import { diaLibre } from '../tests/cierres-de-prueba';
+import {
+  borrarCategoriasConSusGastos,
+  sembrarCategoriaDeGasto,
+  sembrarRecurrente,
+} from '../tests/gastos-de-prueba';
 import { borrarVentas, sembrarVentasParaPaginar } from '../tests/ventas-de-prueba';
 import { SESIONES } from './ayudas';
 
@@ -94,24 +101,37 @@ test('los atajos de Reportes y la paginación se tocan sin errarle', async ({ pa
   }
 });
 
-test('los botones de una ventana mantienen su alto', async ({ page }) => {
-  await page.goto('/admin/gastos');
-  await page.getByRole('button', { name: 'Marcar como pago' }).first().click();
-  const anotar = page.getByRole('button', { name: 'Anotar el pago' });
-  const cancelar = page.getByRole('dialog').getByRole('button', { name: 'Cancelar' });
-  expect(await altoSinEscala(anotar)).toBeGreaterThanOrEqual(44);
-  expect(await altoSinEscala(cancelar)).toBeGreaterThanOrEqual(44);
-});
+test.describe('con un fijo en Próximos pagos', () => {
+  let categoria = '';
+  test.beforeEach(async () => {
+    const sembrada = await sembrarCategoriaDeGasto();
+    categoria = sembrada.id;
+    const vencimiento = sumarDias(diaEnArgentina(new Date()), 3);
+    await sembrarRecurrente({ categoria: sembrada.nombre, primerVencimiento: vencimiento });
+  });
+  test.afterEach(async () => {
+    await borrarCategoriasConSusGastos([categoria]);
+  });
 
-test('en Próximos pagos, la etiqueta de un fijo entra en un renglón', async ({ page }) => {
-  await page.setViewportSize({ width: 360, height: 800 });
-  await page.goto('/admin/gastos');
-  const etiqueta = page
-    .getByText(/^Fijo · Todos/i)
-    .locator('visible=true')
-    .first();
-  await expect(etiqueta).toBeVisible();
-  expect(await altoDe(etiqueta)).toBeLessThan(30);
+  test('los botones de una ventana mantienen su alto', async ({ page }) => {
+    await page.goto('/admin/gastos');
+    await page.getByRole('button', { name: 'Marcar como pago' }).first().click();
+    const anotar = page.getByRole('button', { name: 'Anotar el pago' });
+    const cancelar = page.getByRole('dialog').getByRole('button', { name: 'Cancelar' });
+    expect(await altoSinEscala(anotar)).toBeGreaterThanOrEqual(44);
+    expect(await altoSinEscala(cancelar)).toBeGreaterThanOrEqual(44);
+  });
+
+  test('en Próximos pagos, la etiqueta de un fijo entra en un renglón', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto('/admin/gastos');
+    const etiqueta = page
+      .getByText(/^Fijo · Todos/i)
+      .locator('visible=true')
+      .first();
+    await expect(etiqueta).toBeVisible();
+    expect(await altoDe(etiqueta)).toBeLessThan(30);
+  });
 });
 
 test('las flechas de las formas de venta se tocan sin errarle', async ({ page }) => {

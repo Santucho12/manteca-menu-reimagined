@@ -11,7 +11,7 @@ import {
   sembrarCierreConSalidas,
 } from '../tests/cierres-de-prueba';
 import { borrarVentas, sembrarVentaConPago } from '../tests/ventas-de-prueba';
-import { SESIONES, terminarCierre } from './ayudas';
+import { SESIONES, esperarHidratacion, terminarCierre } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -155,7 +155,9 @@ test('toda la fila del cierre abre su detalle', async ({ page }) => {
   const fecha = dia();
   const id = await sembrarCierreConSalidas(fecha);
   await page.goto(`/admin/caja/control?${delDia(fecha)}`);
-  await fila(page, 'Cierres', fechaParaMostrar(fecha)).click({ position: { x: 300, y: 20 } });
+  const laFila = fila(page, 'Cierres', fechaParaMostrar(fecha));
+  await esperarHidratacion(laFila.getByRole('link'));
+  await laFila.click({ position: { x: 300, y: 20 } });
   await expect(page).toHaveURL(new RegExp(`/admin/caja/cierres/${id}`));
 });
 

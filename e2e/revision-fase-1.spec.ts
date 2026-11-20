@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { borrarCierres, sembrarCierre } from '../tests/cierres-de-prueba';
 import { clienteSecretoDePruebas } from '../tests/clientes';
 import { borrarCategoriasConSusGastos, sembrarCategoriaDeGasto } from '../tests/gastos-de-prueba';
-import { SESIONES } from './ayudas';
+import { SESIONES, esperarHidratacion } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -38,7 +38,9 @@ test('el control marca el fondo distinto y muestra lo retirado', async ({ page }
   await expect(deHoy).toContainText('Retiros: $5.000,00');
   const deAyer = lista.getByRole('listitem').filter({ hasText: '10/05/1997' });
   await expect(deAyer).not.toContainText('Fondo distinto');
-  await deHoy.getByRole('link', { name: '11/05/1997' }).click();
+  const enlace = deHoy.getByRole('link', { name: '11/05/1997' });
+  await esperarHidratacion(enlace);
+  await enlace.click();
   await expect(
     page.getByText('Arrancó con $5.000,00 menos de lo que quedó en el cierre anterior.'),
   ).toBeVisible();
@@ -54,6 +56,7 @@ test.describe('cargar dos gastos seguidos volviendo atras', () => {
   });
 
   async function cargar(page: Page, descripcion: string) {
+    await esperarHidratacion(page.getByLabel('Categoría'));
     await page.getByLabel('Categoría').selectOption({ label: categoria.nombre });
     await page.getByLabel('Monto').fill('100');
     await page.getByLabel('Descripción').fill(descripcion);
