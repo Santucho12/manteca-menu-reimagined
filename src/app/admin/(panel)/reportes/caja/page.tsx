@@ -41,8 +41,9 @@ function FilaDelDia({ fila }: { fila: FilaDeCaja }) {
     <tr>
       <Celda>
         <span className="font-medium whitespace-nowrap">{fechaParaMostrar(fila.fecha)}</span>
+        {/* El turno abajo: al lado de la fecha, la tabla no entraba en un celular angosto. */}
         {fila.turno ? (
-          <span className="ml-2 text-xs text-muted-foreground">{nombreDelTurno(fila.turno)}</span>
+          <span className="block text-xs text-muted-foreground">{nombreDelTurno(fila.turno)}</span>
         ) : null}
       </Celda>
       <Celda>
