@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { SiembraDeCompras } from '../tests/compras-de-prueba';
-import { SESIONES } from './ayudas';
+import { esperarHidratacion, SESIONES } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
@@ -21,6 +21,7 @@ test('carga una compra pagada: genera su gasto y el insumo toma el precio', asyn
   const proveedor = await siembra.proveedor();
   const forma = await siembra.forma(proveedor.id);
   await page.goto('/admin/compras/nueva');
+  await esperarHidratacion(page.getByLabel('Proveedor'));
   await page.getByLabel('Proveedor').selectOption({ label: proveedor.nombre });
   await cargarRenglon(page, '2', '30.000');
   await expect(page.getByText('Total: $60.000,00')).toBeVisible();
@@ -38,6 +39,7 @@ test('arma un pedido, lo recibe y despues lo anula', async ({ page }) => {
   const proveedor = await siembra.proveedor({ telefono: '5491123456789' });
   await siembra.forma(proveedor.id);
   await page.goto('/admin/compras/pedido');
+  await esperarHidratacion(page.getByLabel('Proveedor'));
   await page.getByLabel('Proveedor').selectOption({ label: proveedor.nombre });
   await page.getByRole('button', { name: 'Agregar renglón' }).click();
   await page.getByLabel('Qué llegó 1').selectOption({ index: 1 });
