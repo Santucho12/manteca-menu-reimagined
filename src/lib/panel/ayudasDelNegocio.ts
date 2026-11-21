@@ -5,33 +5,41 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
   vender: {
     titulo: 'Cómo funciona Vender',
     introduccion:
-      'Es el mostrador: cada venta se carga acá en el momento de cobrar, con los productos y los precios del menú.',
+      'Es el mostrador: cada venta se cobra acá, en tres pasos: qué lleva, dónde se vendió y cómo paga. Abajo siempre ves el total, con Atrás y Siguiente.',
     temas: [
       {
-        titulo: 'Armar el ticket',
+        titulo: '1. Productos',
         puntos: [
-          'Elegí la categoría y tocá cada forma de venta que lleva el cliente: Docena, Unidad, Grande. Tocá de nuevo para sumar otra.',
-          'Con − y + cambiás la cantidad de un renglón. Restar el último lo saca del ticket.',
-          'Cada producto va con el precio del menú, que acá no se cambia. Si cambió mientras armabas el ticket, la venta no se guarda y aparece el precio nuevo.',
+          'Tocá la categoría (cada una tiene su color) y después la forma de venta que lleva el cliente: Docena, Media docena, Unidad, Grande. Tocá de nuevo para sumar otra.',
+          'Con − y + cambiás la cantidad de un renglón, y con el tachito lo sacás. Cada producto va con el precio del menú, que acá no se cambia.',
+          'Lo que va por peso abre la balanza: viene el peso de la forma (por ejemplo 250 g), lo cambiás con − y +, escribiéndolo o con un atajo, y el precio sale de la cuenta. Para cambiarlo después, tocá el peso en el ticket.',
+          'Docena variada: las facturas sueltas se juntan solas. Cada 12 se cobra la docena y, si sobran 6 o más, la media docena, aunque sean distintas. En el ticket esas facturas dicen «por cantidad», y un recuadro verde muestra cómo se cobran y cuánto ahorra el cliente.',
         ],
       },
       {
-        titulo: 'Cobrar',
+        titulo: '2. Tipo de venta',
         puntos: [
-          'Elegí el medio: efectivo, débito, crédito, QR o transferencia.',
+          'Viene elegido Local: si es una venta común, tocá Siguiente. Si es de Pedidos Ya, Cheaf u otro, tocá su tarjeta. Salen en el orden de Tipos de venta.',
+        ],
+      },
+      {
+        titulo: '3. Cobro',
+        puntos: [
+          'Elegí el medio: efectivo, débito, crédito, QR o transferencia, cada uno con su color.',
           'Con Pagar con dos medios elegís el segundo y escribís cuánto va con el primero: el resto va con el segundo.',
-          'Con efectivo podés escribir con cuánto paga el cliente y la pantalla te muestra el vuelto.',
-          'Al cobrar queda guardada la venta, de hoy y cobrada en la caja, y el ticket queda vacío para la próxima.',
+          'Con Hacer un descuento elegís porcentaje o monto fijo, escribís el valor y el motivo: el total a cobrar ya lo descuenta. Sin motivo no se aplica.',
+          'Al tocar Cobrar la venta queda guardada, de hoy y en la caja del turno, y te lleva a Ventas. Si fue en efectivo, ahí se abre Calcular vuelto: escribís cuánto te pagaron y muestra el vuelto. Si no la tocás, se va sola a los 5 segundos.',
         ],
       },
       {
         titulo: 'Qué tenés que saber',
         puntos: [
           'Acá no ves lo vendido en el día: así contás la caja a ciegas al cerrar.',
-          'A la hora de cierre de cada turno, Vender se traba hasta que cargues el cierre. Si hay gente esperando, tocá Postergar 10 min: lo vendido mientras tanto queda en el turno que vas a cerrar. Podés postergar las veces que haga falta, y cada vez queda registrada.',
+          'Si te equivocaste, en Ventas podés editar la venta durante los 30 minutos después de cobrarla, con un motivo. Después, o para anularla, avisale a un admin.',
+          'A la hora de cierre de cada turno, Vender se traba hasta que cargues el cierre. Si hay gente esperando, tocá Postergar 10 min: lo vendido mientras tanto queda en el turno que vas a cerrar. Cada postergación queda registrada.',
           'Después del cierre de la noche no se vende hasta el día siguiente.',
-          'Si te equivocaste en una venta, avisale a un admin: él la anula con un motivo.',
-          'Si se corta internet, la venta no se guarda y el ticket queda como estaba. Si no vuelve, anotala y el admin la carga después.',
+          'Si se corta internet al cobrar, la venta queda en este equipo y se manda sola cuando vuelve la conexión: arriba avisa cuántas faltan mandar. No cierres la pestaña mientras tanto.',
+          'Si cambió un precio mientras armabas el ticket, la venta no se guarda y aparece el precio nuevo.',
         ],
       },
     ],
@@ -39,40 +47,52 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
   ventas: {
     titulo: 'Cómo funciona Ventas',
     introduccion:
-      'Todo lo que se vendió, con su total: lo cobrado en el mostrador desde Vender y lo que cargás a mano.',
+      'Todo lo que se vendió, con su total. Las ventas se cobran en Vender, el mostrador: acá se miran, se filtran, se editan y se anulan.',
     temas: [
       {
         titulo: 'La lista',
         puntos: [
-          'Arranca en el mes de hoy, de a 25 por página. Filtrá por fechas, medio de pago, tipo de venta y estado: los totales de arriba siguen al filtro.',
-          'El origen dice si la venta se cobró en el Mostrador o la cargaste A mano, y quién la cargó.',
-          'El total de arriba suma lo cobrado, sin lo anulado.',
-          'Las tarjetas de arriba muestran lo cobrado, el ticket promedio y las anuladas del período filtrado.',
-          'Con un medio de pago elegido, el total suma solo lo que se pagó con ese medio.',
-          'Abrí una venta para ver sus productos, sus pagos y quién la cargó.',
+          'Arranca en el día de hoy, de a 25 por página. Para ver el mes u otro período, cambiá las fechas.',
+          'Filtrá también por medio de pago, tipo de venta, empleado (quién la cobró) y estado (cerradas o anuladas). La lista y las tarjetas se actualizan solas.',
+          'Cada fila dice la fecha y la hora, el tipo de venta (Local, Pedidos Ya…), quién la cobró, el medio, el estado y el total. Si se editó, al lado del estado dice Editada.',
+          'Si tuvo descuento, debajo del total dice cuál fue: «10 % de descuento» o «Descuento fijo de» un monto.',
+          'Tocá cualquier parte de la fila para abrir la venta.',
         ],
       },
       {
-        titulo: 'Las del mostrador',
+        titulo: 'El detalle de una venta',
         puntos: [
-          'Se cargan en Vender, en el momento de cobrar, con los productos y los precios del menú.',
-          'Se pueden pagar con uno o dos medios. Cuentan siempre en lo que debería haber en la caja de ese día.',
+          'A la izquierda, los productos con su cantidad y precio, y el total abajo. A la derecha, el estado, con qué se cobró, el tipo de venta, quién la cargó y los botones.',
+          'Si tuvo descuento, antes del total se ve qué descuento fue, el motivo y cuánto se restó.',
+          'Las facturas cobradas como docena variada dicen por cantidad, y abajo se ve lo cobrado y cuánto se ahorró.',
+          'Si fue anulada, arriba lo dice en rojo con el motivo, y el total aparece tachado.',
+          'Las ventas viejas que vinieron sin productos muestran solo el total.',
         ],
       },
       {
-        titulo: 'Cargar una venta a mano',
+        titulo: 'Las tarjetas de arriba',
         puntos: [
-          'Es para lo que no se cobró en el mostrador: encargos, ventas a comercios, Cheaf, o lo que se vendió sin conexión. El tipo de venta se elige de la lista que armás en Tipos de venta.',
-          'Sumá uno o varios productos. Cada uno trae el precio del menú, y lo podés cambiar. El total se calcula mientras escribís.',
-          'La fecha viene con hoy; puede ser un día anterior, pero no uno futuro.',
-          'Marcá Se cobró en la caja del local si la plata entró a la caja, y elegí el turno: así suma a lo que debería haber en el cierre de ese turno.',
+          'Cobrado: lo que entró en el período, ya con los descuentos y sin lo anulado, y cuántas ventas fueron.',
+          'Ticket promedio: lo cobrado dividido la cantidad de ventas.',
+          'Anuladas: cuánto y cuántas se anularon.',
+          'Siguen a los filtros. Con un medio de pago elegido, suman solo lo que se pagó con ese medio.',
         ],
       },
       {
-        titulo: 'Anular',
+        titulo: 'Editar y anular',
         puntos: [
-          'Una venta no se edita ni se borra: se anula con un motivo, deja de contar y queda en el historial.',
-          'Si te equivocaste en un monto, anulala y cargala de nuevo. Caja no anula: te avisa a vos.',
+          'Abrí la venta y tocá Editar: se abre Vender con la venta cargada. Cambiá productos, cantidades, tipo de venta, medio de pago o descuento, escribí el motivo y guardá. Se cobra con los precios del menú de hoy.',
+          'La venta queda marcada como Editada, y Auditoría guarda cómo estaba antes, cómo quedó, quién la cambió y el motivo.',
+          'Caja ve en Ventas solo las de los últimos 30 minutos, sin filtros ni totales, y puede editarlas en ese tiempo. Después, solo el admin.',
+          'Cada venta cuenta en la caja del turno en que se cobró. Si ese turno ya tenía el cierre cargado, el cierre vuelve a calcular lo que debería haber y puede quedar con diferencia.',
+          'Anular es solo del admin: se anula con un motivo, deja de contar y queda en el historial. Las viejas que vinieron sin productos solo se miran: no se cambian ni se anulan desde acá.',
+        ],
+      },
+      {
+        titulo: 'Vender y los tipos de venta',
+        puntos: [
+          'Vender abre el mostrador: se cobra en el momento, con los productos y los precios del menú, y siempre con la fecha de hoy.',
+          'El tipo de venta viene Local y se cambia en Vender. Los tipos se suman, se ordenan y se desactivan en Tipos de venta.',
         ],
       },
     ],
@@ -80,14 +100,22 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
   canales: {
     titulo: 'Cómo funciona Tipos de venta',
     introduccion:
-      'Por dónde se vende lo que cargás a mano. Arrancan Cheaf, Encargo, Venta a comercios y Otro.',
+      'Por dónde se vende: Local, PedidosYa, Mayorista o el que armes. Se elige en Vender, en el paso 2, y sirve para filtrar Ventas y para controlar cada tipo en el cierre.',
     temas: [
+      {
+        titulo: 'Qué podés hacer',
+        puntos: [
+          'Sumá un tipo escribiendo su nombre y tocando Sumar. No se repite un nombre.',
+          'Ordenalos arrastrando desde la manija de la izquierda, o con las flechas del teclado: es el orden de los botones en Vender. Se guarda solo.',
+          'Con el lápiz lo renombrás: el nombre nuevo sale también en sus ventas anteriores.',
+          'Con el interruptor lo desactivás: un tipo desactivado no se ofrece en Vender, pero conserva sus ventas. Con el tachito se borra, si nunca se usó.',
+        ],
+      },
       {
         titulo: 'Qué tenés que saber',
         puntos: [
-          'Sumá, renombrá y desactivá tipos de venta. No se repite un nombre.',
-          'Un tipo de venta desactivado no se ofrece al cargar una venta, pero conserva las que ya tiene.',
-          'Renombrar un tipo de venta cambia el nombre también en sus ventas anteriores.',
+          'Local es el tipo del mostrador: viene elegido en Vender y no se renombra, no se desactiva ni se borra.',
+          'En Vender cada tipo tiene su color; Otro va en gris.',
         ],
       },
     ],
@@ -158,14 +186,14 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
       {
         titulo: 'Las horas de cierre',
         puntos: [
-          'Con el botón Horas de cierre, arriba, elegís a qué hora se traba Vender para el cierre del mediodía y para el de la noche.',
+          'Con el botón Ajustes de caja, arriba, en Horas de cierre elegís a qué hora se traba Vender para el cierre del mediodía y para el de la noche.',
           'Lo vendido de cada turno se compara con su propio cierre.',
         ],
       },
       {
         titulo: 'La tolerancia',
         puntos: [
-          'Es la diferencia por medio de pago que se acepta como Cierra, por ejemplo unos pesos de cambio. Se cambia con el botón Diferencia aceptada, arriba.',
+          'Es la diferencia por medio de pago que se acepta como Cierra, por ejemplo unos pesos de cambio. Se cambia en Ajustes de caja, arriba, en Diferencia aceptada.',
           'Una diferencia menor no genera aviso, pero se ve igual en el detalle.',
         ],
       },
@@ -173,7 +201,7 @@ export const AYUDAS_DEL_NEGOCIO: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'Cómo se calcula si cierra',
         puntos: [
           'El efectivo esperado es el fondo inicial, más las ventas en efectivo, menos los retiros y los gastos de caja. En los demás medios, lo esperado son las ventas de ese medio.',
-          'Solo cuentan las ventas cobradas en la caja del local: las del mostrador y las cargadas a mano con esa casilla marcada.',
+          'Solo cuentan las ventas cobradas en la caja del local, como todas las del mostrador.',
           'Efectivo contado es todo el efectivo que había en la caja, fondo incluido. Queda en la caja no puede ser más que lo contado.',
           'Lo que queda en la caja de un día es el fondo inicial del siguiente cierre. Si no coincide, el detalle lo avisa.',
           'Para cargar un cierre que falta, usá el botón Cargar cierre o tocá el día pendiente.',

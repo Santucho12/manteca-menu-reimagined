@@ -58,12 +58,13 @@ describe('ventasDelDia', () => {
 });
 
 describe('ventasAManoDelDia', () => {
-  it('a veces hay un encargo o una venta a comercios, cobrados por transferencia', () => {
+  // Sin Encargo desde el pedido 102: lo borró Santiago.
+  it('a veces hay una venta de Cheaf o a comercios, cobrada por transferencia', () => {
     const azar = crearAzar(6);
     const ventas = Array.from({ length: 30 }, () => ventasAManoDelDia(azar, MARTES, formas)).flat();
     expect(ventas.length).toBeGreaterThan(5);
     for (const venta of ventas) {
-      expect(['Encargo', 'Venta a comercios']).toContain(venta.tipo);
+      expect(['Cheaf', 'Venta a comercios']).toContain(venta.tipo);
       expect(venta.pagos).toEqual([{ medio: 'transferencia', montoCentavos: venta.totalCentavos }]);
       expect(venta.fecha).toBe(MARTES);
     }

@@ -5,7 +5,7 @@ import { useFieldArray, type UseFormReturn } from 'react-hook-form';
 import { AvisoDeError } from '@/components/formularios/AvisoDeError';
 import { Campo } from '@/components/formularios/Campo';
 import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
-import { BOTON_CANCELAR, ICONO_EDITAR } from '@/components/panel/estilos';
+import { BOTON_SUAVE, ICONO_EDITAR } from '@/components/panel/estilos';
 import type { FormaParaComprar } from '@/lib/compras/consultas';
 import { opcionesDeFormas, precioAlElegir } from '@/lib/compras/pantalla';
 
@@ -90,7 +90,7 @@ export function Renglones(props: Props) {
       <button
         type="button"
         onClick={() => renglones.append({ formaId: '', cantidad: '', precio: '' })}
-        className={BOTON_CANCELAR}
+        className={BOTON_SUAVE}
       >
         <Plus size={14} aria-hidden="true" /> Agregar renglón
       </button>

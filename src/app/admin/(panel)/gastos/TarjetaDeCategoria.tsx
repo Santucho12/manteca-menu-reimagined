@@ -51,7 +51,7 @@ export function TarjetaDeCategoria({ categoria, enlace, activa }: Props) {
         type="button"
         onClick={() => setAbierta(true)}
         className={cn(
-          'block w-full rounded-3xl border bg-white p-4 text-left shadow-sm shadow-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.99]',
+          'block w-full rounded-2xl border bg-white p-4 text-left shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.99]',
           activa ? 'border-foreground/30 ring-2 ring-foreground/10' : 'border-border',
         )}
       >

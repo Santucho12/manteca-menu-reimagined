@@ -9,11 +9,11 @@ type Validar = (campos: FieldPath<DatosDeCierre>[]) => Promise<boolean>;
 
 /** En qué paso del cierre se está; avanza solo si lo del paso está bien cargado. */
 export function usePasosDelCierre(cantidadDeTipos: number, validar: Validar) {
-  const pasos = pasosDelCierre(cantidadDeTipos);
+  const pasos = pasosDelCierre();
   const [actual, setActual] = useState(0);
   const paso = pasos[actual] ?? { tipo: 'caja' };
   const avanzar = async () => {
-    if (!(await validar(camposDelPaso(paso)))) return;
+    if (!(await validar(camposDelPaso(paso, cantidadDeTipos)))) return;
     setActual((i) => pasoSiguiente(i, 1, pasos.length));
   };
   const volver = () => setActual((i) => pasoSiguiente(i, -1, pasos.length));

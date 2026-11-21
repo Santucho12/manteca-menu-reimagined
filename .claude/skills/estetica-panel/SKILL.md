@@ -18,16 +18,15 @@ PRP es la app "FiestaCobra", en
 React 18, Tailwind 3). Esta skill ya trae todo pasado a Manteca: el código de PRP se consulta
 solo para algo que acá no esté. No se entra a su base real: tiene datos de sus clientes.
 
-**Los colores de FiestaCobra con el azul de marca (Santiago, 2026-11-19, pedido 101).** El fondo
+**Los colores de FiestaCobra con la tinta de marca (Santiago, 2026-11-20, pedido 102).** El fondo
 (`#f9fafb`), las tarjetas blancas, los bordes y los grises fríos de `slate` son los de PRP. El verde
-de marca (`primary`, `accent`, `ring`) pasa a ser el azul `#1e40af`, con letra blanca encima.
-Todo está en `panel.css`. Donde esta skill o `piezas.md` digan "verde" de la marca, se lee "azul";
-`emerald` sigue con su significado (confirma plata o exporta). El logo de Manteca sigue dorado. El
-dorado y el crema del pedido 45 quedaron descartados, y Gastos ya no es una sección sin color de
-marca. El bloque oscuro del mes de Inicio es el de PRP (`#0F172A`, con sus detalles en `emerald`):
-el azul de marca no se vería sobre ese fondo.
+de marca (`primary`, `accent`, `ring`) pasa a ser la tinta del texto, `#121b2b`, con letra blanca
+encima. Todo está en `panel.css`. Donde esta skill o `piezas.md` digan "verde" de la marca, se lee
+"tinta"; `emerald` sigue con su significado (confirma plata o exporta). **El panel no usa dorado**:
+solo el logo de Manteca lo conserva. Inicio va sobre fondo blanco. El bloque oscuro del mes de
+Inicio es el de PRP (`#0F172A`, con sus detalles en `emerald`).
 
-**Más colores, no solo el azul (Santiago, pedido 101).** Para diferenciar en gráficos y piezas se
+**Más colores, no solo la marca (Santiago, pedido 101).** Para diferenciar en gráficos y piezas se
 usan las familias de la paleta. Cada reporte tiene su color en `src/lib/reportes/coloresDeGraficos.ts`,
 por lo que muestra y no por su puesto: verde lo que entra, rojo lo que sale y un color propio para
 el resto.
@@ -35,7 +34,7 @@ el resto.
 Decisiones de Santiago (2026-10-21):
 
 - **Los rojos y grises de PRP**, aunque no pasen el contraste AA (el rojo de error, 3,6; los grises
-  chicos, 2,6). El azul con su letra blanca sí lo pasa. Es una excepción anotada en `PEDIDOS.md` (pedido 43): `tests/contraste.test.ts`
+  chicos, 2,6). La tinta con su letra blanca sí lo pasa. Es una excepción anotada en `PEDIDOS.md` (pedido 43): `tests/contraste.test.ts`
   mira solo la carta y no se extiende al panel.
 - **Las tres librerías de PRP, con su versión exacta**: `framer-motion` 12.36.0, `sonner` 1.7.4 y
   `lenis` 1.1.20.

@@ -15,7 +15,7 @@ export type PlanDeEjemplo = {
   dias: string[];
   sinAbrir: string[];
   ventas: VentaDeEjemplo[];
-  /** Encargos y ventas a comercios: no suman a la caja. */
+  /** Ventas de Cheaf y a comercios: no suman a la caja. */
   aMano: VentaAManoDeEjemplo[];
   cierres: CierreDeEjemplo[];
   gastos: GastoDeEjemplo[];

@@ -140,9 +140,6 @@ test.describe('en una tablet, con el dedo', () => {
     } finally {
       await borrarCategoriasConSusGastos([categoria.id]);
     }
-    await page.goto('/admin/ventas/nueva');
-    const quitar = page.getByRole('button', { name: 'Quitar producto 1' });
-    expect(await alto(quitar)).toBeGreaterThanOrEqual(44);
   });
 
   test('los botones de encabezado y el Ir se tocan sin errarle', async ({ page }) => {

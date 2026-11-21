@@ -1,6 +1,16 @@
+import { ArrowLeftRight, Banknote, CreditCard, QrCode, type LucideIcon } from 'lucide-react';
 import { nombreDeMedio } from '@/lib/caja/pantalla';
-import { MEDIOS_DE_VENTA as MEDIOS, type MedioDeVenta as Medio } from '@/lib/caja/resultado';
+import { MEDIOS, type Medio } from '@/lib/caja/resultado';
+import { tonoDeMedio } from '@/lib/vender/colores';
 import { cn } from '@/lib/utils';
+
+const ICONOS: Record<Medio, LucideIcon> = {
+  efectivo: Banknote,
+  debito: CreditCard,
+  credito: CreditCard,
+  qr: QrCode,
+  transferencia: ArrowLeftRight,
+};
 
 type Props = {
   grupo: string;
@@ -10,30 +20,45 @@ type Props = {
   sin?: Medio | null;
 };
 
-/** Los medios de pago como botones grandes: se toca uno. */
+/** Los medios de pago como tarjetas grandes, cada uno con su color: se toca uno. */
 export function ElegirMedio({ grupo, elegido, elegir, sin = null }: Props) {
   return (
     <div role="group" aria-label={grupo} className="space-y-2">
-      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+      <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
         {grupo}
       </p>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2">
-        {MEDIOS.filter((medio) => medio !== sin).map((medio) => (
-          <button
-            type="button"
-            key={medio}
-            aria-pressed={medio === elegido}
-            onClick={() => elegir(medio)}
-            className={cn(
-              'min-h-12 rounded-xl border px-3 text-sm font-bold transition-all active:scale-95',
-              medio === elegido
-                ? 'border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/20'
-                : 'border-border bg-card hover:border-primary/40',
-            )}
-          >
-            {nombreDeMedio(medio)}
-          </button>
-        ))}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {MEDIOS.filter((medio) => medio !== sin).map((medio) => {
+          const tono = tonoDeMedio(medio);
+          const Icono = ICONOS[medio];
+          const actual = medio === elegido;
+          return (
+            <button
+              type="button"
+              key={medio}
+              aria-pressed={actual}
+              onClick={() => elegir(medio)}
+              className={cn(
+                'flex min-h-20 items-center gap-3 rounded-2xl border-2 px-4 text-left text-sm font-bold transition-all active:scale-[0.98]',
+                tono.suave,
+                tono.texto,
+                actual
+                  ? 'border-foreground shadow-lg ring-4 ring-foreground/10'
+                  : 'border-transparent',
+              )}
+            >
+              <span
+                className={cn(
+                  'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white',
+                  tono.solido,
+                )}
+              >
+                <Icono size={18} aria-hidden="true" />
+              </span>
+              {nombreDeMedio(medio)}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

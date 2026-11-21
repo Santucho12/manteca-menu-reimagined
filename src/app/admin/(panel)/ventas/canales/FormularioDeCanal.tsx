@@ -66,7 +66,8 @@ export function FormularioDeCanal({ id, inicial = '' }: { id?: string; inicial?:
               : {
                   variante: 'ingreso',
                   icono: Store,
-                  placeholder: 'Ej: Pedidos Ya, Mayorista, Encargos',
+                  tono: 'gris',
+                  placeholder: 'Ej: Pedidos Ya, Mayorista',
                 })}
             error={formState.errors.nombre?.message}
             {...registro('nombre')}

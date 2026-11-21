@@ -1,0 +1,8 @@
+/* El ingreso, el registro y el cambio de contraseña llevan el dorado del logo de Manteca, con la
+   letra oscura (el blanco sobre el dorado no se lee). El resto del panel no usa dorado
+   (Santiago, 2026-11-20). */
+.ingreso-dorado {
+  --color-primary: #bfa042;
+  --color-primary-foreground: #1a1a1a;
+  --color-ring: #bfa042;
+}

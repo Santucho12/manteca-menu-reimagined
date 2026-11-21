@@ -1,4 +1,5 @@
-// Las clases de Plan Reminder Pro que se repiten en el panel (skill estetica-panel, piezas.md).
+// Las clases de Plan Reminder Pro que se repiten en el panel (skill estetica-panel, piezas.md), con la
+// estética de Ventas e Inicio (skill estetica-sistema): cancelar, eliminar y anular en rojo.
 
 export const ETIQUETA = 'text-[10px] font-black text-muted-foreground uppercase tracking-widest';
 
@@ -12,7 +13,7 @@ export const BOTON_PRINCIPAL_AL_PIE =
   'flex-[2] h-12 rounded-xl bg-primary text-primary-foreground font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl hover:shadow-primary/30 active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2';
 
 export const BOTON_CANCELAR =
-  'flex-1 h-12 rounded-xl bg-secondary text-foreground font-bold text-[10px] uppercase tracking-widest border border-transparent hover:border-border hover:bg-white hover:shadow-md active:scale-95 transition-all duration-200 flex items-center justify-center';
+  'flex-1 h-12 rounded-xl bg-rose-50 text-rose-700 font-bold text-[10px] uppercase tracking-widest border border-rose-200 hover:bg-rose-100 hover:border-rose-300 hover:shadow-md hover:shadow-rose-200/60 active:scale-95 transition-all duration-200 flex items-center justify-center';
 
 // Los botones de arriba de cada pantalla, simples: sin mayúsculas, sin sombra y sin saltito
 // (Santiago, 2026-10-27). El ícono va a 16 aunque la pantalla lo pida más grande.
@@ -29,7 +30,7 @@ export const BOTON_SUAVE =
   'h-12 px-6 rounded-xl bg-secondary text-foreground font-bold text-[10px] uppercase tracking-widest border border-transparent hover:border-border hover:bg-white hover:shadow-md active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60';
 
 export const BOTON_PELIGRO =
-  'h-10 pointer-coarse:h-11 px-4 rounded-xl border border-rose-200 text-rose-700 font-bold text-[10px] uppercase tracking-widest hover:bg-rose-50 hover:border-rose-300 hover:shadow-md hover:shadow-rose-200/60 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50';
+  'h-10 pointer-coarse:h-11 px-4 rounded-xl bg-rose-600 text-white font-bold text-[10px] uppercase tracking-widest shadow-md shadow-rose-600/25 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg active:translate-y-0 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50';
 
 export const BOTON_REACTIVAR =
   'h-10 px-4 rounded-xl border border-emerald-200 text-emerald-700 font-bold text-[10px] uppercase tracking-widest hover:bg-emerald-50 hover:border-emerald-300 hover:shadow-md hover:shadow-emerald-200/60 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50';
@@ -44,16 +45,16 @@ export const ICONO_EDITAR =
   'p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 hover:scale-110 active:scale-95 transition-all duration-200';
 
 export const ICONO_BORRAR =
-  'p-1.5 pointer-coarse:p-3.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:scale-110 active:scale-95 transition-all duration-200';
+  'p-1.5 pointer-coarse:p-3.5 rounded-lg text-rose-500 hover:text-rose-600 hover:bg-rose-50 hover:scale-110 active:scale-95 transition-all duration-200';
 
 export const ATAJO =
   'inline-flex items-center gap-1 h-9 pointer-coarse:h-11 px-3 rounded-xl text-xs font-bold bg-secondary/60 text-slate-600 hover:bg-primary/10 hover:text-primary hover:-translate-y-0.5 hover:shadow-sm active:scale-95 transition-all duration-200 whitespace-nowrap';
 
 export const TARJETA_DE_SECCION =
-  'bg-card rounded-[2rem] border border-border/60 shadow-xl p-5 md:p-8 space-y-6';
+  'bg-card rounded-2xl border border-border shadow-card p-5 md:p-8 space-y-6';
 
 export const TARJETA_DE_FORMULARIO =
-  'bg-card rounded-[2rem] border border-border/50 shadow-xl p-5 md:p-8 space-y-5';
+  'bg-card rounded-2xl border border-border shadow-card p-5 md:p-8 space-y-5';
 
 export const ICONO_DE_TARJETA =
   'w-12 h-12 shrink-0 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20';
@@ -79,10 +80,10 @@ export const CAMPO_DE_FILTRO =
 
 // Fechas y desplegables: en la tablet van de a dos por renglon; desde xl, todos en uno.
 export const BARRA_AUTOMATICA =
-  'grid grid-cols-1 sm:grid-cols-2 sm:items-end xl:flex xl:flex-row xl:flex-wrap gap-3 md:gap-4 mb-6 md:mb-8 bg-card border border-border p-3 md:p-5 rounded-2xl md:rounded-3xl shadow-xs';
+  'grid grid-cols-1 sm:grid-cols-2 sm:items-end xl:flex xl:flex-row xl:flex-wrap gap-3 md:gap-4 mb-6 md:mb-8 bg-card border border-border p-3 md:p-5 rounded-2xl md:rounded-3xl shadow-card';
 
 export const BARRA_DE_FILTROS =
-  'flex flex-col xl:flex-row xl:flex-wrap xl:items-end gap-3 md:gap-4 mb-6 md:mb-8 bg-card border border-border p-3 md:p-5 rounded-2xl md:rounded-3xl shadow-xs';
+  'flex flex-col xl:flex-row xl:flex-wrap xl:items-end gap-3 md:gap-4 mb-6 md:mb-8 bg-card border border-border p-3 md:p-5 rounded-2xl md:rounded-3xl shadow-card';
 
 export const BOTON_DE_ENCABEZADO_NEUTRO =
   'flex-1 lg:flex-none h-10 pointer-coarse:h-11 px-4 rounded-xl border border-border bg-card text-foreground text-sm font-semibold whitespace-nowrap hover:bg-secondary active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2 [&_svg]:size-4';

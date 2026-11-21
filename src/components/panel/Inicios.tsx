@@ -32,7 +32,7 @@ export function EsperaDeAcceso() {
     <>
       <EncabezadoDePantalla titulo="Tu cuenta está en espera" />
       <EntradaDePantalla>
-        <div className="bg-card rounded-[2rem] border border-border/50 shadow-xl p-5 md:p-8">
+        <div className="bg-card rounded-2xl border border-border shadow-card p-5 md:p-8">
           <p className="text-sm text-muted-foreground leading-relaxed">
             Tu cuenta ya está creada. Un administrador tiene que darte acceso.
           </p>

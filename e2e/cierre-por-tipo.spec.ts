@@ -39,17 +39,18 @@ test.describe('con la sesión de admin', () => {
 
 async function venderDelTipo(page: Page) {
   await page.goto('/admin/vender');
-  const tipos = page.getByRole('group', { name: 'Tipo de venta' });
-  await esperarHidratacion(tipos.getByRole('button').first());
-  await tipos.getByRole('button', { name: plataforma.nombre, exact: true }).click();
-  await page
-    .getByRole('group', { name: 'Categorías' })
-    .getByRole('button', { name: categoria.nombre })
-    .click();
+  // Vender en tres pasos (pedido 102): productos, tipo de venta y cobro.
+  const categorias = page.getByRole('group', { name: 'Categorías' });
+  await esperarHidratacion(categorias.getByRole('button').first());
+  await categorias.getByRole('button', { name: categoria.nombre }).click();
   await page.getByRole('button', { name: `Sumar ${producto.nombre} · Unidad` }).click();
+  await page.getByRole('button', { name: 'Siguiente' }).click();
+  const tipos = page.getByRole('group', { name: 'Tipo de venta' });
+  await tipos.getByRole('button', { name: plataforma.nombre, exact: true }).click();
+  await page.getByRole('button', { name: 'Siguiente' }).click();
   await page
     .getByRole('group', { name: 'Medio de pago' })
-    .getByRole('button', { name: 'Fuera de la caja', exact: true })
+    .getByRole('button', { name: 'Efectivo', exact: true })
     .click();
   await page.getByRole('button', { name: /^Cobrar/ }).click();
   await expect(page.getByText(/Venta guardada/)).toBeVisible();
@@ -62,8 +63,9 @@ test.describe('con la sesión de caja', () => {
     await venderDelTipo(page);
     await page.goto(`/admin/caja?fecha=${HOY}&turno=1`);
     await page.getByLabel('Fondo inicial').fill('0');
-    await page.getByLabel('Efectivo contado').fill('0');
-    await page.getByLabel('Queda en la caja').fill('0');
+    // Sin Fuera de la caja (pedido 102): la venta del tipo se cobra en efectivo y queda en la caja.
+    await page.getByLabel('Efectivo contado').fill('40.000');
+    await page.getByLabel('Queda en la caja').fill('40.000');
     await terminarCierre(page, { facturado: { [plataforma.nombre]: '40.000' } });
     await expect(page).toHaveURL(/\/admin\/caja\/cierres\//);
     const seccion = page.getByRole('region', { name: plataforma.nombre });

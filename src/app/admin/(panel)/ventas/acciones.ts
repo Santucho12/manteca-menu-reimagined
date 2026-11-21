@@ -8,15 +8,18 @@ import {
   cambiarEstadoDeCanal,
   crearCanal,
   editarCanal,
-  guardarVenta,
+  ordenarCanales,
 } from '@/lib/ventas/escritura';
-import { esquemaAnulacionDeVenta, esquemaCanal, esquemaVenta } from '@/lib/ventas/esquemas';
+import { esquemaEdicionDeVenta } from '@/lib/ventas/edicion';
+import { editarVenta } from '@/lib/ventas/editar';
+import { esquemaAnulacionDeVenta, esquemaCanal } from '@/lib/ventas/esquemas';
 
 const conId = z.object({ id: z.uuid() });
 
-export async function guardarVentaDesdeElPanel(datos: unknown) {
-  return ejecutarAccion('admin', esquemaVenta, datos, ({ cliente }, venta) =>
-    guardarVenta(cliente, venta),
+// Caja también edita: la base le deja solo las de los últimos 30 minutos (pedido 102).
+export async function editarVentaDesdeElPanel(datos: unknown) {
+  return ejecutarAccion('caja', esquemaEdicionDeVenta, datos, ({ cliente }, edicion) =>
+    editarVenta(cliente, edicion),
   );
 }
 
@@ -35,6 +38,13 @@ export async function crearCanalDesdeElPanel(datos: unknown) {
 export async function editarCanalDesdeElPanel(datos: unknown) {
   return ejecutarAccion('admin', esquemaCanal.extend(conId.shape), datos, ({ cliente }, canal) =>
     editarCanal(cliente, canal.id, canal),
+  );
+}
+
+export async function ordenarCanalesDesdeElPanel(datos: unknown) {
+  const esquema = z.object({ ids: z.array(z.uuid()).min(1).max(200) });
+  return ejecutarAccion('admin', esquema, datos, ({ cliente }, { ids }) =>
+    ordenarCanales(cliente, ids),
   );
 }
 

@@ -42,3 +42,10 @@ export function resumenDeLaSemana(dias: DiaDeLaSemana[]): ResumenDeLaSemana {
     return { titulo: `Vas ${monto} abajo`, chip: `▼ ${cifras}`, estado: 'empeora' };
   return { titulo: 'Vas igual que la semana pasada', chip: `= ${cifras}`, estado: 'igual' };
 }
+
+/** Lo que aparece al pasar el mouse por la frase y por la etiqueta de la semana. */
+export const AYUDAS_DE_LA_SEMANA = {
+  titulo:
+    'Cuánto más o menos vendiste en los últimos 7 días, con lo de hoy hasta ahora, contra los 7 días anteriores.',
+  chip: 'Lo vendido en los últimos 7 días contra lo vendido en los 7 días anteriores.',
+} as const;

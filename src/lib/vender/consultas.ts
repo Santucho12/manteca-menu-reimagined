@@ -37,3 +37,26 @@ export async function tiposParaVender(cliente: Cliente): Promise<TipoParaVender[
     seControla: t.se_controla_en_el_cierre,
   }));
 }
+
+export type PorArmar = {
+  ventaId: string;
+  renglonId: string;
+  cerradaEn: string;
+  descripcion: string;
+  categoriaId: string;
+  unidades: number;
+};
+
+/** Las facturas surtidas cobradas que falta armar, de hoy y de ayer (pedido 102). */
+export async function porArmar(cliente: Cliente): Promise<PorArmar[]> {
+  const { data, error } = await cliente.rpc('ventas_por_armar');
+  if (error) throw new Error(`No pudimos leer lo que falta armar: ${error.message}`);
+  return (data ?? []).map((p) => ({
+    ventaId: p.venta_id,
+    renglonId: p.renglon_id,
+    cerradaEn: p.cerrada_en,
+    descripcion: p.descripcion,
+    categoriaId: p.categoria_id,
+    unidades: p.unidades,
+  }));
+}

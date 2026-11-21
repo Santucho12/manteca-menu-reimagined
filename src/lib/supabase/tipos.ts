@@ -177,6 +177,7 @@ export type Database = {
           id: string
           local_id: string
           nombre: string
+          orden: number
           se_controla_en_el_cierre: boolean
         }
         Insert: {
@@ -187,6 +188,7 @@ export type Database = {
           id?: string
           local_id?: string
           nombre: string
+          orden?: number
           se_controla_en_el_cierre?: boolean
         }
         Update: {
@@ -197,6 +199,7 @@ export type Database = {
           id?: string
           local_id?: string
           nombre?: string
+          orden?: number
           se_controla_en_el_cierre?: boolean
         }
         Relationships: [
@@ -1387,30 +1390,36 @@ export type Database = {
           categoria_id: string
           fecha_actualizacion: string
           fecha_creacion: string
+          gramos: number | null
           id: string
           local_id: string
           nombre: string
           orden: number
+          unidades: number | null
         }
         Insert: {
           activo?: boolean
           categoria_id: string
           fecha_actualizacion?: string
           fecha_creacion?: string
+          gramos?: number | null
           id?: string
           local_id: string
           nombre: string
           orden: number
+          unidades?: number | null
         }
         Update: {
           activo?: boolean
           categoria_id?: string
           fecha_actualizacion?: string
           fecha_creacion?: string
+          gramos?: number | null
           id?: string
           local_id?: string
           nombre?: string
           orden?: number
+          unidades?: number | null
         }
         Relationships: [
           {
@@ -1876,6 +1885,10 @@ export type Database = {
           origen: Database["public"]["Enums"]["origen_de_venta"]
           total_centavos: number
           turno: number
+          editada: boolean
+          editada_por: string | null
+          fecha_edicion: string | null
+          motivo_edicion: string | null
         }
         Insert: {
           anulado?: boolean
@@ -1898,6 +1911,10 @@ export type Database = {
           origen?: Database["public"]["Enums"]["origen_de_venta"]
           total_centavos: number
           turno?: number
+          editada?: boolean
+          editada_por?: string | null
+          fecha_edicion?: string | null
+          motivo_edicion?: string | null
         }
         Update: {
           anulado?: boolean
@@ -1920,6 +1937,10 @@ export type Database = {
           origen?: Database["public"]["Enums"]["origen_de_venta"]
           total_centavos?: number
           turno?: number
+          editada?: boolean
+          editada_por?: string | null
+          fecha_edicion?: string | null
+          motivo_edicion?: string | null
         }
         Relationships: [
           {
@@ -2045,11 +2066,14 @@ export type Database = {
         Returns: {
           categoria: string
           categoria_id: string
+          compartido: boolean
+          gramos: number | null
           precio_centavos: number
           presentacion: string
           presentacion_id: string
           producto: string
           producto_id: string
+          unidades: number | null
         }[]
       }
       cierres_anotar_controles: {
@@ -2415,16 +2439,36 @@ export type Database = {
       }
       ventas_borrar_canal: { Args: { el_canal: string }; Returns: undefined }
       ventas_guardar_manual: { Args: { datos: Json }; Returns: string }
+      ventas_armar: { Args: { detalle: Json; el_renglon: string }; Returns: undefined }
+      ventas_editar: { Args: { datos: Json; el_motivo: string; la_venta: string }; Returns: Json }
+      ventas_ordenar_canales: { Args: { los_ids: string[] }; Returns: undefined }
       ventas_guardar_mostrador: { Args: { datos: Json }; Returns: Json }
+      ventas_por_armar: {
+        Args: never
+        Returns: {
+          categoria_id: string
+          cerrada_en: string
+          descripcion: string
+          renglon_id: string
+          unidades: number
+          venta_id: string
+        }[]
+      }
       ventas_renglones_del_mostrador: {
         Args: { datos: Json; el_local: string }
         Returns: {
           cantidad: number
+          categoria_id: string
+          compartido: boolean
           descripcion: string
+          gramos: number | null
           mandado_centavos: number
+          orden: number
           precio_centavos: number
           presentacion_id: string
           producto_id: string
+          solo_centavos: number
+          unidades: number | null
         }[]
       }
       ventas_tipo_del_mostrador: {
@@ -2435,6 +2479,7 @@ export type Database = {
         Args: {
           desde: string
           el_canal?: string
+          el_creador?: string
           el_medio?: string
           el_origen?: string
           hasta: string

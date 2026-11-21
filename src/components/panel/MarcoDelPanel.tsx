@@ -14,7 +14,8 @@ type Props = { nombre: string; enlaces: EnlaceDelMarco[]; children: ReactNode };
  */
 export function MarcoDelPanel({ nombre, enlaces, children }: Props) {
   return (
-    <div className="min-h-screen bg-background">
+    // Inicio pide fondo blanco con data-fondo; las demás pantallas siguen sobre el gris.
+    <div className="min-h-screen bg-background has-[[data-fondo=blanco]]:bg-white">
       <BarraLateral nombre={nombre} enlaces={enlaces} />
       <BarrasDelCelular nombre={nombre} enlaces={enlaces} />
       <Principal className="lg:ml-[234px] px-5 sm:px-4 md:px-8 pt-20 pb-28 lg:px-10 lg:pt-8 lg:pb-10 min-h-screen relative overflow-clip">

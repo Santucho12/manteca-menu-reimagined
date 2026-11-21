@@ -15,7 +15,16 @@ const VACIA = {
   icono: '🥐' as const,
   foto: '',
   precioCompartido: false,
-  presentaciones: [{ id: '', nombre: 'Unidad', compartido: '', compartidoOriginal: '' }],
+  presentaciones: [
+    {
+      id: '',
+      nombre: 'Unidad',
+      compartido: '',
+      compartidoOriginal: '',
+      medida: 'unidades' as const,
+      cantidad: '1',
+    },
+  ],
 };
 
 export default async function PaginaNuevaCategoria() {

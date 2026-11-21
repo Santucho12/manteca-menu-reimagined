@@ -4,7 +4,6 @@ import {
   estadoDeVenta,
   filtrosDeVentas,
   horaDeVenta,
-  nombreDeOrigen,
   tarjetasDelResumen,
   tonoDeEstado,
 } from './pantalla';
@@ -12,14 +11,16 @@ import {
 const HOY = '2026-10-10';
 
 describe('filtrosDeVentas', () => {
-  it('por defecto, el mes en curso y todo', () => {
+  // Por defecto, hoy: lista y tarjetas muestran el día (Santiago, 2026-11-20, pedido 102).
+  it('por defecto, el día de hoy y todo', () => {
     expect(filtrosDeVentas({}, HOY)).toEqual({
-      desde: '2026-10-01',
-      hasta: '2026-10-31',
+      desde: '2026-10-10',
+      hasta: '2026-10-10',
       origen: null,
       medio: null,
       tipo: null,
       estado: null,
+      persona: null,
       pagina: 1,
     });
   });
@@ -55,13 +56,15 @@ describe('enlaceDeVentas', () => {
     );
     expect(enlaceDeVentas(filtrosDeVentas({}, HOY), HOY)).toBe('/admin/ventas');
   });
+
+  it('el mes entero va en la URL, porque ya no es lo de por defecto', () => {
+    const mes = { ...filtrosDeVentas({}, HOY), desde: '2026-10-01', hasta: '2026-10-31' };
+    expect(enlaceDeVentas(mes, HOY)).toBe('/admin/ventas?desde=2026-10-01&hasta=2026-10-31');
+  });
 });
 
 describe('nombres', () => {
-  it('del origen y del estado, con lo anulado primero', () => {
-    expect(nombreDeOrigen('mostrador')).toBe('Mostrador');
-    expect(nombreDeOrigen('manual')).toBe('A mano');
-    expect(nombreDeOrigen('fudo')).toBe('Fudo');
+  it('del estado, con lo anulado primero', () => {
     expect(estadoDeVenta({ estado: 'cerrada', anulado: true })).toBe('Anulada');
     expect(estadoDeVenta({ estado: 'cancelada', anulado: false })).toBe('Cancelada');
     expect(estadoDeVenta({ estado: 'en_curso', anulado: false })).toBe('En curso');
@@ -131,5 +134,30 @@ describe('horaDeVenta', () => {
 
   it('cuenta el dia en Argentina, no en UTC', () => {
     expect(horaDeVenta('2026-10-26', '2026-10-27T01:15:00Z')).toBe('22:15');
+  });
+});
+
+describe('subtituloDeVenta', () => {
+  it('junta la hora y el tipo, sin el origen', async () => {
+    const { subtituloDeVenta } = await import('./pantalla');
+    expect(subtituloDeVenta({ hora: '13:38', canal: 'Local' })).toBe('13:38 · Local');
+  });
+
+  it('sin hora ni tipo, lo dice', async () => {
+    const { subtituloDeVenta } = await import('./pantalla');
+    expect(subtituloDeVenta({ hora: null, canal: null })).toBe('El detalle de lo que se vendió.');
+  });
+});
+
+// Filtrar por quién cobró (Santiago, 2026-11-20, pedido 102).
+describe('el filtro por empleado', () => {
+  const persona = '6f1c1e0a-2b1d-4c1e-9a6b-1f2e3d4c5b6a';
+
+  it('lee la persona solo si es un id, y va en la dirección', () => {
+    expect(filtrosDeVentas({ persona }, HOY).persona).toBe(persona);
+    expect(filtrosDeVentas({ persona: 'Juan' }, HOY).persona).toBeNull();
+    expect(enlaceDeVentas({ ...filtrosDeVentas({}, HOY), persona }, HOY)).toBe(
+      `/admin/ventas?persona=${persona}`,
+    );
   });
 });

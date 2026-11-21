@@ -29,7 +29,7 @@ test.describe('con la sesion del admin', () => {
       };
     });
     expect(tema).toEqual({
-      principal: '#1e40af',
+      principal: '#121b2b',
       letraSobrePrincipal: '#ffffff',
       fondo: '#f9fafb',
     });
@@ -60,17 +60,19 @@ test.describe('con la sesion del admin', () => {
     }
   });
 
-  test('en una pantalla baja entran todos los enlaces sin desplazarse', async ({ page }, info) => {
+  // Desde el 2026-11-20 la barra se desplaza (Santiago, pedido 102): en una pantalla baja se llega
+  // al ultimo enlace bajando la lista.
+  test('en una pantalla baja la lista se desplaza hasta el ultimo enlace', async ({
+    page,
+  }, info) => {
     test.skip(info.project.name !== 'computadora', 'solo en la computadora');
-    // 1366x768 con la barra del navegador deja unos 680 px de alto.
-    await page.setViewportSize({ width: 1366, height: 680 });
+    await page.setViewportSize({ width: 1366, height: 520 });
     await page.goto('/admin');
-    const enlaces = panel(page).getByRole('link');
-    await expect(enlaces.first()).toBeVisible();
-    for (const enlace of await enlaces.all()) await expect(enlace).toBeInViewport({ ratio: 1 });
     const lista = panel(page).locator('> div').first();
-    const sobra = await lista.evaluate((d) => d.scrollHeight - d.clientHeight);
-    expect(sobra).toBeLessThanOrEqual(0);
+    await expect(lista).toHaveCSS('overflow-y', 'auto');
+    const ultimo = lista.getByRole('link').last();
+    await ultimo.scrollIntoViewIfNeeded();
+    await expect(ultimo).toBeInViewport({ ratio: 1 });
   });
 
   test('en la computadora, Usuarios dice cuantos esperan un rol', async ({ page }, info) => {

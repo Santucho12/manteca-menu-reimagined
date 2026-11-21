@@ -12,6 +12,8 @@ export type PropsDeCampo = ComponentProps<'input'> & {
   error?: string;
   icono?: LucideIcon;
   variante?: VarianteDeCampo;
+  /** El color del ícono y del foco: el de marca, o gris donde no va el dorado (Ventas). */
+  tono?: 'marca' | 'gris';
 };
 
 // En el ingreso, la etiqueta queda para el lector: a la vista, el icono y el texto de ayuda.
@@ -48,9 +50,11 @@ export function Campo({
   error,
   icono: Icono,
   variante = 'panel',
+  tono = 'marca',
   className,
   ...props
 }: PropsDeCampo) {
+  const gris = tono === 'gris';
   return (
     <div className={variante === 'panel' ? 'space-y-2' : undefined}>
       <label htmlFor={id} className={clasesDeEtiqueta(variante)}>
@@ -62,13 +66,20 @@ export function Campo({
             size={16}
             strokeWidth={2}
             aria-hidden
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-primary"
+            className={cn(
+              'absolute left-4 top-1/2 -translate-y-1/2',
+              gris ? 'text-muted-foreground' : 'text-primary',
+            )}
           />
         ) : null}
         <input
           {...props}
           id={id}
-          className={cn(clasesDeCampo(variante), className)}
+          className={cn(
+            clasesDeCampo(variante),
+            gris && 'focus:border-slate-400 focus:ring-slate-400/15',
+            className,
+          )}
           {...atributosDeError(id, error)}
         />
       </div>

@@ -9,7 +9,6 @@ import {
   textoDeAyerSinCierre,
   textoDeLaTraba,
   textoDePostergaciones,
-  turnoDeLaVentaAMano,
   textoDePostergado,
   type EstadoDelTurno,
 } from './turnos';
@@ -140,12 +139,5 @@ describe('textoDePostergaciones', () => {
     expect(textoDePostergaciones({ veces: 1, minutos: 10 })).toBe('Se postergó 1 vez (10 min).');
     expect(textoDePostergaciones({ veces: 3, minutos: 30 })).toBe('Se postergó 3 veces (30 min).');
     expect(textoDePostergaciones(null)).toBeNull();
-  });
-});
-
-describe('turnoDeLaVentaAMano', () => {
-  it('hoy, el turno abierto; un día anterior, la noche', () => {
-    expect(turnoDeLaVentaAMano('2026-11-19', '2026-11-19', '1')).toBe('1');
-    expect(turnoDeLaVentaAMano('2026-11-18', '2026-11-19', '1')).toBe('2');
   });
 });

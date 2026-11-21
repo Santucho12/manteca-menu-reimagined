@@ -9,7 +9,7 @@ import { AvisoDeExito } from '@/components/formularios/AvisoDeExito';
 import { Campo } from '@/components/formularios/Campo';
 import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
 import { PieDelFormulario } from '@/components/formularios/PieDelFormulario';
-import { BOTON_CANCELAR, ICONO_EDITAR } from '@/components/panel/estilos';
+import { BOTON_SUAVE, ICONO_EDITAR } from '@/components/panel/estilos';
 import { buscarInsumos } from '@/lib/costos/buscarInsumos';
 import type { InsumoParaReceta } from '@/lib/costos/consultas';
 import { esquemaReceta, type DatosDeReceta } from '@/lib/costos/esquemas';
@@ -63,7 +63,7 @@ function Renglon({
         <Trash2 size={16} aria-hidden="true" />
       </button>
       {desactivado ? (
-        <p className="text-xs font-semibold text-amber-700 sm:col-span-3">
+        <p className="text-xs font-semibold text-blue-700 sm:col-span-3">
           Desactivado en Materia prima: la receta lo sigue usando.
         </p>
       ) : null}
@@ -122,7 +122,7 @@ export function FormularioDeReceta({ inicial, insumos, desactivados }: Props) {
       <button
         type="button"
         onClick={() => renglones.append({ insumoId: '', cantidad: '' })}
-        className={BOTON_CANCELAR}
+        className={BOTON_SUAVE}
       >
         <Plus size={14} aria-hidden="true" /> Agregar insumo
       </button>

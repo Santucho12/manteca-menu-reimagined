@@ -2,7 +2,7 @@ import { enlacesDelPanel, type EnlaceDelPanel, type EstadoDeAcceso } from './est
 
 export type EnlaceDelMarco = EnlaceDelPanel & { insignia: number | null };
 /** Lo que espera al admin en cada seccion: los mismos casos que los avisos de Inicio. */
-export type PendientesDelMarco = { usuarios: number; caja: number; gastos: number };
+export type PendientesDelMarco = { usuarios: number; caja: number; gastos: number; ventas: number };
 
 const conNumero = (n: number | undefined) => (n && n > 0 ? n : null);
 

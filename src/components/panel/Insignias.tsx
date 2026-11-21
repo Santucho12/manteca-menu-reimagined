@@ -7,7 +7,7 @@ const TONOS = {
     clases: 'bg-rose-500/10 text-rose-600 border-rose-500/20 animate-pulse-subtle',
     icono: AlertCircle,
   },
-  ambar: { clases: 'bg-amber-500/10 text-amber-600 border-amber-500/20', icono: Clock },
+  ambar: { clases: 'bg-blue-500/10 text-blue-600 border-blue-500/20', icono: Clock },
   esmeralda: {
     clases: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
     icono: CheckCircle2,
@@ -38,12 +38,14 @@ export function InsigniaDeEstado({ tono, icono, children }: Props) {
 }
 
 const TONOS_DE_CHIP = {
-  violeta: 'bg-violet-100 text-violet-700',
-  celeste: 'bg-sky-100 text-sky-700',
-  ambar: 'bg-amber-100 text-amber-700',
+  // La regla de color de Inicio (pedido 102): los nombres quedan, el violeta pasa a gris y el
+  // celeste a azul; el ámbar sigue para los avisos.
+  violeta: 'bg-slate-100 text-slate-600',
+  celeste: 'bg-blue-50 text-blue-700',
+  ambar: 'bg-blue-100 text-blue-700',
 } as const;
 
-/** El chip bajo un nombre (seguimiento, "Automatico", "De caja"): violeta, o el tono que se pida. */
+/** El chip bajo un nombre (seguimiento, "Automatico", "De caja"): gris, o el tono que se pida. */
 export function Chip({
   children,
   tono = 'violeta',

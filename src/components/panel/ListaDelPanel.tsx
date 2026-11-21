@@ -12,6 +12,7 @@ type Props<T> = {
   /** El nombre de la lista para el lector de pantalla y las pruebas. */
   etiqueta: string;
   icono: LucideIcon;
+  colorDelIcono?: string;
   total: number;
   filas: T[];
   clave: (fila: T) => string;

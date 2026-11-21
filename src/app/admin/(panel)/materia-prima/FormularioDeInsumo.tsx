@@ -9,7 +9,7 @@ import { Campo } from '@/components/formularios/Campo';
 import { CampoDeSeleccion } from '@/components/formularios/CampoDeSeleccion';
 import { CampoDeTextoLargo } from '@/components/formularios/CampoDeTextoLargo';
 import { PieDelFormulario } from '@/components/formularios/PieDelFormulario';
-import { BOTON_CANCELAR, BOTON_PRINCIPAL } from '@/components/panel/estilos';
+import { BOTON_PRINCIPAL, BOTON_SUAVE } from '@/components/panel/estilos';
 import { conValorInicial } from '@/lib/formularios/valorInicial';
 import { esquemaInsumo, type DatosDeInsumo } from '@/lib/materia-prima/esquemas';
 import { OPCIONES_DE_UNIDAD } from '@/lib/materia-prima/pantalla';
@@ -30,7 +30,7 @@ function Repetido({ nombre, enviando, alConfirmar, alVolver }: PropsDelAviso) {
     <div
       role="alertdialog"
       aria-labelledby="repetido"
-      className="space-y-4 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-amber-900"
+      className="space-y-4 rounded-2xl border border-blue-300 bg-blue-50 p-4 text-blue-900"
     >
       <div className="flex items-start gap-3">
         <AlertTriangle size={18} className="shrink-0 mt-0.5" aria-hidden="true" />
@@ -39,7 +39,7 @@ function Repetido({ nombre, enviando, alConfirmar, alVolver }: PropsDelAviso) {
         </p>
       </div>
       <div className="flex flex-col-reverse gap-3 max-sm:[&>*]:flex-none sm:flex-row">
-        <button type="button" onClick={alVolver} className={BOTON_CANCELAR}>
+        <button type="button" onClick={alVolver} className={BOTON_SUAVE}>
           Volver
         </button>
         <button type="button" disabled={enviando} onClick={alConfirmar} className={BOTON_PRINCIPAL}>

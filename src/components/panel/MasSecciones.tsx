@@ -37,7 +37,7 @@ export function MasSecciones({ enlaces, activo }: Props) {
         className={cn(LUGAR_DE_ABAJO, marcado ? 'text-primary' : 'text-muted-foreground')}
       >
         <span className="relative">
-          <Insignia numero={insigniaDeMas(enlaces)} lugar="abajo" />
+          <Insignia numero={insigniaDeMas(enlaces)} />
           <Ellipsis size={20} strokeWidth={marcado ? 2.5 : 2} />
         </span>
         <span className="truncate max-w-full px-0.5">Más</span>

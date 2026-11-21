@@ -11,6 +11,7 @@ export const MENSAJES_DEL_MOSTRADOR = {
   horaDelCierre: 'Es hora del cierre de caja: cargalo o postergalo para seguir vendiendo.',
   cajaCerrada: 'La caja de hoy ya cerró. Mañana se vuelve a vender.',
   nadaParaPostergar: 'No hay ningún cierre para postergar.',
+  descuento: 'El descuento no es válido: revisá el número y el motivo.',
   generico: 'No pudimos guardar la venta. Revisá la conexión y probá de nuevo.',
 } as const;
 
@@ -20,6 +21,7 @@ const POR_CODIGO: Record<string, string> = {
   PV304: MENSAJES_DEL_MOSTRADOR.productoNoDisponible,
   PV310: MENSAJES_DEL_MOSTRADOR.precio,
   PV311: MENSAJES_DEL_MOSTRADOR.pagos,
+  PV320: MENSAJES_DEL_MOSTRADOR.descuento,
   PV314: MENSAJES_DEL_MOSTRADOR.horaDelCierre,
   PV315: MENSAJES_DEL_MOSTRADOR.cajaCerrada,
   PC310: MENSAJES_DEL_MOSTRADOR.nadaParaPostergar,
@@ -30,7 +32,8 @@ export const esRechazoDeLaTraba = (mensaje: string) =>
   mensaje === MENSAJES_DEL_MOSTRADOR.horaDelCierre ||
   mensaje === MENSAJES_DEL_MOSTRADOR.cajaCerrada;
 
-export type VentaGuardada = { id: string; totalCentavos: number };
+/** sinConexion: quedó en el equipo y se manda sola al volver internet (pedido 102). */
+export type VentaGuardada = { id: string; totalCentavos: number; sinConexion?: boolean };
 
 /**
  * Guarda la venta del mostrador. La base vuelve a calcular cada precio y el total con el menú, y

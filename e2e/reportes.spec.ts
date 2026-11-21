@@ -82,7 +82,7 @@ test('ventas por tipo: cada tipo con sus ventas, su monto y su parte del total',
   page,
 }) => {
   const producto = await productoParaVender();
-  const [local, encargo] = await Promise.all([idDeCanal('Local'), idDeCanal('Encargo')]);
+  const [local, encargo] = await Promise.all([idDeCanal('Local'), idDeCanal('Cheaf')]);
   const vender = (canalId: string, precioCentavos: number) =>
     sembrarVentaConRenglones({
       fecha: '2018-06-04',
@@ -100,7 +100,7 @@ test('ventas por tipo: cada tipo con sus ventas, su monto y su parte del total',
     await expect(fila).toContainText('$3.000,00');
     await expect(fila).toContainText('75 %');
     await expect(fila.getByRole('cell').nth(1)).toHaveText('2');
-    await expect(page.getByRole('row').filter({ hasText: 'Encargo' })).toContainText('25 %');
+    await expect(page.getByRole('row').filter({ hasText: 'Cheaf' })).toContainText('25 %');
   } finally {
     await borrarVentas(ventas, { categoriasDelMenu: [producto.categoriaId] });
   }

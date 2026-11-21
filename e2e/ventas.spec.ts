@@ -1,28 +1,16 @@
-import { randomUUID } from 'node:crypto';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { diaEnArgentina } from '../src/lib/fechas';
 import { diaLibre } from '../tests/cierres-de-prueba';
-import {
-  borrarVentas,
-  idDeCanal,
-  idsDeVentasComentadas,
-  productoParaVender,
-  sembrarVenta,
-} from '../tests/ventas-de-prueba';
+import { borrarVentas, idDeCanal, sembrarVenta } from '../tests/ventas-de-prueba';
 import { SESIONES, esperarHidratacion } from './ayudas';
 
 test.use({ storageState: SESIONES.admin });
 
 const HOY = diaEnArgentina(new Date());
 let ventas: string[] = [];
-let comentarios: string[] = [];
-let menu: string[] = [];
 test.afterEach(async () => {
-  const cargadas = (await Promise.all(comentarios.map(idsDeVentasComentadas))).flat();
-  await borrarVentas([...ventas, ...cargadas], { categoriasDelMenu: menu });
+  await borrarVentas(ventas);
   ventas = [];
-  comentarios = [];
-  menu = [];
 });
 
 async function venta(semilla: Parameters<typeof sembrarVenta>[0]) {
@@ -31,59 +19,6 @@ async function venta(semilla: Parameters<typeof sembrarVenta>[0]) {
   return id;
 }
 
-async function elegirProducto(page: Page, renglon: string, texto: string) {
-  await page.getByRole('combobox', { name: renglon }).click();
-  await page.getByRole('option').filter({ hasText: texto }).click();
-}
-
-test('carga una venta con dos productos y ve su total y su detalle', async ({ page }) => {
-  const producto = await productoParaVender();
-  menu.push(producto.categoriaId);
-  const comentario = `Encargo ${randomUUID().slice(0, 8)}`;
-  comentarios.push(comentario);
-  await page.goto('/admin/ventas');
-  await page.getByRole('link', { name: 'Cargar venta' }).click();
-  await expect(page.getByLabel('Fecha')).toHaveValue(HOY);
-  await esperarHidratacion(page.getByLabel('Tipo de venta', { exact: true }));
-  await page.getByLabel('Tipo de venta', { exact: true }).selectOption({ label: 'Mayorista' });
-  await page.getByLabel('Medio de pago').selectOption({ label: 'Transferencia' });
-  await elegirProducto(page, 'Producto 1', producto.texto);
-  await expect(page.getByLabel('Precio 1')).toHaveValue('1.000');
-  await page.getByLabel('Cantidad 1').fill('2');
-  await page.getByRole('button', { name: 'Sumar producto' }).click();
-  await elegirProducto(page, 'Producto 2', producto.texto);
-  await page.getByLabel('Cantidad 2').fill('1,5');
-  await page.getByLabel('Precio 2').fill('333,33');
-  await expect(page.getByText(/^Total: ?\$2\.500,00$/)).toBeVisible();
-  await page.getByLabel('Comentario').fill(comentario);
-  await page.getByRole('button', { name: 'Guardar venta' }).click();
-  await expect(page.getByRole('heading', { level: 1, name: /^Venta del/ })).toBeVisible();
-  const renglones = page.getByRole('list', { name: 'Productos' });
-  await expect(renglones.getByRole('listitem')).toHaveCount(2);
-  await expect(page.getByText(/^Total: ?\$2\.500,00$/)).toBeVisible();
-  await expect(page.getByText(comentario)).toBeVisible();
-  await expect(page.getByText('Se cobró en la caja del local: No')).toBeVisible();
-});
-
-test('la venta a mano marcada como cobrada en la caja lo dice en su detalle', async ({ page }) => {
-  const producto = await productoParaVender();
-  menu.push(producto.categoriaId);
-  const comentario = `En la caja ${randomUUID().slice(0, 8)}`;
-  comentarios.push(comentario);
-  await page.goto('/admin/ventas/nueva');
-  const casilla = page.getByLabel('Se cobró en la caja del local');
-  await esperarHidratacion(casilla);
-  await expect(casilla).not.toBeChecked();
-  await page.getByLabel('Tipo de venta', { exact: true }).selectOption({ label: 'Local' });
-  await page.getByLabel('Medio de pago').selectOption({ label: 'Efectivo' });
-  await elegirProducto(page, 'Producto 1', producto.texto);
-  await casilla.check();
-  await page.getByLabel('Comentario').fill(comentario);
-  await page.getByRole('button', { name: 'Guardar venta' }).click();
-  await expect(page.getByText('Se cobró en la caja del local: Sí')).toBeVisible();
-});
-
-// La barra lateral del admin no suma Vender: en una pantalla baja no entraría (pedido 83).
 test('el admin entra a Vender desde Ventas', async ({ page }) => {
   await page.goto('/admin/ventas');
   await expect(
@@ -145,7 +80,7 @@ test('los filtros actualizan la lista solos: sin boton Filtrar ni filtro de orig
 test('filtra por tipo de venta, con los totales del tipo', async ({ page }) => {
   const dia = diaLibre();
   await venta({ fecha: dia, origen: 'mostrador', canalId: await idDeCanal('Local') });
-  await venta({ fecha: dia, canalId: await idDeCanal('Encargo') });
+  await venta({ fecha: dia, canalId: await idDeCanal('Cheaf') });
   await page.goto(`/admin/ventas?desde=${dia}&hasta=${dia}`);
   await esperarHidratacion(page.getByRole('combobox', { name: 'Tipo de venta' }));
   await page.getByRole('combobox', { name: 'Tipo de venta' }).click();
@@ -169,14 +104,15 @@ test('el resumen son tres tarjetas, con el ticket promedio', async ({ page }) =>
   await expect(ticket).toContainText('$1.000,00');
 });
 
-test('cada venta muestra su estado, su hora y de donde viene', async ({ page }) => {
+test('cada venta muestra su estado, su hora y su tipo de venta', async ({ page }) => {
   await venta({ fecha: HOY });
   await page.goto('/admin/ventas');
   const fila = page.getByRole('list', { name: 'Ventas' }).getByRole('listitem').first();
   await expect(fila).toContainText('Cerrada');
   // La fecha y la hora van pegadas en el texto de la fila: no hay un borde de palabra entre ellas.
   await expect(fila).toContainText(/\d{2}:\d{2}/);
-  await expect(fila).toContainText('A mano');
+  // Sin origen desde el pedido 102: la fila dice el tipo de venta.
+  await expect(fila).not.toContainText('A mano');
 });
 
 test('un clic en cualquier parte de la fila abre la venta', async ({ page }) => {
@@ -202,16 +138,11 @@ test('una venta de Fudo sin productos avisa que no tiene detalle', async ({ page
   ).toBeVisible();
 });
 
-test('guarda capturas de la lista y la carga', async ({ page }, info) => {
+test('guarda capturas de la lista', async ({ page }, info) => {
   await venta({ fecha: HOY });
   await page.goto('/admin/ventas');
   await page.evaluate(() => document.fonts.ready);
   await page.screenshot({ path: `e2e/capturas/ventas-${info.project.name}.png`, fullPage: true });
-  await page.goto('/admin/ventas/nueva');
-  await page.screenshot({
-    path: `e2e/capturas/venta-nueva-${info.project.name}.png`,
-    fullPage: true,
-  });
 });
 
 for (const rol of ['caja', 'invitado'] as const) {

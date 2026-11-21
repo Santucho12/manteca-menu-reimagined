@@ -44,7 +44,16 @@ export function EditorDePresentaciones() {
       {general ? <p className="text-xs text-rose-600 font-medium">{general}</p> : null}
       <button
         type="button"
-        onClick={() => append({ id: '', nombre: '', compartido: '', compartidoOriginal: '' })}
+        onClick={() =>
+          append({
+            id: '',
+            nombre: '',
+            compartido: '',
+            compartidoOriginal: '',
+            medida: '',
+            cantidad: '',
+          })
+        }
         disabled={fields.length >= 6}
         className={cn(BOTON_SUAVE, 'mt-2')}
       >

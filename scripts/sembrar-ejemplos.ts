@@ -8,7 +8,7 @@ import { sembrarEjemplos } from './ejemplos/sembrar';
 await prepararBaseDePruebas();
 const resumen = await sembrarEjemplos(clienteSecretoDePruebas(), {
   hoy: diaEnArgentina(new Date()),
-  dias: 60,
+  dias: 365,
   semilla: 89,
   local: 'Local de ejemplo',
   prefijo: 'ejemplo',

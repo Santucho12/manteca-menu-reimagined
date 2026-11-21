@@ -1,37 +1,26 @@
 import type { Metadata } from 'next';
-import { BOTON_PELIGRO } from '@/components/panel/estilos';
+import { LogOut } from 'lucide-react';
+import { ACCESO_SECUNDARIO, ICONO_DE_ACCESO_SUAVE } from '@/components/panel/estilos';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { cierreACargar } from '@/lib/caja/cierreACargar';
 import { fechaDelFondoSugerido, fondoSugerido } from '@/lib/caja/consultas';
-import type { Cliente } from '@/lib/supabase/cliente';
-import { estadoDelMostrador, tiposParaVender } from '@/lib/vender/consultas';
+import type { DatosDeCierre } from '@/lib/caja/esquemas';
 import { avisoDelFondo } from '@/lib/caja/fondo';
 import { diaEnArgentina } from '@/lib/fechas';
 import { montoParaEditar } from '@/lib/gastos/plata';
+import type { Cliente } from '@/lib/supabase/cliente';
 import { unValor } from '@/lib/usuarios/presentacion';
-import { FormularioDeCierre } from './FormularioDeCierre';
+import { estadoDelMostrador, tiposParaVender } from '@/lib/vender/consultas';
+import { CargaDelCierre } from './CargaDelCierre';
 
 export const metadata: Metadata = { title: 'Cargar cierre' };
 
 type Parametros = Promise<Record<string, string | string[] | undefined>>;
-
-// Quien carga se ve arriba: el cierre queda a nombre de la sesion y no se puede elegir a otro.
-function QuienCarga({ nombre }: { nombre: string }) {
-  return (
-    <form action="/admin/salir" method="post" className="flex flex-wrap items-center gap-3">
-      <p className="text-sm font-semibold">Cargando como {nombre}.</p>
-      <button type="submit" className={`${BOTON_PELIGRO} bg-rose-50`}>
-        ¿No sos vos? Cambiar de persona
-      </button>
-    </form>
-  );
-}
-
 type Pedido = { fecha?: string; turno?: string };
 
-// El cierre que se carga sale del estado del mostrador, y con el su fondo sugerido.
-async function leerCierreACargar(cliente: Cliente, pedido: Pedido, hoy: string) {
+// El cierre que se carga sale del estado del mostrador, y con él su fondo sugerido.
+async function leerLaCarga(cliente: Cliente, pedido: Pedido, hoy: string) {
   const { fecha, turno } = cierreACargar(pedido, hoy, await estadoDelMostrador(cliente));
   const [fondo, diaDelFondo, tipos] = await Promise.all([
     fondoSugerido(cliente, fecha, turno),
@@ -44,24 +33,31 @@ async function leerCierreACargar(cliente: Cliente, pedido: Pedido, hoy: string) 
   return { fecha, turno, fondo, diaDelFondo, controlados };
 }
 
+// El cierre queda a nombre de la sesión: si carga otra persona, sale y entra con su cuenta.
+const CambiarDePersona = () => (
+  <form action="/admin/salir" method="post">
+    <button type="submit" className={ACCESO_SECUNDARIO}>
+      <span className={ICONO_DE_ACCESO_SUAVE}>
+        <LogOut size={15} aria-hidden="true" />
+      </span>
+      ¿No sos vos? Cambiar de persona
+    </button>
+  </form>
+);
+
 export default async function CargarCierre({ searchParams }: { searchParams: Parametros }) {
   const hoy = diaEnArgentina(new Date());
   const parametros = await searchParams;
-  // Un dia o un turno que quedo sin cargar llega por la URL; un dia futuro o invalido, no.
   const pedido = { fecha: unValor(parametros.fecha), turno: unValor(parametros.turno) };
   const { perfil, datos } = await exigirPaginaYLeer('caja', (cliente) =>
-    leerCierreACargar(cliente, pedido, hoy),
+    leerLaCarga(cliente, pedido, hoy),
   );
   const { fecha, turno, fondo, diaDelFondo, controlados } = datos;
-  const inicial = {
+  const inicial: DatosDeCierre = {
     fecha,
-    turno: turno === 1 ? ('1' as const) : ('2' as const),
+    turno: turno === 1 ? '1' : '2',
     fondoInicial: fondo === null ? '' : montoParaEditar(fondo),
-    efectivo: '',
-    credito: '',
-    debito: '',
-    qr: '',
-    transferencia: '',
+    ...{ efectivo: '', credito: '', debito: '', qr: '', transferencia: '' },
     quedaEnCaja: '',
     comentario: '',
     retiros: [],
@@ -70,15 +66,16 @@ export default async function CargarCierre({ searchParams }: { searchParams: Par
   };
   return (
     <Pantalla
-      titulo="Cierre de caja"
-      subtitulo="Contá lo que hay en la caja y cargalo al terminar el turno."
+      titulo="Cargar cierre"
+      subtitulo="Contá lo que hay en la caja al terminar el turno y cargalo."
+      acciones={<CambiarDePersona />}
       ayuda="caja"
     >
-      <QuienCarga nombre={perfil.nombre} />
-      <FormularioDeCierre
+      <CargaDelCierre
         key={`${fecha}-${turno}`}
         hoy={hoy}
         inicial={inicial}
+        quien={perfil.nombre}
         avisoDelFondo={avisoDelFondo(diaDelFondo, fecha)}
         tipos={controlados}
       />

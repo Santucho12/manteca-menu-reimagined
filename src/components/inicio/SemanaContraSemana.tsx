@@ -19,11 +19,14 @@ import { CartelDeSemana } from './CartelDeSemana';
 import { EncabezadoDeTarjeta } from './EncabezadoDeTarjeta';
 import type { DiaDeLaSemana } from '@/lib/inicio/semana';
 import {
+  AYUDAS_DE_LA_SEMANA,
   acumularSemana,
   resumenDeLaSemana,
   type PuntoAcumulado,
 } from '@/lib/inicio/semanaAcumulada';
 import { COLORES_DE_LA_SEMANA } from '@/lib/inicio/coloresDeInicio';
+import { EtiquetaConAyuda } from './EtiquetaConAyuda';
+import { SOMBRA_DE_INICIO } from './sombraDeInicio';
 
 // La semana actual en azul y la anterior en rojo, punteada (Santiago, 2026-10-25).
 const COLORES = COLORES_DE_LA_SEMANA;
@@ -43,7 +46,7 @@ export function SemanaContraSemana({ datos }: { datos: DiaDeLaSemana[] }) {
   return (
     <section
       aria-label="Esta semana vs la anterior"
-      className="h-full rounded-2xl border border-border bg-card p-6 md:p-8"
+      className={`h-full rounded-2xl border border-border bg-card p-6 md:p-8 ${SOMBRA_DE_INICIO}`}
     >
       <EncabezadoDeTarjeta
         titulo="Esta semana vs la anterior"
@@ -57,12 +60,22 @@ export function SemanaContraSemana({ datos }: { datos: DiaDeLaSemana[] }) {
         />
       </EncabezadoDeTarjeta>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className={`rounded-full px-3 py-1.5 text-xs font-bold ${CHIP[resumen.estado]}`}>
-          {resumen.titulo}
+        <h3>
+          <EtiquetaConAyuda
+            ayuda={AYUDAS_DE_LA_SEMANA.titulo}
+            lado="izquierda"
+            className={`rounded-full px-3 py-1.5 text-xs font-bold ${CHIP[resumen.estado]}`}
+          >
+            {resumen.titulo}
+          </EtiquetaConAyuda>
         </h3>
-        <span className={`rounded-full px-3 py-1.5 text-xs font-bold ${CHIP[resumen.estado]}`}>
+        <EtiquetaConAyuda
+          ayuda={AYUDAS_DE_LA_SEMANA.chip}
+          lado="derecha"
+          className={`rounded-full px-3 py-1.5 text-xs font-bold ${CHIP[resumen.estado]}`}
+        >
           {resumen.chip}
-        </span>
+        </EtiquetaConAyuda>
       </div>
       <GraficoAcumulado puntos={acumularSemana(datos)} />
     </section>

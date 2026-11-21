@@ -26,6 +26,9 @@ export type FilaPresentacion = {
   nombre: string;
   orden: number;
   activo: boolean;
+  /** Cuánto es: unidades (Docena = 12) o gramos (Por cuarto = 250), o ninguna. */
+  unidades?: number | null;
+  gramos?: number | null;
 };
 export type FilaProducto = {
   id: string;
@@ -82,7 +85,12 @@ function presentacionesDe(filas: FilasDelMenu, categoriaId: string): Presentacio
   return filas.presentaciones
     .filter((p) => p.categoria_id === categoriaId && p.activo)
     .sort(porOrden)
-    .map(({ id, nombre }) => ({ id, nombre }));
+    .map(({ id, nombre, unidades, gramos }) => ({
+      id,
+      nombre,
+      unidades: unidades ?? null,
+      gramos: gramos ?? null,
+    }));
 }
 
 function preciosGuardados(filas: FilasDelMenu): PrecioGuardado[] {
@@ -214,6 +222,17 @@ export function desactivados(filas: FilasDelMenu): Desactivados {
 
 const enPesos = (centavos: number | null) => (centavos === null ? '' : String(centavos / 100));
 
+function medidaDe(p: PresentacionDelMenu) {
+  if (p.unidades) return { medida: 'unidades' as const, cantidad: String(p.unidades) };
+  if (p.gramos) return { medida: 'gramos' as const, cantidad: String(p.gramos) };
+  return { medida: '' as const, cantidad: '' };
+}
+
+function formaParaEditar(p: PresentacionDelMenu, compartidoCentavos: number | null) {
+  const compartido = enPesos(compartidoCentavos);
+  return { id: p.id, nombre: p.nombre, compartido, compartidoOriginal: compartido, ...medidaDe(p) };
+}
+
 export function categoriaParaEditar(
   panel: CategoriaDelPanel[],
   id: string,
@@ -227,10 +246,9 @@ export function categoriaParaEditar(
     icono: categoria.icono,
     foto: categoria.foto ?? '',
     precioCompartido: categoria.compartidos.some((c) => c !== null),
-    presentaciones: categoria.presentaciones.map((p, i) => {
-      const compartido = enPesos(categoria.compartidos[i] ?? null);
-      return { id: p.id, nombre: p.nombre, compartido, compartidoOriginal: compartido };
-    }),
+    presentaciones: categoria.presentaciones.map((p, i) =>
+      formaParaEditar(p, categoria.compartidos[i] ?? null),
+    ),
   };
 }
 

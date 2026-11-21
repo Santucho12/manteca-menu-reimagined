@@ -3,7 +3,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { BARRA_DE_FILTROS, CAMPO_DE_FILTRO } from './estilos';
+import { BARRA_DE_FILTROS } from './estilos';
 import { SelectorDeFiltro } from './SelectorDeFiltro';
 
 type PropsDeLaBarra = { accion: string; ocultos?: Record<string, string>; children: ReactNode };
@@ -70,26 +70,8 @@ export function FiltroDeSeleccion({
   );
 }
 
-/** Un campo de fecha de la barra: arriba, su etiqueta chica. */
-export function FiltroDeFecha({ id, name, etiqueta, valor }: PropsDeCampo & { valor: string }) {
-  return (
-    <div className="space-y-1 xl:min-w-[170px] xl:flex-1">
-      <label
-        htmlFor={id}
-        className="text-[10px] font-black text-muted-foreground uppercase tracking-widest"
-      >
-        {etiqueta}
-      </label>
-      <input
-        id={id}
-        name={name}
-        type="date"
-        defaultValue={valor}
-        className={cn(CAMPO_DE_FILTRO, 'sm:w-full')}
-      />
-    </div>
-  );
-}
+// Vive en su archivo: muestra día/mes/año y necesita el navegador.
+export { FiltroDeFecha } from './FiltroDeFecha';
 
 /** El boton de una barra que filtra sin buscador. */
 export function BotonDeFiltrar({ texto = 'Filtrar' }: { texto?: string }) {

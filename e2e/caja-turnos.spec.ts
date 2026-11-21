@@ -18,7 +18,13 @@ import {
   idsDeVentasDelProducto,
   sembrarVentaConPago,
 } from '../tests/ventas-de-prueba';
-import { SESIONES, esperarHidratacion, terminarCierre } from './ayudas';
+import {
+  irAlCobro,
+  volverALosProductos,
+  SESIONES,
+  esperarHidratacion,
+  terminarCierre,
+} from './ayudas';
 
 const HOY = diaEnArgentina(new Date());
 let categoria: CategoriaSembrada;
@@ -71,6 +77,7 @@ async function armarTicket(page: Page) {
     .getByRole('button', { name: categoria.nombre })
     .click();
   await page.getByRole('button', { name: `Sumar ${medialuna.nombre} · Unidad` }).click();
+  await irAlCobro(page);
 }
 
 test.describe('con la sesión de caja', () => {
@@ -105,6 +112,7 @@ test.describe('con la sesión de caja', () => {
     await page.getByRole('button', { name: /^Cobrar/ }).click();
     await expect(ventana(page)).toBeVisible();
     await ventana(page).getByRole('button', { name: 'Postergar 10 min' }).click();
+    await volverALosProductos(page);
     await expect(page.getByRole('list', { name: 'Ticket' }).getByRole('listitem')).toHaveCount(1);
   });
 

@@ -13,7 +13,7 @@ export function ParaClasificar({ gastos, categorias, proveedores }: Props) {
   if (gastos.length === 0) return null;
   return (
     <PanelDeLista titulo="Para clasificar" cantidad={String(gastos.length)} acento="ambar">
-      <p className="px-4 md:px-6 pt-4 text-sm text-amber-900">
+      <p className="px-4 md:px-6 pt-4 text-sm text-blue-900">
         Se pagaron con la caja. Elegí la categoría de cada uno.
       </p>
       <ul aria-label="Para clasificar" className="divide-y divide-border">

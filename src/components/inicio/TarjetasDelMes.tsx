@@ -5,6 +5,7 @@ import { Receipt, ShoppingBag, Ticket, TrendingUp, type LucideIcon } from 'lucid
 import type { NumeroDelMes } from '@/lib/inicio/numeros';
 import { colorDeTarjeta } from '@/lib/inicio/coloresDeTarjetas';
 import { detalleDeTarjeta } from '@/lib/inicio/detallesDeTarjetas';
+import { SOMBRA_DE_INICIO } from './sombraDeInicio';
 
 const ICONOS: Record<string, LucideIcon> = {
   Ventas: ShoppingBag,
@@ -47,7 +48,7 @@ export function TarjetasDelMes({ items }: { items: NumeroDelMes[] }) {
           <motion.div
             key={item.etiqueta}
             variants={TARJETA}
-            className={`relative overflow-hidden rounded-xl border ${borde} bg-white p-4 md:p-6 flex flex-col shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300`}
+            className={`relative overflow-hidden rounded-xl border ${borde} bg-white p-4 md:p-6 flex flex-col ${SOMBRA_DE_INICIO}`}
           >
             <div className="flex justify-between items-start gap-2 relative z-10">
               <div className="space-y-1 min-w-0">

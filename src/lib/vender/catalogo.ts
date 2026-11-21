@@ -1,3 +1,5 @@
+import { armarPaquetes, type Paquetes } from './cuenta';
+import { surtidasDe } from './surtidas';
 import { claveDe, type ItemDelCatalogo, type RenglonDelTicket } from './ticket';
 
 /** Lo que devuelve catalogo_para_vender: una fila por producto y forma de venta, en orden. */
@@ -9,6 +11,11 @@ export type FilaDelCatalogo = {
   presentacion_id: string;
   presentacion: string;
   precio_centavos: number;
+  /** Cuánto es la forma: unidades (Docena = 12) o gramos (Por cuarto = 250). */
+  unidades?: number | null;
+  gramos?: number | null;
+  /** Si el precio es el de la categoría para todos los productos. */
+  compartido?: boolean;
 };
 
 export type ProductoParaVender = { id: string; nombre: string; formas: ItemDelCatalogo[] };
@@ -20,6 +27,10 @@ const formaDe = (f: FilaDelCatalogo): ItemDelCatalogo => ({
   nombre: f.producto,
   presentacion: f.presentacion,
   precioCentavos: f.precio_centavos,
+  categoriaId: f.categoria_id,
+  unidades: f.unidades ?? null,
+  gramosDeLaForma: f.gramos ?? null,
+  compartido: f.compartido ?? false,
 });
 
 function productoDe(categoria: CategoriaParaVender, f: FilaDelCatalogo): ProductoParaVender {
@@ -29,6 +40,8 @@ function productoDe(categoria: CategoriaParaVender, f: FilaDelCatalogo): Product
   categoria.productos.push(nuevo);
   return nuevo;
 }
+
+export const MOSTRAR_SURTIDAS = false;
 
 /** Las categorías con sus productos y las formas de venta de cada uno, en el orden del menú. */
 export function catalogoDeFilas(filas: FilaDelCatalogo[]): CategoriaParaVender[] {
@@ -41,8 +54,31 @@ export function catalogoDeFilas(filas: FilaDelCatalogo[]): CategoriaParaVender[]
     }
     productoDe(categoria, f).formas.push(formaDe(f));
   }
+  // Surtidas, oculta por ahora (Santiago, 2026-11-20): con MOSTRAR_SURTIDAS vuelve a aparecer.
+  if (MOSTRAR_SURTIDAS) {
+    for (const categoria of categorias) {
+      const surtidas = surtidasDe(categoria);
+      if (surtidas) categoria.productos.unshift(surtidas);
+    }
+  }
   return categorias;
 }
+
+/** Los paquetes de la docena variada de cada categoría: Docena, Media docena y Unidad. */
+export const paquetesDelCatalogo = (catalogo: CategoriaParaVender[]): Paquetes =>
+  armarPaquetes(
+    catalogo.flatMap((c) =>
+      c.productos.flatMap((p) =>
+        p.formas.map((f) => ({
+          categoriaId: c.id,
+          unidades: f.unidades ?? null,
+          precioCentavos: f.precioCentavos,
+          compartido: f.compartido ?? false,
+          nombre: f.presentacion,
+        })),
+      ),
+    ),
+  );
 
 /** El ticket con los precios que rigen hoy; lo que ya no se vende sale. */
 export function preciosAlDia(

@@ -40,7 +40,7 @@ export const AYUDAS_DE_CONTROL: Partial<Record<ClaveDeAyuda, Ayuda>> = {
         titulo: 'Qué tenés que saber',
         puntos: [
           'Los números salen del mismo cálculo que Inicio: el mismo dato no da distinto en dos pantallas.',
-          'Lo anulado no cuenta. Las ventas incluyen las del mostrador y las cargadas a mano.',
+          'Lo anulado no cuenta. Las ventas son todas las cargadas en el sistema.',
           'Un producto que cambió de categoría cuenta en la que tiene hoy.',
           'En Balance, un mes sin gastos cargados muestra solo las ventas, sin balance.',
         ],

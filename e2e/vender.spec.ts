@@ -8,7 +8,7 @@ import {
   type ProductoSembrado,
 } from '../tests/menu-de-prueba';
 import { borrarVentas, idsDeVentasDelProducto, ventaDe } from '../tests/ventas-de-prueba';
-import { SESIONES, aviso, esperarHidratacion } from './ayudas';
+import { irAlCobro, volverALosProductos, SESIONES, aviso, esperarHidratacion } from './ayudas';
 
 let categoria: CategoriaSembrada;
 let medialuna: ProductoSembrado;
@@ -49,9 +49,7 @@ async function ventaDeLaMedialuna() {
 test.describe('con la sesion de caja', () => {
   test.use({ storageState: SESIONES.caja });
 
-  test('arma el ticket, cobra en efectivo con vuelto y queda listo para otra venta', async ({
-    page,
-  }) => {
+  test('arma el ticket, cobra en efectivo y queda listo para otra venta', async ({ page }) => {
     await abrirLaCategoria(page);
     await sumar(page, 'Docena').click();
     await sumar(page, 'Docena').click();
@@ -59,12 +57,15 @@ test.describe('con la sesion de caja', () => {
     await expect(ticket(page).getByRole('listitem')).toHaveCount(2);
     await page.getByRole('button', { name: `Uno menos de ${medialuna.nombre} · Unidad` }).click();
     await expect(ticket(page).getByRole('listitem')).toHaveCount(1);
-    await expect(ticket(page)).toContainText('2 × $18.000,00');
+    await expect(ticket(page)).toContainText(`${medialuna.nombre} · Docena`);
+    await irAlCobro(page);
     await medio(page, 'Medio de pago', 'Efectivo').click();
-    await page.getByLabel('Paga con').fill('40.000');
-    await expect(page.getByText('Vuelto: $4.000,00')).toBeVisible();
     await page.getByRole('button', { name: 'Cobrar $36.000,00' }).click();
     await expect(page.getByText('Venta guardada: $36.000,00')).toBeVisible();
+    // Al cobrar en efectivo aparece la ventana de vuelto; tocándola no se va sola.
+    const vuelto = page.getByRole('dialog', { name: 'Calcular vuelto' });
+    await vuelto.getByLabel('¿Cuánto te pagaron?').fill('40.000');
+    await expect(vuelto).toContainText('$4.000,00');
     await expect(ticket(page).getByRole('listitem')).toHaveCount(0);
     const venta = await ventaDeLaMedialuna();
     expect(venta).toMatchObject({ origen: 'mostrador', en_la_caja: true, total_centavos: 3600000 });
@@ -74,6 +75,7 @@ test.describe('con la sesion de caja', () => {
   test('cobra con dos medios: una parte en efectivo y el resto con débito', async ({ page }) => {
     await abrirLaCategoria(page);
     await sumar(page, 'Docena').click();
+    await irAlCobro(page);
     await medio(page, 'Medio de pago', 'Efectivo').click();
     await page.getByRole('button', { name: 'Pagar con dos medios' }).click();
     await medio(page, 'Segundo medio', 'Tarjeta de débito').click();
@@ -99,9 +101,11 @@ test.describe('con la sesion de caja', () => {
       .update({ monto_centavos: 1900000 })
       .eq('presentacion_id', categoria.presentaciones[0]!.id)
       .is('producto_id', null);
+    await irAlCobro(page);
     await medio(page, 'Medio de pago', 'QR').click();
     await page.getByRole('button', { name: 'Cobrar $18.000,00' }).click();
     await expect(aviso(page)).toHaveText(MENSAJES_DEL_MOSTRADOR.precio);
+    await volverALosProductos(page);
     await expect(sumar(page, 'Docena')).toContainText('$19.000');
     await expect(ticket(page).getByRole('listitem')).toHaveCount(1);
     expect(await idsDeVentasDelProducto(medialuna.id)).toEqual([]);
@@ -121,13 +125,13 @@ test.describe('con la sesion de caja', () => {
   test('sin medio elegido no cobra', async ({ page }) => {
     await abrirLaCategoria(page);
     await sumar(page, 'Unidad').click();
+    await irAlCobro(page);
     await expect(page.getByRole('button', { name: 'Cobrar $2.000,00' })).toBeDisabled();
   });
 
   test('guarda capturas del mostrador', async ({ page }, info) => {
     await abrirLaCategoria(page);
     await sumar(page, 'Docena').click();
-    await medio(page, 'Medio de pago', 'Efectivo').click();
     await page.evaluate(() => document.fonts.ready);
     await page.screenshot({ path: `e2e/capturas/vender-${info.project.name}.png`, fullPage: true });
   });
@@ -139,6 +143,7 @@ test.describe('con la sesion del admin', () => {
   test('también vende desde Vender', async ({ page }) => {
     await abrirLaCategoria(page);
     await sumar(page, 'Unidad').click();
+    await irAlCobro(page);
     await medio(page, 'Medio de pago', 'Transferencia').click();
     await page.getByRole('button', { name: 'Cobrar $2.000,00' }).click();
     await expect(page.getByText('Venta guardada: $2.000,00')).toBeVisible();

@@ -83,9 +83,10 @@ describe('esquemaVentaDelMostrador', () => {
     expect(mensajeDe({ ...venta, pagos })).toBe('Cada medio lleva más de $0.');
   });
 
-  it('los pagos suman el total del ticket', () => {
+  // Desde el pedido 102 lo controla la base: es la que conoce la docena variada y el peso.
+  it('que los pagos sumen el total lo controla la base', () => {
     const pagos = [{ medio: 'efectivo', montoCentavos: 3_500_000 }];
-    expect(mensajeDe({ ...venta, pagos })).toBe('Los pagos no suman el total.');
+    expect(mensajeDe({ ...venta, pagos })).toBeUndefined();
   });
 });
 
@@ -125,8 +126,9 @@ describe('el tipo de venta y Fuera de la caja (pedido 99)', () => {
     expect(ventaDelMostradorParaLaBase(conTipo)).toMatchObject({ canal_id: CANAL });
   });
 
-  it('acepta cobrar Fuera de la caja', () => {
+  // Santiago lo sacó (2026-11-20, pedido 102): en el mostrador se cobra solo con los medios de la caja.
+  it('ya no acepta cobrar Fuera de la caja', () => {
     const pagos = venta.pagos.map((p, i) => (i === 0 ? { ...p, medio: 'fuera_de_caja' } : p));
-    expect(esquemaVentaDelMostrador.safeParse({ ...venta, pagos }).success).toBe(true);
+    expect(esquemaVentaDelMostrador.safeParse({ ...venta, pagos }).success).toBe(false);
   });
 });

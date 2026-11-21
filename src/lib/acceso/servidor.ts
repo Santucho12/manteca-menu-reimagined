@@ -16,6 +16,7 @@ import {
 } from './estados';
 import { diaEnArgentina } from '../fechas';
 import { cierresConDiferencia, gastosSinClasificar } from '../inicio/consultas';
+import { ventasParaAvisar } from '../inicio/ventasParaAvisar';
 import { enlacesDelMarco, type EnlaceDelMarco, type PendientesDelMarco } from './marco';
 import { accesoYDatos, accesoYLectura } from './enParalelo';
 
@@ -101,15 +102,17 @@ export async function datosDelMarco({ cliente, perfil, estado }: Acceso): Promis
   return { nombre: perfil.nombre, enlaces: enlacesDelMarco(estado, pendientes) };
 }
 
-const SIN_PENDIENTES: PendientesDelMarco = { usuarios: 0, caja: 0, gastos: 0 };
+const SIN_PENDIENTES: PendientesDelMarco = { usuarios: 0, caja: 0, gastos: 0, ventas: 0 };
 
 // Los mismos casos que los avisos de Inicio, para que la sidebar y el Inicio digan lo mismo.
 async function pendientesDelAdmin(cliente: Cliente): Promise<PendientesDelMarco> {
   const hoy = diaEnArgentina(new Date());
-  const [usuarios, caja, gastos] = await Promise.all([
+  const [usuarios, caja, gastos, ventas] = await Promise.all([
     pendientesActuales(cliente),
     cierresConDiferencia(cliente, hoy),
     gastosSinClasificar(cliente),
+    ventasParaAvisar(cliente, hoy),
   ]);
-  return { usuarios, caja: caja.cantidad, gastos: gastos.cantidad };
+  const venta = ventas.descuentosGrandes + ventas.editadasHoy;
+  return { usuarios, caja: caja.cantidad, gastos: gastos.cantidad, ventas: venta };
 }

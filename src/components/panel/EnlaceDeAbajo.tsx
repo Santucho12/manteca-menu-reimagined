@@ -26,7 +26,7 @@ export function EnlaceDeAbajo({ enlace, activo }: Props) {
       className={cn(LUGAR_DE_ABAJO, activo ? 'text-primary' : 'text-muted-foreground')}
     >
       <span className="relative">
-        <Insignia numero={enlace.insignia} lugar="abajo" />
+        <Insignia numero={enlace.insignia} clave={enlace.clave} />
         <Icono size={20} strokeWidth={activo ? 2.5 : 2} />
       </span>
       <span className="truncate max-w-full px-0.5">{enlace.texto}</span>

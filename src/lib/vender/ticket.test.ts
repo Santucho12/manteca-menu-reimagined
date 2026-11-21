@@ -2,10 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   cambiarCantidad,
   claveDe,
+  cuentaDeTicket,
   sacarDelTicket,
-  subtotalDe,
   sumarAlTicket,
-  totalDelTicket,
   type ItemDelCatalogo,
   type RenglonDelTicket,
 } from './ticket';
@@ -73,11 +72,12 @@ describe('sacarDelTicket', () => {
 describe('subtotales y total', () => {
   it('cada renglón es precio por cantidad, y el total la suma, en centavos enteros', () => {
     const ticket = [conCantidad(docena, 2), conCantidad(cafe, 3)];
-    expect(subtotalDe(ticket[0]!)).toBe(3_600_000);
-    expect(totalDelTicket(ticket)).toBe(3_600_000 + 1_050_000);
+    const cuenta = cuentaDeTicket(ticket, {});
+    expect(cuenta.renglones[0]!.subtotalCentavos).toBe(3_600_000);
+    expect(cuenta.totalCentavos).toBe(3_600_000 + 1_050_000);
   });
 
   it('un ticket vacío da $0', () => {
-    expect(totalDelTicket([])).toBe(0);
+    expect(cuentaDeTicket([], {}).totalCentavos).toBe(0);
   });
 });

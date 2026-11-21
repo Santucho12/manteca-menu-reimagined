@@ -78,20 +78,33 @@ export async function abrirSeccion(page: Page, nombre: string): Promise<void> {
 type FinDelCierre = { facturado?: Record<string, string>; comentario?: string };
 
 /**
- * Del formulario de la caja al guardado, por las ventanas del cierre: cada tipo de venta sin
+ * Del formulario de la caja al guardado, por la ventana del cierre: cada tipo de venta sin
  * monto pedido va en cero. Termina con el clic en guardar (pedido 100).
  */
 export async function terminarCierre(page: Page, fin: FinDelCierre = {}): Promise<void> {
   await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
   const paso = page.getByRole('dialog');
-  while (/¿Cuánto se hizo con/.test(await paso.getByRole('heading').innerText())) {
-    const nombre = (await paso.getByRole('heading').innerText()).replace(
-      /^¿Cuánto se hizo con (.*)\?$/,
-      '$1',
-    );
-    await paso.getByLabel(`Facturado en ${nombre}`).fill(fin.facturado?.[nombre] ?? '0');
-    await paso.getByRole('button', { name: 'Siguiente', exact: true }).click();
+  // Todos los tipos de venta van en la misma ventana (Santiago, 2026-11-20).
+  for (const etiqueta of await paso
+    .locator('label', { hasText: /^Facturado en / })
+    .allInnerTexts()) {
+    const nombre = etiqueta.trim().replace(/^Facturado en /i, '');
+    await paso.getByLabel(etiqueta.trim()).fill(fin.facturado?.[nombre] ?? '0');
   }
   if (fin.comentario) await paso.getByLabel('Comentario (opcional)').fill(fin.comentario);
   await paso.getByRole('button', { name: /^Guardar (cierre|cambios)$/ }).click();
+}
+
+/** Vender va en tres pasos (pedido 102): de los productos al cobro, dejando el tipo que esté. */
+export async function irAlCobro(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Siguiente' }).click();
+  await page.getByRole('button', { name: 'Siguiente' }).click();
+}
+
+/** Vuelve al paso de los productos desde la barra de pasos. */
+export async function volverALosProductos(page: Page): Promise<void> {
+  await page
+    .getByRole('list', { name: 'Pasos de la venta' })
+    .getByRole('button', { name: /Productos/ })
+    .click();
 }

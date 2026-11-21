@@ -1,6 +1,6 @@
 import { AlertTriangle } from 'lucide-react';
 import { useId, type ReactNode } from 'react';
-import { BOTON_CANCELAR, BOTON_PRINCIPAL } from '@/components/panel/estilos';
+import { BOTON_PRINCIPAL, BOTON_SUAVE } from '@/components/panel/estilos';
 
 type Props = {
   titulo: string;
@@ -17,7 +17,7 @@ export function AvisoParaConfirmar({ titulo, children, enviando, alConfirmar, al
     <div
       role="alertdialog"
       aria-labelledby={id}
-      className="space-y-4 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-amber-900"
+      className="space-y-4 rounded-2xl border border-blue-300 bg-blue-50 p-4 text-blue-900"
     >
       <div className="flex items-start gap-3">
         <AlertTriangle size={18} className="shrink-0 mt-0.5" aria-hidden="true" />
@@ -29,7 +29,7 @@ export function AvisoParaConfirmar({ titulo, children, enviando, alConfirmar, al
         </div>
       </div>
       <div className="flex flex-col-reverse gap-3 max-sm:[&>*]:flex-none sm:flex-row">
-        <button type="button" onClick={alVolver} className={BOTON_CANCELAR}>
+        <button type="button" onClick={alVolver} className={BOTON_SUAVE}>
           Volver
         </button>
         <button

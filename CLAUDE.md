@@ -166,7 +166,8 @@ resultado, y se anota cómo.
   costos y totales, de la base o del cálculo en el servidor.
 - **Caja** vende en el mostrador, carga el cierre de su turno y ve sus propios cierres, nada
   más: no ve las ventas ni lo vendido en el día, para contar la caja a ciegas, y no anula
-  (Santiago, 2026-11-18, pedido 89). **Encargado**
+  (Santiago, 2026-11-18, pedido 89). Por excepción, ve las ventas de los últimos 30 minutos y
+  puede editarlas en ese tiempo, con motivo (Santiago, 2026-11-20, pedido 102). **Encargado**
   queda fuera de la primera fase: el rol existe, pero no se puede asignar desde la pantalla
   y no tiene acceso a nada. Todo lo demás que no sea el menú público es solo para Admin, y
   los tests comprueban que invitado, caja y encargado reciben rechazo fuera de lo que les
@@ -188,8 +189,12 @@ El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
 - El panel (`/admin`) se rehace desde cero (pedido 43), sin tomar como referencia el diseño
   anterior, con la estética de Plan Reminder Pro: letras, piezas y movimiento (Santiago,
   2026-10-21). Está entera en la skill `estetica-panel`. Los colores son los de PRP (FiestaCobra),
-  con sus fondos y grises fríos, y el azul `#1e40af` con letra blanca en lugar de su verde de
-  marca; el logo de Manteca sigue dorado (Santiago, 2026-11-19, pedido 101).
+  con sus fondos y grises fríos, y la tinta `#121B2B` con letra blanca en lugar de su verde de
+  marca. El panel no usa dorado: solo el logo de Manteca lo conserva (Santiago, 2026-11-20,
+  pedido 102). Por excepción, Ingresar, Crear cuenta y Cambiar contraseña llevan el dorado de Manteca
+  (`src/estilos/ingreso-dorado.css`).
+- El resto del panel, salvo Inicio y el ingreso, se lleva a la estética de tarjetas de Ventas e
+  Inicio, que está en la skill `estetica-sistema` (Santiago, 2026-11-21).
 - La carta pública (`/`) usa los colores y las tipografías de Manteca de `src/app/globals.css`.
 
 ## Stack
@@ -221,7 +226,7 @@ El detalle de base, permisos y RLS está en `migracion-supabase` y `tests-rls`.
 | `npm run verificar` | Lint, tipos, todos los tests y build, en ese orden; se corta en el primer error |
 | `npm run e2e` | Las pruebas de Playwright, sin abrir ventana (con `E2E_A_LA_VISTA=1`, a la vista) |
 | `npm run sembrar:pruebas` | Crea en la base de pruebas los usuarios de prueba que falten y repara la contraseña de los que ya estaban; a todos les deja su rol, su local y su estado |
-| `npm run sembrar:ejemplos` | Arma (o vuelve a armar) en la base de pruebas el "Local de ejemplo", aparte del principal: su menú copiado, las cuentas `ejemplo.admin@manteca.test` y `ejemplo.caja@manteca.test` (con la contraseña de las de prueba) y 60 días de ventas, cierres, gastos y proveedores inventados (pedido 93). Nunca en la real |
+| `npm run sembrar:ejemplos` | Arma (o vuelve a armar) en la base de pruebas el "Local de ejemplo", aparte del principal: su menú copiado, las cuentas `ejemplo.admin@manteca.test` y `ejemplo.caja@manteca.test` (con la contraseña de las de prueba) y un año (365 días) de ventas, cierres, gastos y proveedores inventados (pedidos 93 y 102). Nunca en la real |
 
 El lint es ESLint más el control de formato de Prettier. Si falla por formato, lo corrige
 `npx prettier --write .`.
@@ -275,6 +280,7 @@ Están en `.claude/skills/` y se usan dentro del flujo de superpowers.
 | `pre-finish` | Al terminar cualquier cambio de código, antes de decir que está hecho |
 | `verificacion-funcional` | Para revisar a fondo un módulo ya hecho; detecta y no arregla |
 | `estetica-panel` | Al construir, cambiar o revisar cualquier pantalla o estilo del panel (`/admin`) |
+| `estetica-sistema` | Al construir o rediseñar una pantalla del panel que no sea Inicio, Ingresar, Crear cuenta ni Cambiar contraseña: la estética de tarjetas de Ventas e Inicio |
 
 Las reglas viven en este archivo; las skills las repiten donde las aplican. Al cambiar una,
 se busca en todas (`pre-finish`, paso 7).

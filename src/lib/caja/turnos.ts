@@ -108,7 +108,3 @@ export function textoDePostergaciones(resumen: { veces: number; minutos: number 
   const veces = resumen.veces === 1 ? '1 vez' : `${resumen.veces} veces`;
   return `Se postergó ${veces} (${resumen.minutos} min).`;
 }
-
-/** El turno que viene elegido en una venta a mano cobrada en la caja: hoy el abierto, antes la noche. */
-export const turnoDeLaVentaAMano = (fecha: string, hoy: string, abierto: '1' | '2') =>
-  fecha === hoy ? abierto : ('2' as const);

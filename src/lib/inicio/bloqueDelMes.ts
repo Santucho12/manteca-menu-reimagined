@@ -9,7 +9,9 @@ export function porcionDelResultado(resultado: ResultadoDelPeriodo): number | nu
 }
 
 export function textoDeLaPorcion(porcion: number | null): string {
-  return porcion === null ? 'Sin calcular' : `Lo que queda de cada peso vendido: ${porcion}%`;
+  return porcion === null
+    ? 'Sin calcular'
+    : `Después de pagar los gastos, te queda el ${porcion}% de lo que vendiste`;
 }
 
 export function textoDeVentasDelMes(cantidad: number): string {

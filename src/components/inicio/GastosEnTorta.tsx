@@ -7,6 +7,7 @@ import { formatearPesos } from '@/lib/plata';
 import { TOOLTIP } from '@/components/reportes/estiloDelTooltip';
 import { EncabezadoDeTarjeta } from './EncabezadoDeTarjeta';
 import type { GastoDelDia } from '@/lib/reportes/gastos';
+import { SOMBRA_DE_INICIO } from './sombraDeInicio';
 
 // Los colores vivos de "Mes a mes" (verde, azul y rojo), el celeste, el ambar y el violeta para el resto.
 const COLORES = ['#10b981', '#0ea5e9', '#f43f5e', '#f59e0b', '#8b5cf6'];
@@ -19,7 +20,7 @@ export function GastosEnTorta({ gastos }: { gastos: GastoDelDia[] }) {
   return (
     <section
       aria-label="Gastos del mes"
-      className="h-full rounded-2xl border border-border bg-card p-6 md:p-8"
+      className={`h-full rounded-2xl border border-border bg-card p-6 md:p-8 ${SOMBRA_DE_INICIO}`}
     >
       <EncabezadoDeTarjeta
         titulo="Gastos por categoría"

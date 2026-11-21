@@ -14,7 +14,7 @@ export async function asegurarLocal(secreto: Cliente, nombre: string): Promise<s
   return creado.data!.id;
 }
 
-const CANALES = ['Cheaf', 'Encargo', 'Venta a comercios', 'Otro'];
+const CANALES = ['Cheaf', 'Venta a comercios', 'Otro'];
 const CATEGORIAS_DE_GASTO = [
   { nombre: 'Mercadería', pide_proveedor: true, de_sistema: false },
   ...['Alquiler', 'Servicios', 'Sueldos', 'Impuestos', 'Mantenimiento', 'Otros'].map((nombre) => ({

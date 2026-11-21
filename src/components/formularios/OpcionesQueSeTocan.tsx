@@ -27,8 +27,8 @@ export function OpcionesQueSeTocan({ nombre, etiqueta, opciones, valor, alCambia
               className={cn(
                 OPCION,
                 elegida
-                  ? 'bg-violet-600 text-white border-violet-600'
-                  : 'bg-white text-foreground border-border hover:border-violet-300',
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-white text-foreground border-border hover:border-blue-300',
               )}
             >
               <input

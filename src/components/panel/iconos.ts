@@ -1,9 +1,8 @@
 import {
-  BookOpen,
   Calculator,
+  Search,
+  House,
   ChartColumn,
-  History,
-  LayoutDashboard,
   ListChecks,
   Receipt,
   ShoppingCart,
@@ -11,28 +10,29 @@ import {
   Store,
   Truck,
   UserCog,
+  UtensilsCrossed,
+  CircleDollarSign,
   Users,
-  Wallet,
-  Wheat,
+  Package,
   type LucideIcon,
 } from 'lucide-react';
 import type { EnlaceDelPanel } from '@/lib/acceso/estados';
 
 // Plan Reminder Pro no tiene estas secciones: los eligio Claude (skill estetica-panel).
 export const ICONOS_DEL_PANEL: Record<EnlaceDelPanel['clave'], LucideIcon> = {
-  inicio: LayoutDashboard,
+  inicio: House,
   vender: Store,
-  menu: BookOpen,
+  menu: UtensilsCrossed,
   ventas: ShoppingBag,
   proveedores: Truck,
-  'materia-prima': Wheat,
+  'materia-prima': Package,
   compras: ShoppingCart,
   costos: Calculator,
   gastos: Receipt,
-  caja: Wallet,
+  caja: CircleDollarSign,
   reportes: ChartColumn,
   cierres: ListChecks,
   usuarios: Users,
-  auditoria: History,
+  auditoria: Search,
   cuenta: UserCog,
 };

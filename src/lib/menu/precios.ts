@@ -3,7 +3,12 @@ export type PrecioGuardado = {
   productoId: string | null;
   montoCentavos: number;
 };
-export type PresentacionDelMenu = { id: string; nombre: string };
+export type PresentacionDelMenu = {
+  id: string;
+  nombre: string;
+  unidades?: number | null;
+  gramos?: number | null;
+};
 export type OrigenDelPrecio = 'propio' | 'compartido';
 export type PrecioVigente = {
   presentacionId: string;

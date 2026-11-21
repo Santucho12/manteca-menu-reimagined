@@ -18,6 +18,12 @@ export type FilaDeVenta = {
   /** El nombre de quien la cargo; null si nadie (las viejas de Fudo entraban solas). */
   cargada_por: string | null;
   medios: Medio[];
+  /** Si se editó después de cobrarla (pedido 102): la lista lo marca al lado del estado. */
+  editada?: boolean;
+  /** Lo descontado al cobrar (pedido 102): la lista lo muestra debajo del total. */
+  descuento_centavos?: number;
+  descuento_porcentaje?: number | null;
+  descuento_tipo?: string | null;
 };
 export type Totales = {
   cobradoCentavos: number;
@@ -48,7 +54,7 @@ function comprobar<T>(
 function columnasDe(filtros: FiltrosDeVentas, contar: boolean): string {
   const pagos = `pagos:pagos_de_venta${filtros.medio ? '!inner' : ''}(medio)`;
   if (contar) return `id, ${pagos}`;
-  return `id, fecha, cerrada_en, origen, estado, anulado, total_centavos, canal:canales_de_venta(nombre), autor:perfiles!ventas_creado_por_fkey(nombre), ${pagos}`;
+  return `id, fecha, cerrada_en, origen, estado, anulado, editada, descuento_centavos, descuento_porcentaje, descuento_tipo, total_centavos, canal:canales_de_venta(nombre), autor:perfiles!ventas_creado_por_fkey(nombre), ${pagos}`;
 }
 
 function consultaDe(cliente: Cliente, filtros: FiltrosDeVentas, contar = false) {
@@ -60,6 +66,7 @@ function consultaDe(cliente: Cliente, filtros: FiltrosDeVentas, contar = false) 
   if (filtros.origen) consulta = consulta.eq('origen', filtros.origen);
   if (filtros.medio) consulta = consulta.eq('pagos.medio', filtros.medio);
   if (filtros.tipo) consulta = consulta.eq('canal_id', filtros.tipo);
+  if (filtros.persona) consulta = consulta.eq('creado_por', filtros.persona);
   if (filtros.estado === 'anulada') consulta = consulta.eq('anulado', true);
   else if (filtros.estado) consulta = consulta.eq('estado', filtros.estado).eq('anulado', false);
   return consulta;
@@ -72,6 +79,7 @@ async function totalesDe(cliente: Cliente, filtros: FiltrosDeVentas): Promise<To
     ...(filtros.origen ? { el_origen: filtros.origen } : {}),
     ...(filtros.medio ? { el_medio: filtros.medio } : {}),
     ...(filtros.tipo ? { el_canal: filtros.tipo } : {}),
+    ...(filtros.persona ? { el_creador: filtros.persona } : {}),
   });
   const [fila] = comprobar(respuesta, 'los totales');
   return {
@@ -119,26 +127,53 @@ export async function listarVentas(
   return { filas, total, pagina, totales: await totalesDe(cliente, filtros) };
 }
 
+const TREINTA_MINUTOS = 30 * 60 * 1000;
+
+/** Lo que Caja puede ver de Ventas: las de los últimos 30 minutos, las últimas primero (pedido 102). */
+export async function ventasRecientes(cliente: Cliente, ahora: Date): Promise<FilaDeVenta[]> {
+  const desde = new Date(ahora.getTime() - TREINTA_MINUTOS).toISOString();
+  const respuesta = await cliente
+    .from('ventas')
+    .select(columnasDe({ medio: null } as FiltrosDeVentas, false))
+    .gte('cerrada_en', desde)
+    .order('cerrada_en', { ascending: false })
+    .limit(50);
+  return (comprobar(respuesta, 'las ventas') as unknown as Leida[]).map(aFila);
+}
+
 export type Venta = Omit<FilaDeVenta, 'medios'> & {
   comentario: string | null;
   motivo_anulacion: string | null;
   renglones: {
     id: string;
+    producto_id: string | null;
+    presentacion_id: string | null;
     descripcion: string;
     cantidad: number;
     precio_unitario_centavos: number;
     subtotal_centavos: number;
+    precio_cambiado: boolean;
   }[];
   pagos: { medio: Medio; monto_centavos: number }[];
   /** Si suma a lo esperado de la caja de ese día (pedido 89). */
   en_la_caja: boolean;
+  canal_id: string | null;
+  /** El descuento del cobro (pedido 102): cuánto y por qué. */
+  descuento_centavos: number;
+  descuento_tipo: string | null;
+  motivo_descuento: string | null;
+  motivo_precio: string | null;
+  /** La edición (pedido 102): el motivo, quién y cuándo. */
+  motivo_edicion: string | null;
+  editada_por: string | null;
+  fecha_edicion: string | null;
 };
 
 const COLUMNAS_DE_VENTA =
-  'id, fecha, cerrada_en, origen, estado, anulado, total_centavos, comentario, motivo_anulacion, ' +
-  'en_la_caja, ' +
+  'id, fecha, cerrada_en, origen, estado, anulado, editada, total_centavos, comentario, motivo_anulacion, ' +
+  'en_la_caja, canal_id, motivo_edicion, editada_por, fecha_edicion, descuento_centavos, descuento_porcentaje, descuento_tipo, motivo_descuento, motivo_precio, ' +
   'canal:canales_de_venta(nombre), ' +
-  'renglones:renglones_de_venta(id, descripcion, cantidad, precio_unitario_centavos, subtotal_centavos), ' +
+  'renglones:renglones_de_venta(id, producto_id, presentacion_id, descripcion, cantidad, precio_unitario_centavos, subtotal_centavos, precio_cambiado), ' +
   'pagos:pagos_de_venta(medio, monto_centavos)';
 
 /** Una venta con sus renglones y sus pagos, o null si el id no sirve o no es del local. */
@@ -165,7 +200,8 @@ export async function canalesDeVenta(
   const respuesta = await cliente
     .from('canales_de_venta')
     .select('id, nombre, activo')
-    .order('activo', { ascending: false })
+    // El orden lo arma el admin arrastrando (pedido 102).
+    .order('orden')
     .order('nombre');
   return comprobar(respuesta, 'los tipos de venta');
 }

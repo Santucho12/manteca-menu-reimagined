@@ -39,3 +39,9 @@ const CIRCULO_GRIS = 'bg-slate-50 text-slate-400 border-slate-100';
 export function puestoDeMasVendidos(posicion: number): Puesto {
   return { medalla: MEDALLAS[posicion] ?? null, circulo: CIRCULO_GRIS };
 }
+
+// Los puestos alternan azul y verde azulado (Santiago, 2026-11-21, sin ámbar, naranja ni amarillo);
+// la barra se llena del todo al pasar el mouse.
+const BARRAS = ['bg-blue-500/50 group-hover:bg-blue-500', 'bg-teal-500/50 group-hover:bg-teal-500'];
+
+export const colorDeBarra = (posicion: number): string => BARRAS[posicion % BARRAS.length]!;

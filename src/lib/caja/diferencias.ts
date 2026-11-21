@@ -12,3 +12,10 @@ export const diferenciasPorMedio = (medios: ResultadoDeMedio[]): DiferenciaDeMed
 /** "Efectivo: faltan $5.000,00" o "Tarjeta de crédito: sobran $5.000,00". */
 export const textoDeDiferenciaDeMedio = ({ medio, centavos }: DiferenciaDeMedio): string =>
   `${nombreDeMedio(medio)}: ${textoDeDiferencia(centavos).toLowerCase()}`;
+
+/**
+ * Una diferencia dentro de la tolerancia no cuenta: va en gris. Fuera, falte o sobre, es una alerta
+ * y va en rojo (Santiago, 2026-11-21: sin ámbar).
+ */
+export const tonoDeDiferencia = (estado: string): 'gris' | 'rojo' =>
+  estado === 'cierra' ? 'gris' : 'rojo';

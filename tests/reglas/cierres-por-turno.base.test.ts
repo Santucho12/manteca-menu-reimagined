@@ -188,7 +188,7 @@ describe('el turno de cada venta', () => {
   it('la cargada a mano guarda el turno elegido', async () => {
     const datos = datosDeVenta(
       diaLibre(),
-      await idDeCanal('Encargo'),
+      await idDeCanal('Cheaf'),
       [{ producto, cantidad: 1, precioCentavos: 100000 }],
       { clave: crypto.randomUUID(), en_la_caja: true, turno: 1 },
     );

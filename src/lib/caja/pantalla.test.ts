@@ -14,10 +14,10 @@ const HOY = '2026-10-08';
 const PERSONA = '6f1c1e0a-2b1d-4c1e-9a6b-1f2e3d4c5b6a';
 
 describe('filtrosDeControl', () => {
-  it('por defecto, el mes en curso, todas las personas y todos los estados', () => {
+  it('por defecto, la última semana, todas las personas y todos los estados', () => {
     expect(filtrosDeControl({}, HOY)).toEqual({
-      desde: '2026-10-01',
-      hasta: '2026-10-31',
+      desde: '2026-10-02',
+      hasta: '2026-10-08',
       personaId: null,
       estado: null,
       anulados: false,
@@ -106,5 +106,14 @@ describe('tonoDelCierre', () => {
     [{ estado: 'cierra', anulado: true }, 'pizarra'],
   ] as const)('%j se pinta %s', (cierre, tono) => {
     expect(tonoDelCierre(cierre)).toBe(tono);
+  });
+});
+
+describe('el control arranca en la última semana (Santiago, 2026-11-20)', () => {
+  it('sin fechas: de hace 6 días a hoy, y el enlace no las repite', async () => {
+    const { filtrosDeControl, enlaceDeControl } = await import('./pantalla');
+    const filtros = filtrosDeControl({}, '2026-11-20');
+    expect([filtros.desde, filtros.hasta]).toEqual(['2026-11-14', '2026-11-20']);
+    expect(enlaceDeControl(filtros, '2026-11-20')).toBe('/admin/caja/control');
   });
 });

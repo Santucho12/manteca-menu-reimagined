@@ -16,7 +16,9 @@ function datosDe<T>(respuesta: Respuesta<T>, que: string): T {
 export async function leerFilasDelMenu(cliente: Cliente): Promise<FilasDelMenu> {
   const [categorias, presentaciones, productos, precios] = await Promise.all([
     cliente.from('categorias').select('id, nombre, subtitulo, foto, icono, orden, visible, activo'),
-    cliente.from('presentaciones').select('id, categoria_id, nombre, orden, activo'),
+    cliente
+      .from('presentaciones')
+      .select('id, categoria_id, nombre, orden, activo, unidades, gramos'),
     cliente
       .from('productos')
       .select('id, categoria_id, nombre, descripcion, etiqueta, orden, visible, activo'),

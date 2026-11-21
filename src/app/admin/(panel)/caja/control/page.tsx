@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
+import { Plus } from 'lucide-react';
+import Link from 'next/link';
+import { ACCESO_VERDE, ICONO_DE_ACCESO_SOBRE_VERDE } from '@/components/panel/estilos';
 import { Paginas } from '@/components/panel/Paginas';
 import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import {
   diasConCierre,
-  fondosDelRango,
   listarCierres,
   personasDeCaja,
   toleranciaDeCaja,
@@ -19,21 +21,17 @@ import {
   type ParametrosDeControl,
 } from '@/lib/caja/pantalla';
 import { diasSinAbrir } from '@/lib/caja/sinAbrir';
-import type { HorasDeCierre } from '@/lib/caja/turnos';
 import { diaEnArgentina } from '@/lib/fechas';
 import { montoParaEditar } from '@/lib/gastos/plata';
 import type { Cliente } from '@/lib/supabase/cliente';
 import { cantidadDePaginas } from '@/lib/usuarios/presentacion';
-import { AccesoACargarCierre } from '../AccesoACargarCierre';
-import { ListaDeCierres } from '../ListaDeCierres';
-import { DiasQueNoAbrio } from './DiasQueNoAbrio';
-import { DiasSinCierre, FiltrosDelControl } from './FiltrosDelControl';
-import { HorasEnTuerca } from './HorasEnTuerca';
-import { ToleranciaEnTuerca } from './ToleranciaEnTuerca';
+import { TablaDeCierres } from '../TablaDeCierres';
+import { AjustesDeCaja } from './AjustesDeCaja';
+import { FiltrosDelControl, TurnosPendientes } from './PiezasDelControl';
 
 export const metadata: Metadata = { title: 'Control de cierres' };
 
-// Todo en una tanda: los fondos anteriores salen de los cierres del rango, no de la lista.
+// Todo en una tanda: cada viaje a la base suma tiempo.
 const leerElControl = (cliente: Cliente, filtros: FiltrosDeControl) =>
   Promise.all([
     listarCierres(cliente, filtros),
@@ -41,34 +39,21 @@ const leerElControl = (cliente: Cliente, filtros: FiltrosDeControl) =>
     toleranciaDeCaja(cliente),
     diasConCierre(cliente, filtros.desde, filtros.hasta),
     turnosPendientes(cliente, filtros.desde, filtros.hasta),
-    fondosDelRango(cliente, filtros.desde, filtros.hasta),
     diasSinAbrir(cliente, filtros.desde, filtros.hasta),
     horasDeCierreDelLocal(cliente),
   ]);
 
-async function datosDelControl(searchParams: Promise<ParametrosDeControl>) {
-  const hoy = diaEnArgentina(new Date());
-  const filtros = filtrosDeControl(await searchParams, hoy);
-  const { datos } = await exigirPaginaYLeer('admin', (cliente) => leerElControl(cliente, filtros));
-  const [lista, personas, tolerancia, conCierre, faltan, fondos, sinAbrir, horas] = datos;
-  const noAbrio = diasQueNoAbrio({ conCierre, sinAbrir });
-  return { hoy, filtros, lista, personas, tolerancia, faltan, noAbrio, fondos, horas };
-}
+// Los días sin cierre no son de nadie: con una persona elegida no se muestran.
+const sinPersona = (f: FiltrosDeControl, estado: string) =>
+  !f.personaId && (f.estado === null || f.estado === estado);
 
-// Los dias sin cierre no son de nadie: con una persona elegida no se muestran.
-const verPendientes = (f: FiltrosDeControl) =>
-  !f.personaId && (f.estado === null || f.estado === 'pendiente');
-const verNoAbrio = (f: FiltrosDeControl) =>
-  !f.personaId && (f.estado === null || f.estado === 'no_abrio');
-
-type PropsDeAcciones = { tolerancia: string; horas: HorasDeCierre };
-
-const Acciones = ({ tolerancia, horas }: PropsDeAcciones) => (
-  <>
-    <AccesoACargarCierre />
-    <HorasEnTuerca inicial={horas} />
-    <ToleranciaEnTuerca inicial={tolerancia} />
-  </>
+const CargarCierre = () => (
+  <Link href="/admin/caja" className={ACCESO_VERDE}>
+    <span className={ICONO_DE_ACCESO_SOBRE_VERDE}>
+      <Plus size={15} aria-hidden="true" />
+    </span>
+    Cargar cierre
+  </Link>
 );
 
 export default async function ControlDeCierres({
@@ -76,30 +61,42 @@ export default async function ControlDeCierres({
 }: {
   searchParams: Promise<ParametrosDeControl>;
 }) {
-  const { hoy, filtros, lista, personas, tolerancia, faltan, noAbrio, fondos, horas } =
-    await datosDelControl(searchParams);
+  const hoy = diaEnArgentina(new Date());
+  const filtros = filtrosDeControl(await searchParams, hoy);
+  const { datos } = await exigirPaginaYLeer('admin', (c) => leerElControl(c, filtros));
+  const [lista, personas, tolerancia, conCierre, faltan, sinAbrir, horas] = datos;
+  const ultima = cantidadDePaginas(lista.total);
+  const ajustes = { ...horas, tolerancia: montoParaEditar(tolerancia) };
   return (
     <Pantalla
       titulo="Control de cierres"
       subtitulo="Los cierres de cada turno, quién los cargó y si cierran."
-      acciones={<Acciones tolerancia={montoParaEditar(tolerancia)} horas={horas} />}
+      acciones={
+        <>
+          <CargarCierre />
+          <AjustesDeCaja inicial={ajustes} />
+        </>
+      }
       ayuda="control"
     >
       <FiltrosDelControl filtros={filtros} personas={personas} />
-      <DiasSinCierre
-        turnos={verPendientes(filtros) ? faltan : []}
+      <TurnosPendientes
+        turnos={sinPersona(filtros, 'pendiente') ? faltan : []}
         abierto={filtros.estado === 'pendiente'}
       />
-      <DiasQueNoAbrio
-        dias={verNoAbrio(filtros) ? noAbrio : []}
-        abierto={filtros.estado === 'no_abrio'}
-      />
-      {sinCierresCargados(filtros.estado) ? null : (
-        <ListaDeCierres filas={lista.filas} conPersona fondos={fondos} />
+      {filtros.estado === 'pendiente' ? null : (
+        <TablaDeCierres
+          admin
+          filas={sinCierresCargados(filtros.estado) ? [] : lista.filas}
+          total={lista.total}
+          noAbrio={sinPersona(filtros, 'no_abrio') ? diasQueNoAbrio({ conCierre, sinAbrir }) : []}
+          primera={lista.pagina === 1}
+          ultima={lista.pagina >= ultima}
+        />
       )}
       <Paginas
         pagina={lista.pagina}
-        ultima={cantidadDePaginas(lista.total)}
+        ultima={ultima}
         enlaceA={(pagina) => enlaceDeControl({ ...filtros, pagina }, hoy)}
       />
     </Pantalla>

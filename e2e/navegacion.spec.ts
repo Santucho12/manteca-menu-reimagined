@@ -38,10 +38,10 @@ test('volver a una sección recién vista no la vuelve a pedir', async ({ page }
 test('después de guardar algo, la sección se vuelve a pedir', async ({ page }) => {
   try {
     await pasarDosVecesPorCaja(page);
-    await page.getByRole('button', { name: 'Diferencia aceptada' }).click();
+    await page.getByRole('button', { name: 'Ajustes de caja' }).click();
     await page.getByLabel('Tolerancia', { exact: true }).fill('750');
-    await page.getByRole('button', { name: 'Guardar tolerancia' }).click();
-    await expect(page.getByText('Tolerancia guardada.')).toBeVisible();
+    await page.getByRole('button', { name: 'Guardar ajustes' }).click();
+    await expect(page.getByText('Ajustes guardados.')).toBeVisible();
     // La ventana tapa la barra lateral: se cierra antes de cambiar de sección.
     await page.getByRole('button', { name: 'Cerrar' }).click();
     const pedidos = pedidosDe(page, '/admin');

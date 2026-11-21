@@ -15,7 +15,6 @@ export const PANTALLAS_PARA_CALENTAR = [
   `/admin/gastos/fijos/${SIN_ID}`,
   '/admin/vender',
   '/admin/ventas',
-  '/admin/ventas/nueva',
   `/admin/ventas/${SIN_ID}`,
   '/admin/ventas/canales',
   `/admin/ventas/canales/${SIN_ID}`,

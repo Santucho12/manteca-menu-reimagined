@@ -22,7 +22,7 @@ const vender = (fecha: string, precioCentavos: number, extra: Record<string, unk
 beforeAll(async () => {
   producto = await productoParaVender();
   local = await idDeCanal('Local');
-  encargo = await idDeCanal('Encargo');
+  encargo = await idDeCanal('Cheaf');
   ventas.push(
     await vender('2017-07-03', 100000, { canalId: local }),
     await vender('2017-07-04', 200000, { canalId: local }),
@@ -37,7 +37,7 @@ afterAll(() => borrarVentas(ventas, { categoriasDelMenu: [producto.categoriaId] 
 describe('reporte_ventas_por_tipo', () => {
   it('suma cada tipo sin lo anulado, de mayor a menor, y las viejas sin tipo aparte', async () => {
     expect(await ventasPorTipo(await clienteComo('admin'), PERIODO)).toEqual([
-      { canal_id: encargo, tipo: 'Encargo', ventas: 1, monto_centavos: 500000 },
+      { canal_id: encargo, tipo: 'Cheaf', ventas: 1, monto_centavos: 500000 },
       { canal_id: local, tipo: 'Local', ventas: 2, monto_centavos: 300000 },
       { canal_id: null, tipo: 'Sin tipo', ventas: 1, monto_centavos: 50000 },
     ]);

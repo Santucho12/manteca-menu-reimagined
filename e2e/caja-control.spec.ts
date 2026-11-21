@@ -117,11 +117,11 @@ test('marca un dia pendiente como que no abrio y lo deshace', async ({ page }) =
     .getByRole('button', { name: 'No abrió' })
     .click();
   await expect(page.getByText(/turnos? pendientes?/)).toHaveCount(0);
-  await page.getByText(/días? que el local no abrió/).click();
-  const marcados = page.getByRole('list', { name: 'Días que no abrió' });
-  await expect(marcados).toContainText(fechaParaMostrar(pendiente));
-  await marcados.getByRole('button', { name: 'Deshacer' }).click();
-  await expect(page.getByText(/días? que el local no abrió/)).toHaveCount(0);
+  // El día que no abrió va en la lista de cierres, en su fecha (Santiago, 2026-11-20).
+  const marcado = page.getByRole('row').filter({ hasText: fechaParaMostrar(pendiente) });
+  await expect(marcado).toContainText('No abrió');
+  await marcado.getByRole('button', { name: 'Deshacer' }).click();
+  await expect(page.getByRole('row').filter({ hasText: 'No abrió' })).toHaveCount(0);
   await expect(page.getByText(/turnos? pendientes?/)).toHaveCount(1);
 });
 
@@ -164,12 +164,12 @@ test('toda la fila del cierre abre su detalle', async ({ page }) => {
 test('cambia la tolerancia', async ({ page }) => {
   try {
     await page.goto('/admin/caja/control');
-    await page.getByRole('button', { name: 'Diferencia aceptada' }).click();
+    await page.getByRole('button', { name: 'Ajustes de caja' }).click();
     await page.getByLabel('Tolerancia', { exact: true }).fill('750');
-    await page.getByRole('button', { name: 'Guardar tolerancia' }).click();
-    await expect(page.getByText('Tolerancia guardada.')).toBeVisible();
+    await page.getByRole('button', { name: 'Guardar ajustes' }).click();
+    await expect(page.getByText('Ajustes guardados.')).toBeVisible();
     await page.reload();
-    await page.getByRole('button', { name: 'Diferencia aceptada' }).click();
+    await page.getByRole('button', { name: 'Ajustes de caja' }).click();
     await expect(page.getByLabel('Tolerancia', { exact: true })).toHaveValue('750');
   } finally {
     await restaurarTolerancia();

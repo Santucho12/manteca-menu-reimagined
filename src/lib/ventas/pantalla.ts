@@ -1,5 +1,4 @@
 import { MEDIOS_DE_VENTA as MEDIOS, type MedioDeVenta as Medio } from '../caja/resultado';
-import { mesDe } from '../gastos/pantalla';
 import { diaEnArgentina } from '../fechas';
 import { esFechaValida } from '../gastos/vencimientos';
 import { formatearPesos } from '../plata';
@@ -18,23 +17,24 @@ export type FiltrosDeVentas = {
   medio: Medio | null;
   /** El id del tipo de venta (pedido 90). */
   tipo: string | null;
+  /** Quién cobró (pedido 102). */
+  persona?: string | null;
   estado: EstadoDeLista | null;
   pagina: number;
 };
 export type ParametrosDeVentas = Record<string, string | string[] | undefined>;
 
-const NOMBRES_DE_ORIGEN: Record<Origen, string> = {
-  mostrador: 'Mostrador',
-  manual: 'A mano',
-  fudo: 'Fudo',
-};
 const NOMBRES_DE_ESTADO: Record<string, string> = {
   cerrada: 'Cerrada',
   cancelada: 'Cancelada',
   en_curso: 'En curso',
 };
 
-export const nombreDeOrigen = (origen: Origen) => NOMBRES_DE_ORIGEN[origen];
+type ParaElSubtitulo = { hora: string | null; canal: string | null };
+
+/** Lo que va debajo del título del detalle: la hora y el tipo de venta. */
+export const subtituloDeVenta = ({ hora, canal }: ParaElSubtitulo) =>
+  [hora, canal].filter(Boolean).join(' · ') || 'El detalle de lo que se vendió.';
 
 /** Como se ve el estado: lo anulado manda sobre lo que dijera la venta. */
 export function estadoDeVenta(venta: { estado: string; anulado: boolean }): string {
@@ -54,30 +54,30 @@ const fechaDe = (texto: string | undefined) => (texto && esFechaValida(texto) ? 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const idDe = (texto: string | undefined) => (texto && UUID.test(texto) ? texto : null);
 
-/** Los filtros de la lista, leidos de la URL; sin fechas, el mes de hoy en Argentina. */
+/** Los filtros de la lista, leidos de la URL; sin fechas, hoy en Argentina. */
 export function filtrosDeVentas(parametros: ParametrosDeVentas, hoy: string): FiltrosDeVentas {
-  const mes = mesDe(hoy);
-  const desde = fechaDe(unValor(parametros.desde)) ?? mes.desde;
-  const hasta = fechaDe(unValor(parametros.hasta)) ?? mes.hasta;
+  const desde = fechaDe(unValor(parametros.desde)) ?? hoy;
+  const hasta = fechaDe(unValor(parametros.hasta)) ?? hoy;
   return {
     desde: desde <= hasta ? desde : hasta,
     hasta: desde <= hasta ? hasta : desde,
     origen: unoDe(ORIGENES, unValor(parametros.origen)),
     medio: unoDe(MEDIOS, unValor(parametros.medio)),
     tipo: idDe(unValor(parametros.tipo)),
+    persona: idDe(unValor(parametros.persona)),
     estado: unoDe(ESTADOS_DE_LISTA, unValor(parametros.estado)),
     pagina: numeroDePagina(unValor(parametros.pagina)),
   };
 }
 
 export function enlaceDeVentas(filtros: FiltrosDeVentas, hoy: string): string {
-  const mes = mesDe(hoy);
   const parametros = new URLSearchParams();
-  if (filtros.desde !== mes.desde) parametros.set('desde', filtros.desde);
-  if (filtros.hasta !== mes.hasta) parametros.set('hasta', filtros.hasta);
+  if (filtros.desde !== hoy) parametros.set('desde', filtros.desde);
+  if (filtros.hasta !== hoy) parametros.set('hasta', filtros.hasta);
   if (filtros.origen) parametros.set('origen', filtros.origen);
   if (filtros.medio) parametros.set('medio', filtros.medio);
   if (filtros.tipo) parametros.set('tipo', filtros.tipo);
+  if (filtros.persona) parametros.set('persona', filtros.persona);
   if (filtros.estado) parametros.set('estado', filtros.estado);
   if (filtros.pagina > 1) parametros.set('pagina', String(filtros.pagina));
   const texto = parametros.toString();

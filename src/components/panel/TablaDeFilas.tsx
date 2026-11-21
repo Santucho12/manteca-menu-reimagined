@@ -17,6 +17,8 @@ export type Columna<T> = {
 type Props<T> = {
   etiqueta: string;
   icono: LucideIcon;
+  /** El color del ícono de la cabecera: por defecto el de marca. */
+  colorDelIcono?: string;
   total: number;
   filas: T[];
   clave: (fila: T) => string;
@@ -55,6 +57,7 @@ function Titulos<T>({ columnas }: { columnas: Columna<T>[] }) {
 export function TablaDeFilas<T>({
   etiqueta,
   icono: Icono,
+  colorDelIcono = 'text-primary',
   total,
   filas,
   clave,
@@ -64,7 +67,7 @@ export function TablaDeFilas<T>({
     <div className="hidden xl:block bg-card rounded-2xl shadow-premium border border-border overflow-hidden animate-in-slide">
       <div className="px-6 py-5 border-b border-border bg-secondary/20 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Icono size={18} className="text-primary" aria-hidden="true" />
+          <Icono size={18} className={colorDelIcono} aria-hidden="true" />
           <h2 className="text-base font-bold tracking-tight uppercase text-muted-foreground/80">
             {etiqueta}
           </h2>

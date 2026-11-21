@@ -18,8 +18,8 @@ const itemStyle: CSSProperties = { fontSize: 12, fontWeight: 700, padding: '2px 
 
 export const TOOLTIP = { contentStyle, labelStyle, itemStyle, separator: ': ' } as const;
 
-/** Barras y torta: en lugar del bloque gris, un resalte suave del azul de marca. */
-export const TOOLTIP_DE_BARRAS = { ...TOOLTIP, cursor: { fill: 'rgba(30, 64, 175, 0.08)' } };
+/** Barras y torta: en lugar del bloque gris, un resalte suave del color de marca. */
+export const TOOLTIP_DE_BARRAS = { ...TOOLTIP, cursor: { fill: 'rgba(15, 23, 42, 0.05)' } };
 
 /** Líneas: la guía vertical, fina y en el color del borde. */
 export const TOOLTIP_DE_LINEAS = { ...TOOLTIP, cursor: { stroke: '#cbd5e1', strokeWidth: 1 } };

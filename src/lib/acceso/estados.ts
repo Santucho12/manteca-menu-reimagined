@@ -37,7 +37,7 @@ export type EnlaceDelPanel = {
   href: string;
   texto: string;
   /** El titulo del grupo de la barra lateral; Mi cuenta no lleva: va aparte, abajo. */
-  grupo?: 'Día a día' | 'Plata' | 'Ajustes';
+  grupo?: 'Día a día' | 'Plata' | 'Mercadería' | 'Ajustes';
 };
 
 const INGRESAR = '/admin/ingresar';
@@ -56,6 +56,8 @@ const PERMITIDOS: Record<Exclude<Pagina, 'publica'>, readonly EstadoDeAcceso[]> 
 const ENLACES: Record<'caja' | 'admin', EnlaceDelPanel[]> = {
   caja: [
     { clave: 'vender', href: '/admin/vender', texto: 'Vender' },
+    // Solo las de los últimos 30 minutos, para corregirlas (pedido 102).
+    { clave: 'ventas', href: '/admin/ventas', texto: 'Ventas' },
     { clave: 'caja', href: '/admin/caja', texto: 'Cargar cierre' },
     { clave: 'cierres', href: '/admin/caja/mis-cierres', texto: 'Mis cierres' },
     { clave: 'cuenta', href: '/admin/cuenta', texto: 'Mi cuenta' },
@@ -66,17 +68,17 @@ const ENLACES: Record<'caja' | 'admin', EnlaceDelPanel[]> = {
     { clave: 'ventas', href: '/admin/ventas', texto: 'Ventas', grupo: 'Día a día' },
     { clave: 'caja', href: '/admin/caja/control', texto: 'Caja', grupo: 'Día a día' },
     { clave: 'gastos', href: '/admin/gastos', texto: 'Gastos', grupo: 'Plata' },
-    { clave: 'proveedores', href: '/admin/proveedores', texto: 'Proveedores', grupo: 'Plata' },
+    // Segunda fase: por ahora la navegación solo avisa "Próximamente" (src/lib/acceso/proximamente.ts).
+    { clave: 'costos', href: '/admin/costos', texto: 'Costos', grupo: 'Plata' },
+    { clave: 'reportes', href: '/admin/reportes', texto: 'Reportes', grupo: 'Plata' },
+    { clave: 'compras', href: '/admin/compras', texto: 'Compras', grupo: 'Mercadería' },
+    { clave: 'proveedores', href: '/admin/proveedores', texto: 'Proveedores', grupo: 'Mercadería' },
     {
       clave: 'materia-prima',
       href: '/admin/materia-prima',
       texto: 'Materia prima',
-      grupo: 'Plata',
+      grupo: 'Mercadería',
     },
-    { clave: 'compras', href: '/admin/compras', texto: 'Compras', grupo: 'Plata' },
-    // Segunda fase: por ahora la navegación solo avisa "Próximamente" (src/lib/acceso/proximamente.ts).
-    { clave: 'costos', href: '/admin/costos', texto: 'Costos', grupo: 'Plata' },
-    { clave: 'reportes', href: '/admin/reportes', texto: 'Reportes', grupo: 'Plata' },
     { clave: 'menu', href: '/admin/menu', texto: 'Menú', grupo: 'Ajustes' },
     { clave: 'usuarios', href: '/admin/usuarios', texto: 'Usuarios', grupo: 'Ajustes' },
     { clave: 'auditoria', href: '/admin/auditoria', texto: 'Auditoría', grupo: 'Ajustes' },

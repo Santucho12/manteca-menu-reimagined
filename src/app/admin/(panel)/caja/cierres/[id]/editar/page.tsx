@@ -4,8 +4,7 @@ import { Pantalla } from '@/components/panel/Pantalla';
 import { exigirPaginaYLeer } from '@/lib/acceso/servidor';
 import { cierrePorId } from '@/lib/caja/consultas';
 import { datosParaEditar } from '@/lib/caja/paraEditar';
-import { fechaParaMostrar } from '@/lib/gastos/pantalla';
-import { FormularioDeCierre } from '../../../FormularioDeCierre';
+import { CargaDelCierre } from '../../../CargaDelCierre';
 
 export const metadata: Metadata = { title: 'Editar cierre' };
 
@@ -16,11 +15,11 @@ export default async function EditarCierre({ params }: { params: Promise<{ id: s
   if (!cierre || cierre.anulado) notFound();
   return (
     <Pantalla
-      titulo={`Editar el cierre del ${fechaParaMostrar(cierre.fecha)}`}
-      subtitulo="Corregí lo que haga falta: el resultado se vuelve a calcular con las ventas del día."
+      titulo="Editar cierre"
+      subtitulo="Corregí lo que haga falta: el resultado se vuelve a calcular con las ventas del turno."
       ayuda="control"
     >
-      <FormularioDeCierre
+      <CargaDelCierre
         id={cierre.id}
         inicial={datosParaEditar(cierre)}
         tipos={cierre.controles.map((c) => ({ canalId: c.canalId, nombre: c.tipo }))}

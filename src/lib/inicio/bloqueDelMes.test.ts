@@ -19,7 +19,9 @@ describe('porcionDelResultado', () => {
 
 describe('textoDeLaPorcion', () => {
   it('dice cuanto queda de cada peso', () =>
-    expect(textoDeLaPorcion(55)).toBe('Lo que queda de cada peso vendido: 55%'));
+    expect(textoDeLaPorcion(55)).toBe(
+      'Después de pagar los gastos, te queda el 55% de lo que vendiste',
+    ));
   it('sin porcion dice sin calcular', () => expect(textoDeLaPorcion(null)).toBe('Sin calcular'));
 });
 

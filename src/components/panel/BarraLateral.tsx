@@ -30,8 +30,8 @@ export function BarraLateral({ nombre, enlaces }: Props) {
       </div>
       {enlaces.length > 0 ? (
         <motion.nav aria-label="Panel" className="flex-1 min-h-0 flex flex-col px-3.5 pb-2">
-          {/* Sin desplazamiento (Santiago, 2026-11-02): en una pantalla baja se juntan los grupos. */}
-          <div className="flex-1 min-h-0 overflow-hidden space-y-4 [@media(max-height:760px)]:space-y-2 pt-1">
+          {/* Se desplaza si no entra (Santiago, 2026-11-20); en una pantalla baja, además, se juntan los grupos. */}
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden space-y-6 [@media(max-height:760px)]:space-y-3 pt-1">
             {grupos.map((grupo) => (
               <div key={grupo.titulo ?? 'secciones'} className="space-y-1">
                 {grupo.titulo ? (

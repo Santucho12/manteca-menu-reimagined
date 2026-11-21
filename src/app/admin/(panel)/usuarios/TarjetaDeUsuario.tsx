@@ -16,14 +16,14 @@ const TONOS: Record<EstadoDeCuenta, Tono> = {
 
 // La franja del costado dice el estado de un vistazo, antes de leer la insignia.
 const FRANJAS: Record<EstadoDeCuenta, string> = {
-  Pendiente: 'border-l-amber-400',
+  Pendiente: 'border-l-blue-400',
   Activa: 'border-l-emerald-400',
   Desactivada: 'border-l-slate-300',
   Rechazada: 'border-l-rose-400',
 };
 
 const TARJETA =
-  'flex flex-col sm:min-h-[12rem] gap-4 rounded-3xl border border-l-4 border-border bg-white p-5 shadow-sm shadow-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-900/10';
+  'flex flex-col sm:min-h-[12rem] gap-4 rounded-2xl border border-l-4 border-border bg-white p-5 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-900/10';
 
 export function TarjetaDeUsuario({ fila, yo }: { fila: FilaDeUsuario; yo: string }) {
   const cuenta = { id: fila.id, nombre: fila.nombre, email: fila.email };
@@ -38,7 +38,7 @@ export function TarjetaDeUsuario({ fila, yo }: { fila: FilaDeUsuario; yo: string
               {fila.nombre}
             </p>
             {fila.id === yo ? (
-              <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+              <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
                 Vos
               </span>
             ) : null}

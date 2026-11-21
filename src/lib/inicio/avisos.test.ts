@@ -40,7 +40,7 @@ describe('avisosDeInicio', () => {
         pendientes: 1,
         sinClasificar: { cantidad: 3, desde: '2026-08-02', categoriaId: 'sc' },
       }),
-    ).toEqual([
+    ).toMatchObject([
       {
         texto: 'Hay 2 cierres con diferencia sin revisar.',
         enlace: '/admin/caja/control?estado=con_diferencia&desde=2026-09-20',

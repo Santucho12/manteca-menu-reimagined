@@ -10,11 +10,12 @@ import {
 import { formatearPesos } from '@/lib/plata';
 import type { ResultadoDelPeriodo } from '@/lib/reportes/resultado';
 
-const ETIQUETA = 'text-slate-500 text-xs font-bold uppercase tracking-widest';
+// Los grises fríos de antes, fijos: los del panel ahora son cálidos (excepción de Santiago, pedido 102).
+const ETIQUETA = 'text-[#64748b] text-xs font-bold uppercase tracking-widest';
 
 type Props = { resultado: ResultadoDelPeriodo; cantidad: number };
 
-/** El bloque oscuro de FiestaCobra ("Cobranza del mes"), con sus colores, y las ventas del mes. */
+/** El bloque oscuro del mes, en su azul casi negro de siempre (Santiago, pedido 102), con las ventas del mes. */
 export function BloqueDelMes({ resultado, cantidad }: Props) {
   const porcion = porcionDelResultado(resultado);
   const final = resultado.resultadoCentavos;
@@ -24,7 +25,7 @@ export function BloqueDelMes({ resultado, cantidad }: Props) {
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="h-full relative overflow-hidden rounded-2xl bg-[#0F172A] border border-slate-800 shadow-2xl p-6 md:px-8 md:py-9"
+      className="h-full relative overflow-hidden rounded-2xl bg-[#0F172A] border border-[#1e293b] shadow-2xl p-6 md:px-8 md:py-9"
     >
       <div className="relative z-10 flex flex-col gap-9">
         <div className="space-y-6 min-w-0">
@@ -32,18 +33,18 @@ export function BloqueDelMes({ resultado, cantidad }: Props) {
             <div className="flex items-center justify-center text-emerald-400">
               <TrendingUp size={14} aria-hidden="true" />
             </div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">
+            <p className="text-xs font-bold text-[#94a3b8] uppercase tracking-[0.2em]">
               Ventas del mes
             </p>
           </div>
           <div className="space-y-3">
-            <p className="text-slate-500 text-sm font-medium">{textoDeVentasDelMes(cantidad)}</p>
+            <p className="text-[#64748b] text-sm font-medium">{textoDeVentasDelMes(cantidad)}</p>
             <p className="text-3xl md:text-4xl font-extrabold tracking-tighter text-white font-display break-words">
               {formatearPesos(resultado.ventasCentavos)}
             </p>
           </div>
         </div>
-        <div className="w-full space-y-5 p-5 md:p-6 rounded-xl bg-slate-900/50 border border-slate-800/50">
+        <div className="w-full space-y-5 p-5 md:p-6 rounded-xl bg-[#0f172a]/50 border border-[#1e293b]/50">
           <div className="grid grid-cols-2 gap-4 md:w-2/3">
             <div>
               <p className={ETIQUETA}>Gastos</p>
@@ -74,7 +75,7 @@ function Avance({ porcion }: { porcion: number | null }) {
   return (
     <div className="space-y-2">
       {porcion === null ? null : (
-        <div className="h-2.5 w-full bg-slate-800 rounded-full overflow-hidden p-0.5">
+        <div className="h-2.5 w-full bg-[#1e293b] rounded-full overflow-hidden p-0.5">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${porcion}%` }}
@@ -83,7 +84,7 @@ function Avance({ porcion }: { porcion: number | null }) {
           />
         </div>
       )}
-      <p className="text-xs text-slate-500 leading-relaxed">{textoDeLaPorcion(porcion)}</p>
+      <p className="text-xs text-[#64748b] leading-relaxed">{textoDeLaPorcion(porcion)}</p>
     </div>
   );
 }

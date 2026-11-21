@@ -70,7 +70,7 @@ async function cargarAMano(fecha: string, enLaCaja: boolean) {
   const datos: DatosDeVenta = {
     clave: crypto.randomUUID(),
     fecha,
-    canalId: await idDeCanal('Encargo'),
+    canalId: await idDeCanal('Cheaf'),
     medio: 'transferencia',
     comentario: '',
     enLaCaja,

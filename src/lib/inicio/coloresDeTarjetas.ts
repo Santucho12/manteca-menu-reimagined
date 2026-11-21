@@ -23,6 +23,13 @@ const COLORES: Record<string, ColorDeTarjeta> = {
     icono: 'bg-slate-50 text-slate-600',
     punto: 'bg-slate-600',
   },
+  Costo: { borde: 'border-rose-100', icono: 'bg-rose-50 text-rose-600', punto: 'bg-rose-600' },
+  Ganancia: { borde: 'border-blue-100', icono: 'bg-blue-50 text-blue-600', punto: 'bg-blue-600' },
+  'Cantidad de ventas': {
+    borde: 'border-slate-100',
+    icono: 'bg-slate-50 text-slate-600',
+    punto: 'bg-slate-600',
+  },
   Canceladas: {
     borde: 'border-slate-100',
     icono: 'bg-slate-50 text-slate-600',

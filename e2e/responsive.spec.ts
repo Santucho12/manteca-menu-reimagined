@@ -65,14 +65,6 @@ test('en el menú, el texto del producto usa todo el ancho de la fila', async ({
   expect(await anchoDe(enlace)).toBeGreaterThan((await anchoDe(fila)) * 0.8);
 });
 
-test('al cargar una venta, el producto tiene su propio renglón', async ({ page }) => {
-  await page.goto('/admin/ventas/nueva');
-  const cantidad = page.getByLabel('Cantidad 1');
-  const fila = cantidad.locator('..');
-  const selector = fila.locator('> div').first();
-  expect(await anchoDe(selector)).toBeGreaterThan((await anchoDe(fila)) * 0.9);
-});
-
 test('las tarjetas de usuarios no guardan lugar vacío', async ({ page }) => {
   await page.goto('/admin/usuarios');
   const tarjeta = page.getByRole('listitem').filter({ hasText: 'Prueba Admin' }).first();
@@ -168,12 +160,12 @@ test('en el celular todo se ve un poco más chico y con más aire', async ({ pag
 test('los botones de arriba bajan de renglón en vez de cortarse', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 780 });
   await page.goto('/admin/ventas');
-  for (const nombre of ['Vender', 'Cargar venta', 'Tipos de venta']) {
+  for (const nombre of ['Vender', 'Tipos de venta']) {
     const boton = (await page.getByRole('link', { name: nombre }).boundingBox())!;
     expect(boton.x + boton.width).toBeLessThanOrEqual(360);
   }
   await page.goto('/admin/caja/control');
-  const diferencia = page.getByRole('button', { name: 'Diferencia aceptada' });
+  const diferencia = page.getByRole('button', { name: 'Ajustes de caja' });
   const caja = (await diferencia.boundingBox())!;
   expect(caja.x + caja.width).toBeLessThanOrEqual(360);
 });

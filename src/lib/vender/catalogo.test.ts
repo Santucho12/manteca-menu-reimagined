@@ -26,7 +26,7 @@ describe('catalogoDeFilas', () => {
     ]);
     expect(catalogo.map((c) => c.nombre)).toEqual(['Facturas', 'Cafetería']);
     expect(catalogo[0]!.productos.map((p) => p.nombre)).toEqual(['Medialuna', 'Vigilante']);
-    expect(catalogo[0]!.productos[0]!.formas).toEqual([
+    expect(catalogo[0]!.productos[0]!.formas).toMatchObject([
       {
         productoId: 'p-Medialuna',
         presentacionId: 'f-Medialuna-Docena',

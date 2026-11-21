@@ -28,7 +28,7 @@ function Cabecera({
 }: Omit<Props, 'children'> & { id: string }) {
   const clases = cn(
     'px-4 md:px-6 py-4 md:py-5 flex flex-wrap items-center justify-between gap-3',
-    acento === 'ambar' ? 'bg-amber-50' : 'bg-white',
+    acento === 'ambar' ? 'bg-blue-50' : 'bg-white',
     !desplegable && 'border-b border-border',
   );
   const contenido = (
@@ -95,8 +95,8 @@ export function PanelDeLista({
     <section
       aria-labelledby={id}
       className={cn(
-        'overflow-hidden rounded-3xl border bg-white shadow-sm shadow-slate-900/5',
-        acento === 'ambar' ? 'border-amber-300' : 'border-border',
+        'overflow-hidden rounded-2xl border bg-white shadow-card',
+        acento === 'ambar' ? 'border-blue-300' : 'border-border',
       )}
     >
       {desplegable ? (

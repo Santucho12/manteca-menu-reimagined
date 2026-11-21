@@ -12,6 +12,9 @@ describe('el color de cada tarjeta de números', () => {
     ['Balance', 'blue'],
     ['Ticket promedio', 'slate'],
     ['Canceladas', 'slate'],
+    ['Costo', 'rose'],
+    ['Ganancia', 'blue'],
+    ['Cantidad de ventas', 'slate'],
   ])('%s va en %s, en el borde, el ícono y el punto', (etiqueta, familia) => {
     const { borde, icono, punto } = colorDeTarjeta(etiqueta);
     expect(borde).toBe(`border-${familia}-100`);

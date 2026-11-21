@@ -25,3 +25,7 @@ tsconfig.json
 # Documentacion
 docs/
 *.md
+
+# Skills de terceros copiadas tal cual (pedido 102)
+.claude/skills/impeccable/
+.claude/skills/design-taste-frontend/

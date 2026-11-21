@@ -1,5 +1,3 @@
-import { centavosDeCaja } from '../caja/esquemas';
-
 // Hasta seis cifras enteras y tres decimales con coma: 1,5 docenas o 0,250 kilos.
 const FORMA = /^(\d{1,6})(?:,(\d{1,3}))?$/;
 
@@ -23,18 +21,6 @@ export function subtotalDe(cantidad: number, precioCentavos: number): number {
 /** El total de la venta: la suma de los subtotales ya redondeados. */
 export function totalDe(renglones: { cantidad: number; precioCentavos: number }[]): number {
   return renglones.reduce((suma, r) => suma + subtotalDe(r.cantidad, r.precioCentavos), 0);
-}
-
-/** El total mientras se escribe la venta: los renglones a medio completar todavia no suman. */
-export function totalEscrito(renglones: { cantidad: string; precio: string }[]): number {
-  const completos = renglones.flatMap((r) => {
-    const cantidad = cantidadDe(r.cantidad);
-    const precioCentavos = centavosDeCaja(r.precio);
-    return cantidad !== undefined && precioCentavos !== undefined
-      ? [{ cantidad, precioCentavos }]
-      : [];
-  });
-  return totalDe(completos);
 }
 
 /** Una cantidad como se lee aca: 1,5 y no 1.5. */

@@ -1,16 +1,17 @@
 import { BarraAutomatica } from '@/components/panel/BarraAutomatica';
 import { FiltroDeFecha, FiltroDeSeleccion } from '@/components/panel/Filtros';
 import { nombreDeMedio } from '@/lib/caja/pantalla';
-import { MEDIOS_DE_VENTA as MEDIOS } from '@/lib/caja/resultado';
+import { MEDIOS } from '@/lib/caja/resultado';
 import { ESTADOS_DE_LISTA, type FiltrosDeVentas as Filtros } from '@/lib/ventas/pantalla';
 
 const NOMBRES_DE_ESTADO = { cerrada: 'Cerradas', anulada: 'Anuladas' };
 const todos = (texto: string) => ({ valor: '', texto });
 
-type Props = { filtros: Filtros; tipos: { id: string; nombre: string }[] };
+type Opcion = { id: string; nombre: string };
+type Props = { filtros: Filtros; tipos: Opcion[]; personas?: Opcion[] };
 
 /** Los filtros de la lista: cada cambio actualiza las ventas solo, sin botón. */
-export function FiltrosDeVentas({ filtros, tipos }: Props) {
+export function FiltrosDeVentas({ filtros, tipos, personas = [] }: Props) {
   return (
     <BarraAutomatica accion="/admin/ventas">
       <FiltroDeFecha id="desde" name="desde" etiqueta="Desde" valor={filtros.desde} />
@@ -31,6 +32,13 @@ export function FiltrosDeVentas({ filtros, tipos }: Props) {
         etiqueta="Tipo de venta"
         opciones={[todos('Tipo de venta'), ...tipos.map((t) => ({ valor: t.id, texto: t.nombre }))]}
         valor={filtros.tipo ?? ''}
+      />
+      <FiltroDeSeleccion
+        id="persona"
+        name="persona"
+        etiqueta="Empleado"
+        opciones={[todos('Empleado'), ...personas.map((p) => ({ valor: p.id, texto: p.nombre }))]}
+        valor={filtros.persona ?? ''}
       />
       <FiltroDeSeleccion
         id="estado"

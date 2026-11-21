@@ -13,17 +13,17 @@ export default async function PaginaDeCanales() {
   return (
     <Pantalla
       titulo="Tipos de venta"
-      subtitulo="Por dónde se vende lo que cargás a mano."
+      subtitulo="Por dónde se vende: se elige en Vender al cobrar."
       ayuda="canales"
     >
       <section
         aria-label="Sumar un tipo de venta"
-        className="rounded-3xl border border-border bg-white p-5 shadow-sm shadow-slate-900/5 md:p-6"
+        className="rounded-2xl border border-border bg-white p-5 shadow-card md:p-6"
       >
         <div className="mb-4">
           <p className="font-display text-lg font-bold tracking-tight">Sumar un tipo de venta</p>
           <p className="text-sm text-muted-foreground">
-            Escribí cómo se llama y aparece al cargar una venta a mano.
+            Escribí cómo se llama y aparece en Vender.
           </p>
         </div>
         <FormularioDeCanal />

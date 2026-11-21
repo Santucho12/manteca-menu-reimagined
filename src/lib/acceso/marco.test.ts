@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { enlacesDelMarco } from './marco';
 
-const NADA = { usuarios: 0, caja: 0, gastos: 0 };
+const NADA = { usuarios: 0, caja: 0, gastos: 0, ventas: 0 };
 const insigniaDe = (enlaces: ReturnType<typeof enlacesDelMarco>, clave: string) =>
   enlaces.find((enlace) => enlace.clave === clave)?.insignia;
 
 describe('enlacesDelMarco', () => {
   it('al admin, cada seccion con pendientes le muestra cuantos hay', () => {
-    const enlaces = enlacesDelMarco('admin', { usuarios: 2, caja: 1, gastos: 3 });
+    const enlaces = enlacesDelMarco('admin', { usuarios: 2, caja: 1, gastos: 3, ventas: 0 });
     expect(insigniaDe(enlaces, 'usuarios')).toBe(2);
     expect(insigniaDe(enlaces, 'caja')).toBe(1);
     expect(insigniaDe(enlaces, 'gastos')).toBe(3);
@@ -18,12 +18,20 @@ describe('enlacesDelMarco', () => {
     expect(enlacesDelMarco('admin', NADA).every((enlace) => enlace.insignia === null)).toBe(true);
   });
 
-  it('caja ve sus cuatro enlaces, sin numero', () => {
-    expect(enlacesDelMarco('caja', { usuarios: 3, caja: 2, gastos: 1 })).toEqual([
+  it('caja ve sus cinco enlaces, sin numero', () => {
+    expect(enlacesDelMarco('caja', { usuarios: 3, caja: 2, gastos: 1, ventas: 0 })).toEqual([
       { clave: 'vender', href: '/admin/vender', texto: 'Vender', insignia: null },
+      { clave: 'ventas', href: '/admin/ventas', texto: 'Ventas', insignia: null },
       { clave: 'caja', href: '/admin/caja', texto: 'Cargar cierre', insignia: null },
       { clave: 'cierres', href: '/admin/caja/mis-cierres', texto: 'Mis cierres', insignia: null },
       { clave: 'cuenta', href: '/admin/cuenta', texto: 'Mi cuenta', insignia: null },
     ]);
+  });
+});
+
+describe('la insignia de Ventas (pedido 102)', () => {
+  it('al admin le cuenta los descuentos grandes y las ventas editadas de hoy', () => {
+    const enlaces = enlacesDelMarco('admin', { ...NADA, ventas: 4 });
+    expect(enlaces.find((e) => e.clave === 'ventas')?.insignia).toBe(4);
   });
 });

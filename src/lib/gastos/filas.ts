@@ -51,7 +51,7 @@ export function fechaCorta(fecha: string): { dia: string; mes: string } {
 
 export type TonoDeMarca = 'violeta' | 'celeste' | 'ambar';
 
-/** Cada frecuencia de un fijo se pinta distinto; el resto de las marcas, en violeta. */
+/** Cada frecuencia de un fijo se pinta distinto; el resto de las marcas, en el tono «violeta» (hoy gris). */
 export function tonoDeLaMarca(marca: string): TonoDeMarca {
   if (marca === `Fijo · ${nombreDeFrecuencia('bimestral')}`) return 'celeste';
   if (marca === `Fijo · ${nombreDeFrecuencia('anual')}`) return 'ambar';

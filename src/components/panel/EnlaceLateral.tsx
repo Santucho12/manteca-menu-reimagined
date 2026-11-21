@@ -51,9 +51,11 @@ export function EnlaceLateral({
           : 'border border-transparent text-muted-foreground hover:text-foreground hover:bg-white hover:border-border hover:shadow-md hover:shadow-slate-900/5',
       )}
     >
-      <Icono size={compacto ? 18 : 20} strokeWidth={activo ? 2.5 : 2} />
+      <span className="relative shrink-0">
+        <Icono size={compacto ? 18 : 20} strokeWidth={activo ? 2.5 : 2} />
+        <Insignia numero={enlace.insignia} clave={enlace.clave} />
+      </span>
       <span className="relative z-10">{enlace.texto}</span>
-      <Insignia numero={enlace.insignia} lugar="lateral" />
       {/* Ultimo: queda sobre el icono (apenas tenido) y bajo el texto (z-10), como en PRP. */}
       {activo ? <FondoActivo deslizable={deslizable} /> : null}
     </Link>

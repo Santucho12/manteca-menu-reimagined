@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { mesDe } from '../gastos/pantalla';
+import { sumarDias } from '../reportes/periodos';
 import { esFechaValida } from '../gastos/vencimientos';
 import { formatearPesos } from '../plata';
 import { numeroDePagina, unValor } from '../usuarios/presentacion';
@@ -45,9 +45,12 @@ const fechaDe = (texto: string | undefined) => (texto && esFechaValida(texto) ? 
 const idDe = (texto: string | undefined) => (z.uuid().safeParse(texto).success ? texto! : null);
 const estadoDe = (texto: string | undefined) => ESTADOS.find((estado) => estado === texto) ?? null;
 
-/** Los filtros del control, leidos de la URL; sin fechas, el mes de hoy en Argentina. */
+// Sin fechas, la última semana: de hace 6 días a hoy en Argentina (Santiago, 2026-11-20).
+const semanaDe = (hoy: string) => ({ desde: sumarDias(hoy, -6), hasta: hoy });
+
+/** Los filtros del control, leidos de la URL; sin fechas, la última semana. */
 export function filtrosDeControl(parametros: ParametrosDeControl, hoy: string): FiltrosDeControl {
-  const mes = mesDe(hoy);
+  const mes = semanaDe(hoy);
   const desde = fechaDe(unValor(parametros.desde)) ?? mes.desde;
   const hasta = fechaDe(unValor(parametros.hasta)) ?? mes.hasta;
   return {
@@ -61,7 +64,7 @@ export function filtrosDeControl(parametros: ParametrosDeControl, hoy: string): 
 }
 
 export function enlaceDeControl(filtros: FiltrosDeControl, hoy: string): string {
-  const mes = mesDe(hoy);
+  const mes = semanaDe(hoy);
   const parametros = new URLSearchParams();
   if (filtros.desde !== mes.desde) parametros.set('desde', filtros.desde);
   if (filtros.hasta !== mes.hasta) parametros.set('hasta', filtros.hasta);

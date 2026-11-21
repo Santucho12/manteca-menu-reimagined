@@ -37,13 +37,14 @@ async function sumar(page: Page, nombre: string) {
   await page.getByRole('button', { name: 'Sumar' }).click();
 }
 
-test('suma un canal y aparece al cargar una venta', async ({ page }) => {
+test('suma un canal y aparece en Vender', async ({ page }) => {
   const nombre = nuevoNombre();
   await sumar(page, nombre);
   await expect(fila(page, nombre)).toHaveCount(1);
-  await page.goto('/admin/ventas/nueva');
+  // Desde el pedido 102 no hay carga a mano: el tipo de venta se elige en Vender.
+  await page.goto('/admin/vender');
   await expect(
-    page.getByLabel('Tipo de venta', { exact: true }).getByRole('option', { name: nombre }),
+    page.getByRole('group', { name: 'Tipo de venta' }).getByRole('button', { name: nombre }),
   ).toHaveCount(1);
 });
 
@@ -64,9 +65,10 @@ test('cada canal tiene editar, un interruptor para activarlo y borrar, a la vist
   await interruptor.click();
   await expect(interruptor).toHaveAttribute('aria-checked', 'false');
   await expect(canal).toContainText('Desactivado');
-  await page.goto('/admin/ventas/nueva');
+  // Desde el pedido 102 no hay carga a mano: el tipo de venta se elige en Vender.
+  await page.goto('/admin/vender');
   await expect(
-    page.getByLabel('Tipo de venta', { exact: true }).getByRole('option', { name: nombre }),
+    page.getByRole('group', { name: 'Tipo de venta' }).getByRole('button', { name: nombre }),
   ).toHaveCount(0);
   await page.goto('/admin/ventas/canales');
   await fila(page, nombre).getByRole('switch').click();

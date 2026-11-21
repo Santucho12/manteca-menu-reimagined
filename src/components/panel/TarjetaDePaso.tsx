@@ -5,7 +5,7 @@ type Props = { numero: number; titulo: string; ayuda?: string; children: ReactNo
 /** Un paso del formulario: número, título y una línea que dice qué se pide. */
 export function TarjetaDePaso({ numero, titulo, ayuda, children }: Props) {
   return (
-    <section className="rounded-3xl border border-border bg-white px-4 py-3 shadow-sm shadow-slate-900/5 md:px-6">
+    <section className="rounded-2xl border border-border bg-white px-4 py-3 shadow-card md:px-6">
       <div className="mb-3 flex items-center gap-3">
         <span
           aria-hidden="true"

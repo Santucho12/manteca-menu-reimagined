@@ -23,7 +23,7 @@ describe('ayudas', () => {
       'pagos vencidos',
       'No abrió',
       'en pesos',
-      'barra de avance',
+      'La barra dice',
       'Ventas:',
       'Gastos:',
       'Balance:',
@@ -120,19 +120,10 @@ describe('ayudas', () => {
     ],
     [
       'ventas',
-      [
-        'Mostrador',
-        'Vender',
-        'tipo de venta',
-        'Tipos de venta',
-        'precio del menú',
-        'Se cobró en la caja del local',
-        'motivo',
-        'futuro',
-        'lo que no se cobró en el mostrador',
-      ],
+      // Sin carga a mano desde el pedido 102: se vende solo en Vender.
+      ['mostrador', 'Vender', 'tipo de venta', 'motivo', 'quién la cobró'],
     ],
-    ['canales', ['Cheaf', 'Encargo', 'Venta a comercios', 'desactivado']],
+    ['canales', ['Vender', 'PedidosYa', 'desactivado']],
     [
       'caja',
       [
@@ -252,7 +243,7 @@ describe('ayudas', () => {
   it('la ayuda de Vender cuenta cómo se arma el ticket y cómo se cobra', () => {
     const ayuda = AYUDAS.vender;
     const texto = [ayuda.introduccion, ...ayuda.temas.flatMap((t) => t.puntos)].join(' ');
-    for (const parte of ['Tocá', 'dos medios', 'vuelto', 'precio del menú', 'a ciegas', 'admin']) {
+    for (const parte of ['Tocá', 'dos medios', 'precio del menú', 'a ciegas', 'admin']) {
       expect(texto).toContain(parte);
     }
   });

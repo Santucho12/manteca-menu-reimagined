@@ -96,18 +96,19 @@ describe('requiereSesion', () => {
 });
 
 describe('enlacesDelPanel', () => {
-  it('el admin ve sus secciones agrupadas: Dia a dia, Plata y Ajustes, y Mi cuenta aparte', () => {
+  // Cuatro grupos, la opcion 2 que eligio Santiago (2026-11-20, pedido 102).
+  it('el admin ve sus secciones agrupadas: Dia a dia, Plata, Mercaderia y Ajustes, y Mi cuenta aparte', () => {
     const enlaces = enlacesDelPanel('admin');
     expect(enlaces.map((enlace) => enlace.texto)).toEqual([
       'Inicio',
       'Ventas',
       'Caja',
       'Gastos',
-      'Proveedores',
-      'Materia prima',
-      'Compras',
       'Costos',
       'Reportes',
+      'Compras',
+      'Proveedores',
+      'Materia prima',
       'Menú',
       'Usuarios',
       'Auditoría',
@@ -120,9 +121,9 @@ describe('enlacesDelPanel', () => {
       'Plata',
       'Plata',
       'Plata',
-      'Plata',
-      'Plata',
-      'Plata',
+      'Mercadería',
+      'Mercadería',
+      'Mercadería',
       'Ajustes',
       'Ajustes',
       'Ajustes',
@@ -130,9 +131,11 @@ describe('enlacesDelPanel', () => {
     ]);
   });
 
-  it('caja ve Vender primero, después Cargar cierre, Mis cierres y Mi cuenta', () => {
+  // Ventas para Caja: las de los últimos 30 minutos, para corregirlas (pedido 102).
+  it('caja ve Vender primero, después Ventas, Cargar cierre, Mis cierres y Mi cuenta', () => {
     expect(enlacesDelPanel('caja').map((enlace) => enlace.href)).toEqual([
       '/admin/vender',
+      '/admin/ventas',
       '/admin/caja',
       '/admin/caja/mis-cierres',
       '/admin/cuenta',

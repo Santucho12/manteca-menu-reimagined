@@ -38,11 +38,12 @@ describe('los colores del panel', () => {
     ['--color-muted-foreground', '#5c6b8a'],
     ['--color-border', '#e0e4eb'],
     ['--color-input', '#e0e4eb'],
-    ['--color-primary', '#1e40af'],
+    // Sin dorado (Santiago, 2026-11-20, pedido 102): la marca es la tinta, con letra blanca.
+    ['--color-primary', '#121b2b'],
     ['--color-primary-foreground', '#ffffff'],
-    ['--color-accent', '#1e40af'],
+    ['--color-accent', '#121b2b'],
     ['--color-accent-foreground', '#ffffff'],
-    ['--color-ring', '#1e40af'],
+    ['--color-ring', '#121b2b'],
   ])('%s es %s', (nombre, valor) => {
     expect(token(nombre)).toBe(valor);
   });
@@ -59,8 +60,8 @@ describe('los colores del panel', () => {
     ]);
   });
 
-  it('no quedan el dorado de texto ni el módulo sin color de marca', () => {
-    expect(css).not.toContain('#8a7330');
+  it('el panel no usa el dorado en ningún lado', () => {
+    expect(css).not.toMatch(/bfa042|8a7330/i);
     expect(css).not.toContain('modulo-sin-dorado');
   });
 

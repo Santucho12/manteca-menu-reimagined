@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { DiaDeLaSemana } from './semana';
-import { acumularSemana, resumenDeLaSemana } from './semanaAcumulada';
+import { AYUDAS_DE_LA_SEMANA, acumularSemana, resumenDeLaSemana } from './semanaAcumulada';
 
 // Plata en centavos: cada dia de la semana lleva lo vendido, no cuantas ventas fueron.
 const dia = (etiqueta: string, actual: number, anterior: number): DiaDeLaSemana => ({
@@ -89,6 +89,17 @@ describe('resumenDeLaSemana', () => {
       titulo: 'Vas igual que la semana pasada',
       chip: '= $6 k vs $6 k',
       estado: 'igual',
+    });
+  });
+});
+
+// Al pasar el mouse, cada etiqueta dice qué es (Santiago, 2026-11-20, pedido 102).
+describe('las explicaciones de las etiquetas de la semana', () => {
+  it('la frase explica la diferencia y la etiqueta las dos sumas', () => {
+    expect(AYUDAS_DE_LA_SEMANA).toEqual({
+      titulo:
+        'Cuánto más o menos vendiste en los últimos 7 días, con lo de hoy hasta ahora, contra los 7 días anteriores.',
+      chip: 'Lo vendido en los últimos 7 días contra lo vendido en los 7 días anteriores.',
     });
   });
 });

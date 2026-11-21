@@ -1,40 +1,30 @@
 import { describe, expect, it } from 'vitest';
 import { camposDelPaso, pasoSiguiente, pasosDelCierre } from './pasosDelCierre';
 
+// Santiago, 2026-11-20: todos los tipos de venta en una sola ventana, sin la cantidad de ventas.
 describe('pasosDelCierre', () => {
-  it('sin tipos controlados: la caja y después el comentario', () => {
-    expect(pasosDelCierre(0)).toEqual([{ tipo: 'caja' }, { tipo: 'comentario' }]);
-  });
-
-  it('con tipos: la caja, una ventana por tipo y al final el comentario', () => {
-    expect(pasosDelCierre(2)).toEqual([
-      { tipo: 'caja' },
-      { tipo: 'control', indice: 0 },
-      { tipo: 'control', indice: 1 },
-      { tipo: 'comentario' },
-    ]);
+  it('siempre dos pasos: la caja y después los tipos de venta con el comentario', () => {
+    expect(pasosDelCierre()).toEqual([{ tipo: 'caja' }, { tipo: 'final' }]);
+    expect(pasosDelCierre()).toEqual([{ tipo: 'caja' }, { tipo: 'final' }]);
   });
 });
 
 describe('camposDelPaso', () => {
   it('la caja valida sus montos, los retiros y los gastos, no los controles', () => {
-    const campos = camposDelPaso({ tipo: 'caja' });
+    const campos = camposDelPaso({ tipo: 'caja' }, 2);
     expect(campos).toContain('efectivo');
     expect(campos).toContain('quedaEnCaja');
     expect(campos).toContain('retiros');
-    expect(campos).not.toContain('controles');
+    expect(campos).not.toContain('controles.0.total');
     expect(campos).not.toContain('comentario');
   });
 
-  it('un tipo valida solo lo suyo', () => {
-    expect(camposDelPaso({ tipo: 'control', indice: 1 })).toEqual([
+  it('el último paso valida lo facturado de cada tipo y el comentario', () => {
+    expect(camposDelPaso({ tipo: 'final' }, 2)).toEqual([
+      'controles.0.total',
       'controles.1.total',
-      'controles.1.cantidad',
+      'comentario',
     ]);
-  });
-
-  it('el último paso valida el comentario', () => {
-    expect(camposDelPaso({ tipo: 'comentario' })).toEqual(['comentario']);
   });
 });
 

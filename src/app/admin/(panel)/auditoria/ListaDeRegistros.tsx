@@ -1,6 +1,7 @@
+import { EtiquetaDeColor, Persona } from '@/components/panel/Etiquetas';
+import { colorDeAccion } from '@/lib/panel/coloresDelSistema';
 import { ScrollText } from 'lucide-react';
 import Link from 'next/link';
-import { Chip } from '@/components/panel/Insignias';
 import { ListaDelPanel, type Columna } from '@/components/panel/ListaDelPanel';
 import { SinResultados } from '@/components/panel/SinResultados';
 import {
@@ -26,6 +27,11 @@ function queEs(registro: RegistroDeAuditoria, nombres: Nombres): string {
   return `${modulo} · ${dato}${nombre ? ` · ${nombre}` : ''}`;
 }
 
+// Alta y reactivación en verde, anulación en rojo, desactivación en gris (Santiago, 2026-11-21).
+const Accion = ({ accion }: { accion: string }) => (
+  <EtiquetaDeColor color={colorDeAccion(accion)}>{nombreDeAccion(accion)}</EtiquetaDeColor>
+);
+
 const Detalle = ({ registro }: { registro: RegistroDeAuditoria }) => (
   <Link href={`/admin/auditoria/${registro.id}`} className={ENLACE}>
     Ver el detalle
@@ -49,9 +55,9 @@ const columnas = (nombres: Nombres): Columna<RegistroDeAuditoria>[] => [
   {
     titulo: 'Persona',
     desde: 'lg',
-    celda: (r) => <span className="text-xs">{personaDe(r.usuario_id, nombres)}</span>,
+    celda: (r) => <Persona nombre={personaDe(r.usuario_id, nombres)} />,
   },
-  { titulo: 'Acción', celda: (r) => <Chip>{nombreDeAccion(r.accion)}</Chip> },
+  { titulo: 'Acción', celda: (r) => <Accion accion={r.accion} /> },
   { titulo: 'Detalle', alinear: 'der', celda: (r) => <Detalle registro={r} /> },
 ];
 
@@ -60,7 +66,7 @@ function Tarjeta({ registro, nombres }: { registro: RegistroDeAuditoria; nombres
     <>
       <div className="flex items-start justify-between gap-3">
         <p className="min-w-0 text-sm font-bold break-words">{queEs(registro, nombres)}</p>
-        <Chip>{nombreDeAccion(registro.accion)}</Chip>
+        <Accion accion={registro.accion} />
       </div>
       <p className="text-xs text-muted-foreground">
         {fechaYHora(registro.fecha)} · {personaDe(registro.usuario_id, nombres)}

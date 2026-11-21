@@ -27,14 +27,14 @@ export function InicioAdmin({ datos, hoy }: { datos: DatosDelInicio; hoy: string
         ayuda={<BotonDeAyuda ayuda={AYUDAS.inicio} />}
       />
       <EntradaDePantalla className="space-y-8">
-        <section aria-label="Este mes" className="space-y-3">
+        <section aria-label="Este mes" className="space-y-3" data-fondo="blanco">
           <TarjetasDelMes items={numerosDelMes(datos.actual, datos.anterior)} />
         </section>
-        <div className="grid grid-cols-1 xl:grid-cols-5 gap-8 xl:h-[24rem]">
-          <div className="xl:col-span-3">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 xl:h-[24rem]">
+          <div className="xl:col-span-2">
             <BloqueDelMes resultado={datos.actual.resultado} cantidad={cantidad} />
           </div>
-          <div className="xl:col-span-2 min-h-0">
+          <div className="xl:col-span-1 min-h-0">
             <Avisos avisos={datos.avisos} />
           </div>
         </div>

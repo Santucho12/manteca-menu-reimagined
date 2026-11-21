@@ -68,24 +68,14 @@ test('el detalle del cierre cuenta las postergaciones', async ({ page }) => {
 
 test('el admin cambia las horas de cierre', async ({ page }) => {
   await page.goto('/admin/caja/control');
-  await page.getByRole('button', { name: 'Horas de cierre' }).click();
-  const ventana = page.getByRole('dialog', { name: 'Horas de cierre' });
+  await page.getByRole('button', { name: 'Ajustes de caja' }).click();
+  const ventana = page.getByRole('dialog', { name: 'Ajustes de caja' });
   await ventana.getByLabel('Cierre del mediodía').fill('23:00');
   await ventana.getByLabel('Cierre de la noche').fill('22:00');
-  await ventana.getByRole('button', { name: 'Guardar horas' }).click();
+  await ventana.getByRole('button', { name: 'Guardar ajustes' }).click();
   await expect(ventana).toContainText('El cierre del mediodía va antes que el de la noche.');
   await ventana.getByLabel('Cierre del mediodía').fill('15:30');
   await ventana.getByLabel('Cierre de la noche').fill('23:50');
-  await ventana.getByRole('button', { name: 'Guardar horas' }).click();
-  await expect(ventana).toContainText('Horas guardadas.');
-});
-
-test('en la venta a mano cobrada en la caja, un día anterior viene en la noche', async ({
-  page,
-}) => {
-  await page.goto('/admin/ventas/nueva');
-  await page.getByLabel('Se cobró en la caja del local').check();
-  await expect(page.getByLabel('Turno')).toBeVisible();
-  await page.getByLabel('Fecha').fill(DIA);
-  await expect(page.getByLabel('Turno')).toHaveValue('2');
+  await ventana.getByRole('button', { name: 'Guardar ajustes' }).click();
+  await expect(ventana).toContainText('Ajustes guardados.');
 });

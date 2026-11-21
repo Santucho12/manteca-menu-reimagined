@@ -10,7 +10,7 @@ export function AvisoDeRepetido({ enviando, alConfirmar }: Props) {
     <div
       role="alertdialog"
       aria-labelledby="gasto-repetido"
-      className="space-y-4 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-amber-900"
+      className="space-y-4 rounded-2xl border border-blue-300 bg-blue-50 p-4 text-blue-900"
     >
       <div className="flex items-start gap-3">
         <AlertTriangle size={18} className="shrink-0 mt-0.5" aria-hidden="true" />

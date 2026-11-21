@@ -1,9 +1,10 @@
 import { EnlaceASeccion } from '@/components/panel/EnlaceASeccion';
 import { textoDePresentaciones } from '@/lib/inicio/meses';
-import { anchoDeBarra, puestoDeMasVendidos } from '@/lib/inicio/masVendidos';
+import { anchoDeBarra, colorDeBarra, puestoDeMasVendidos } from '@/lib/inicio/masVendidos';
 import { formatearPesos } from '@/lib/plata';
 import { EncabezadoDeTarjeta } from './EncabezadoDeTarjeta';
 import type { ProductoDelReporte } from '@/lib/reportes/ventas';
+import { SOMBRA_DE_INICIO } from './sombraDeInicio';
 
 /** Los 5 productos que mas plata dejaron en el mes, cada uno con su barra contra el primero. */
 export function MasVendidos({ productos }: { productos: ProductoDelReporte[] }) {
@@ -11,7 +12,7 @@ export function MasVendidos({ productos }: { productos: ProductoDelReporte[] }) 
   return (
     <section
       aria-labelledby="mas-vendidos"
-      className="h-full flex flex-col rounded-2xl border border-border bg-card p-6 md:p-8 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:shadow-slate-200/50 transition-shadow duration-300"
+      className={`h-full flex flex-col rounded-2xl border border-border bg-card p-6 md:p-8 ${SOMBRA_DE_INICIO}`}
     >
       <EncabezadoDeTarjeta
         titulo="Más vendidos"
@@ -56,7 +57,7 @@ function FilaDeProducto({ producto, posicion, ancho }: PropsDeFila) {
         </div>
         <div aria-hidden="true" className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
           <div
-            className="h-full rounded-full bg-emerald-500/45 transition-colors duration-300 group-hover:bg-emerald-500"
+            className={`h-full rounded-full transition-colors duration-300 ${colorDeBarra(posicion)}`}
             style={{ width: `${ancho}%` }}
           />
         </div>

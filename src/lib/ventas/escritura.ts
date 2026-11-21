@@ -88,6 +88,12 @@ export async function editarCanal(cliente: Cliente, id: string, { nombre }: { no
   );
 }
 
+/** Guarda el orden de los tipos de venta: los ids van en el orden nuevo. */
+export async function ordenarCanales(cliente: Cliente, ids: string[]): Promise<Resultado> {
+  const { error } = await cliente.rpc('ventas_ordenar_canales', { los_ids: ids });
+  return error ? fallo(mensajeDe(error)) : exito(undefined);
+}
+
 /** Borra un canal que nunca se uso; uno con ventas se desactiva (lo dice la base). */
 export async function borrarCanal(cliente: Cliente, id: string): Promise<Resultado> {
   const { error } = await cliente.rpc('ventas_borrar_canal', { el_canal: id });

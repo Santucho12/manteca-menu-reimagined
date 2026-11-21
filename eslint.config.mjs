@@ -51,5 +51,8 @@ export default defineConfig([
     'test-results/**',
     'playwright-report/**',
     'e2e/capturas/**',
+    // Skills de terceros copiadas tal cual (pedido 102): no son código del sistema.
+    '.claude/skills/impeccable/**',
+    '.claude/skills/design-taste-frontend/**',
   ]),
 ]);

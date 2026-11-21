@@ -34,3 +34,12 @@ describe('textoDeDiferenciaDeMedio', () => {
     );
   });
 });
+
+describe('tonoDeDiferencia (Santiago, 2026-11-20)', () => {
+  it('dentro de la tolerancia va en gris; fuera, rojo, falte o sobre (sin ámbar, 2026-11-21)', async () => {
+    const { tonoDeDiferencia } = await import('./diferencias');
+    expect(tonoDeDiferencia('cierra')).toBe('gris');
+    expect(tonoDeDiferencia('con_diferencia')).toBe('rojo');
+    expect(tonoDeDiferencia('con_diferencia')).toBe('rojo');
+  });
+});

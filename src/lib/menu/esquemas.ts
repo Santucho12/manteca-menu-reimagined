@@ -12,13 +12,23 @@ const pesos = z
 const nombre = (maximo: number) =>
   z.string().trim().min(1, 'Escribí el nombre.').max(maximo, `Usá hasta ${maximo} caracteres.`);
 
-export const esquemaPresentacion = z.object({
-  id: z.string(),
-  nombre: nombre(50),
-  compartido: pesos,
-  // Lo que tenia al abrir el formulario: si no cambio, no se manda.
-  compartidoOriginal: z.string(),
-});
+const MEDIDA = 'Escribí cuántas son, en un número entero mayor que cero.';
+
+export const esquemaPresentacion = z
+  .object({
+    id: z.string(),
+    nombre: nombre(50),
+    compartido: pesos,
+    // Lo que tenia al abrir el formulario: si no cambio, no se manda.
+    compartidoOriginal: z.string(),
+    // Cuánto es la forma de venta: unidades (Docena = 12) o gramos (Por cuarto = 250).
+    medida: z.enum(['', 'unidades', 'gramos']).optional(),
+    cantidad: z.string().trim().optional(),
+  })
+  .refine((p) => !p.medida || /^[1-9]\d{0,5}$/.test(p.cantidad ?? ''), {
+    message: MEDIDA,
+    path: ['cantidad'],
+  });
 
 export const esquemaCategoria = z.object({
   id: z.string(),
@@ -83,8 +93,18 @@ type Presentacion = DatosDeCategoria['presentaciones'][number];
 
 // Solo los compartidos que cambiaron: un precio que nadie toco no pisa un aumento hecho en el
 // medio. Sin la casilla de precio compartido, el nuevo es ninguno.
+// Sin el campo de la medida (un llamado viejo) no se tocan; con él, va una y la otra en nulo.
+function medidaParaLaBase(p: Presentacion) {
+  if (p.medida === undefined) return {};
+  const cantidad = p.medida ? Number(p.cantidad) : null;
+  return {
+    unidades: p.medida === 'unidades' ? cantidad : null,
+    gramos: p.medida === 'gramos' ? cantidad : null,
+  };
+}
+
 function presentacionParaLaBase(p: Presentacion, conCompartido: boolean) {
-  const base = { id: vacioANulo(p.id), nombre: p.nombre.trim() };
+  const base = { id: vacioANulo(p.id), nombre: p.nombre.trim(), ...medidaParaLaBase(p) };
   const nuevo = conCompartido ? aCentavos(p.compartido) : null;
   if (nuevo === aCentavos(p.compartidoOriginal)) return base;
   return { ...base, monto_compartido_centavos: nuevo };

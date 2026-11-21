@@ -4,10 +4,10 @@ import { cn } from '@/lib/utils';
 // El logo de Manteca en dorado sobre blanco (Santiago, 2026-10-26).
 const TAMANOS = {
   lateral: {
-    caja: 'flex flex-col items-center gap-1.5',
+    caja: 'flex flex-col items-center',
     recuadro: '',
-    logo: 'w-[124px]',
-    lema: 'text-[8px] font-bold text-muted-foreground/80 uppercase tracking-[0.18em] whitespace-nowrap',
+    logo: 'w-[164px]',
+    lema: null,
   },
   barra: {
     caja: 'flex items-center',

@@ -94,37 +94,76 @@ function Acciones({ i, total, quitar, mover }: Omit<PropsDeFila, 'conPrecio'>) {
   );
 }
 
+/**
+ * Cuánto es la forma de venta: unidades (la Docena son 12) o gramos (el Cuarto son 250). Con eso
+ * Vender junta la docena variada y cobra por peso (pedido 102).
+ */
+function MedidaDeLaForma({ i }: { i: number }) {
+  const { register, formState, watch } = useFormContext<DatosDeCategoria>();
+  const medida = watch(`presentaciones.${i}.medida`);
+  const error = formState.errors.presentaciones?.[i]?.cantidad?.message;
+  return (
+    <div className="flex flex-wrap items-center gap-2 pl-1 text-xs text-muted-foreground">
+      <label htmlFor={`medida-${i}`}>Cuánto es</label>
+      <select
+        id={`medida-${i}`}
+        className="h-9 rounded-lg border border-border bg-white px-2 text-xs font-semibold text-foreground"
+        {...register(`presentaciones.${i}.medida`)}
+      >
+        <option value="">Sin medida</option>
+        <option value="unidades">Unidades</option>
+        <option value="gramos">Gramos (se vende por peso)</option>
+      </select>
+      {medida ? (
+        <input
+          id={`cantidad-${i}`}
+          aria-label={`Cuántas ${medida} es la forma de venta ${i + 1}`}
+          inputMode="numeric"
+          placeholder={medida === 'gramos' ? '250' : '12'}
+          className="h-9 w-24 rounded-lg border border-border bg-white px-2 text-xs font-semibold text-foreground"
+          {...atributosDeError(`cantidad-${i}`, error)}
+          {...register(`presentaciones.${i}.cantidad`)}
+        />
+      ) : null}
+      <ErrorDeCampo id={`cantidad-${i}`} error={error} />
+    </div>
+  );
+}
+
 /** Una forma de venta de la categoria (Docena, Unidad...), con su precio si es para todos. */
 export function FormaDeVenta({ i, total, conPrecio, quitar, mover }: PropsDeFila) {
   const { register, formState } = useFormContext<DatosDeCategoria>();
   const errores = formState.errors.presentaciones?.[i];
   return (
-    <div className={columnasDeFormas(conPrecio)}>
-      <CampoEnLinea
-        id={`presentacion-${i}`}
-        etiqueta={`Forma de venta ${i + 1}`}
-        placeholder="Ej.: Docena"
-        error={errores?.nombre?.message}
-        {...register(`presentaciones.${i}.nombre`)}
-      />
-      {conPrecio ? (
+    <div className="space-y-1.5">
+      <div className={columnasDeFormas(conPrecio)}>
         <CampoEnLinea
-          id={`compartido-${i}`}
-          etiqueta={`Precio de la forma de venta ${i + 1}`}
-          prefijo="$"
-          inputMode="numeric"
-          error={errores?.compartido?.message}
-          {...register(`presentaciones.${i}.compartido`)}
+          id={`presentacion-${i}`}
+          etiqueta={`Forma de venta ${i + 1}`}
+          placeholder="Ej.: Docena"
+          error={errores?.nombre?.message}
+          {...register(`presentaciones.${i}.nombre`)}
         />
-      ) : null}
-      <div
-        className={cn(
-          'flex items-center justify-end gap-1 sm:h-12',
-          conPrecio ? 'col-span-2 sm:col-span-1' : 'h-12',
-        )}
-      >
-        <Acciones i={i} total={total} quitar={quitar} mover={mover} />
+        {conPrecio ? (
+          <CampoEnLinea
+            id={`compartido-${i}`}
+            etiqueta={`Precio de la forma de venta ${i + 1}`}
+            prefijo="$"
+            inputMode="numeric"
+            error={errores?.compartido?.message}
+            {...register(`presentaciones.${i}.compartido`)}
+          />
+        ) : null}
+        <div
+          className={cn(
+            'flex items-center justify-end gap-1 sm:h-12',
+            conPrecio ? 'col-span-2 sm:col-span-1' : 'h-12',
+          )}
+        >
+          <Acciones i={i} total={total} quitar={quitar} mover={mover} />
+        </div>
       </div>
+      <MedidaDeLaForma i={i} />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { GraficoPorMes } from '@/components/reportes/GraficoPorMes';
 import { mesesVisibles } from '@/lib/inicio/meses';
 import type { ResultadoDelMes } from '@/lib/reportes/resultado';
 import { EncabezadoDeTarjeta } from './EncabezadoDeTarjeta';
+import { SOMBRA_DE_INICIO } from './sombraDeInicio';
 
 type Props = { datos: ResultadoDelMes[]; mesEnCurso: string };
 
@@ -17,7 +18,7 @@ export function MesAMes({ datos, mesEnCurso }: Props) {
   return (
     <section
       aria-labelledby="mes-a-mes"
-      className="h-full flex flex-col rounded-2xl border border-border bg-card p-6 md:p-8"
+      className={`h-full flex flex-col rounded-2xl border border-border bg-card p-6 md:p-8 ${SOMBRA_DE_INICIO}`}
     >
       <EncabezadoDeTarjeta
         titulo="Mes a mes"

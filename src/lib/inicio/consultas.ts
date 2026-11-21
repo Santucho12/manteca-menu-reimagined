@@ -16,6 +16,7 @@ import { avisosDeInicio, type ConFecha, type DatosDeAvisos } from './avisos';
 import { masVendidos, mesEnCurso, ultimosDoceMeses } from './meses';
 import { pagosParaAvisar, type PagosParaAvisar } from './pagos';
 import { semanaContraSemana, rangoDeSemanas } from './semana';
+import { ventasParaAvisar } from './ventasParaAvisar';
 
 type Respuesta = {
   data: { fecha: string }[] | null;
@@ -77,13 +78,14 @@ async function ayerSinCierre(
 }
 
 export async function datosDeAvisos(cliente: Cliente, hoy: string): Promise<DatosDeAvisos> {
-  const [conDiferencia, ayer, pendientes, sinClasificar] = await Promise.all([
+  const [conDiferencia, ayer, pendientes, sinClasificar, ventas] = await Promise.all([
     cierresConDiferencia(cliente, hoy),
     ayerSinCierre(cliente, hoy),
     contarPendientes(cliente),
     gastosSinClasificar(cliente),
+    ventasParaAvisar(cliente, hoy),
   ]);
-  return { conDiferencia, ayerSinCierre: ayer, pendientes, sinClasificar };
+  return { conDiferencia, ayerSinCierre: ayer, pendientes, sinClasificar, ...ventas };
 }
 
 /** Lo vencido y lo que vence esta semana, de la misma lista que muestra Próximos pagos de Gastos. */
